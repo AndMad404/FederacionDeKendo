@@ -1,11 +1,10 @@
-import { ArrowRight } from "lucide-react";
 import type { Page } from "../types";
 
 interface HeroSectionProps {
   onNavigate: (page: Page) => void;
 }
 
-export function HeroBanner({ onNavigate }: HeroSectionProps) {
+function HeroBanner() {
   return (
     <section
       className="relative flex items-center justify-center"
@@ -21,7 +20,7 @@ export function HeroBanner({ onNavigate }: HeroSectionProps) {
       </picture>
       <div className="absolute inset-0 bg-gradient-to-b from-stone-950/40 via-stone-950/10 to-stone-950" />
 
-      <div className="relative z-10 w-full text-center text-white px-4 sm:px-6 py-12 sm:py-16 max-w-2xl mx-auto flex flex-col items-center gap-4 sm:gap-6">
+        <div className="relative z-10 w-full text-center text-white px-4 sm:px-6 py-12 sm:py-16 max-w-2xl mx-auto flex flex-col items-center gap-4 sm:gap-6">
         <p className="text-xs uppercase tracking-[0.25em] sm:tracking-[0.3em] text-red-400">
           剣道 — El camino de la espada
         </p>
@@ -33,17 +32,17 @@ export function HeroBanner({ onNavigate }: HeroSectionProps) {
         <p className="text-gray-300 text-sm sm:text-base max-w-sm sm:max-w-md leading-relaxed">
           Únete a nuestra comunidad y descubre el arte marcial
           japonés del kendo. Clases para todos los niveles, de
-          princante a dan avanzado.
+          principiante a dan avanzado.
         </p>
       </div>
     </section>
   );
 }
 
-export function HeroSection({ onNavigate }: HeroSectionProps) {
+export function HeroSection(_props: HeroSectionProps) {
   return (
     <main className="pt-16 bg-stone-950">
-      <HeroBanner onNavigate={onNavigate} />
+      <HeroBanner />
     </main>
   );
 }
