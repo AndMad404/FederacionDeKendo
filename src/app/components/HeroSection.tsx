@@ -1,10 +1,11 @@
+import { ArrowRight } from "lucide-react";
 import type { Page } from "../types";
 
 interface HeroSectionProps {
   onNavigate: (page: Page) => void;
 }
 
-function HeroBanner() {
+export function HeroBanner({ onNavigate }: HeroSectionProps) {
   return (
     <section
       className="relative flex items-center justify-center"
@@ -32,18 +33,17 @@ function HeroBanner() {
         <p className="text-gray-300 text-sm sm:text-base max-w-sm sm:max-w-md leading-relaxed">
           Únete a nuestra comunidad y descubre el arte marcial
           japonés del kendo. Clases para todos los niveles, de
-          principiante a dan avanzado.
+          princante a dan avanzado.
         </p>
-
       </div>
     </section>
   );
 }
 
-export function HeroSection(_props: HeroSectionProps) {
+export function HeroSection({ onNavigate }: HeroSectionProps) {
   return (
     <main className="pt-16 bg-stone-950">
-      <HeroBanner />
+      <HeroBanner onNavigate={onNavigate} />
     </main>
   );
 }
