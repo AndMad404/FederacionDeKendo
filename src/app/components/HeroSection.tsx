@@ -1,11 +1,10 @@
-import { ArrowRight } from "lucide-react";
 import type { Page } from "../types";
 
 interface HeroSectionProps {
   onNavigate: (page: Page) => void;
 }
 
-export function HeroBanner({ onNavigate }: HeroSectionProps) {
+function HeroBanner() {
   return (
     <section
       className="relative flex items-center justify-center"
@@ -33,31 +32,18 @@ export function HeroBanner({ onNavigate }: HeroSectionProps) {
         <p className="text-gray-300 text-sm sm:text-base max-w-sm sm:max-w-md leading-relaxed">
           Únete a nuestra comunidad y descubre el arte marcial
           japonés del kendo. Clases para todos los niveles, de
-          princante a dan avanzado.
+          principiante a dan avanzado.
         </p>
-        <div>
-          <button
-            onClick={() => onNavigate("galeria")}
-            className="inline-flex items-center justify-center gap-2 bg-red-700 hover:bg-red-600 text-white px-7 py-3 rounded-full text-sm font-medium transition-colors"
-          >
-            Ver galería <ArrowRight size={15} />
-          </button>
-          <button
-            onClick={() => onNavigate("galeria")}
-            className="inline-flex items-center justify-center gap-2 bg-red-700 hover:bg-red-600 text-white px-7 py-3 rounded-full text-sm font-medium transition-colors"
-          >
-            Ver afiliados <ArrowRight size={15} />
-          </button>
-        </div>
+
       </div>
     </section>
   );
 }
 
-export function HeroSection({ onNavigate }: HeroSectionProps) {
+export function HeroSection(_props: HeroSectionProps) {
   return (
     <main className="pt-16 bg-stone-950">
-      <HeroBanner onNavigate={onNavigate} />
+      <HeroBanner />
     </main>
   );
 }
