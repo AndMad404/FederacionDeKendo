@@ -158,10 +158,19 @@ function FeaturedImage({
 
 interface ThumbnailProps {
   image: GalleryImage;
+  liked: boolean;
+  likeCount: number;
   onClick: () => void;
+  onLike: (e: React.MouseEvent) => void;
 }
 
-function Thumbnail({ image, onClick }: ThumbnailProps) {
+function Thumbnail({
+  image,
+  liked,
+  likeCount,
+  onClick,
+  onLike,
+}: ThumbnailProps) {
   return (
     <div
       className="group relative overflow-hidden rounded-xl bg-stone-800 cursor-pointer"
@@ -230,9 +239,12 @@ export function GallerySection() {
               <Thumbnail
                 key={img.id}
                 image={img}
+                liked={isLiked(img.id)}
+                likeCount={count(img.id, img.likes)}
                 onClick={() =>
                   goTo((index + 1 + k) % IMAGES.length)
                 }
+                onLike={(e) => toggle(img.id, e)}
               />
             ))}
           </div>
