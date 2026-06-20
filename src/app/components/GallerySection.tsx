@@ -121,7 +121,7 @@ function FeaturedImage({
         key={image.id}
         src={image.src}
         alt={image.title}
-        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+        className="w-full h-full object-cover transition-transform min-h-[420px] duration-700 group-hover:scale-105"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 
@@ -198,10 +198,10 @@ export function GallerySection() {
 
   return (
     <main className="bg-stone-950 md:h-full">
-      <div className="mx-auto flex min-h-0 flex-col h-full">
+      <div className="mx-auto flex min-h-0 flex-col h-full min-h-[530px]">
         <div className="flex min-h-0 flex-col gap-4 md:flex-1">
           <div
-            className="flex min-h-0 flex-col gap-4 md:flex-1"
+            className="flex min-h-0 flex-col gap-4 md:flex-1 min-h-[530px]"
           >
             <FeaturedImage
               image={featured}

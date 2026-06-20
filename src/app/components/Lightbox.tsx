@@ -130,9 +130,10 @@ export function Lightbox({
               type="button"
               aria-label="Imagen anterior"
               onClick={(e) => {
-    			e.stopPropagation();
-    			onPrev();
-			  }}
+                e.stopPropagation();
+                onPrev();
+              }}
+              className="fixed left-3 md:left-6 top-1/2 -translate-y-1/2 z-50 flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
             >
               <ChevronLeft size={22} />
             </button>
@@ -140,9 +141,9 @@ export function Lightbox({
               type="button"
               aria-label="Imagen siguiente"
               onClick={(e) => {
-				e.stopPropagation();
-				onNext();
-			  }}
+                e.stopPropagation();
+                onNext();
+              }}
               className="fixed right-3 md:right-6 top-1/2 -translate-y-1/2 z-50 flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
             >
               <ChevronRight size={22} />

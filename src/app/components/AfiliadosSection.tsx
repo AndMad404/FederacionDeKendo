@@ -2,17 +2,17 @@ import { Clock, Mail, MapPin, Phone } from "lucide-react";
 
 const INFO = [
   {
-    icon: <MapPin size={16} />,
+    icon: <MapPin size={14} />,
     label: "Ubicacion",
     value: "Av. del Bushido 88, Ciudad",
   },
   {
-    icon: <Mail size={16} />,
+    icon: <Mail size={14} />,
     label: "Email",
     value: "info@kendodojo.com",
   },
   {
-    icon: <Phone size={16} />,
+    icon: <Phone size={14} />,
     label: "Telefono",
     value: "+1 (555) 000-0000",
   },
@@ -26,8 +26,8 @@ const SCHEDULE = [
 
 function DojoInfo({ title }: { title: string }) {
   return (
-    <section className="flex flex-col gap-5 rounded-2xl border border-white/5 bg-black/40 p-6">
-      <p className="text-base font-semibold text-white">
+    <section className="flex flex-col gap-2 rounded-2xl border border-white/5 bg-black/40 py-2 px-4 my-1">
+      <p className="text-base font-bold text-white">
         {title}
       </p>
 
@@ -48,13 +48,12 @@ function DojoInfo({ title }: { title: string }) {
       ))}
 
       <div>
-        <div className="mb-3 flex items-center gap-2">
-          <Clock size={14} className="text-red-500" />
+        <div className="mb-2 flex items-center ">
           <p className="text-xs font-bold text-white">
-            Horario de clases
+            Horario de clases:
           </p>
         </div>
-        <div className="grid max-w-[17rem] grid-cols-[auto_auto] gap-x-4 gap-y-1 text-xs text-white">
+        <div className="grid max-w-[15rem] grid-cols-[auto_auto] gap-x-4 text-xs text-white">
           {SCHEDULE.map((slot) => (
             <div key={slot.days} className="contents">
               <span>{slot.days}</span>
@@ -69,7 +68,7 @@ function DojoInfo({ title }: { title: string }) {
 
 function InfoCard() {
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 md:gap-8">
       <DojoInfo title="Informacion del dojo #1" />
       <DojoInfo title="Informacion del dojo #2" />
     </div>
@@ -79,7 +78,7 @@ function InfoCard() {
 export function AfiliadosSection() {
   return (
     <main className="rounded-3xl bg-stone-950 md:h-full">
-      <div className="relative flex min-h-[560px] items-center justify-center overflow-hidden rounded-3xl md:h-full md:min-h-0">
+      <div className="relative flex min-h-[53W0px] items-center justify-center overflow-hidden rounded-3xl md:h-full md:min-h-0">
         <img
           src="https://images.unsplash.com/photo-1765666738346-28ce4c332831?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHw1fHxrZW5kbyUyMG1hcnRpYWwlMjBhcnRzJTIwamFwYW5lc2UlMjBzd29yZHxlbnwxfHx8fDE3ODAxMDAzODB8MA&ixlib=rb-4.1.0&q=80&w=1080"
           alt="Nuestro dojo"
