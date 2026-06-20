@@ -8,7 +8,7 @@ const SOCIAL_LINKS = ["ig", "yt", "fb"];
 
 export function Footer({ onNavigate }: FooterProps) {
   return (
-    <footer className="bg-stone-950 border-t border-white/5 text-gray-500">
+    <footer className="text-white bg-stone-950 border-t border-white/5 text-gray-500">
       <div className="max-w-6xl mx-auto px-6 pt-4 grid grid-cols-1 md:grid-cols-[1.2fr_0.8fr] gap-10">
         <div className="flex flex-col items-center text-center md:items-start md:text-left">
           <div className="flex items-center gap-3 mb-4 justify-center md:justify-start">
@@ -32,13 +32,12 @@ export function Footer({ onNavigate }: FooterProps) {
         </div>
 
         <div>
-          <p className="text-white text-sm font-medium mb-4 tracking-wide">
+          <p className="text-sm text-center font-medium mb-4 tracking-wide">
             Contacto de la Federación
           </p>
           <ul className="space-y-2 text-sm">
             <li>info@kendodojo.com</li>
             <li>+1 (555) 000-0000</li>
-            <li>Av. del Bushido 88, Ciudad</li>
           </ul>
           <div className="flex gap-3 mt-2 justify-center md:justify-start">
             {SOCIAL_LINKS.map((s) => (
