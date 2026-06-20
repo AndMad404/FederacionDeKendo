@@ -8,7 +8,7 @@
     return (
       <header
         className="relative flex items-center justify-center"
-        style={{ minHeight: "calc(70svh)" }}
+        style={{ minHeight: "calc(80svh)" }}
       >
         <picture className="absolute inset-0 w-full h-full">
           <img
@@ -19,10 +19,12 @@
           />
         </picture>
 
-        <div className="relative z-10 text-center px-4 sm:px-6 py-12 sm:py-16 max-w-2xl mx-auto flex flex-col items-center gap-4 sm:gap-6 bg-black/40 rounded-lg">
+        <div className="relative z-10 text-center px-4 sm:px-6 py-8 sm:py-6 max-w-2xl  flex flex-col items-center gap-4 sm:gap-4 bg-black/40 rounded-4xl">
           <h1 className="text-xs tracking-[0.25em] sm:tracking-[0.3em] text-red-400">
-            FEDERACIÓN DE KENDO COSTA RICA<br />
-            剣道 <br />
+            FEDERACIÓN DE KENDO COSTA RICA
+            <br />
+            剣道
+            <br />
             EL CAMINO DE LA ESPADA
           </h1>
 
@@ -30,9 +32,10 @@
             Disciplina, Honor y Maestría
           </h2>
 
-          <p className="text-gray-300 text-sm sm:text-base max-w-sm sm:max-w-md leading-relaxed">
+          <p className="text-white text-sm sm:text-base max-w-sm sm:max-w-md leading-relaxed">
             Únete a nuestra comunidad y descubre el arte marcial japonés del kendo.
-            <br />Clases para todos los niveles, de principiante a dan avanzado.
+            <br />
+            Clases para todos los niveles, de principiante a dan avanzado.
           </p>
         </div>
       </header>
@@ -41,7 +44,7 @@
 
   export function HeroSection(_props: HeroSectionProps) {
     return (
-      <main className="pt-16 bg-stone-950">
+      <main>
         <HeroBanner />
       </main>
     );
