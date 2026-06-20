@@ -55,10 +55,9 @@ export function Footer({ onNavigate }: FooterProps) {
           </div>
         </div>
       </div>
-      <div className="border-t border-white/5 px-4 py-6">
+      <div className="border-t border-white/5 px-4 py-4">
         <p className="text-center text-xs text-gray-700">
-          © 2026 Kendo Dojo. Todos los derechos reservados. —
-          一期一会
+          © 2026 Kendo Dojo. Todos los derechos reservados.
         </p>
       </div>
     </footer>

@@ -113,7 +113,7 @@ function FeaturedImage({
   onLike,
 }: FeaturedImageProps) {
   return (
-    <div
+    <picture
       className="group relative overflow-hidden rounded-2xl bg-stone-800 flex-1 cursor-pointer min-h-[220px] md:min-h-0"
       onClick={onOpen}
     >
@@ -152,7 +152,7 @@ function FeaturedImage({
         <NavArrow direction="left" onClick={onPrev} />
         <NavArrow direction="right" onClick={onNext} />
       </div>
-    </div>
+    </picture>
   );
 }
 
