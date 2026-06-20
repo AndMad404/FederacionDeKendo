@@ -127,18 +127,25 @@ export function Lightbox({
         <div className="flex items-center justify-between mt-4 text-white">
           <div className="flex items-center gap-2">
             <button
+              type="button"
               aria-label="Imagen anterior"
-              onClick={onPrev}
-              className="flex items-center justify-center w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+              onClick={(e) => {
+    			e.stopPropagation();
+    			onPrev();
+			  }}
             >
-              <ChevronLeft size={20} />
+              <ChevronLeft size={22} />
             </button>
             <button
+              type="button"
               aria-label="Imagen siguiente"
-              onClick={onNext}
-              className="flex items-center justify-center w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+              onClick={(e) => {
+				e.stopPropagation();
+				onNext();
+			  }}
+              className="fixed right-3 md:right-6 top-1/2 -translate-y-1/2 z-50 flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
             >
-              <ChevronRight size={20} />
+              <ChevronRight size={22} />
             </button>
           </div>
 
