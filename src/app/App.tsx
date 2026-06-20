@@ -15,10 +15,10 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-stone-950">
+    <div className="flex min-h-dvh flex-col bg-stone-950 md:h-dvh md:overflow-hidden">
       <Navbar currentPage={page} onNavigate={navigate} />
 
-      <div className="flex-1">
+      <div className="min-h-0 flex-1 pt-16 md:overflow-hidden">
         {page === "inicio" && <HeroSection onNavigate={navigate} />}
         {page === "galeria" && <GallerySection />}
         {page === "afiliados" && <AfiliadosSection />}

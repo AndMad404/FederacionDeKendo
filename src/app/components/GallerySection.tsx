@@ -114,7 +114,7 @@ function FeaturedImage({
 }: FeaturedImageProps) {
   return (
     <picture
-      className="group relative overflow-hidden rounded-2xl bg-stone-800 flex-1 cursor-pointer min-h-[220px] md:min-h-0"
+      className="group relative overflow-hidden rounded-3xl bg-stone-800 flex-1 cursor-pointer min-h-[220px] md:min-h-0"
       onClick={(e) => onOpen(e)}
     >
       <img
@@ -197,12 +197,11 @@ export function GallerySection() {
   );
 
   return (
-    <main className="pt-16 bg-stone-950">
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="flex flex-col gap-4">
+    <main className="bg-stone-950 md:h-full">
+      <div className="mx-auto flex min-h-0 flex-col h-full">
+        <div className="flex min-h-0 flex-col gap-4 md:flex-1">
           <div
-            className="flex flex-col gap-4"
-            style={{ height: "clamp(460px, 70vh, 680px)" }}
+            className="flex min-h-0 flex-col gap-4 md:flex-1"
           >
             <FeaturedImage
               image={featured}
