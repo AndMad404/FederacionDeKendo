@@ -198,11 +198,11 @@ export function GallerySection() {
 
   return (
     <main className="pt-16 bg-stone-950">
-      <div className="max-w-6xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="flex flex-col gap-4">
           <div
             className="flex flex-col gap-4"
-            style={{ height: "clamp(380px, 72vh, 580px)" }}
+            style={{ height: "clamp(460px, 70vh, 680px)" }}
           >
             <FeaturedImage
               image={featured}
