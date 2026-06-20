@@ -103,7 +103,7 @@ export function Lightbox({
         role="dialog"
         aria-modal="true"
         aria-labelledby="lightbox-title"
-        className="relative max-w-3xl w-full"
+        className="relative max-w-3xl w-full "
         onClick={(e) => e.stopPropagation()}
       >
         {/* Botón cierre — 44×44px área táctil mínima */}
@@ -120,7 +120,7 @@ export function Lightbox({
         <img
           src={image.src}
           alt={image.title}
-          className="w-full max-h-[75vh] object-contain rounded-xl"
+          className="w-full max-h-[75vh] object-contain rounded-3xl"
         />
 
         {/* Footer: nav + info + like */}
