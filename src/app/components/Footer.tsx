@@ -35,21 +35,23 @@ export function Footer({ onNavigate }: FooterProps) {
           <p className="text-sm text-center font-medium mb-4 tracking-wide">
             Contacto de la Federación
           </p>
-          <ul className="space-y-2 text-sm">
-            <li>info@kendodojo.com</li>
-            <li>+1 (555) 000-0000</li>
-          </ul>
-          <div className="flex gap-3 mt-2 justify-center md:justify-start">
-            {SOCIAL_LINKS.map((s) => (
-              <a
-                key={s}
-                href="#"
-                className="w-8 h-8 rounded-full border border-gray-700 flex items-center justify-center text-xs hover:border-red-600 hover:text-red-400 transition-colors"
-              >
-                {s}
-              </a>
-            ))}
-          </div>
+		  <div className="flex flex-col md:flex-row items-center md:items-start justify-center gap-6">
+          	<ul className="space-y-2 text-sm">
+          	  <li>info@kendodojo.com</li>
+          	  <li>+1 (555) 000-0000</li>
+          	</ul>
+          	<div className="flex gap-3 mt-2 justify-center md:justify-start">
+          	  {SOCIAL_LINKS.map((s) => (
+          	    <a
+          	      key={s}
+          	      href="#"
+          	      className="w-8 h-8 rounded-full border border-gray-700 flex items-center justify-center text-xs hover:border-red-600 hover:text-red-400 transition-colors"
+          	    >
+          	      {s}
+          	    </a>
+          	  ))}
+          	</div>
+		  </div>
         </div>
       </div>
       <div className="px-4 py-2">
