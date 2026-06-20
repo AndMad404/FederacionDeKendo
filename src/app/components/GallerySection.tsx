@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCarousel } from "../hooks/useCarousel";
 import { useLikes } from "../hooks/useLikes";
@@ -95,7 +95,7 @@ interface FeaturedImageProps {
   total: number;
   liked: boolean;
   likeCount: number;
-  onOpen: () => void;
+  onOpen: (e: React.MouseEvent) => void;
   onPrev: (e: React.MouseEvent) => void;
   onNext: (e: React.MouseEvent) => void;
   onLike: (e: React.MouseEvent) => void;
@@ -115,7 +115,7 @@ function FeaturedImage({
   return (
     <picture
       className="group relative overflow-hidden rounded-2xl bg-stone-800 flex-1 cursor-pointer min-h-[220px] md:min-h-0"
-      onClick={onOpen}
+      onClick={(e) => onOpen(e)}
     >
       <img
         key={image.id}
@@ -134,16 +134,16 @@ function FeaturedImage({
       />
 
       <div className="absolute bottom-0 left-0 right-0 p-6">
-        <span className="text-xs text-red-400 uppercase tracking-widest">
+        <p className="text-red-400 uppercase tracking-widest">
           {image.tag}
-        </span>
+        </p>
         <p
           className="text-white mt-1 mb-1"
           style={{ fontSize: "1.3rem", fontWeight: 700 }}
         >
           {image.title}
         </p>
-        <p className="text-gray-400 text-xs">
+        <p className="text-white text-xs">
           {index + 1} / {total}
         </p>
       </div>
@@ -158,45 +158,34 @@ function FeaturedImage({
 
 interface ThumbnailProps {
   image: GalleryImage;
-  liked: boolean;
-  likeCount: number;
   onClick: () => void;
-  onLike: (e: React.MouseEvent) => void;
 }
 
-function Thumbnail({
-  image,
-  liked,
-  likeCount,
-  onClick,
-  onLike,
-}: ThumbnailProps) {
+function Thumbnail({ image, onClick }: ThumbnailProps) {
   return (
-    <div
-      className="group relative overflow-hidden rounded-xl bg-stone-800 cursor-pointer"
+    <button
+      type="button"
+      aria-label={`Ver imagen: ${image.title}`}
       onClick={onClick}
+      className="group relative w-full h-full overflow-hidden rounded-lg bg-stone-800 cursor-pointer"
     >
       <img
         src={image.src}
-        alt={image.title}
-        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+        alt=""
+        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
       />
-      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-colors duration-300 flex flex-col justify-end p-2">
-      </div>
-    </div>
+    </button>
   );
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function GallerySection() {
-  const { index, prev, next, goTo } = useCarousel(
-    IMAGES.length,
-  );
+  const { index, prev, next, goTo } = useCarousel(IMAGES.length);
   const { toggle, isLiked, count } = useLikes();
-  const [lightboxId, setLightboxId] = useState<number | null>(
-    null,
-  );
+  const [lightboxId, setLightboxId] = useState<number | null>(null);
+  // Ref para restaurar foco al cerrar el Lightbox
+  const lightboxTriggerRef = useRef<HTMLElement | null>(null);
 
   const featured = IMAGES[index];
   const thumbs = Array.from(
@@ -212,7 +201,7 @@ export function GallerySection() {
       <div className="max-w-6xl mx-auto px-6 py-8">
         <div className="flex flex-col gap-4">
           <div
-            className="flex flex-col md:flex-row gap-4"
+            className="flex flex-col gap-4"
             style={{ height: "clamp(380px, 72vh, 580px)" }}
           >
             <FeaturedImage
@@ -221,7 +210,10 @@ export function GallerySection() {
               total={IMAGES.length}
               liked={isLiked(featured.id)}
               likeCount={count(featured.id, featured.likes)}
-              onOpen={() => setLightboxId(featured.id)}
+              onOpen={(e) => {
+                lightboxTriggerRef.current = e.currentTarget as HTMLElement;
+                setLightboxId(featured.id);
+              }}
               onPrev={(e) => {
                 e.stopPropagation();
                 prev();
@@ -232,19 +224,14 @@ export function GallerySection() {
               }}
               onLike={(e) => toggle(featured.id, e)}
             />
-          </div>
 
-          <div className="grid grid-cols-6 gap-2 md:w-64 lg:w-72 flex-shrink-0 mx-auto justify-items-center">
+          {/* Thumbnails — tira horizontal en mobile */}
+          <div className="grid grid-cols-6 gap-2 h-16 md:h-20">
             {thumbs.map((img, k) => (
               <Thumbnail
                 key={img.id}
                 image={img}
-                liked={isLiked(img.id)}
-                likeCount={count(img.id, img.likes)}
-                onClick={() =>
-                  goTo((index + 1 + k) % IMAGES.length)
-                }
-                onLike={(e) => toggle(img.id, e)}
+                onClick={() => goTo((index + 1 + k) % IMAGES.length)}
               />
             ))}
           </div>
@@ -263,6 +250,7 @@ export function GallerySection() {
               />
             ))}
           </div>
+          </div>
         </div>
       </div>
 
@@ -270,11 +258,17 @@ export function GallerySection() {
         <Lightbox
           image={lightboxImage}
           liked={isLiked(lightboxImage.id)}
-          likeCount={count(
-            lightboxImage.id,
-            lightboxImage.likes,
-          )}
+          likeCount={count(lightboxImage.id, lightboxImage.likes)}
+          triggerRef={lightboxTriggerRef}
           onClose={() => setLightboxId(null)}
+          onPrev={() => {
+            const newIndex = (IMAGES.findIndex(img => img.id === lightboxImage.id) - 1 + IMAGES.length) % IMAGES.length;
+            setLightboxId(IMAGES[newIndex].id);
+          }}
+          onNext={() => {
+            const newIndex = (IMAGES.findIndex(img => img.id === lightboxImage.id) + 1) % IMAGES.length;
+            setLightboxId(IMAGES[newIndex].id);
+          }}
           onToggleLike={(e) => toggle(lightboxImage.id, e)}
         />
       )}

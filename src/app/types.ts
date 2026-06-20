@@ -6,4 +6,5 @@ export interface GalleryImage {
   title: string;
   tag: string;
   likes: number;
+  date?: string; // ISO 8601, e.g. "2024-11-03"
 }
