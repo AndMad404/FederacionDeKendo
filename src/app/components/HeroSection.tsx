@@ -19,21 +19,19 @@
           />
         </picture>
 
-        <div className="relative z-10 text-center px-4 sm:px-6 py-8 sm:py-6 max-w-2xl  flex flex-col items-center gap-4 sm:gap-4 bg-black/40 rounded-4xl">
-          <h1 className="text-xs tracking-[0.25em] sm:tracking-[0.3em] text-red-400">
+        <div className="relative z-10 text-center px-4 sm:px-6 py-8 sm:py-6 max-w-2xl flex flex-col items-center gap-4 sm:gap-4 bg-black/40 rounded-4xl">
+          <h1 className="text-red-400 leading-tight text-[clamp(1.5rem,4vw,2.75rem)] font-bold tracking-wide">
             FEDERACIÓN DE KENDO COSTA RICA
-            <br />
+          </h1>
+
+          <h2 className="text-white leading-tight text-[clamp(1.25rem,3vw,2rem)] font-semibold tracking-tight">
             剣道
             <br />
             EL CAMINO DE LA ESPADA
-          </h1>
-
-          <h2 className="text-white leading-tight text-[clamp(1.7rem,5vw,3.8rem)] font-bold tracking-tight">
-            Disciplina, Honor y Maestría
           </h2>
 
           <p className="text-white text-sm sm:text-base max-w-sm sm:max-w-md leading-relaxed">
-            Únete a nuestra comunidad y descubre el arte marcial japonés del kendo.
+            Únete a nuestra comunidad y descubre este arte marcial japonés.
             <br />
             Clases para todos los niveles, de principiante a dan avanzado.
           </p>

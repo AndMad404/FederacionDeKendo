@@ -26,13 +26,13 @@ const SCHEDULE = [
 
 function InfoCard() {
   return (
-    <div className="bg-stone-900 rounded-2xl p-7 border border-white/5 flex flex-col gap-5 justify-center">
-      <h3
-        className="text-white"
+    <div className="bg-black/40 rounded-2xl p-7 border border-white/5 flex flex-col gap-5 justify-center ">
+      <p
+        className="text-white font-bold"
         style={{ fontWeight: 600, fontSize: "1rem" }}
       >
         Información del dojo #1
-      </h3>
+      </p>
 
       {INFO.map((item) => (
         <div
@@ -42,25 +42,25 @@ function InfoCard() {
           <div className="w-8 h-8 rounded-full bg-red-700/20 flex items-center justify-center text-red-500 flex-shrink-0">
             {item.icon}
           </div>
-          <div>
-            <p className="text-xs text-gray-500">
+          <div className="text-white">
+            <p className="text-xs font-bold">
               {item.label}
             </p>
-            <p className="text-sm text-gray-300">
+            <p className="text-sm">
               {item.value}
             </p>
           </div>
         </div>
       ))}
 
-      <div className="pt-2 border-t border-white/5">
+      <div>
         <div className="flex items-center gap-2 mb-3">
           <Clock size={14} className="text-red-500" />
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-white font-bold">
             Horario de clases
           </p>
         </div>
-        <div className="grid grid-cols-2 gap-1 text-xs text-gray-400">
+        <div className="grid grid-cols-2 gap-1 text-xs text-white">
           {SCHEDULE.map((s) => (
             <>
               <span key={s.days}>{s.days}</span>
@@ -71,12 +71,12 @@ function InfoCard() {
           ))}
         </div>
       </div>
-      <h3
-        className="text-white mt-7"
+      <p
+        className="text-white mt-6 font-bold"
         style={{ fontWeight: 600, fontSize: "1rem" }}
       >
         Información del dojo #2
-      </h3>
+      </p>
 
       {INFO.map((item) => (
         <div
@@ -86,29 +86,29 @@ function InfoCard() {
           <div className="w-8 h-8 rounded-full bg-red-700/20 flex items-center justify-center text-red-500 flex-shrink-0">
             {item.icon}
           </div>
-          <div>
-            <p className="text-xs text-gray-500">
+          <div className="text-white">
+            <p className="text-xs font-bold">
               {item.label}
             </p>
-            <p className="text-sm text-gray-300">
+            <p className="text-sm">
               {item.value}
             </p>
           </div>
         </div>
       ))}
 
-      <div className="pt-2 border-t border-white/5">
+      <div>
         <div className="flex items-center gap-2 mb-3">
           <Clock size={14} className="text-red-500" />
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-white font-bold">
             Horario de clases
           </p>
         </div>
-        <div className="grid grid-cols-2 gap-1 text-xs text-gray-400">
+        <div className="grid grid-cols-2 gap-1 text-xs text-white">
           {SCHEDULE.map((s) => (
             <>
               <span key={s.days}>{s.days}</span>
-              <span key={s.hours} className="text-right">
+              <span key={s.hours} className="text-left">
                 {s.hours}
               </span>
             </>
@@ -121,10 +121,10 @@ function InfoCard() {
 
 export function AfiliadosSection() {
   return (
-    <main className="pt-16 bg-stone-950">
-      <div className="max-w-6xl mx-auto px-6 py-8">
-       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-          <div className="overflow-hidden rounded-2xl bg-stone-800 h-80 lg:h-auto">
+    <main className="bg-stone-950 rounded-3xl md:flex md:h-full md:items-center md:justify-center">
+      <div className="w-full max-w-6xl mx-auto px-4 sm:px-6">
+       <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
+          <div className="overflow-hidden rounded-3xl bg-stone-800 h-80 lg:h-auto">
             <img
               src="https://images.unsplash.com/photo-1765666738346-28ce4c332831?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHw1fHxrZW5kbyUyMG1hcnRpYWwlMjBhcnRzJTIwamFwYW5lc2UlMjBzd29yZHxlbnwxfHx8fDE3ODAxMDAzODB8MA&ixlib=rb-4.1.0&q=80&w=1080"
               alt="Nuestro dojo"
