@@ -52,7 +52,7 @@ const SCHEDULE = [
 
 function DojoInfo({ title }: { title: string }) {
   return (
-    <section className="my-4 flex flex-col gap-2 rounded-3xl bg-black/40 px-3 py-3 md:my-0 md:gap-4 md:px-6 md:py-5 lg:gap-5 lg:px-8 lg:py-6">
+    <section className="my-4 flex flex-col gap-2 rounded-3xl bg-black/40 px-3 py-3 md:my-0 md:gap-2 md:px-6 md:py-5  ">
       <p className="text-center text-base font-bold text-white md:text-xl lg:text-2xl">
         {title}
       </p>
@@ -92,11 +92,11 @@ function DojoInfo({ title }: { title: string }) {
             Horario de clases:
           </p>
         </div>
-        <div className="mx-auto grid w-full max-w-[15rem] grid-cols-2 gap-x-4 text-xs text-white md:max-w-md md:gap-x-8 md:text-sm lg:max-w-lg lg:gap-x-10 lg:text-base">
+        <div className="mx-auto grid w-full max-w-[15rem] grid-cols-2 gap-x-4 text-xs text-white md:max-w-none md:gap-x-5 md:text-sm lg:gap-x-6 lg:text-base">
           {SCHEDULE.map((slot) => (
             <div key={slot.days} className="contents">
-              <span className="text-left">{slot.days}</span>
-              <span className="text-right">{slot.hours}</span>
+              <span className="text-left md:pl-[3.5rem] lg:pl-[4.25rem]">{slot.days}</span>
+              <span className="text-right md:pl-[3.5rem] md:text-left lg:pl-[4.25rem]">{slot.hours}</span>
             </div>
           ))}
         </div>
