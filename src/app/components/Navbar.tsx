@@ -26,7 +26,7 @@ export function Navbar() {
           </div>
           <div className="flex flex-col leading-none">
             <span className="text-white font-semibold tracking-widest text-sm">KENDO</span>
-            <span className="text-red-500 text-[10px] tracking-widest uppercase">Dojo</span>
+            <span className="text-red-400 text-[10px] tracking-widest uppercase">Dojo</span>
           </div>
         </Link>
 

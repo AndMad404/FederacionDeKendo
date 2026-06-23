@@ -13,7 +13,7 @@ export function Footer() {
               <p className="text-white font-semibold tracking-widest text-base font-extrabold">
                 Propósito del
               </p>
-              <p className="text-red-500 text-base font-bold">
+              <p className="text-red-400 text-base font-bold">
                 KENDO
               </p>
             </div>

@@ -64,7 +64,7 @@ function DojoInfo({
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-4">
         {info.map((item) => (
           <div key={item.label} className="flex items-center gap-4">
-            <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-500/20 text-red-500 [&>svg]:size-5 md:h-10 md:w-10 lg:h-12 lg:w-12 lg:[&>svg]:size-6">
+            <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-500/20 text-red-400 [&>svg]:size-5 md:h-10 md:w-10 lg:h-12 lg:w-12 lg:[&>svg]:size-6">
               {ICON_MAP[item.icon]}
             </span>
             <div className="min-w-0">

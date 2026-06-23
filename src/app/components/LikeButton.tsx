@@ -22,7 +22,7 @@ export function LikeButton({ liked, count, onClick, size = "sm", className = "" 
     >
       <Heart
         size={iconSize}
-        className={liked ? "fill-red-500 text-red-500" : "text-gray-600"}
+        className={liked ? "fill-red-500 text-red-400" : "text-gray-600"}
       />
       <span className="text-gray-700">{count}</span>
     </button>
