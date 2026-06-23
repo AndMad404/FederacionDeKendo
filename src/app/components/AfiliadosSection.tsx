@@ -24,29 +24,31 @@ function DojoInfo({
   schedule: ScheduleSlot[];
 }) {
   return (
-    <section className="my-4 flex flex-col gap-2 rounded-3xl bg-black/40 px-3 py-3 md:my-0 md:gap-2 md:px-6 md:py-5">
-      <p className="text-center text-2xl font-bold text-white md:text-2xl lg:text-2xl">
+    <section className="flex flex-col gap-2 rounded-3xl bg-black/40 outline px-6 py-6 my-4 border border-1 border-blue-500">
+      <p className="text-center text-2xl font-bold text-white">
         {title}
       </p>
 
-      <div className="grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-x-5 md:gap-y-4 lg:gap-x-6 lg:gap-y-5">
+      <div className="grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-4 ">
         {info.map((item) => (
-            <div key={item.label} className="flex items-start gap-3 md:gap-4 lg:gap-5">
-              <picture className="flex flex-shrink-0 items-center justify-center rounded-full bg-red-700/20 text-red-500 [&>svg]:size-3.5 md:h-10 md:w-10 md:[&>svg]:size-5 lg:h-12 lg:w-12 lg:[&>svg]:size-6">
-                {ICON_MAP[item.icon]}
-              </picture>
+          <div key={item.label} className="flex items-start gap-4">
+            <picture className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-500/20 text-red-500 [&>svg]:size-5 md:h-10 md:w-10 md:[&>svg]:size-5 lg:h-12 lg:w-12 lg:[&>svg]:size-6">
+              {ICON_MAP[item.icon]}
+            </picture>
             <div className="min-w-0 text-white">
-              <p className="text-xl font-bold md:text-xl lg:text-lg">{item.label}</p>
-                              <a
-                  href={item.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className={`block text-base underline-offset-4 [overflow-wrap:anywhere] hover:underline md:text-base ${
-                    item.icon === "mail" ? "lg:text-sm" : "lg:text-base"
-                  }`}
-                >
-                  {item.value}
-                </a>
+              <p className="text-xl font-bold lg:text-lg">
+                {item.label}
+              </p>
+              <a
+                href={item.href}
+                target="_blank"
+                rel="noreferrer"
+                className={`block text-base underline-offset-4 [overflow-wrap:anywhere] hover:underline md:text-base ${
+                  item.icon === "mail" ? "lg:text-sm" : "lg:text-base"
+                }`}
+              >
+                {item.value}
+              </a>
             </div>
           </div>
         ))}
@@ -56,10 +58,10 @@ function DojoInfo({
         <p className="text-xl font-bold text-white lg:text-2xl">
           Horario de clases:
         </p>
-        <div className="grid gap-1 text-base text-white md:text-base lg:gap-4 lg:text-base">
+        <div className="grid gap-1 text-base text-white lg:gap-4">
           {schedule.map((slot) => (
             <div key={slot.location}>
-              <p className="text-lg font-bold text-white md:text-lg lg:text-lg">
+              <p className="text-lg font-bold text-white">
                 {slot.location}
               </p>
               <div className="grid grid-cols-[1fr_auto] gap-x-4 md:grid-cols-2 md:gap-x-5 lg:gap-x-6">
