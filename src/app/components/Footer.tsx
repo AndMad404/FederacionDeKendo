@@ -11,7 +11,7 @@ export function Footer() {
             </div>
             <div className="flex items-baseline gap-1">
               <p className="text-white font-semibold tracking-widest text-base font-extrabold">
-                Proposito del
+                Propósito del
               </p>
               <p className="text-red-500 text-base font-bold">
                 KENDO
@@ -19,13 +19,13 @@ export function Footer() {
             </div>
           </div>
           <p className="text-sm leading-relaxed">
-            El concepto del Kendo es disciplinar el car\u00e1cter humano a trav\u00e9s de la aplicaci\u00f3n de los principios de la Katana.
+            El concepto del Kendo es disciplinar el carácter humano a través de la aplicación de los principios de la Katana.
           </p>
         </div>
 
         <div className="flex max-w-md flex-col items-center gap-2">
           <p className="text-center text-base font-bold tracking-wide">
-            Contactos de la Federaci\u00f3n
+            Contactos de la Federación
           </p>
           <div className="flex flex-col items-center justify-center sm:text-center md:flex-row">
             <ul className="flex flex-col gap-1 text-sm">
