@@ -10,7 +10,7 @@ export interface InfoItem {
   icon: IconKey;
   label: string;
   value: string;
-  href?: string;
+  href: string;
 }
 
 export interface ScheduleSlot {
@@ -74,29 +74,48 @@ export const DOJOS: DojoData[] = [
     ],
   },
   {
-    title: "Dojo #2",
+    title: "Heredia Kendo Club",
     info: [
-      {
-        icon: "mapPin",
-        label: "Ubicaci\u00f3n",
-        value: "Por definir",
-      },
       {
         icon: "mail",
         label: "Correo",
-        value: "Por definir",
+        value: "herediakendoclub@gmail.com",
+        href: "mailto:herediakendoclub@gmail.com",
       },
       {
         icon: "phone",
         label: "Tel\u00e9fono",
-        value: "Por definir",
+        value: "+506 6005 9090",
+        href: "tel:+50660059090",
+      },
+      {
+        icon: "instagram",
+        label: "Instagram",
+        value: "@heredia_kendo_club",
+        href: "https://www.instagram.com/heredia_kendo_club",
+      },
+      {
+        icon: "mapPin",
+        label: "Colegio Europeo",
+        value: "Ver ubicaci\u00f3n",
+        href: "https://waze.com/ul/hd1u0y5tcp",
       },
     ],
     schedule: [
       {
-        location: "Por definir",
-        days: "Por definir",
-        hours: "Por definir",
+        location: "Colegio Europeo",
+        days: "Viernes",
+        hours: "7:00 - 9:00 PM",
+      },
+      {
+        location: "Colegio Europeo",
+        days: "S\u00e1bado",
+        hours: "11:00 AM - 12:15 PM",
+      },
+      {
+        location: "Colegio Europeo",
+        days: "S\u00e1bado",
+        hours: "12:15 - 2:00 PM",
       },
     ],
   },
