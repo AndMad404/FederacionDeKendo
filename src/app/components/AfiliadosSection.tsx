@@ -40,7 +40,7 @@ function DojoInfo({
     schedule.length > 0 && schedule.every((slot) => slot.location === schedule[0].location);
 
   return (
-    <section className="flex flex-col gap-2 rounded-3xl bg-black/40 px-6 py-4 mb-6 border border-blue-500 text-white">
+    <section className="mb-6 flex flex-col gap-2 rounded-3xl border border-blue-500 bg-black/40 px-6 py-4 text-white">
       <p className="text-center text-2xl font-bold">
         {title}
       </p>
@@ -48,7 +48,7 @@ function DojoInfo({
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-4">
         {info.map((item) => (
           <div key={item.label} className="flex items-center gap-4">
-            <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-500/20 text-red-500 [&>svg]:size-5 md:h-10 md:w-10 md:[&>svg]:size-5 lg:h-12 lg:w-12 lg:[&>svg]:size-6">
+            <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-500/20 text-red-500 [&>svg]:size-5 md:h-10 md:w-10 lg:h-12 lg:w-12 lg:[&>svg]:size-6">
               {ICON_MAP[item.icon]}
             </span>
             <div className="min-w-0">
@@ -70,7 +70,7 @@ function DojoInfo({
         ))}
       </div>
 
-      <div className="text-center grid gap-2">
+      <div className="grid gap-2 text-center">
         <p className="text-xl font-bold lg:text-2xl">
           Horario de clases:
         </p>
