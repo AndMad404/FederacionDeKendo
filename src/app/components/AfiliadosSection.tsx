@@ -53,7 +53,7 @@ function DojoInfo({
       </div>
 
       <div className="text-center grid gap-2">
-        <p className="text-xl font-bold text-white md:text-xl lg:text-xl">
+        <p className="text-xl font-bold text-white lg:text-2xl">
           Horario de clases:
         </p>
         <div className="grid gap-1 text-base text-white md:text-base lg:gap-4 lg:text-base">
