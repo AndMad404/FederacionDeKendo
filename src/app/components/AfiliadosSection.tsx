@@ -3,7 +3,7 @@ import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import { Globe, Mail, MapPin, Phone } from "lucide-react";
 import { DOJOS } from "../data/dojos";
-import type { IconKey, InfoItem, ScheduleSlot } from "../data/dojos";
+import type { IconKey, InfoItem, ScheduleSlot } from "../types";
 
 const ICON_MAP: Record<IconKey, ReactNode> = {
   mail: <Mail />,
@@ -16,11 +16,11 @@ const ICON_MAP: Record<IconKey, ReactNode> = {
 
 function ScheduleRow({ days, hours }: Pick<ScheduleSlot, "days" | "hours">) {
   return (
-    <div className="grid grid-cols-[1fr_auto] gap-x-4 md:grid-cols-2 md:gap-x-5 lg:gap-x-6">
-      <p className="text-left [overflow-wrap:anywhere] md:pl-[3.5rem] lg:pl-[4.25rem]">
+    <div className="mx-auto grid w-full max-w-xl grid-cols-[1fr_auto] gap-x-4 md:grid-cols-2 md:gap-x-5 lg:gap-x-6">
+      <p className="text-left [overflow-wrap:anywhere]">
         {days}
       </p>
-      <p className="text-right md:text-left [overflow-wrap:anywhere] md:pl-[3.5rem] lg:pl-[4.25rem]">
+      <p className="text-right md:text-left [overflow-wrap:anywhere]">
         {hours}
       </p>
     </div>

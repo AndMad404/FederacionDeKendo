@@ -1,69 +1,11 @@
 import { useState, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { GALLERY_IMAGES } from "../data/gallery";
 import { useCarousel } from "../hooks/useCarousel";
 import { useLikes } from "../hooks/useLikes";
 import { LikeButton } from "./LikeButton";
 import { Lightbox } from "./Lightbox";
 import type { GalleryImage } from "../types";
-
-const IMAGES: GalleryImage[] = [
-  {
-    id: 1,
-    src: "https://images.unsplash.com/photo-1763905720991-0ce68f551743?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHw0fHxrZW5kbyUyMG1hcnRpYWwlMjBhcnRzJTIwamFwYW5lc2UlMjBzd29yZHxlbnwxfHx8fDE3ODAxMDAzODB8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    title: "Práctica en el Dojo",
-    tag: "Entrenamiento",
-    likes: 214,
-  },
-  {
-    id: 2,
-    src: "https://images.unsplash.com/photo-1765666738346-28ce4c332831?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHw1fHxrZW5kbyUyMG1hcnRpYWwlMjBhcnRzJTIwamFwYW5lc2UlMjBzd29yZHxlbnwxfHx8fDE3ODAxMDAzODB8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    title: "Armadura Bogu",
-    tag: "Equipamiento",
-    likes: 189,
-  },
-  {
-    id: 3,
-    src: "https://images.unsplash.com/photo-1713766056305-d33bb4d71e1f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwzfHxrZW5kbyUyMG1hcnRpYWwlMjBhcnRzJTIwamFwYW5lc2UlMjBzd29yZHxlbnwxfHx8fDE3ODAxMDAzODB8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    title: "El Camino del Agua",
-    tag: "Filosofía",
-    likes: 342,
-  },
-  {
-    id: 4,
-    src: "https://images.unsplash.com/photo-1583684977172-528983104c31?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwyfHxrZW5kbyUyMG1hcnRpYWwlMjBhcnRzJTIwamFwYW5lc2UlMjBzd29yZHxlbnwxfHx8fDE3ODAxMDAzODB8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    title: "Cinturón y Disciplina",
-    tag: "Grado",
-    likes: 97,
-  },
-  {
-    id: 5,
-    src: "https://images.unsplash.com/photo-1731530283978-337f43a44ea6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHw4fHxrZW5kbyUyMG1hcnRpYWwlMjBhcnRzJTIwamFwYW5lc2UlMjBzd29yZHxlbnwxfHx8fDE3ODAxMDAzODB8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    title: "Vestimenta Tradicional",
-    tag: "Keikogi",
-    likes: 156,
-  },
-  {
-    id: 6,
-    src: "https://images.unsplash.com/photo-1514050566906-8d077bae7046?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwyfHxqYXBhbmVzZSUyMGRvam8lMjB0cmFpbmluZyUyMG1hcnRpYWwlMjBhcnRzfGVufDF8fHx8MTc4MDEwMDM4MXww&ixlib=rb-4.1.0&q=80&w=1080",
-    title: "Kata y Forma",
-    tag: "Técnica",
-    likes: 278,
-  },
-  {
-    id: 7,
-    src: "https://images.unsplash.com/photo-1708409858781-30df7a234f2d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxrZW5kbyUyMG1hcnRpYWwlMjBhcnRzJTIwamFwYW5lc2UlMjBzd29yZHxlbnwxfHx8fDE3ODAxMDAzODB8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    title: "El Shinai",
-    tag: "Equipamiento",
-    likes: 133,
-  },
-  {
-    id: 8,
-    src: "https://images.unsplash.com/photo-1529630218527-7df22fc2d4ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHw0fHxqYXBhbmVzZSUyMGRvam8lMjB0cmFpbmluZyUyMG1hcnRpYWwlMjBhcnRzfGVufDF8fHx8MTc4MDEwMDM4MXww&ixlib=rb-4.1.0&q=80&w=1080",
-    title: "Shiai — Combate",
-    tag: "Competición",
-    likes: 401,
-  },
-];
 
 const THUMBS_COUNT = 6;
 
@@ -77,6 +19,8 @@ interface NavArrowProps {
 function NavArrow({ direction, onClick }: NavArrowProps) {
   return (
     <button
+      type="button"
+      aria-label={direction === "left" ? "Imagen anterior" : "Imagen siguiente"}
       onClick={onClick}
       className="pointer-events-auto w-10 h-10 rounded-full bg-black/50 hover:bg-red-700 border border-white/10 flex items-center justify-center transition-colors"
     >
@@ -113,17 +57,35 @@ function FeaturedImage({
   onLike,
 }: FeaturedImageProps) {
   return (
-    <picture
+    <div
       className="group relative overflow-hidden rounded-3xl bg-stone-800 flex-1 cursor-pointer min-h-[220px] md:min-h-0"
-      onClick={(e) => onOpen(e)}
     >
-      <img
-        key={image.id}
-        src={image.src}
-        alt={image.title}
-        className="w-full h-full object-cover transition-transform min-h-[420px] duration-700 group-hover:scale-105"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+      <button
+        type="button"
+        aria-label={`Abrir imagen: ${image.title}`}
+        className="block h-full w-full cursor-pointer text-left"
+        onClick={onOpen}
+      >
+        <img
+          key={image.id}
+          src={image.src}
+          alt={image.title}
+          className="w-full h-full object-cover transition-transform min-h-[420px] duration-700 group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+
+        <div className="absolute bottom-0 left-0 right-0 p-6">
+          <p className="text-base font-bold uppercase tracking-widest text-red-400">
+            {image.tag}
+          </p>
+          <p className="mt-1 mb-1 text-2xl font-bold text-white">
+            {image.title}
+          </p>
+          <p className="text-base text-white">
+            {index + 1} / {total}
+          </p>
+        </div>
+      </button>
 
       <LikeButton
         liked={liked}
@@ -133,23 +95,11 @@ function FeaturedImage({
         className="absolute top-4 right-4 shadow"
       />
 
-      <div className="absolute bottom-0 left-0 right-0 p-6">
-        <p className="text-base font-bold uppercase tracking-widest text-red-400">
-          {image.tag}
-        </p>
-        <p className="mt-1 mb-1 text-2xl font-bold text-white">
-          {image.title}
-        </p>
-        <p className="text-base text-white">
-          {index + 1} / {total}
-        </p>
-      </div>
-
       <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-3 pointer-events-none">
         <NavArrow direction="left" onClick={onPrev} />
         <NavArrow direction="right" onClick={onNext} />
       </div>
-    </picture>
+    </div>
   );
 }
 
@@ -178,18 +128,18 @@ function Thumbnail({ image, onClick }: ThumbnailProps) {
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function GallerySection() {
-  const { index, prev, next, goTo } = useCarousel(IMAGES.length);
+  const { index, prev, next, goTo } = useCarousel(GALLERY_IMAGES.length);
   const { toggle, isLiked, count } = useLikes();
   const [lightboxId, setLightboxId] = useState<number | null>(null);
   // Ref para restaurar foco al cerrar el Lightbox
   const lightboxTriggerRef = useRef<HTMLElement | null>(null);
 
-  const featured = IMAGES[index];
+  const featured = GALLERY_IMAGES[index];
   const thumbs = Array.from(
     { length: THUMBS_COUNT },
-    (_, k) => IMAGES[(index + 1 + k) % IMAGES.length],
+    (_, k) => GALLERY_IMAGES[(index + 1 + k) % GALLERY_IMAGES.length],
   );
-  const lightboxImage = IMAGES.find(
+  const lightboxImage = GALLERY_IMAGES.find(
     (img) => img.id === lightboxId,
   );
 
@@ -203,7 +153,7 @@ export function GallerySection() {
             <FeaturedImage
               image={featured}
               index={index}
-              total={IMAGES.length}
+              total={GALLERY_IMAGES.length}
               liked={isLiked(featured.id)}
               likeCount={count(featured.id, featured.likes)}
               onOpen={(e) => {
@@ -227,15 +177,18 @@ export function GallerySection() {
               <Thumbnail
                 key={img.id}
                 image={img}
-                onClick={() => goTo((index + 1 + k) % IMAGES.length)}
+                onClick={() => goTo((index + 1 + k) % GALLERY_IMAGES.length)}
               />
             ))}
           </div>
 
           {/* Dots */}
           <div className="flex justify-center gap-1.5 pt-1">
-            {IMAGES.map((_, i) => (
+            {GALLERY_IMAGES.map((_, i) => (
               <button
+                type="button"
+                aria-label={`Ver imagen ${i + 1} de ${GALLERY_IMAGES.length}`}
+                aria-current={i === index ? "true" : undefined}
                 key={i}
                 onClick={() => goTo(i)}
                 className={`rounded-full transition-all duration-300 ${
@@ -258,12 +211,12 @@ export function GallerySection() {
           triggerRef={lightboxTriggerRef}
           onClose={() => setLightboxId(null)}
           onPrev={() => {
-            const newIndex = (IMAGES.findIndex(img => img.id === lightboxImage.id) - 1 + IMAGES.length) % IMAGES.length;
-            setLightboxId(IMAGES[newIndex].id);
+            const newIndex = (GALLERY_IMAGES.findIndex(img => img.id === lightboxImage.id) - 1 + GALLERY_IMAGES.length) % GALLERY_IMAGES.length;
+            setLightboxId(GALLERY_IMAGES[newIndex].id);
           }}
           onNext={() => {
-            const newIndex = (IMAGES.findIndex(img => img.id === lightboxImage.id) + 1) % IMAGES.length;
-            setLightboxId(IMAGES[newIndex].id);
+            const newIndex = (GALLERY_IMAGES.findIndex(img => img.id === lightboxImage.id) + 1) % GALLERY_IMAGES.length;
+            setLightboxId(GALLERY_IMAGES[newIndex].id);
           }}
           onToggleLike={(e) => toggle(lightboxImage.id, e)}
         />
@@ -271,3 +224,4 @@ export function GallerySection() {
     </main>
   );
 }
+
