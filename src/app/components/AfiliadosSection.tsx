@@ -1,15 +1,17 @@
 import type { ReactNode } from "react";
-import { Facebook, Globe, Instagram, Mail, MapPin, Phone } from "lucide-react";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import InstagramIcon from "@mui/icons-material/Instagram";
+import { Globe, Mail, MapPin, Phone } from "lucide-react";
 import { DOJOS } from "../data/dojos";
 import type { IconKey, InfoItem, ScheduleSlot } from "../data/dojos";
 
 const ICON_MAP: Record<IconKey, ReactNode> = {
-  mail:      <Mail      className="size-3.5 md:size-5 lg:size-6" />,
-  phone:     <Phone     className="size-3.5 md:size-5 lg:size-6" />,
-  mapPin:    <MapPin    className="size-3.5 md:size-5 lg:size-6" />,
-  instagram: <Instagram className="size-3.5 md:size-5 lg:size-6" />,
-  facebook:  <Facebook  className="size-3.5 md:size-5 lg:size-6" />,
-  globe:     <Globe     className="size-3.5 md:size-5 lg:size-6" />,
+  mail: <Mail />,
+  phone: <Phone />,
+  mapPin: <MapPin />,
+  instagram: <InstagramIcon />,
+  facebook: <FacebookIcon />,
+  globe: <Globe />,
 };
 
 function DojoInfo({
@@ -29,8 +31,8 @@ function DojoInfo({
 
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-x-5 md:gap-y-4 lg:gap-x-6 lg:gap-y-5">
         {info.map((item) => (
-          <div key={item.label} className="flex items-start gap-3 md:gap-4 lg:gap-5">
-            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-red-700/20 text-red-500 md:h-10 md:w-10 lg:h-12 lg:w-12">
+            <div key={item.label} className="flex items-start gap-3 md:gap-4 lg:gap-5">
+            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-red-700/20 text-red-500 [&>svg]:size-3.5 md:h-10 md:w-10 md:[&>svg]:size-5 lg:h-12 lg:w-12 lg:[&>svg]:size-6">
               {ICON_MAP[item.icon]}
             </div>
             <div className="min-w-0 text-white">
