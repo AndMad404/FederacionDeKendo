@@ -134,16 +134,13 @@ function FeaturedImage({
       />
 
       <div className="absolute bottom-0 left-0 right-0 p-6">
-        <p className="text-red-400 uppercase tracking-widest">
+        <p className="text-base font-bold uppercase tracking-widest text-red-400">
           {image.tag}
         </p>
-        <p
-          className="text-white mt-1 mb-1"
-          style={{ fontSize: "1.3rem", fontWeight: 700 }}
-        >
+        <p className="mt-1 mb-1 text-2xl font-bold text-white">
           {image.title}
         </p>
-        <p className="text-white text-xs">
+        <p className="text-base text-white">
           {index + 1} / {total}
         </p>
       </div>
