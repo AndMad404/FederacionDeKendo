@@ -124,7 +124,7 @@ function InfoCard() {
 export function AfiliadosSection() {
   return (
     <main className="rounded-3xl bg-stone-950 md:h-full">
-      <div className="relative flex min-h-[530px] items-center justify-center overflow-hidden rounded-3xl pt-6 md:h-full md:min-h-0">
+      <div className="relative flex min-h-[530px] items-center justify-center overflow-hidden rounded-3xl pt-6 lg:pt-0 md:h-full md:min-h-0">
         <img
           src="https://images.unsplash.com/photo-1765666738346-28ce4c332831?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHw1fHxrZW5kbyUyMG1hcnRpYWwlMjBhcnRzJTIwamFwYW5lc2UlMjBzd29yZHxlbnwxfHx8fDE3ODAxMDAzODB8MA&ixlib=rb-4.1.0&q=80&w=1080"
           alt="Nuestro dojo"
