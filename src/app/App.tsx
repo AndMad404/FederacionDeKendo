@@ -1,30 +1,36 @@
-import { useState, useCallback } from "react";
+import { useEffect } from "react";
+import { Route, Routes, useLocation } from "react-router";
 import { Navbar } from "./components/Navbar";
 import { HeroSection } from "./components/HeroSection";
 import { GallerySection } from "./components/GallerySection";
 import { AfiliadosSection } from "./components/AfiliadosSection";
 import { Footer } from "./components/Footer";
-import type { Page } from "./types";
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [pathname]);
+
+  return null;
+}
 
 export default function App() {
-  const [page, setPage] = useState<Page>("inicio");
-
-  const navigate = useCallback((p: Page) => {
-    setPage(p);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
-
   return (
     <div className="flex min-h-dvh flex-col bg-stone-950 md:h-dvh md:overflow-hidden">
-      <Navbar currentPage={page} onNavigate={navigate} />
+      <ScrollToTop />
+      <Navbar />
 
       <div className="min-h-0 flex-1 pt-16 md:overflow-hidden">
-        {page === "inicio" && <HeroSection onNavigate={navigate} />}
-        {page === "galeria" && <GallerySection />}
-        {page === "afiliados" && <AfiliadosSection />}
+        <Routes>
+          <Route path="/" element={<HeroSection />} />
+          <Route path="/galeria" element={<GallerySection />} />
+          <Route path="/afiliados" element={<AfiliadosSection />} />
+        </Routes>
       </div>
 
-      <Footer onNavigate={navigate} />
+      <Footer />
     </div>
   );
 }

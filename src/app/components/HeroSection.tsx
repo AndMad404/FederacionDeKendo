@@ -1,9 +1,3 @@
-  import type { Page } from "../types";
-
-  interface HeroSectionProps {
-    onNavigate: (page: Page) => void;
-  }
-
   function HeroBanner() {
     return (
       <header
@@ -40,7 +34,7 @@
     );
   }
 
-  export function HeroSection(_props: HeroSectionProps) {
+  export function HeroSection() {
     return (
       <main>
         <HeroBanner />

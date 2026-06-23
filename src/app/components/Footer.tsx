@@ -1,12 +1,4 @@
-import type { Page } from "../types";
-
-interface FooterProps {
-  onNavigate: (page: Page) => void;
-}
-
-const SOCIAL_LINKS = ["ig", "yt", "fb"];
-
-export function Footer({ onNavigate }: FooterProps) {
+export function Footer() {
   return (
     <footer className="text-white bg-stone-950 border-t border-white/5">
       <div className="mx-auto grid max-w-6xl grid-cols-1 justify-items-center gap-3 px-4 pt-2 text-center md:grid-cols-2 md:px-0">
@@ -14,7 +6,7 @@ export function Footer({ onNavigate }: FooterProps) {
           <div className="flex items-center justify-center gap-3">
             <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
               <p className="text-white text-xs font-extrabold">
-                剣道
+                {"\u5263\u9053"}
               </p>
             </div>
             <div className="flex items-baseline gap-1">
@@ -27,25 +19,25 @@ export function Footer({ onNavigate }: FooterProps) {
             </div>
           </div>
           <p className="text-sm leading-relaxed">
-            El concepto del Kendo es disciplinar el carácter humano a través de la aplicación de los principios de la Katana.
+            El concepto del Kendo es disciplinar el car\u00e1cter humano a trav\u00e9s de la aplicaci\u00f3n de los principios de la Katana.
           </p>
         </div>
 
         <div className="flex max-w-md flex-col items-center gap-2">
           <p className="text-center text-base font-bold tracking-wide">
-            Contactos de la Federación
+            Contactos de la Federaci\u00f3n
           </p>
-		  <div className="flex flex-col items-center justify-center sm:text-center md:flex-row">
-          	<ul className="flex flex-col gap-1 text-sm">
-          	  <li>info@kendodojo.com</li>
-          	  <li>+1 (555) 000-0000</li>
-          	</ul>
-		  </div>
+          <div className="flex flex-col items-center justify-center sm:text-center md:flex-row">
+            <ul className="flex flex-col gap-1 text-sm">
+              <li>info@kendodojo.com</li>
+              <li>+1 (555) 000-0000</li>
+            </ul>
+          </div>
         </div>
       </div>
       <div className="px-4 py-2">
         <p className="text-center text-xs text-white/50">
-          © 2026 Kendo Dojo. Todos los derechos reservados.
+          {"\u00a9"} 2026 Kendo Dojo. Todos los derechos reservados.
         </p>
       </div>
     </footer>
