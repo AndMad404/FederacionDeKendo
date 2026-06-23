@@ -14,6 +14,19 @@ const ICON_MAP: Record<IconKey, ReactNode> = {
   globe: <Globe />,
 };
 
+function ScheduleRow({ days, hours }: Pick<ScheduleSlot, "days" | "hours">) {
+  return (
+    <div className="grid grid-cols-[1fr_auto] gap-x-4 md:grid-cols-2 md:gap-x-5 lg:gap-x-6">
+      <p className="text-left [overflow-wrap:anywhere] md:pl-[3.5rem] lg:pl-[4.25rem]">
+        {days}
+      </p>
+      <p className="text-right md:text-left [overflow-wrap:anywhere] md:pl-[3.5rem] lg:pl-[4.25rem]">
+        {hours}
+      </p>
+    </div>
+  );
+}
+
 function DojoInfo({
   title,
   info,
@@ -69,17 +82,11 @@ function DojoInfo({
               </p>
               <div className="grid gap-1">
                 {schedule.map((slot) => (
-                  <div
+                  <ScheduleRow
                     key={`${slot.days}-${slot.hours}`}
-                    className="grid grid-cols-[1fr_auto] gap-x-4 md:grid-cols-2 md:gap-x-5 lg:gap-x-6"
-                  >
-                    <p className="text-left [overflow-wrap:anywhere] md:pl-[3.5rem] lg:pl-[4.25rem]">
-                      {slot.days}
-                    </p>
-                    <p className="text-right md:text-left [overflow-wrap:anywhere] md:pl-[3.5rem] lg:pl-[4.25rem]">
-                      {slot.hours}
-                    </p>
-                  </div>
+                    days={slot.days}
+                    hours={slot.hours}
+                  />
                 ))}
               </div>
             </div>
@@ -89,14 +96,7 @@ function DojoInfo({
                 <p className="text-lg font-bold">
                   {slot.location}
                 </p>
-                <div className="grid grid-cols-[1fr_auto] gap-x-4 md:grid-cols-2 md:gap-x-5 lg:gap-x-6">
-                  <p className="text-left [overflow-wrap:anywhere] md:pl-[3.5rem] lg:pl-[4.25rem]">
-                    {slot.days}
-                  </p>
-                  <p className="text-right md:text-left [overflow-wrap:anywhere] md:pl-[3.5rem] lg:pl-[4.25rem]">
-                    {slot.hours}
-                  </p>
-                </div>
+                <ScheduleRow days={slot.days} hours={slot.hours} />
               </div>
             ))
           )}
