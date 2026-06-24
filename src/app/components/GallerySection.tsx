@@ -142,6 +142,9 @@ export function GallerySection() {
   const lightboxImage = GALLERY_IMAGES.find(
     (img) => img.id === lightboxId,
   );
+  const lightboxIndex = lightboxImage
+    ? GALLERY_IMAGES.findIndex((img) => img.id === lightboxImage.id)
+    : -1;
 
   return (
     <main className="bg-stone-950 md:h-full">
@@ -184,12 +187,12 @@ export function GallerySection() {
 
           {/* Dots */}
           <div className="flex justify-center gap-4">
-            {GALLERY_IMAGES.map((_, i) => (
+            {GALLERY_IMAGES.map((img, i) => (
               <button
                 type="button"
                 aria-label={`Ver imagen ${i + 1} de ${GALLERY_IMAGES.length}`}
                 aria-current={i === index ? "true" : undefined}
-                key={i}
+                key={img.id}
                 onClick={() => goTo(i)}
                 className={`rounded-full transition-all duration-300 ${
                   i === index
@@ -211,11 +214,11 @@ export function GallerySection() {
           triggerRef={lightboxTriggerRef}
           onClose={() => setLightboxId(null)}
           onPrev={() => {
-            const newIndex = (GALLERY_IMAGES.findIndex(img => img.id === lightboxImage.id) - 1 + GALLERY_IMAGES.length) % GALLERY_IMAGES.length;
+            const newIndex = (lightboxIndex - 1 + GALLERY_IMAGES.length) % GALLERY_IMAGES.length;
             setLightboxId(GALLERY_IMAGES[newIndex].id);
           }}
           onNext={() => {
-            const newIndex = (GALLERY_IMAGES.findIndex(img => img.id === lightboxImage.id) + 1) % GALLERY_IMAGES.length;
+            const newIndex = (lightboxIndex + 1) % GALLERY_IMAGES.length;
             setLightboxId(GALLERY_IMAGES[newIndex].id);
           }}
           onToggleLike={(e) => toggle(lightboxImage.id, e)}

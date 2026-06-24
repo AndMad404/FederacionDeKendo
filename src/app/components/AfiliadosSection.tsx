@@ -153,12 +153,7 @@ function InfoCard() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 md:gap-8">
       {DOJOS.map((dojo) => (
-        <DojoInfo
-          key={dojo.title}
-          title={dojo.title}
-          info={dojo.info}
-          schedule={dojo.schedule}
-        />
+        <DojoInfo key={dojo.title} {...dojo} />
       ))}
     </div>
   );

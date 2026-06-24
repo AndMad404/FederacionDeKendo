@@ -109,6 +109,7 @@ export function Lightbox({
         {/* Botón cierre — 44×44px área táctil mínima */}
         <button
           ref={closeBtnRef}
+          type="button"
           aria-label="Cerrar galería"
           onClick={onClose}
           className="absolute -top-14 right-0 flex items-center justify-center w-11 h-11 rounded-full bg-red-700 hover:bg-red-600 text-white transition-colors cursor-pointer"
