@@ -37,7 +37,7 @@ export function Footer() {
       </div>
       <div className="px-4 py-2">
         <p className="text-center text-xs text-white/50">
-          {"\u00a9"} 2026 Kendo Dojo. Todos los derechos reservados.
+          {"\u00a9"} 2026 Federacion de Kendo Costa Rica. Todos los derechos reservados.
         </p>
       </div>
     </footer>

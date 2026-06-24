@@ -75,11 +75,11 @@ function FeaturedImage({
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 
         <div className="absolute bottom-0 left-0 right-0 p-6">
+          <p className="text-2xl font-bold text-white">
+            {image.title}
+          </p>
           <p className="text-base font-bold uppercase tracking-widest text-red-400">
             {image.tag}
-          </p>
-          <p className="mt-1 mb-1 text-2xl font-bold text-white">
-            {image.title}
           </p>
           <p className="text-base text-white">
             {index + 1} / {total}
@@ -148,7 +148,7 @@ export function GallerySection() {
       <div className="mx-auto flex min-h-0 flex-col h-full min-h-[530px]">
         <div className="flex min-h-0 flex-col gap-4 md:flex-1">
           <div
-            className="flex min-h-0 flex-col gap-4 md:flex-1 min-h-[530px]"
+            className="flex min-h-0 flex-col gap-2 md:flex-1 min-h-[530px]"
           >
             <FeaturedImage
               image={featured}
@@ -183,7 +183,7 @@ export function GallerySection() {
           </div>
 
           {/* Dots */}
-          <div className="flex justify-center gap-1.5 pt-1">
+          <div className="flex justify-center gap-4">
             {GALLERY_IMAGES.map((_, i) => (
               <button
                 type="button"
@@ -193,8 +193,8 @@ export function GallerySection() {
                 onClick={() => goTo(i)}
                 className={`rounded-full transition-all duration-300 ${
                   i === index
-                    ? "bg-red-600 w-5 h-2"
-                    : "bg-stone-600 hover:bg-stone-400 w-2 h-2"
+                    ? "bg-red-400 w-6 h-4"
+                    : "bg-blue-500/70 hover:bg-blue-400/80 w-4 h-4"
                 }`}
               />
             ))}

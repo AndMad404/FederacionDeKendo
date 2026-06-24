@@ -151,8 +151,12 @@ export function Lightbox({
           </div>
 
           <div className="text-center flex-1 px-4">
-            <p className="text-xs text-red-400 uppercase tracking-widest">{image.tag}</p>
-            <p id="lightbox-title" className="font-semibold mt-0.5 text-sm">{image.title}</p>
+            <p id="lightbox-title" className="font-semibold text-lg">  
+              {image.title}
+            </p>
+            <p className="text-md text-red-400 uppercase tracking-widest">    
+              {image.tag}
+            </p>
           </div>
 
           <LikeButton
