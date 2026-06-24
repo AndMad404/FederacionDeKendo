@@ -13,7 +13,6 @@
           />
         </picture>
 
-        {/* WCAG overlay: asegura contraste mínimo 4.5:1 sobre imagen */}
         <div className="absolute inset-0 rounded-3xl bg-black/40" aria-hidden="true" />
 
         <div className="relative z-10 text-center px-4 sm:px-6 py-8 sm:py-6 max-w-2xl flex flex-col items-center gap-4 sm:gap-4 bg-black/70 rounded-4xl border border-blue-500">
