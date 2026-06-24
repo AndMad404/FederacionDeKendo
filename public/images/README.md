@@ -1,4 +1,8 @@
-# Local image requirements
+# Local images
+
+These files are optimized web exports generated from the original images in:
+
+`C:\Users\and_m\Documents\Profesional\Imagenes para la galeria de la federacion`
 
 Recommended exports:
 
@@ -9,4 +13,4 @@ Recommended exports:
 - Preferred formats for photos: WebP and AVIF.
 - Keep descriptive filenames, dimensions in code, and meaningful alt text.
 
-Current placeholders are local, original SVG files only intended to remove third-party image dependencies while official photos are prepared.
+Current site images use WebP first, with JPG fallbacks for hero and affiliates.

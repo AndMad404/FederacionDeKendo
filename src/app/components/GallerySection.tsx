@@ -58,7 +58,7 @@ function FeaturedImage({
 }: FeaturedImageProps) {
   return (
     <div
-      className="group relative overflow-hidden rounded-3xl bg-stone-800 flex-1 cursor-pointer min-h-[220px] md:min-h-0"
+      className="group relative aspect-[3/2] min-h-[320px] w-full overflow-hidden rounded-3xl bg-stone-800 cursor-pointer md:min-h-0 md:flex-1"
     >
       <button
         type="button"
@@ -72,7 +72,8 @@ function FeaturedImage({
           alt={image.title}
           width={image.width}
           height={image.height}
-          className="w-full h-full object-cover transition-transform min-h-[420px] duration-700 group-hover:scale-105"
+          style={{ objectPosition: image.objectPosition }}
+          className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 
@@ -116,7 +117,7 @@ function Thumbnail({ image, onClick }: ThumbnailProps) {
       type="button"
       aria-label={`Ver imagen: ${image.title}`}
       onClick={onClick}
-      className="group relative w-full h-full overflow-hidden rounded-lg bg-stone-800 cursor-pointer"
+      className="group relative h-full w-full overflow-hidden rounded-lg bg-stone-800 cursor-pointer"
     >
       <img
         src={image.src}
@@ -124,7 +125,8 @@ function Thumbnail({ image, onClick }: ThumbnailProps) {
         width={image.width}
         height={image.height}
         loading="lazy"
-        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+        style={{ objectPosition: image.objectPosition }}
+        className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
       />
     </button>
   );

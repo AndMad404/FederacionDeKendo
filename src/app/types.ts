@@ -3,6 +3,7 @@ export interface GalleryImage {
   src: string;
   width: number;
   height: number;
+  objectPosition?: string;
   title: string;
   tag: string;
   likes: number;

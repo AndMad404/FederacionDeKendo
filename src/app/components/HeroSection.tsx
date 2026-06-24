@@ -1,22 +1,23 @@
   function HeroBanner() {
     return (
       <header
-        className="relative flex items-center justify-center"
+        className="relative flex items-start justify-center pt-[18svh] sm:pt-[20svh]"
         style={{ minHeight: "calc(80svh)" }}
       >
         <picture className="absolute inset-0 w-full h-full">
+          <source srcSet="/images/gallery/kendo-gallery-08.webp" type="image/webp" />
           <img
-            src="/images/hero/kendo-hero-placeholder.svg"
+            src="/images/gallery/kendo-gallery-08.jpg"
             alt="Kendo en el dojo"
-            width={1920}
-            height={1080}
-            className="absolute inset-0 w-full h-full object-cover rounded-3xl"
+            width={1600}
+            height={1201}
+            className="absolute inset-0 w-full h-full rounded-3xl object-cover object-[center_70%]"
             loading="eager"
             fetchPriority="high"
           />
         </picture>
 
-        <div className="absolute inset-0 rounded-3xl bg-black/40" aria-hidden="true" />
+        <div className="absolute inset-0 rounded-3xl bg-black/30" aria-hidden="true" />
 
         <div className="relative z-10 text-center px-4 sm:px-6 py-8 sm:py-6 max-w-2xl flex flex-col items-center gap-4 sm:gap-4 bg-black/70 rounded-4xl border border-blue-500">
           <h1 className="text-red-400 leading-tight text-[clamp(1.5rem,4vw,2.75rem)] font-bold tracking-wide">

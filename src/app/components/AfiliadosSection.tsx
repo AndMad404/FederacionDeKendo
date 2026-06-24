@@ -157,15 +157,21 @@ export function AfiliadosSection() {
   return (
     <main className="rounded-3xl bg-stone-950 md:h-full">
       <div className="relative flex min-h-[530px] items-center justify-center overflow-hidden rounded-3xl pt-6 lg:pt-0 md:h-full md:min-h-0">
-        <img
-          src="/images/affiliates/kendo-affiliates-placeholder.svg"
-          alt="Nuestro dojo"
-          width={1920}
-          height={1080}
-          loading="lazy"
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        <div className="absolute inset-0 rounded-3xl bg-black/40" aria-hidden="true" />
+        <picture className="absolute inset-0 h-full w-full">
+          <source
+            srcSet="/images/affiliates/kendo-affiliates.webp"
+            type="image/webp"
+          />
+          <img
+            src="/images/affiliates/kendo-affiliates.jpg"
+            alt="Nuestro dojo"
+            width={1500}
+            height={1001}
+            loading="lazy"
+            className="h-full w-full object-cover"
+          />
+        </picture>
+        <div className="absolute inset-0 rounded-3xl bg-black/30" aria-hidden="true" />
         <div className="relative z-10 w-full max-w-4xl px-4 sm:px-6 md:max-w-5xl lg:max-w-6xl xl:max-w-7xl">
           <InfoCard />
         </div>

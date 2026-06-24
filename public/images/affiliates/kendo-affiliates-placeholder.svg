@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-labelledby="title desc">
-  <title id="title">Kendo affiliates placeholder</title>
-  <desc id="desc">Local placeholder for the affiliates section background.</desc>
-  <rect width="1920" height="1080" fill="#0c0a09"/>
-  <path d="M0 760 C 320 620, 600 820, 960 680 C 1320 540, 1560 620, 1920 480 L 1920 1080 L 0 1080 Z" fill="#1e3a8a" opacity="0.38"/>
-  <path d="M0 870 C 380 720, 660 900, 1040 760 C 1400 630, 1620 700, 1920 610 L 1920 1080 L 0 1080 Z" fill="#991b1b" opacity="0.42"/>
-  <text x="960" y="475" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="68" font-weight="700">Imagen de dojos pendiente</text>
-  <text x="960" y="560" text-anchor="middle" fill="#bfdbfe" font-family="Arial, sans-serif" font-size="34">Fondo local para afiliados</text>
-</svg>
