@@ -30,12 +30,18 @@ export function Footer() {
           <div className="flex flex-col items-center justify-center sm:text-center md:flex-row">
             <ul className="flex flex-col gap-1 text-sm">
               <li>
-                <a href="mailto:info@kendodojo.com">
+                <a
+                  className="hover:transition-colors hover:duration-200 hover:text-blue-400"
+                  href="mailto:info@kendodojo.com"
+                >
                   info@kendodojo.com
                 </a>
               </li>
               <li>
-                <a href="tel:+15550000000">
+                <a
+                  className="hover:transition-colors hover:duration-200 hover:text-blue-400"
+                  href="tel:+15550000000"
+                >
                   +1 (555) 000-0000
                 </a>
               </li>

@@ -69,6 +69,8 @@ export function Lightbox({
           const focusable = dialog!.querySelectorAll<HTMLElement>(
             'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
           );
+          if (focusable.length === 0) break;
+
           const first = focusable[0];
           const last = focusable[focusable.length - 1];
           if (e.shiftKey) {
