@@ -157,17 +157,18 @@ export function AfiliadosSection() {
   return (
     <main className="rounded-3xl bg-stone-950 md:h-full">
       <div className="relative flex min-h-[530px] items-center justify-center overflow-hidden rounded-3xl pt-6 lg:pt-0 md:h-full md:min-h-0">
-        <picture>
-          <img
-            src="https://images.unsplash.com/photo-1765666738346-28ce4c332831?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHw1fHxrZW5kbyUyMG1hcnRpYWwlMjBhcnRzJTIwamFwYW5lc2UlMjBzd29yZHxlbnwxfHx8fDE3ODAxMDAzODB8MA&ixlib=rb-4.1.0&q=80&w=1080"
-            alt="Nuestro dojo"
-            className="absolute inset-0 h-full w-full object-cover"
-          />
+        <img
+          src="/images/affiliates/kendo-affiliates-placeholder.svg"
+          alt="Nuestro dojo"
+          width={1920}
+          height={1080}
+          loading="lazy"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
         <div className="absolute inset-0 rounded-3xl bg-black/40" aria-hidden="true" />
-        <div className="relative z-10 w-full max-w-4xl px-4 sm:px-6 md:max-w-5xl lg:max-w-6xl xl:max-w-7xl index-10">
+        <div className="relative z-10 w-full max-w-4xl px-4 sm:px-6 md:max-w-5xl lg:max-w-6xl xl:max-w-7xl">
           <InfoCard />
         </div>
-        </picture>
       </div>
     </main>
   );

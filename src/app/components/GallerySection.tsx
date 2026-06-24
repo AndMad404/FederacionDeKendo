@@ -70,6 +70,8 @@ function FeaturedImage({
           key={image.id}
           src={image.src}
           alt={image.title}
+          width={image.width}
+          height={image.height}
           className="w-full h-full object-cover transition-transform min-h-[420px] duration-700 group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
@@ -119,6 +121,9 @@ function Thumbnail({ image, onClick }: ThumbnailProps) {
       <img
         src={image.src}
         alt=""
+        width={image.width}
+        height={image.height}
+        loading="lazy"
         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
       />
     </button>

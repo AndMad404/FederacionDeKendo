@@ -1,6 +1,8 @@
 export interface GalleryImage {
   id: number;
   src: string;
+  width: number;
+  height: number;
   title: string;
   tag: string;
   likes: number;

@@ -123,6 +123,8 @@ export function Lightbox({
         <img
           src={image.src}
           alt={image.title}
+          width={image.width}
+          height={image.height}
           className="w-full max-h-[75vh] object-contain rounded-3xl"
         />
 
