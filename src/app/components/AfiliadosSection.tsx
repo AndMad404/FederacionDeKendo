@@ -3,30 +3,22 @@ import { Globe, Mail, MapPin, Phone } from "lucide-react";
 import { DOJOS } from "../data/dojos";
 import type { IconKey, InfoItem, ScheduleSlot } from "../types";
 
-function FacebookIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-    </svg>
-  );
-}
-
-function InstagramIcon() {
-  return (
+const ICON_MAP: Record<IconKey, ReactNode> = {
+  mail: <Mail />,
+  phone: <Phone />,
+  mapPin: <MapPin />,
+  instagram: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
       <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
       <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
       <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
     </svg>
-  );
-}
-
-const ICON_MAP: Record<IconKey, ReactNode> = {
-  mail: <Mail />,
-  phone: <Phone />,
-  mapPin: <MapPin />,
-  instagram: <InstagramIcon />,
-  facebook: <FacebookIcon />,
+  ),
+  facebook: (
+    <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+    </svg>
+  ),
   globe: <Globe />,
 };
 
@@ -62,7 +54,7 @@ function InfoCell({ item, side }: { item: InfoItem; side: "left" | "right" }) {
           href={item.href}
           target="_blank"
           rel="noreferrer"
-          className={`block text-base underline-offset-4 [overflow-wrap:anywhere] hover:underline ${
+          className={`block text-base underline-offset-4 transition-colors duration-200 [overflow-wrap:anywhere] hover:text-blue-400 hover:underline ${
             item.icon === "mail" ? "lg:text-sm" : "lg:text-base"
           }`}
         >
@@ -95,7 +87,7 @@ function DojoInfo({
   info: InfoItem[];
   schedule: ScheduleSlot[];
 }) {
-  const singleScheduleLocation =
+  const allSlotsShareLocation =
     schedule.length > 0 && schedule.every((slot) => slot.location === schedule[0].location);
 
   return (
@@ -118,7 +110,7 @@ function DojoInfo({
           Horario de clases:
         </p>
         <div className="grid gap-1 text-base lg:gap-4">
-          {singleScheduleLocation ? (
+          {allSlotsShareLocation ? (
             <div>
               <p className="text-lg font-bold">
                 {schedule[0].location}

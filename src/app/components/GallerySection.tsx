@@ -39,7 +39,7 @@ interface FeaturedImageProps {
   total: number;
   liked: boolean;
   likeCount: number;
-  onOpen: (e: React.MouseEvent) => void;
+  onOpen: (e: React.MouseEvent<HTMLButtonElement>) => void;
   onPrev: (e: React.MouseEvent) => void;
   onNext: (e: React.MouseEvent) => void;
   onLike: (e: React.MouseEvent) => void;
@@ -132,7 +132,7 @@ export function GallerySection() {
   const { toggle, isLiked, count } = useLikes();
   const [lightboxId, setLightboxId] = useState<number | null>(null);
   // Ref para restaurar foco al cerrar el Lightbox
-  const lightboxTriggerRef = useRef<HTMLElement | null>(null);
+  const lightboxTriggerRef = useRef<HTMLButtonElement | null>(null);
 
   const featured = GALLERY_IMAGES[index];
   const thumbs = Array.from(
@@ -160,7 +160,7 @@ export function GallerySection() {
               liked={isLiked(featured.id)}
               likeCount={count(featured.id, featured.likes)}
               onOpen={(e) => {
-                lightboxTriggerRef.current = e.currentTarget as HTMLElement;
+                lightboxTriggerRef.current = e.currentTarget;
                 setLightboxId(featured.id);
               }}
               onPrev={(e) => {

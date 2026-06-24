@@ -29,8 +29,16 @@ export function Footer() {
           </p>
           <div className="flex flex-col items-center justify-center sm:text-center md:flex-row">
             <ul className="flex flex-col gap-1 text-sm">
-              <li>info@kendodojo.com</li>
-              <li>+1 (555) 000-0000</li>
+              <li>
+                <a href="mailto:info@kendodojo.com">
+                  info@kendodojo.com
+                </a>
+              </li>
+              <li>
+                <a href="tel:+15550000000">
+                  +1 (555) 000-0000
+                </a>
+              </li>
             </ul>
           </div>
         </div>

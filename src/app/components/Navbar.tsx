@@ -9,8 +9,8 @@ const NAV_LINKS = [
 ];
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `text-sm tracking-wide transition-colors duration-200 ${
-    isActive ? "text-red-400 border-b border-red-500 pb-0.5" : "text-gray-400 hover:text-white"
+  `text-base tracking-wide transition-colors duration-200 ${
+    isActive ? "text-blue-400 border-b border-blue-500 pb-0.5" : "text-white hover:transition-colors hover:duration-200 hover:text-red-400"
   }`;
 
 export function Navbar() {
@@ -25,7 +25,7 @@ export function Navbar() {
             <span className="text-white text-xs font-bold tracking-wider">{"\u5263\u9053"}</span>
           </div>
           <div className="flex flex-col leading-none">
-            <span className="text-white text-center font-semibold tracking-widest text-sm">Federacion de Kendo<br/>Costa Rica</span>
+            <span className="text-white text-center font-semibold tracking-widest text-base">Federacion de Kendo<br/>Costa Rica</span>
           </div>
         </Link>
 
