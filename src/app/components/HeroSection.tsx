@@ -10,7 +10,7 @@ function HeroBanner() {
           height={1201}
           className="absolute inset-0 h-full w-full object-cover object-[center_70%]"
           loading="eager"
-          fetchPriority="high"
+          fetchpriority="high"
         />
       </picture>
 
