@@ -25,7 +25,7 @@ export function Navbar() {
             <span className="text-white text-xs font-bold tracking-wider">{"\u5263\u9053"}</span>
           </div>
           <div className="flex flex-col leading-none">
-            <span className="text-white text-center font-semibold tracking-widest text-base">Federacion de Kendo<br/>Costa Rica</span>
+            <span className="text-white text-center font-semibold tracking-widest text-base">Federación de<br/>Asociaciones de Kendo</span>
           </div>
         </Link>
 

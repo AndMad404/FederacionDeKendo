@@ -1,6 +1,6 @@
-# Federación de Kendo Costa Rica
+# Federación de Asociaciones de Kendo
 
-Sitio oficial de la Federación de Kendo Costa Rica, desarrollado con React, TypeScript, Tailwind CSS y Vite a partir del diseño base en Figma.
+Sitio oficial de la Federación de Asociaciones de Kendo, desarrollado con React, TypeScript, Tailwind CSS y Vite a partir del diseño base en Figma.
 
 ## Desarrollo
 

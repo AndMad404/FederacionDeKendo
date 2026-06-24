@@ -51,7 +51,7 @@ export function Footer() {
       </div>
       <div className="px-4 py-2">
         <p className="text-center text-xs text-white/50">
-          <span>{"\u00a9"} 2026 Federacion de Kendo Costa Rica.</span>{" "}
+          <span>{"\u00a9"} 2026 Federación de Asociaciones de Kendo.</span>{" "}
           <span className="block sm:inline">Todos los derechos reservados.</span>
         </p>
       </div>
