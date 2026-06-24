@@ -13,7 +13,7 @@
           />
         </picture>
 
-        <div className="relative z-10 text-center px-4 sm:px-6 py-8 sm:py-6 max-w-2xl flex flex-col items-center gap-4 sm:gap-4 bg-black/40 rounded-4xl">
+        <div className="relative z-10 text-center px-4 sm:px-6 py-8 sm:py-6 max-w-2xl flex flex-col items-center gap-4 sm:gap-4 bg-black/70 rounded-4xl">
           <h1 className="text-red-400 leading-tight text-[clamp(1.5rem,4vw,2.75rem)] font-bold tracking-wide">
             FEDERACIÓN DE KENDO COSTA RICA
           </h1>

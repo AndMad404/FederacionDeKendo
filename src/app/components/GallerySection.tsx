@@ -22,7 +22,7 @@ function NavArrow({ direction, onClick }: NavArrowProps) {
       type="button"
       aria-label={direction === "left" ? "Imagen anterior" : "Imagen siguiente"}
       onClick={onClick}
-      className="pointer-events-auto w-10 h-10 rounded-full bg-black/50 hover:bg-red-700 border border-white/10 flex items-center justify-center transition-colors"
+      className="pointer-events-auto w-10 h-10 rounded-full bg-black/70 hover:bg-red-700 border border-white/10 flex items-center justify-center transition-colors"
     >
       {direction === "left" ? (
         <ChevronLeft size={20} className="text-white" />
