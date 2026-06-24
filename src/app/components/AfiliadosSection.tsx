@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import { Globe, Mail, MapPin, Phone } from "lucide-react";
 import { DOJOS } from "../data/dojos";
 import type { IconKey, InfoItem, ScheduleSlot } from "../types";
@@ -30,13 +30,56 @@ const ICON_MAP: Record<IconKey, ReactNode> = {
   globe: <Globe />,
 };
 
+const DETAIL_GRID =
+  "grid w-full grid-cols-[2rem_minmax(0,1fr)] items-center gap-x-4 gap-y-2 md:grid-cols-[2.5rem_minmax(0,1fr)_2rem_2.5rem_minmax(0,1fr)] md:gap-y-4 lg:grid-cols-[3rem_minmax(0,1fr)_2.5rem_3rem_minmax(0,1fr)]";
+
+function getInfoRows(info: InfoItem[]) {
+  return info.reduce<InfoItem[][]>((rows, item, index) => {
+    if (index % 2 === 0) {
+      rows.push([item]);
+    } else {
+      rows[rows.length - 1].push(item);
+    }
+
+    return rows;
+  }, []);
+}
+
+function InfoCell({ item, side }: { item: InfoItem; side: "left" | "right" }) {
+  const iconColumn = side === "left" ? "col-start-1" : "md:col-start-4";
+  const textColumn = side === "left" ? "col-start-2" : "md:col-start-5";
+
+  return (
+    <Fragment>
+      <span className={`${iconColumn} flex h-8 w-8 items-center justify-center rounded-full bg-blue-500/20 text-red-400 [&>svg]:size-5 md:h-10 md:w-10 lg:h-12 lg:w-12 lg:[&>svg]:size-6`}>
+        {ICON_MAP[item.icon]}
+      </span>
+      <div className={`${textColumn} min-w-0`}>
+        <p className="text-xl font-bold lg:text-lg">
+          {item.label}
+        </p>
+        <a
+          href={item.href}
+          target="_blank"
+          rel="noreferrer"
+          className={`block text-base underline-offset-4 [overflow-wrap:anywhere] hover:underline ${
+            item.icon === "mail" ? "lg:text-sm" : "lg:text-base"
+          }`}
+        >
+          {item.value}
+        </a>
+      </div>
+    </Fragment>
+  );
+}
+
 function ScheduleRow({ days, hours }: Pick<ScheduleSlot, "days" | "hours">) {
   return (
-    <div className="mx-auto grid w-full max-w-xl grid-cols-[1fr_auto] gap-x-4 md:grid-cols-2 md:gap-x-5 lg:gap-x-6">
-      <p className="text-left [overflow-wrap:anywhere]">
+    <div className={DETAIL_GRID}>
+      <p className="col-start-2 text-left [overflow-wrap:anywhere]">
         {days}
       </p>
-      <p className="text-right md:text-left [overflow-wrap:anywhere]">
+      <p className="col-start-2 text-left [overflow-wrap:anywhere] md:col-start-5">
         {hours}
       </p>
     </div>
@@ -61,27 +104,11 @@ function DojoInfo({
         {title}
       </p>
 
-      <div className="grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-4">
-        {info.map((item) => (
-          <div key={item.label} className="flex items-center gap-4">
-            <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-500/20 text-red-400 [&>svg]:size-5 md:h-10 md:w-10 lg:h-12 lg:w-12 lg:[&>svg]:size-6">
-              {ICON_MAP[item.icon]}
-            </span>
-            <div className="min-w-0">
-              <p className="text-xl font-bold lg:text-lg">
-                {item.label}
-              </p>
-              <a
-                href={item.href}
-                target="_blank"
-                rel="noreferrer"
-                className={`block text-base underline-offset-4 [overflow-wrap:anywhere] hover:underline ${
-                  item.icon === "mail" ? "lg:text-sm" : "lg:text-base"
-                }`}
-              >
-                {item.value}
-              </a>
-            </div>
+      <div className="grid gap-2 md:gap-4">
+        {getInfoRows(info).map(([leftItem, rightItem]) => (
+          <div key={leftItem.label} className={DETAIL_GRID}>
+            <InfoCell item={leftItem} side="left" />
+            {rightItem ? <InfoCell item={rightItem} side="right" /> : null}
           </div>
         ))}
       </div>
