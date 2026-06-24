@@ -1,11 +1,29 @@
+# Federación de Kendo Costa Rica
 
-  # Federacion de Kendo
+Sitio oficial de la Federación de Kendo Costa Rica, desarrollado con React, TypeScript, Tailwind CSS y Vite a partir del diseño base en Figma.
 
-  This is a code bundle for Federacion de Kendo. The original project is available at https://www.figma.com/design/p21uXLQF5Jwy55ZN8Q1AxV/Federacion-de-Kendo.
+## Desarrollo
 
-  ## Running the code
+Instala dependencias:
 
-  Run `npm i` to install the dependencies.
+```bash
+npm install
+```
 
-  Run `npm run dev` to start the development server.
-  
+Inicia el servidor local:
+
+```bash
+npm run dev
+```
+
+Genera el build de producción:
+
+```bash
+npm run build
+```
+
+## Configuración pública
+
+La identidad del sitio y los datos públicos pendientes viven en `src/app/config/site.ts`.
+
+Completa ahí el correo, teléfono o redes oficiales de la Federación cuando estén confirmados; los campos vacíos no se muestran en el footer.
