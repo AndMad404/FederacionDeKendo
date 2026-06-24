@@ -17,7 +17,7 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-stone-950/95 backdrop-blur">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-stone-950 backdrop-blur">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
 
         <Link to="/" onClick={() => setOpen(false)} className="flex items-center gap-3">
@@ -54,7 +54,7 @@ export function Navbar() {
       </div>
 
       {open && (
-        <div id="mobile-menu" className="md:hidden bg-stone-950 border-t border-white/5 px-6 py-5 flex flex-col gap-5">
+        <div id="mobile-menu" className="md:hidden bg-stone-950 border-t border-white/5 px-6 py-5 flex flex-col items-center gap-5 text-center">
           {NAV_LINKS.map((link) => (
             <NavLink
               key={link.to}
