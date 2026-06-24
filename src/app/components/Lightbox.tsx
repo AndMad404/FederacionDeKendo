@@ -111,7 +111,7 @@ export function Lightbox({
           ref={closeBtnRef}
           aria-label="Cerrar galería"
           onClick={onClose}
-          className="absolute -top-14 right-0 flex items-center justify-center w-11 h-11 rounded-full bg-red-700 hover:bg-red-600 text-white transition-colors"
+          className="absolute -top-14 right-0 flex items-center justify-center w-11 h-11 rounded-full bg-red-700 hover:bg-red-600 text-white transition-colors cursor-pointer"
         >
           <X size={20} />
         </button>
@@ -133,7 +133,7 @@ export function Lightbox({
                 e.stopPropagation();
                 onPrev();
               }}
-              className="fixed left-3 md:left-6 top-1/2 -translate-y-1/2 z-50 flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+              className="fixed left-3 md:left-6 top-1/2 -translate-y-1/2 z-50 flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
             >
               <ChevronLeft size={22} />
             </button>
@@ -144,7 +144,7 @@ export function Lightbox({
                 e.stopPropagation();
                 onNext();
               }}
-              className="fixed right-3 md:right-6 top-1/2 -translate-y-1/2 z-50 flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+              className="fixed right-3 md:right-6 top-1/2 -translate-y-1/2 z-50 flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
             >
               <ChevronRight size={22} />
             </button>
@@ -164,6 +164,7 @@ export function Lightbox({
             count={likeCount}
             onClick={onToggleLike}
             size="md"
+            className="cursor-pointer"
           />
         </div>
       </div>
