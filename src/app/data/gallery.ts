@@ -52,8 +52,8 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     src: "/images/gallery/kendo-gallery-06.webp",
     width: 1600,
     height: 1067,
-    title: "Kata y Forma",
-    tag: "Técnica",
+    title: "Técnica",
+    tag: "Kirikaeshi",
     likes: 278,
   },
   {
