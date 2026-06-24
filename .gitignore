@@ -55,4 +55,3 @@ pnpm-debug.log*
 .DS_Store?
 ._*
 Thumbs.db
-node_modules
