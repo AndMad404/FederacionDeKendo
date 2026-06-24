@@ -24,6 +24,10 @@ const ICON_MAP: Record<IconKey, ReactNode> = {
 
 const DETAIL_GRID =
   "grid w-full grid-cols-[2rem_minmax(0,1fr)] items-center gap-x-4 gap-y-2 md:grid-cols-[2.5rem_minmax(0,1fr)_2rem_2.5rem_minmax(0,1fr)] md:gap-y-4 lg:grid-cols-[3rem_minmax(0,1fr)_2.5rem_3rem_minmax(0,1fr)]";
+const INFO_GRID =
+  "grid w-full grid-cols-[2rem_minmax(0,1fr)] items-center gap-x-4 gap-y-2 md:grid-cols-[2.5rem_minmax(11rem,1.1fr)_1.5rem_2.5rem_minmax(0,1fr)] md:gap-y-4 lg:grid-cols-[3rem_minmax(13rem,1.1fr)_2rem_3rem_minmax(0,1fr)]";
+const SCHEDULE_GRID =
+  "grid w-full grid-cols-1 items-center gap-y-1 text-center md:grid-cols-[2.5rem_minmax(0,1fr)_2rem_2.5rem_minmax(0,1fr)] md:gap-x-4 md:gap-y-4 lg:grid-cols-[3rem_minmax(0,1fr)_2.5rem_3rem_minmax(0,1fr)]";
 
 function getInfoRows(info: InfoItem[]) {
   return info.reduce<InfoItem[][]>((rows, item, index) => {
@@ -54,9 +58,7 @@ function InfoCell({ item, side }: { item: InfoItem; side: "left" | "right" }) {
           href={item.href}
           target="_blank"
           rel="noreferrer"
-          className={`block text-base underline-offset-4 transition-colors duration-200 [overflow-wrap:anywhere] hover:text-blue-400 hover:underline ${
-            item.icon === "mail" ? "lg:text-sm" : "lg:text-base"
-          }`}
+          className="block text-base underline-offset-4 transition-colors duration-200 [overflow-wrap:anywhere] hover:text-blue-400 hover:underline lg:text-base"
         >
           {item.value}
         </a>
@@ -67,11 +69,11 @@ function InfoCell({ item, side }: { item: InfoItem; side: "left" | "right" }) {
 
 function ScheduleRow({ days, hours }: Pick<ScheduleSlot, "days" | "hours">) {
   return (
-    <div className={DETAIL_GRID}>
-      <p className="col-start-2 text-left [overflow-wrap:anywhere]">
+    <div className={SCHEDULE_GRID}>
+      <p className="text-center [overflow-wrap:anywhere] md:col-start-2 md:text-left">
         {days}
       </p>
-      <p className="col-start-2 text-left [overflow-wrap:anywhere] md:col-start-5">
+      <p className="text-center [overflow-wrap:anywhere] md:col-start-5 md:text-left">
         {hours}
       </p>
     </div>
@@ -98,7 +100,7 @@ function DojoInfo({
 
       <div className="grid gap-2 md:gap-4">
         {getInfoRows(info).map(([leftItem, rightItem]) => (
-          <div key={leftItem.label} className={DETAIL_GRID}>
+          <div key={leftItem.label} className={INFO_GRID}>
             <InfoCell item={leftItem} side="left" />
             {rightItem ? <InfoCell item={rightItem} side="right" /> : null}
           </div>
