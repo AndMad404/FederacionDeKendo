@@ -32,17 +32,9 @@ export function Footer() {
               <li>
                 <a
                   className="hover:transition-colors hover:duration-200 hover:text-blue-400"
-                  href="mailto:info@kendodojo.com"
+                  href="mailto:secretaria.fedekendo@outlook.com"
                 >
-                  info@kendodojo.com
-                </a>
-              </li>
-              <li>
-                <a
-                  className="hover:transition-colors hover:duration-200 hover:text-blue-400"
-                  href="tel:+15550000000"
-                >
-                  +1 (555) 000-0000
+                  secretaria.fedekendo@outlook.com
                 </a>
               </li>
             </ul>

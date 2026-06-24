@@ -23,7 +23,7 @@ function HeroBanner() {
           </h1>
         </div>
 
-        <div className="mx-auto flex max-w-2xl flex-col items-center gap-3 rounded-3xl border border-blue-500/70 bg-black/70 px-4 py-5 shadow-2xl sm:px-8 md:px-10">
+        <div className="mx-auto flex max-w-2xl flex-col items-center gap-1 rounded-3xl border border-blue-500/70 bg-black/70 px-4 py-5 shadow-2xl sm:px-8 md:px-10">
           <h2 className="text-[clamp(1.25rem,3vw,2rem)] font-semibold leading-tight tracking-tight text-white">
             EL CAMINO DE LA ESPADA
             <br />
