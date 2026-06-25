@@ -4,7 +4,7 @@ import { Menu, X } from "lucide-react";
 
 const NAV_LINKS = [
   { to: "/", label: "Inicio", end: true },
-  { to: "/galeria", label: "Galer\u00eda" },
+  { to: "/galeria", label: "Galería" },
   { to: "/afiliados", label: "Afiliados" },
 ];
 
@@ -19,14 +19,25 @@ export function Navbar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-stone-950 backdrop-blur">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-
-        <Link to="/" onClick={() => setOpen(false)} className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-red-700 flex items-center justify-center">
-            <span className="text-white text-xs font-bold tracking-wider">{"\u5263\u9053"}</span>
-          </div>
-          <div className="flex flex-col leading-none">
-            <span className="text-white text-center font-semibold tracking-widest text-base">Federación de<br/>Asociaciones de Kendo</span>
-          </div>
+        <Link to="/" onClick={() => setOpen(false)} className="flex min-w-0 items-center gap-3">
+          <picture>
+            <source
+              srcSet="/images/logo/fakcr-lockup-112.webp 112w, /images/logo/fakcr-lockup-224.webp 224w"
+              sizes="56px"
+              type="image/webp"
+            />
+            <img
+              src="/images/logo/fakcr-lockup-224.png"
+              alt=""
+              aria-hidden="true"
+              className="h-14 w-14 shrink-0 rounded-sm bg-white object-contain"
+              width="56"
+              height="56"
+            />
+          </picture>
+          <span className="max-w-[11rem] text-sm font-semibold leading-tight tracking-wide text-white sm:max-w-none sm:text-base">
+            Federación de<br className="sm:hidden" /> Asociaciones de Kendo
+          </span>
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
@@ -46,7 +57,7 @@ export function Navbar() {
           className="md:hidden text-gray-400 hover:text-white"
           aria-controls="mobile-menu"
           aria-expanded={open}
-          aria-label={open ? "Cerrar men\u00fa" : "Abrir men\u00fa"}
+          aria-label={open ? "Cerrar menú" : "Abrir menú"}
           onClick={() => setOpen(!open)}
         >
           {open ? <X size={22} /> : <Menu size={22} />}
