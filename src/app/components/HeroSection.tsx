@@ -1,6 +1,6 @@
 function HeroBanner() {
   return (
-    <header className="relative flex min-h-[80svh] items-stretch overflow-hidden rounded-3xl">
+    <header className="relative flex min-h-[calc(100dvh-4rem)] items-stretch overflow-hidden rounded-3xl md:h-full md:min-h-0">
       <picture className="absolute inset-0 h-full w-full">
         <source srcSet="/images/gallery/kendo-gallery-08.webp" type="image/webp" />
         <img
@@ -10,7 +10,7 @@ function HeroBanner() {
           height={1201}
           className="absolute inset-0 h-full w-full object-cover object-[center_70%]"
           loading="eager"
-          fetchpriority="high"
+          fetchPriority="high"
         />
       </picture>
 
@@ -43,7 +43,7 @@ function HeroBanner() {
 
 export function HeroSection() {
   return (
-    <main>
+    <main className="md:h-full">
       <HeroBanner />
     </main>
   );

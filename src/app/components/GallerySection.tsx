@@ -50,7 +50,7 @@ function FeaturedImage({
 }: FeaturedImageProps) {
   return (
     <div
-      className="group relative aspect-[3/2] min-h-[320px] w-full overflow-hidden rounded-3xl bg-stone-800 cursor-pointer md:min-h-0 md:flex-1"
+      className="group relative min-h-0 flex-1 w-full overflow-hidden rounded-3xl bg-stone-800 cursor-pointer"
     >
       <button
         type="button"
@@ -137,11 +137,11 @@ export function GallerySection() {
     : -1;
 
   return (
-    <main className="bg-stone-950 md:h-full">
-      <div className="mx-auto flex min-h-0 flex-col h-full min-h-[530px]">
-        <div className="flex min-h-0 flex-col gap-4 md:flex-1">
+    <main className="h-[calc(100dvh-4rem)] overflow-hidden bg-stone-950 md:h-full md:min-h-0">
+      <div className="mx-auto flex h-full min-h-0 flex-col">
+        <div className="flex min-h-0 flex-1 flex-col gap-4">
           <div
-            className="flex min-h-0 flex-col gap-2 md:flex-1 min-h-[530px]"
+            className="flex min-h-0 flex-1 flex-col gap-2"
           >
             <FeaturedImage
               image={featured}

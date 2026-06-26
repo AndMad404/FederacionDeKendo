@@ -41,8 +41,8 @@ export const GALLERY_IMAGES: GalleryImage[] = [
   {
     id: 5,
     src: "/images/gallery/kendo-gallery-05.webp",
-    width: 1600,
-    height: 1067,
+    width: 1066,
+    height: 1600,
     title: "Vestimenta Tradicional",
     tag: "Keikogi",
     likes: 156,

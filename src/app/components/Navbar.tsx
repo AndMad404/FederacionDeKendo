@@ -65,7 +65,7 @@ export function Navbar() {
       </div>
 
       {open && (
-        <div id="mobile-menu" className="md:hidden bg-stone-950 border-t border-white/5 px-6 py-5 flex flex-col items-center gap-5 text-center">
+        <div id="mobile-menu" className="md:hidden bg-stone-950 px-6 py-5 flex flex-col items-center gap-5 text-center">
           {NAV_LINKS.map((link) => (
             <NavLink
               key={link.to}
