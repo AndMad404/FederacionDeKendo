@@ -2,6 +2,8 @@ import { useEffect, useRef, type RefObject } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import type { GalleryImage } from "../types";
 
+const LIGHTBOX_IMAGE_SIZES = "(max-width: 640px) 92vw, 75vw";
+
 interface LightboxProps {
   image: GalleryImage;
   triggerRef: RefObject<HTMLElement | null>;
@@ -105,10 +107,13 @@ export function Lightbox({
         <div className="mx-auto w-fit max-w-full overflow-hidden rounded-3xl">
           <img
             src={image.src}
+            srcSet={image.srcSet}
+            sizes={LIGHTBOX_IMAGE_SIZES}
             alt={image.title}
             width={image.width}
             height={image.height}
-            className="block max-h-[58dvh] max-w-full w-auto object-contain sm:max-h-[75vh]"
+            decoding="async"
+            className="block w-auto max-w-full max-h-[58dvh] object-contain sm:max-h-[75vh]"
           />
         </div>
 

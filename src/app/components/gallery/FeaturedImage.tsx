@@ -62,6 +62,7 @@ export function FeaturedImage({
           width={image.width}
           height={image.height}
           loading="eager"
+          decoding="async"
           {...highPriorityImageProps}
           style={{ objectPosition: image.objectPosition }}
           className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
