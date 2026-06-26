@@ -56,3 +56,5 @@ corepack pnpm images:gallery
 Esto genera los banners optimizados, los WebP de galeria, thumbnails, actualiza `src/app/data/gallery.ts` y deja un manifiesto local en `local/gallery-manifest.ts` para revision.
 
 El script conserva los datos editoriales existentes de la galeria: `title`, `tag`, `likes`, `objectPosition` y `date`.
+
+Si Windows reporta una imagen como ocupada, cierra el navegador, vistas previas o el servidor local que la este usando y vuelve a correr el comando.

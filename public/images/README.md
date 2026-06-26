@@ -58,3 +58,5 @@ The script generates:
 - `local/gallery-manifest.ts`
 
 The script preserves existing gallery editorial data: `title`, `tag`, `likes`, `objectPosition`, and `date`. Review `local/gallery-manifest.ts` only as a local audit file.
+
+If Windows reports an image as busy, close the browser, image previews, or local dev server using it and run the command again.
