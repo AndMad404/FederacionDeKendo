@@ -21,6 +21,7 @@ Genera el build de produccion:
 ```bash
 pnpm build
 ```
+<<<<<<< HEAD
 
 ## Imagenes de galeria
 
@@ -58,3 +59,5 @@ Esto genera los banners optimizados, los WebP de galeria, thumbnails, actualiza 
 El script conserva los datos editoriales existentes de la galeria: `title`, `tag`, `likes`, `objectPosition` y `date`.
 
 Si Windows reporta una imagen como ocupada, cierra el navegador, vistas previas o el servidor local que la este usando y vuelve a correr el comando.
+=======
+>>>>>>> parent of 6186d40b (Merge pull request #8 from AndMad404/fixes_lighthouse)

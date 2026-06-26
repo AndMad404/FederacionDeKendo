@@ -14,6 +14,7 @@ Recommended exports:
 - Keep descriptive filenames, dimensions in code, and meaningful alt text.
 
 Current site images use WebP first, with JPG fallbacks for hero and affiliates.
+<<<<<<< HEAD
 
 ## Gallery processing
 
@@ -60,3 +61,5 @@ The script generates:
 The script preserves existing gallery editorial data: `title`, `tag`, `likes`, `objectPosition`, and `date`. Review `local/gallery-manifest.ts` only as a local audit file.
 
 If Windows reports an image as busy, close the browser, image previews, or local dev server using it and run the command again.
+=======
+>>>>>>> parent of 6186d40b (Merge pull request #8 from AndMad404/fixes_lighthouse)
