@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
-    "dev": "vite"
+    "dev": "vite",
+    "images:gallery": "node scripts/process-gallery-images.mjs"
   },
   "dependencies": {
     "lucide-react": "0.487.0",
@@ -19,6 +20,7 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@vitejs/plugin-react": "4.7.0",
+    "sharp": "^0.35.2",
     "tailwindcss": "4.1.12",
     "typescript": "^6.0.3",
     "vite": "^6.4.3"

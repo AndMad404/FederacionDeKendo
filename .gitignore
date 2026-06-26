@@ -9,6 +9,9 @@ dist-ssr/
 .eslintcache
 *.tsbuildinfo
 
+# Local-only source assets and generated review manifests
+local/
+
 # Environment
 .env
 .env.local
