@@ -2,8 +2,6 @@ import { useState, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { GALLERY_IMAGES } from "../data/gallery";
 import { useCarousel } from "../hooks/useCarousel";
-import { useLikes } from "../hooks/useLikes";
-import { LikeButton } from "./LikeButton";
 import { Lightbox } from "./Lightbox";
 import type { GalleryImage } from "../types";
 
@@ -37,24 +35,18 @@ interface FeaturedImageProps {
   image: GalleryImage;
   index: number;
   total: number;
-  liked: boolean;
-  likeCount: number;
   onOpen: (e: React.MouseEvent<HTMLButtonElement>) => void;
   onPrev: (e: React.MouseEvent) => void;
   onNext: (e: React.MouseEvent) => void;
-  onLike: (e: React.MouseEvent) => void;
 }
 
 function FeaturedImage({
   image,
   index,
   total,
-  liked,
-  likeCount,
   onOpen,
   onPrev,
   onNext,
-  onLike,
 }: FeaturedImageProps) {
   return (
     <div
@@ -89,14 +81,6 @@ function FeaturedImage({
           </p>
         </div>
       </button>
-
-      <LikeButton
-        liked={liked}
-        count={likeCount}
-        onClick={onLike}
-        size="md"
-        className="absolute top-4 right-4 shadow"
-      />
 
       <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-3 pointer-events-none">
         <NavArrow direction="left" onClick={onPrev} />
@@ -136,7 +120,6 @@ function Thumbnail({ image, onClick }: ThumbnailProps) {
 
 export function GallerySection() {
   const { index, prev, next, goTo } = useCarousel(GALLERY_IMAGES.length);
-  const { toggle, isLiked, count } = useLikes();
   const [lightboxId, setLightboxId] = useState<number | null>(null);
   // Ref para restaurar foco al cerrar el Lightbox
   const lightboxTriggerRef = useRef<HTMLButtonElement | null>(null);
@@ -164,8 +147,6 @@ export function GallerySection() {
               image={featured}
               index={index}
               total={GALLERY_IMAGES.length}
-              liked={isLiked(featured.id)}
-              likeCount={count(featured.id, featured.likes)}
               onOpen={(e) => {
                 lightboxTriggerRef.current = e.currentTarget;
                 setLightboxId(featured.id);
@@ -178,7 +159,6 @@ export function GallerySection() {
                 e.stopPropagation();
                 next();
               }}
-              onLike={(e) => toggle(featured.id, e)}
             />
 
           {/* Thumbnails — tira horizontal en mobile */}
@@ -216,8 +196,6 @@ export function GallerySection() {
       {lightboxImage && (
         <Lightbox
           image={lightboxImage}
-          liked={isLiked(lightboxImage.id)}
-          likeCount={count(lightboxImage.id, lightboxImage.likes)}
           triggerRef={lightboxTriggerRef}
           onClose={() => setLightboxId(null)}
           onPrev={() => {
@@ -228,7 +206,6 @@ export function GallerySection() {
             const newIndex = (lightboxIndex + 1) % GALLERY_IMAGES.length;
             setLightboxId(GALLERY_IMAGES[newIndex].id);
           }}
-          onToggleLike={(e) => toggle(lightboxImage.id, e)}
         />
       )}
     </main>

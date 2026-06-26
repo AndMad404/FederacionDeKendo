@@ -1,29 +1,22 @@
 import { useEffect, useRef } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
-import { LikeButton } from "./LikeButton";
 import type { GalleryImage } from "../types";
 
 interface LightboxProps {
   image: GalleryImage;
-  liked: boolean;
-  likeCount: number;
   /** Ref al elemento que abrió el lightbox — se le restaura el foco al cerrar */
   triggerRef: React.RefObject<HTMLElement | null>;
   onClose: () => void;
   onPrev: () => void;
   onNext: () => void;
-  onToggleLike: (e: React.MouseEvent) => void;
 }
 
 export function Lightbox({
   image,
-  liked,
-  likeCount,
   triggerRef,
   onClose,
   onPrev,
   onNext,
-  onToggleLike,
 }: LightboxProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
@@ -128,7 +121,7 @@ export function Lightbox({
           className="w-full max-h-[75vh] object-contain rounded-3xl"
         />
 
-        {/* Footer: nav + info + like */}
+        {/* Footer: nav + info */}
         <div className="flex items-center justify-between mt-4 text-white">
           <div className="flex items-center gap-2">
             <button
@@ -163,14 +156,6 @@ export function Lightbox({
               {image.tag}
             </p>
           </div>
-
-          <LikeButton
-            liked={liked}
-            count={likeCount}
-            onClick={onToggleLike}
-            size="md"
-            className="cursor-pointer"
-          />
         </div>
       </div>
     </div>

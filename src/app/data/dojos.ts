@@ -2,7 +2,7 @@ import type { DojoData } from "../types";
 
 export const DOJOS: DojoData[] = [
   {
-    title: "Koken Chiai Dojo",
+    title: "Asociaci\u00f3n Deportiva Kendo Koken Chiai",
     info: [
       {
         icon: "mail",
