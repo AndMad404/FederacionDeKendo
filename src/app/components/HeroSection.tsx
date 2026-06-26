@@ -1,3 +1,5 @@
+const highPriorityImageProps = { fetchpriority: "high" } as const;
+
 function HeroBanner() {
   return (
     <header className="relative flex min-h-[calc(100dvh-4rem)] items-stretch overflow-hidden rounded-3xl md:h-full md:min-h-0">
@@ -10,7 +12,7 @@ function HeroBanner() {
           height={1201}
           className="absolute inset-0 h-full w-full object-cover object-[center_70%]"
           loading="eager"
-          fetchPriority="high"
+          {...highPriorityImageProps}
         />
       </picture>
 
@@ -27,7 +29,7 @@ function HeroBanner() {
           <h2 className="text-[clamp(1.25rem,3vw,2rem)] font-semibold leading-tight tracking-tight text-white">
             EL CAMINO DE LA ESPADA
             <br />
-            剣道           
+            剣道
           </h2>
 
           <p className="max-w-sm text-sm leading-relaxed text-white sm:max-w-md sm:text-base">

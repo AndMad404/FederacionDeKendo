@@ -1,14 +1,14 @@
 export function Footer() {
   return (
-    <footer className="text-white bg-stone-950">
+    <footer className="bg-stone-950 text-white">
       <div className="mx-auto grid max-w-6xl grid-cols-1 justify-items-center gap-3 px-4 pt-2 text-center md:grid-cols-2 md:px-0">
         <div className="flex max-w-md flex-col items-center gap-2">
           <div className="flex items-center justify-center gap-3">
             <div className="flex items-baseline gap-1">
-              <p className="text-white font-semibold tracking-widest text-base font-extrabold">
+              <p className="text-base font-extrabold tracking-widest text-white">
                 Propósito del
               </p>
-              <p className="text-red-400 text-base font-bold">
+              <p className="text-base font-bold text-red-400">
                 KENDO
               </p>
             </div>
@@ -26,7 +26,7 @@ export function Footer() {
             <ul className="flex flex-col gap-1 text-sm">
               <li>
                 <a
-                  className="hover:transition-colors hover:duration-200 hover:text-blue-400"
+                  className="hover:text-blue-400"
                   href="mailto:secretaria.fedekendo@outlook.com"
                 >
                   secretaria.fedekendo@outlook.com

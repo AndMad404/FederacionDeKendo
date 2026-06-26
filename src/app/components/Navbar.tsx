@@ -10,16 +10,22 @@ const NAV_LINKS = [
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   `text-base tracking-wide transition-colors duration-200 ${
-    isActive ? "text-blue-400 border-b border-blue-500 pb-0.5" : "text-white hover:transition-colors hover:duration-200 hover:text-red-400"
+    isActive
+      ? "border-b border-blue-500 pb-0.5 text-blue-400"
+      : "text-white hover:text-red-400"
   }`;
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-stone-950 backdrop-blur">
-      <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link to="/" onClick={() => setOpen(false)} className="flex min-w-0 items-center gap-3">
+    <nav className="fixed left-0 right-0 top-0 z-50 bg-stone-950 backdrop-blur">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+        <Link
+          to="/"
+          onClick={() => setOpen(false)}
+          className="flex min-w-0 items-center gap-3"
+        >
           <picture>
             <source
               srcSet="/images/logo/fakcr-lockup-112.webp 112w, /images/logo/fakcr-lockup-224.webp 224w"
@@ -40,7 +46,7 @@ export function Navbar() {
           </span>
         </Link>
 
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden items-center gap-8 md:flex">
           {NAV_LINKS.map((link) => (
             <NavLink
               key={link.to}
@@ -54,7 +60,8 @@ export function Navbar() {
         </div>
 
         <button
-          className="md:hidden text-gray-400 hover:text-white"
+          type="button"
+          className="text-gray-400 hover:text-white md:hidden"
           aria-controls="mobile-menu"
           aria-expanded={open}
           aria-label={open ? "Cerrar menú" : "Abrir menú"}
@@ -65,7 +72,10 @@ export function Navbar() {
       </div>
 
       {open && (
-        <div id="mobile-menu" className="md:hidden bg-stone-950 px-6 py-5 flex flex-col items-center gap-5 text-center">
+        <div
+          id="mobile-menu"
+          className="flex flex-col items-center gap-5 bg-stone-950 px-6 py-5 text-center md:hidden"
+        >
           {NAV_LINKS.map((link) => (
             <NavLink
               key={link.to}
