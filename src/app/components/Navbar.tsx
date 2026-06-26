@@ -30,7 +30,7 @@ export function Navbar() {
               src="/images/logo/fakcr-lockup-224.png"
               alt=""
               aria-hidden="true"
-              className="h-14 w-14 shrink-0 rounded-sm bg-white object-contain"
+              className="h-14 w-14 shrink-0 rounded-full bg-white object-contain"
               width="56"
               height="56"
             />
