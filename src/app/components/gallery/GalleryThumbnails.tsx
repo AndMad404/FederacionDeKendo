@@ -11,7 +11,7 @@ function Thumbnail({ image, onClick }: ThumbnailProps) {
       type="button"
       aria-label={`Ver imagen: ${image.title}`}
       onClick={onClick}
-      className="group relative h-full w-full cursor-pointer overflow-hidden rounded-lg bg-stone-800"
+      className="group relative aspect-[4/3] h-full w-full cursor-pointer overflow-hidden rounded-lg bg-stone-800"
     >
       <img
         src={image.thumbnailSrc}
@@ -19,6 +19,7 @@ function Thumbnail({ image, onClick }: ThumbnailProps) {
         width={image.thumbnailWidth}
         height={image.thumbnailHeight}
         loading="lazy"
+        decoding="async"
         sizes="(min-width: 768px) 16vw, 17vw"
         style={{ objectPosition: image.objectPosition }}
         className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
