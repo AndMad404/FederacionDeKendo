@@ -1,11 +1,21 @@
-import { useEffect } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router";
 import { Navbar } from "./components/Navbar";
 import { HeroSection } from "./components/HeroSection";
-import { GallerySection } from "./components/GallerySection";
-import { AfiliadosSection } from "./components/AfiliadosSection";
 import { Footer } from "./components/Footer";
 import { DEFAULT_SITE_DESCRIPTION, ROUTE_META } from "./config/seo";
+
+const GallerySection = lazy(() =>
+  import("./components/GallerySection").then((module) => ({
+    default: module.GallerySection,
+  })),
+);
+
+const AfiliadosSection = lazy(() =>
+  import("./components/AfiliadosSection").then((module) => ({
+    default: module.AfiliadosSection,
+  })),
+);
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -49,11 +59,13 @@ export default function App() {
       <Navbar />
 
       <div className="min-h-0 flex-1 pt-16 md:overflow-hidden">
-        <Routes>
-          <Route path="/" element={<HeroSection />} />
-          <Route path="/galeria" element={<GallerySection />} />
-          <Route path="/afiliados" element={<AfiliadosSection />} />
-        </Routes>
+        <Suspense fallback={null}>
+          <Routes>
+            <Route path="/" element={<HeroSection />} />
+            <Route path="/galeria" element={<GallerySection />} />
+            <Route path="/afiliados" element={<AfiliadosSection />} />
+          </Routes>
+        </Suspense>
       </div>
 
       <Footer />
