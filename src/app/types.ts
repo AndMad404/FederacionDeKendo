@@ -6,6 +6,7 @@ export interface GalleryImage {
   width: number;
   height: number;
   thumbnailSrc: string;
+  thumbnailSrcSet?: string;
   thumbnailWidth: number;
   thumbnailHeight: number;
   objectPosition?: string;

@@ -1,5 +1,7 @@
 import type { GalleryImage } from "../../types";
 
+const THUMBNAIL_SIZES = "(min-width: 768px) 168px, 17vw";
+
 interface ThumbnailProps {
   image: GalleryImage;
   onClick: () => void;
@@ -15,12 +17,13 @@ function Thumbnail({ image, onClick }: ThumbnailProps) {
     >
       <img
         src={image.thumbnailSrc}
+        srcSet={image.thumbnailSrcSet}
         alt=""
         width={image.thumbnailWidth}
         height={image.thumbnailHeight}
         loading="lazy"
         decoding="async"
-        sizes="(min-width: 768px) 16vw, 17vw"
+        sizes={THUMBNAIL_SIZES}
         style={{ objectPosition: image.objectPosition }}
         className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
       />

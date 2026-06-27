@@ -161,6 +161,11 @@ export function AfiliadosSection() {
       <div className="relative flex min-h-[530px] items-center justify-center overflow-hidden rounded-3xl pt-6 lg:pt-0 md:h-full md:min-h-0">
         <picture className="absolute inset-0 h-full w-full">
           <source
+            srcSet="/images/affiliates/kendo-affiliates-768.avif 768w, /images/affiliates/kendo-affiliates-1200.avif 1200w"
+            sizes="(min-width: 1024px) 1200px, 100vw"
+            type="image/avif"
+          />
+          <source
             srcSet="/images/affiliates/kendo-affiliates-768.webp 768w, /images/affiliates/kendo-affiliates-1200.webp 1200w"
             sizes="(min-width: 1024px) 1200px, 100vw"
             type="image/webp"
