@@ -2,7 +2,7 @@ import type { DojoData } from "../types";
 
 export const DOJOS: DojoData[] = [
   {
-    title: "Asociaci\u00f3n Deportiva Kendo Koken Chiai",
+    title: "Asociación Deportiva Kendo Koken Chiai",
     info: [
       {
         icon: "mail",
@@ -12,20 +12,20 @@ export const DOJOS: DojoData[] = [
       },
       {
         icon: "phone",
-        label: "Tel\u00e9fono",
+        label: "Teléfono",
         value: "+506 8869 9205",
         href: "tel:+50688699205",
       },
       {
         icon: "mapPin",
         label: "Moravia / Guadalupe",
-        value: "Ver ubicaci\u00f3n",
+        value: "Ver ubicación",
         href: "https://maps.app.goo.gl/WeVxr3pNL7N2hkos5",
       },
       {
         icon: "mapPin",
         label: "Curridabat",
-        value: "Ver ubicaci\u00f3n",
+        value: "Ver ubicación",
         href: "https://maps.app.goo.gl/jKnHfSwpWiobTCkN6",
       },
       {
@@ -38,7 +38,7 @@ export const DOJOS: DojoData[] = [
     schedule: [
       {
         location: "Moravia / Guadalupe",
-        days: "Lunes, Mi\u00e9rcoles y Viernes",
+        days: "Lunes, Miércoles y Viernes",
         hours: "8:15 - 9:30 PM",
       },
       {
@@ -59,7 +59,7 @@ export const DOJOS: DojoData[] = [
       },
       {
         icon: "phone",
-        label: "Tel\u00e9fono",
+        label: "Teléfono",
         value: "+506 6005 9090",
         href: "tel:+50660059090",
       },
@@ -72,7 +72,7 @@ export const DOJOS: DojoData[] = [
       {
         icon: "mapPin",
         label: "Colegio Europeo",
-        value: "Ver ubicaci\u00f3n",
+        value: "Ver ubicación",
         href: "https://waze.com/ul/hd1u0y5tcp",
       },
     ],
@@ -84,12 +84,12 @@ export const DOJOS: DojoData[] = [
       },
       {
         location: "Colegio Europeo",
-        days: "S\u00e1bado",
+        days: "Sábado",
         hours: "11:00 AM - 12:15 PM",
       },
       {
         location: "Colegio Europeo",
-        days: "S\u00e1bado",
+        days: "Sábado",
         hours: "12:15 - 2:00 PM",
       },
     ],
