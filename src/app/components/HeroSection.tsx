@@ -4,7 +4,11 @@ function HeroBanner() {
   return (
     <header className="relative flex min-h-[calc(100dvh-4rem)] items-stretch overflow-hidden rounded-3xl md:h-full md:min-h-0">
       <picture className="absolute inset-0 h-full w-full">
-        <source srcSet="/images/gallery/kendo-gallery-08.webp" type="image/webp" />
+        <source
+          srcSet="/images/gallery/thumbs/kendo-gallery-08-480.webp 480w, /images/gallery/kendo-gallery-08-960.webp 960w, /images/gallery/kendo-gallery-08-1600.webp 1600w"
+          sizes="100vw"
+          type="image/webp"
+        />
         <img
           src="/images/gallery/kendo-gallery-08.jpg"
           alt="Kendo en el dojo"

@@ -21,43 +21,31 @@ Genera el build de produccion:
 ```bash
 pnpm build
 ```
-<<<<<<< HEAD
 
 ## Imagenes de galeria
 
-Los originales de galeria se trabajan solo en local y no se suben al repo.
+Las variantes responsive de las imagenes LCP se generan desde los JPG fallback versionados en `public/images`.
 
-1. Copia las fotos originales a `local/image-originals/` con estos nombres:
-
-```text
-Afiliados Banner.jpg
-Hero Banner.jpg
-Kendo Gallery (1).jpeg
-Kendo Gallery (2).jpg
-Kendo Gallery (3).jpg
-Kendo Gallery (4).jpg
-Kendo Gallery (5).jpeg
-Kendo Gallery (6).JPG
-Kendo Gallery (7).JPG
-Kendo Gallery (8).jpeg
-```
-
-2. Ejecuta:
+Genera las variantes:
 
 ```bash
-pnpm images:gallery
+pnpm images:responsive
 ```
 
 Si `pnpm` no esta disponible directo en PowerShell, usa:
 
 ```bash
-corepack pnpm images:gallery
+corepack pnpm images:responsive
 ```
 
-Esto genera los banners optimizados, los WebP de galeria, thumbnails, actualiza `src/app/data/gallery.ts` y deja un manifiesto local en `local/gallery-manifest.ts` para revision.
+Esto genera las variantes usadas por `srcSet` en Home, Galeria y Afiliados.
 
-El script conserva los datos editoriales existentes de la galeria: `title`, `tag`, `likes`, `objectPosition` y `date`.
+Las rutas LCP usan variantes responsive:
+
+- `public/images/gallery/thumbs/kendo-gallery-08-480.webp`
+- `public/images/gallery/kendo-gallery-08-960.webp`
+- `public/images/gallery/kendo-gallery-08-1600.webp`
+- `public/images/affiliates/kendo-affiliates-768.webp`
+- `public/images/affiliates/kendo-affiliates-1200.webp`
 
 Si Windows reporta una imagen como ocupada, cierra el navegador, vistas previas o el servidor local que la este usando y vuelve a correr el comando.
-=======
->>>>>>> parent of 6186d40b (Merge pull request #8 from AndMad404/fixes_lighthouse)

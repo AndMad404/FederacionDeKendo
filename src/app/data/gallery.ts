@@ -3,8 +3,8 @@ import type { GalleryImage } from "../types";
 export const GALLERY_IMAGES: GalleryImage[] = [
   {
     id: 1,
-    src: "/images/gallery/kendo-gallery-08.webp",
-    srcSet: "/images/gallery/thumbs/kendo-gallery-08-480.webp 480w, /images/gallery/kendo-gallery-08.webp 1600w",
+    src: "/images/gallery/kendo-gallery-08-1600.webp",
+    srcSet: "/images/gallery/thumbs/kendo-gallery-08-480.webp 480w, /images/gallery/kendo-gallery-08-960.webp 960w, /images/gallery/kendo-gallery-08-1600.webp 1600w",
     sizes: "100vw",
     width: 1600,
     height: 1201,

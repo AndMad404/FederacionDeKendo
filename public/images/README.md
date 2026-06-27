@@ -14,52 +14,29 @@ Recommended exports:
 - Keep descriptive filenames, dimensions in code, and meaningful alt text.
 
 Current site images use WebP first, with JPG fallbacks for hero and affiliates.
-<<<<<<< HEAD
 
-## Gallery processing
+## Responsive image processing
 
-Gallery source images are local-only and should not be committed.
+Responsive variants are generated from the committed JPG fallbacks in `public/images`.
 
-1. Put original images in `local/image-originals/` with these exact official names:
-
-```text
-Afiliados Banner.jpg
-Hero Banner.jpg
-Kendo Gallery (1).jpeg
-Kendo Gallery (2).jpg
-Kendo Gallery (3).jpg
-Kendo Gallery (4).jpg
-Kendo Gallery (5).jpeg
-Kendo Gallery (6).JPG
-Kendo Gallery (7).JPG
-Kendo Gallery (8).jpeg
-```
-
-2. Run:
+Run:
 
 ```bash
-pnpm images:gallery
+pnpm images:responsive
 ```
 
 If `pnpm` is not available directly in PowerShell, use:
 
 ```bash
-corepack pnpm images:gallery
+corepack pnpm images:responsive
 ```
 
 The script generates:
 
-- `public/images/hero/kendo-hero.webp`
-- `public/images/hero/kendo-hero.jpg`
-- `public/images/affiliates/kendo-affiliates.webp`
-- `public/images/affiliates/kendo-affiliates.jpg`
-- `public/images/gallery/<name>.webp`
-- `public/images/gallery/thumbs/<name>-480.webp`
-- `src/app/data/gallery.ts`
-- `local/gallery-manifest.ts`
-
-The script preserves existing gallery editorial data: `title`, `tag`, `likes`, `objectPosition`, and `date`. Review `local/gallery-manifest.ts` only as a local audit file.
+- `public/images/affiliates/kendo-affiliates-768.webp`
+- `public/images/affiliates/kendo-affiliates-1200.webp`
+- `public/images/gallery/thumbs/kendo-gallery-08-480.webp`
+- `public/images/gallery/kendo-gallery-08-960.webp`
+- `public/images/gallery/kendo-gallery-08-1600.webp`
 
 If Windows reports an image as busy, close the browser, image previews, or local dev server using it and run the command again.
-=======
->>>>>>> parent of 6186d40b (Merge pull request #8 from AndMad404/fixes_lighthouse)
