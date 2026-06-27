@@ -3,6 +3,8 @@ import { Globe, Mail, MapPin, Phone } from "lucide-react";
 import { DOJOS } from "../data/dojos";
 import type { IconKey, InfoItem, ScheduleSlot } from "../types";
 
+const highPriorityImageProps = { fetchpriority: "high" } as const;
+
 const ICON_MAP: Record<IconKey, ReactNode> = {
   mail: <Mail />,
   phone: <Phone />,
@@ -167,7 +169,9 @@ export function AfiliadosSection() {
             alt="Nuestro dojo"
             width={1500}
             height={1001}
-            loading="lazy"
+            loading="eager"
+            decoding="async"
+            {...highPriorityImageProps}
             className="h-full w-full object-cover"
           />
         </picture>
