@@ -27,9 +27,9 @@ const ICON_MAP: Record<IconKey, ReactNode> = {
 const DETAIL_GRID =
   "grid w-full grid-cols-[2rem_minmax(0,1fr)] items-center gap-x-4 gap-y-2 md:grid-cols-[2.5rem_minmax(0,1fr)_2rem_2.5rem_minmax(0,1fr)] md:gap-y-4 lg:grid-cols-[3rem_minmax(0,1fr)_2.5rem_3rem_minmax(0,1fr)]";
 const INFO_GRID =
-  "grid w-full grid-cols-[2rem_minmax(0,1fr)] items-center gap-x-4 gap-y-2 md:grid-cols-[2.5rem_minmax(11rem,1.1fr)_1.5rem_2.5rem_minmax(0,1fr)] md:gap-y-4 lg:grid-cols-[3rem_minmax(13rem,1.1fr)_2rem_3rem_minmax(0,1fr)]";
+  "grid w-full grid-cols-[2rem_minmax(0,1fr)] items-center gap-x-4 gap-y-2 md:grid-cols-[2.5rem_minmax(11rem,1.1fr)_1.5rem_2.5rem_minmax(0,1fr)] md:gap-y-4 lg:grid-cols-[3rem_minmax(13rem,1.1fr)_2rem_3rem_minmax(0,1fr)] [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:grid-cols-[1.75rem_minmax(0,1fr)] [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:gap-x-2 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:gap-y-1";
 const SCHEDULE_GRID =
-  "grid w-full grid-cols-1 items-center gap-y-1 text-center md:grid-cols-[2.5rem_minmax(0,1fr)_2rem_2.5rem_minmax(0,1fr)] md:gap-x-4 md:gap-y-4 lg:grid-cols-[3rem_minmax(0,1fr)_2.5rem_3rem_minmax(0,1fr)]";
+  "grid w-full grid-cols-1 items-center gap-y-1 text-center md:grid-cols-[2.5rem_minmax(0,1fr)_2rem_2.5rem_minmax(0,1fr)] md:gap-x-4 md:gap-y-4 lg:grid-cols-[3rem_minmax(0,1fr)_2.5rem_3rem_minmax(0,1fr)] [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:grid-cols-[minmax(0,1fr)_max-content] [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:items-baseline [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:gap-x-2 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:gap-y-0 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left";
 
 function getInfoRows(info: InfoItem[]) {
   return info.reduce<InfoItem[][]>((rows, item, index) => {
@@ -44,23 +44,29 @@ function getInfoRows(info: InfoItem[]) {
 }
 
 function InfoCell({ item, side }: { item: InfoItem; side: "left" | "right" }) {
-  const iconColumn = side === "left" ? "col-start-1" : "md:col-start-4";
-  const textColumn = side === "left" ? "col-start-2" : "md:col-start-5";
+  const iconColumn =
+    side === "left"
+      ? "col-start-1"
+      : "md:col-start-4 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:col-start-1";
+  const textColumn =
+    side === "left"
+      ? "col-start-2"
+      : "md:col-start-5 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:col-start-2";
 
   return (
     <Fragment>
-      <span className={`${iconColumn} flex h-8 w-8 items-center justify-center rounded-full bg-blue-500/20 text-red-400 [&>svg]:size-5 md:h-10 md:w-10 lg:h-12 lg:w-12 lg:[&>svg]:size-6`}>
+      <span className={`${iconColumn} flex h-8 w-8 items-center justify-center rounded-full bg-blue-500/20 text-red-400 [&>svg]:size-5 md:h-10 md:w-10 lg:h-12 lg:w-12 lg:[&>svg]:size-6 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:h-7 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:w-7 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:[&>svg]:size-4`}>
         {ICON_MAP[item.icon]}
       </span>
       <div className={`${textColumn} min-w-0`}>
-        <p className="text-xl font-bold lg:text-lg">
+        <p className="text-xl font-bold lg:text-lg [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-sm [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
           {item.label}
         </p>
         <a
           href={item.href}
           target="_blank"
           rel="noreferrer"
-          className="block text-base underline-offset-4 transition-colors duration-200 [overflow-wrap:anywhere] hover:text-blue-400 hover:underline lg:text-base"
+          className="block text-base underline-offset-4 transition-colors duration-200 [overflow-wrap:anywhere] hover:text-blue-400 hover:underline lg:text-base [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-xs [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight"
         >
           {item.value}
         </a>
@@ -72,10 +78,10 @@ function InfoCell({ item, side }: { item: InfoItem; side: "left" | "right" }) {
 function ScheduleRow({ days, hours }: Pick<ScheduleSlot, "days" | "hours">) {
   return (
     <div className={SCHEDULE_GRID}>
-      <p className="text-center [overflow-wrap:anywhere] md:col-start-2 md:text-left">
+      <p className="text-center text-sm [overflow-wrap:anywhere] md:col-start-2 md:text-left [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:col-start-auto [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
         {days}
       </p>
-      <p className="text-center [overflow-wrap:anywhere] md:col-start-5 md:text-left">
+      <p className="text-center [overflow-wrap:anywhere] md:col-start-5 md:text-left [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:col-start-auto [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
         {hours}
       </p>
     </div>
@@ -95,12 +101,12 @@ function DojoInfo({
     schedule.length > 0 && schedule.every((slot) => slot.location === schedule[0].location);
 
   return (
-    <section className="mb-6 flex flex-col justify-center gap-2 rounded-3xl border border-blue-500 bg-black/70 px-6 py-4 text-white">
-      <p className="text-center text-2xl font-bold gap-2">
+    <section className="mb-6 flex flex-col justify-center gap-2 rounded-3xl border border-blue-500 bg-black/70 px-6 py-4 text-white [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:mb-0 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:justify-center [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:gap-1 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:rounded-2xl [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:px-3 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:py-2">
+      <p className="w-full text-center text-2xl font-bold gap-2 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-center [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-base [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
         {title}
       </p>
 
-      <div className="grid gap-2 md:gap-4">
+      <div className="grid gap-2 md:gap-4 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:gap-1">
         {getInfoRows(info).map(([leftItem, rightItem]) => (
           <div key={leftItem.label} className={INFO_GRID}>
             <InfoCell item={leftItem} side="left" />
@@ -109,14 +115,14 @@ function DojoInfo({
         ))}
       </div>
 
-      <div className="grid gap-2 text-center">
-        <p className="text-xl font-bold lg:text-2xl">
+      <div className="grid gap-2 text-center [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:gap-1 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left">
+        <p className="w-full text-center text-xl font-bold lg:text-2xl [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-center [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-sm [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
           Horario de clases:
         </p>
-        <div className="grid gap-1 text-base lg:gap-4">
+        <div className="grid gap-1 text-base lg:gap-4 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-xs [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
           {allSlotsShareLocation ? (
-            <div>
-              <p className="text-lg font-bold">
+            <div className="[@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left">
+              <p className="text-lg font-bold [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-sm [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
                 {schedule[0].location}
               </p>
               <div className="grid gap-1">
@@ -131,8 +137,8 @@ function DojoInfo({
             </div>
           ) : (
             schedule.map((slot) => (
-              <div key={slot.location}>
-                <p className="text-lg font-bold">
+              <div key={slot.location} className="[@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left">
+                <p className="text-lg font-bold [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-sm [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
                   {slot.location}
                 </p>
                 <ScheduleRow days={slot.days} hours={slot.hours} />
@@ -147,7 +153,7 @@ function DojoInfo({
 
 function InfoCard() {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-8">
+    <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-8 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:grid-cols-2 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:gap-3">
       {DOJOS.map((dojo) => (
         <DojoInfo key={dojo.title} {...dojo} />
       ))}
@@ -157,8 +163,8 @@ function InfoCard() {
 
 export function AfiliadosSection() {
   return (
-    <main className="rounded-3xl bg-stone-950 md:h-full md:overflow-y-auto lg:overflow-hidden">
-      <div className="relative flex min-h-[530px] items-center justify-center overflow-hidden rounded-3xl pt-6 lg:h-full lg:min-h-0 lg:pt-0">
+    <main className="rounded-3xl bg-stone-950 md:h-full md:overflow-y-auto lg:overflow-hidden [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:overflow-y-auto">
+      <div className="relative flex min-h-[530px] items-center justify-center overflow-hidden rounded-3xl pt-6 lg:h-full lg:min-h-0 lg:pt-0 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:min-h-[calc(100dvh-4rem-10px)] [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:items-start [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:overflow-y-auto [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:py-2">
         <picture className="absolute inset-0 h-full w-full">
           <source
             srcSet="/images/affiliates/kendo-affiliates-768.avif 768w, /images/affiliates/kendo-affiliates-1200.avif 1200w"
@@ -182,7 +188,7 @@ export function AfiliadosSection() {
           />
         </picture>
         <div className="absolute inset-0 rounded-3xl bg-black/30" aria-hidden="true" />
-        <div className="relative z-10 w-full max-w-4xl px-4 sm:px-6 md:max-w-5xl lg:max-w-6xl xl:max-w-7xl">
+        <div className="relative z-10 w-full max-w-4xl px-4 sm:px-6 md:max-w-5xl lg:max-w-6xl xl:max-w-7xl [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:max-w-none [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:px-2">
           <InfoCard />
         </div>
       </div>
