@@ -147,7 +147,7 @@ function DojoInfo({
 
 function InfoCard() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 md:gap-8">
+    <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-8">
       {DOJOS.map((dojo) => (
         <DojoInfo key={dojo.title} {...dojo} />
       ))}
@@ -157,8 +157,8 @@ function InfoCard() {
 
 export function AfiliadosSection() {
   return (
-    <main className="rounded-3xl bg-stone-950 md:h-full">
-      <div className="relative flex min-h-[530px] items-center justify-center overflow-hidden rounded-3xl pt-6 lg:pt-0 md:h-full md:min-h-0">
+    <main className="rounded-3xl bg-stone-950 md:h-full md:overflow-y-auto lg:overflow-hidden">
+      <div className="relative flex min-h-[530px] items-center justify-center overflow-hidden rounded-3xl pt-6 lg:h-full lg:min-h-0 lg:pt-0">
         <picture className="absolute inset-0 h-full w-full">
           <source
             srcSet="/images/affiliates/kendo-affiliates-768.avif 768w, /images/affiliates/kendo-affiliates-1200.avif 1200w"
