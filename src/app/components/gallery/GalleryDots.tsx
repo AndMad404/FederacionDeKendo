@@ -12,7 +12,7 @@ export function GalleryDots({
   onSelect,
 }: GalleryDotsProps) {
   return (
-    <div className="flex justify-center gap-4">
+    <div className="flex h-4 items-center justify-center gap-3 [@media_(orientation:landscape)_and_(max-height:480px)]:h-3 [@media_(orientation:landscape)_and_(max-height:480px)]:gap-2">
       {images.map((image, index) => (
         <button
           type="button"
@@ -22,8 +22,8 @@ export function GalleryDots({
           onClick={() => onSelect(index)}
           className={`rounded-full transition-all duration-300 ${
             index === activeIndex
-              ? "h-4 w-6 bg-red-400"
-              : "h-4 w-4 bg-blue-500/70 hover:bg-blue-400/80"
+              ? "h-3 w-5 bg-red-400 sm:h-4 sm:w-6 [@media_(orientation:landscape)_and_(max-height:480px)]:h-2.5"
+              : "h-3 w-3 bg-blue-500/70 hover:bg-blue-400/80 sm:h-4 sm:w-4 [@media_(orientation:landscape)_and_(max-height:480px)]:h-2.5 [@media_(orientation:landscape)_and_(max-height:480px)]:w-2.5"
           }`}
         />
       ))}

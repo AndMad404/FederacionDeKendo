@@ -15,7 +15,7 @@ function NavArrow({ direction, onClick }: NavArrowProps) {
       type="button"
       aria-label={direction === "left" ? "Imagen anterior" : "Imagen siguiente"}
       onClick={onClick}
-      className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-blue-500 bg-black/80 transition-colors hover:bg-red-700"
+      className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-blue-500 bg-black/80 transition-colors hover:bg-red-700 [@media_(orientation:landscape)_and_(max-height:480px)]:h-8 [@media_(orientation:landscape)_and_(max-height:480px)]:w-8"
     >
       {direction === "left" ? (
         <ChevronLeft size={20} className="text-white" />
@@ -46,7 +46,7 @@ export function FeaturedImage({
   const positionLabel = `${index + 1} / ${total}`;
 
   return (
-    <div className="group relative min-h-0 w-full flex-1 cursor-pointer overflow-hidden rounded-3xl bg-stone-800">
+    <div className="group relative min-h-0 w-full flex-1 cursor-pointer overflow-hidden rounded-2xl bg-stone-800 sm:rounded-3xl">
       <button
         type="button"
         aria-label={`${image.title}. ${image.tag}. ${positionLabel}. Abrir imagen`}
@@ -69,15 +69,15 @@ export function FeaturedImage({
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 
-        <div className="absolute bottom-0 left-0 right-0 flex justify-center p-4 sm:block sm:p-6">
-          <div className="inline-flex max-w-full flex-col rounded-3xl border border-blue-500 bg-black/70 px-5 py-4 text-center text-white shadow-xl backdrop-blur-sm sm:text-left">
-            <p className="text-2xl font-bold">
+        <div className="absolute bottom-0 left-0 right-0 flex justify-center p-3 sm:block sm:p-6 [@media_(orientation:landscape)_and_(max-height:480px)]:justify-start [@media_(orientation:landscape)_and_(max-height:480px)]:p-2">
+          <div className="inline-flex max-w-full flex-col rounded-2xl border border-blue-500 bg-black/70 px-4 py-3 text-center text-white shadow-xl backdrop-blur-sm sm:rounded-3xl sm:px-5 sm:py-4 sm:text-left [@media_(orientation:landscape)_and_(max-height:480px)]:px-3 [@media_(orientation:landscape)_and_(max-height:480px)]:py-2">
+            <p className="text-xl font-bold sm:text-2xl [@media_(orientation:landscape)_and_(max-height:480px)]:text-lg">
               {image.title}
             </p>
-            <p className="text-base font-bold uppercase tracking-widest text-red-400">
+            <p className="text-sm font-bold uppercase tracking-widest text-red-400 sm:text-base [@media_(orientation:landscape)_and_(max-height:480px)]:text-xs">
               {image.tag}
             </p>
-            <p className="text-base">
+            <p className="text-sm sm:text-base [@media_(orientation:landscape)_and_(max-height:480px)]:text-xs">
               {positionLabel}
             </p>
           </div>
