@@ -46,7 +46,7 @@ export function FeaturedImage({
   const positionLabel = `${index + 1} / ${total}`;
 
   return (
-    <div className="group relative min-h-0 w-full flex-1 cursor-pointer overflow-hidden rounded-2xl bg-stone-800 sm:rounded-3xl">
+    <div className="group relative min-h-0 w-full flex-1 cursor-pointer overflow-hidden rounded-2xl bg-stone-800 sm:rounded-3xl [@media_(orientation:landscape)_and_(max-height:480px)]:h-[62dvh] [@media_(orientation:landscape)_and_(max-height:480px)]:flex-none">
       <button
         type="button"
         aria-label={`${image.title}. ${image.tag}. ${positionLabel}. Abrir imagen`}
