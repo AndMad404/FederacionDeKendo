@@ -14,7 +14,7 @@ function HeroBanner() {
           alt="Kendo en el dojo"
           width={1600}
           height={1201}
-          className="absolute inset-0 h-full w-full object-cover object-[center_70%]"
+          className="absolute inset-0 h-full w-full object-cover object-[center_70%] [@media_(orientation:portrait)_and_(max-width:767px)]:h-[125%] [@media_(orientation:portrait)_and_(max-width:767px)]:-translate-y-[20%] [@media_(orientation:portrait)_and_(max-width:767px)]:object-[56%]"
           loading="eager"
           {...highPriorityImageProps}
         />
