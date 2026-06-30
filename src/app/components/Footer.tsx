@@ -1,8 +1,8 @@
 export function Footer() {
   return (
     <footer className="bg-stone-950 text-white">
-      <div className="mx-auto grid max-w-6xl grid-cols-1 justify-items-center gap-3 px-4 pt-2 text-center md:grid-cols-2 md:px-0">
-        <div className="flex max-w-md flex-col items-center gap-2">
+      <div className="mx-auto grid max-w-6xl grid-cols-1 justify-items-center gap-5 px-4 py-4 text-center md:grid-cols-2 md:gap-10 md:px-6 md:py-3 lg:px-0">
+        <div className="flex max-w-md flex-col items-center gap-3 md:gap-2">
           <div className="flex items-center justify-center gap-3">
             <div className="flex items-baseline gap-1">
               <p className="text-base font-extrabold tracking-widest text-white">
@@ -18,7 +18,7 @@ export function Footer() {
           </p>
         </div>
 
-        <div className="flex max-w-md flex-col items-center gap-2">
+        <div className="flex max-w-md flex-col items-center gap-3 md:gap-2">
           <p className="text-center text-base font-bold tracking-wide">
             Contactos de la Federación
           </p>
@@ -36,7 +36,7 @@ export function Footer() {
           </div>
         </div>
       </div>
-      <div className="px-4 py-2">
+      <div className="px-4 pb-4 md:pb-3">
         <p className="text-center text-xs text-white/50">
           <span>© 2026 Federación de Asociaciones de Kendo.</span>{" "}
           <span className="block sm:inline">Todos los derechos reservados.</span>
