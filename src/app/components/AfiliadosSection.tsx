@@ -95,8 +95,8 @@ function DojoInfo({
     schedule.length > 0 && schedule.every((slot) => slot.location === schedule[0].location);
 
   return (
-    <section className="mb-6 flex flex-col gap-2 rounded-3xl border border-blue-500 bg-black/70 px-6 py-4 text-white">
-      <p className="text-center text-2xl font-bold">
+    <section className="mb-6 flex flex-col justify-center gap-2 rounded-3xl border border-blue-500 bg-black/70 px-6 py-4 text-white">
+      <p className="text-center text-2xl font-bold gap-2">
         {title}
       </p>
 
