@@ -1,8 +1,14 @@
 export interface GalleryImage {
   id: number;
   src: string;
+  srcSet?: string;
+  sizes?: string;
   width: number;
   height: number;
+  thumbnailSrc: string;
+  thumbnailSrcSet?: string;
+  thumbnailWidth: number;
+  thumbnailHeight: number;
   objectPosition?: string;
   title: string;
   tag: string;

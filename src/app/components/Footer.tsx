@@ -1,19 +1,14 @@
 export function Footer() {
   return (
-    <footer className="text-white bg-stone-950 border-t border-white/5">
-      <div className="mx-auto grid max-w-6xl grid-cols-1 justify-items-center gap-3 px-4 pt-2 text-center md:grid-cols-2 md:px-0">
-        <div className="flex max-w-md flex-col items-center gap-2">
+    <footer className="bg-stone-950 text-white">
+      <div className="mx-auto grid max-w-6xl grid-cols-1 justify-items-center gap-5 px-4 py-4 text-center md:grid-cols-2 md:gap-10 md:px-6 md:py-3 lg:px-0">
+        <div className="flex max-w-md flex-col items-center gap-3 md:gap-2">
           <div className="flex items-center justify-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
-              <p className="text-white text-xs font-extrabold">
-                {"\u5263\u9053"}
-              </p>
-            </div>
             <div className="flex items-baseline gap-1">
-              <p className="text-white font-semibold tracking-widest text-base font-extrabold">
+              <p className="text-base font-extrabold tracking-widest text-white">
                 Propósito del
               </p>
-              <p className="text-red-400 text-base font-bold">
+              <p className="text-base font-bold text-red-400">
                 KENDO
               </p>
             </div>
@@ -23,7 +18,7 @@ export function Footer() {
           </p>
         </div>
 
-        <div className="flex max-w-md flex-col items-center gap-2">
+        <div className="flex max-w-md flex-col items-center gap-3 md:gap-2">
           <p className="text-center text-base font-bold tracking-wide">
             Contactos de la Federación
           </p>
@@ -31,7 +26,7 @@ export function Footer() {
             <ul className="flex flex-col gap-1 text-sm">
               <li>
                 <a
-                  className="hover:transition-colors hover:duration-200 hover:text-blue-400"
+                  className="hover:text-blue-400"
                   href="mailto:secretaria.fedekendo@outlook.com"
                 >
                   secretaria.fedekendo@outlook.com
@@ -41,9 +36,9 @@ export function Footer() {
           </div>
         </div>
       </div>
-      <div className="px-4 py-2">
+      <div className="px-4 pb-4 md:pb-3">
         <p className="text-center text-xs text-white/50">
-          <span>{"\u00a9"} 2026 Federación de Asociaciones de Kendo.</span>{" "}
+          <span>© 2026 Federación de Asociaciones de Kendo.</span>{" "}
           <span className="block sm:inline">Todos los derechos reservados.</span>
         </p>
       </div>
