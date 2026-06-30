@@ -6,6 +6,8 @@ const LIGHTBOX_IMAGE_SIZES = "(max-width: 640px) 92vw, 75vw";
 
 interface LightboxProps {
   image: GalleryImage;
+  index: number;
+  total: number;
   triggerRef: RefObject<HTMLElement | null>;
   onClose: () => void;
   onPrev: () => void;
@@ -14,6 +16,8 @@ interface LightboxProps {
 
 export function Lightbox({
   image,
+  index,
+  total,
   triggerRef,
   onClose,
   onPrev,
@@ -21,6 +25,7 @@ export function Lightbox({
 }: LightboxProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const positionLabel = `${index + 1} / ${total}`;
 
   useEffect(() => {
     closeBtnRef.current?.focus();
@@ -144,11 +149,14 @@ export function Lightbox({
           </div>
 
           <div className="max-w-full rounded-3xl border border-blue-500 bg-black/80 px-6 py-3 text-center shadow-xl backdrop-blur-sm">
-            <p id="lightbox-title" className="text-lg font-semibold">
+            <p id="lightbox-title" className="text-2xl font-bold">
               {image.title}
             </p>
-            <p className="text-md uppercase tracking-widest text-red-400">
+            <p className="text-base font-bold uppercase tracking-widest text-red-400">
               {image.tag}
+            </p>
+            <p className="text-base">
+              {positionLabel}
             </p>
           </div>
         </div>

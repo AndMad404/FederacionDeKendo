@@ -52,6 +52,7 @@ export function useGalleryLightbox(images: GalleryImage[]) {
 
   return {
     closeLightbox,
+    lightboxIndex,
     lightboxImage,
     openLightbox,
     showNext,
