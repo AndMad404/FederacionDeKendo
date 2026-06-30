@@ -117,7 +117,7 @@ export function Lightbox({
           />
         </div>
 
-        <div className="mt-4 flex items-center justify-between text-white">
+        <div className="mt-4 flex items-center justify-center text-white">
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -126,7 +126,7 @@ export function Lightbox({
                 event.stopPropagation();
                 onPrev();
               }}
-              className="fixed left-3 top-1/2 z-50 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-white/20 md:left-6 md:h-12 md:w-12"
+              className="fixed left-3 top-1/2 z-50 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-blue-500 bg-white/10 transition-colors hover:bg-white/20 md:left-6 md:h-12 md:w-12"
             >
               <ChevronLeft size={22} />
             </button>
@@ -137,13 +137,13 @@ export function Lightbox({
                 event.stopPropagation();
                 onNext();
               }}
-              className="fixed right-3 top-1/2 z-50 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-white/20 md:right-6 md:h-12 md:w-12"
+              className="fixed right-3 top-1/2 z-50 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-blue-500 bg-white/10 transition-colors hover:bg-white/20 md:right-6 md:h-12 md:w-12"
             >
               <ChevronRight size={22} />
             </button>
           </div>
 
-          <div className="flex-1 px-4 text-center">
+          <div className="max-w-full rounded-3xl border border-blue-500 bg-black/80 px-6 py-3 text-center shadow-xl backdrop-blur-sm">
             <p id="lightbox-title" className="text-lg font-semibold">
               {image.title}
             </p>

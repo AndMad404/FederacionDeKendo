@@ -15,7 +15,7 @@ function NavArrow({ direction, onClick }: NavArrowProps) {
       type="button"
       aria-label={direction === "left" ? "Imagen anterior" : "Imagen siguiente"}
       onClick={onClick}
-      className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/70 transition-colors hover:bg-red-700"
+      className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-blue-500 bg-black/80 transition-colors hover:bg-red-700"
     >
       {direction === "left" ? (
         <ChevronLeft size={20} className="text-white" />
@@ -69,16 +69,18 @@ export function FeaturedImage({
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 
-        <div className="absolute bottom-0 left-0 right-0 p-6">
-          <p className="text-2xl font-bold text-white">
-            {image.title}
-          </p>
-          <p className="text-base font-bold uppercase tracking-widest text-red-400">
-            {image.tag}
-          </p>
-          <p className="text-base text-white">
-            {positionLabel}
-          </p>
+        <div className="absolute bottom-0 left-0 right-0 flex justify-center p-4 sm:block sm:p-6">
+          <div className="inline-flex max-w-full flex-col rounded-3xl border border-blue-500 bg-black/70 px-5 py-4 text-center text-white shadow-xl backdrop-blur-sm sm:text-left">
+            <p className="text-2xl font-bold">
+              {image.title}
+            </p>
+            <p className="text-base font-bold uppercase tracking-widest text-red-400">
+              {image.tag}
+            </p>
+            <p className="text-base">
+              {positionLabel}
+            </p>
+          </div>
         </div>
       </button>
 
