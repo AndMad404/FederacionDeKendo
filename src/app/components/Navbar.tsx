@@ -20,7 +20,7 @@ export function Navbar() {
 
   return (
     <nav className="fixed left-0 right-0 top-0 z-50 bg-stone-950 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+      <div className="mx-auto my-[5px] flex h-16 max-w-6xl items-center justify-between px-6">
         <Link
           to="/"
           onClick={() => setOpen(false)}

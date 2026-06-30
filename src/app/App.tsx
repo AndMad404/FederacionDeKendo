@@ -48,7 +48,7 @@ export default function App() {
       <RouteMetadata />
       <Navbar />
 
-      <div className="min-h-[calc(100dvh-4rem)] flex-1 pt-16 md:min-h-0 md:overflow-hidden">
+      <div className="min-h-[calc(100dvh_-_4rem_-_10px)] flex-1 px-2.5 pt-[calc(4rem_+_10px)] md:min-h-0 md:overflow-hidden">
         <Routes>
           <Route path="/" element={<HeroSection />} />
           <Route path="/galeria" element={<GallerySection />} />
