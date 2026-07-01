@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
+    "postbuild": "node scripts/generate-route-html.mjs",
     "dev": "vite",
+    "typecheck": "tsc --noEmit",
     "images:responsive": "node scripts/generate-responsive-images.mjs"
   },
   "dependencies": {

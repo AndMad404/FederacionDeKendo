@@ -5,7 +5,66 @@ import { HeroSection } from "./components/HeroSection";
 import { Footer } from "./components/Footer";
 import { GallerySection } from "./components/GallerySection";
 import { AfiliadosSection } from "./components/AfiliadosSection";
-import { DEFAULT_SITE_DESCRIPTION, ROUTE_META } from "./config/seo";
+import {
+  DEFAULT_SITE_DESCRIPTION,
+  SITE_LOCALE,
+  SITE_NAME,
+  getCanonicalUrl,
+  getRouteImageUrl,
+  getRouteMeta,
+  getRouteStructuredData,
+} from "./config/seo";
+
+function setMetaName(name: string, content: string) {
+  let meta = document.querySelector<HTMLMetaElement>(`meta[name="${name}"]`);
+
+  if (!meta) {
+    meta = document.createElement("meta");
+    meta.name = name;
+    document.head.append(meta);
+  }
+
+  meta.content = content;
+}
+
+function setMetaProperty(property: string, content: string) {
+  let meta = document.querySelector<HTMLMetaElement>(
+    `meta[property="${property}"]`,
+  );
+
+  if (!meta) {
+    meta = document.createElement("meta");
+    meta.setAttribute("property", property);
+    document.head.append(meta);
+  }
+
+  meta.content = content;
+}
+
+function setCanonicalLink(href: string) {
+  let link = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+
+  if (!link) {
+    link = document.createElement("link");
+    link.rel = "canonical";
+    document.head.append(link);
+  }
+
+  link.href = href;
+}
+
+function setJsonLd(id: string, data: Record<string, unknown>) {
+  let script = document.querySelector<HTMLScriptElement>(`script#${id}`);
+
+  if (!script) {
+    script = document.createElement("script");
+    script.id = id;
+    script.type = "application/ld+json";
+    document.head.append(script);
+  }
+
+  script.text = JSON.stringify(data);
+}
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -22,20 +81,21 @@ function RouteMetadata() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    const meta = ROUTE_META[pathname] ?? ROUTE_META["/"];
+    const meta = getRouteMeta(pathname);
+    const canonicalUrl = getCanonicalUrl(meta);
+    const imageUrl = getRouteImageUrl(meta);
+
     document.title = meta.title;
-
-    let description = document.querySelector<HTMLMetaElement>(
-      'meta[name="description"]',
-    );
-
-    if (!description) {
-      description = document.createElement("meta");
-      description.name = "description";
-      document.head.append(description);
-    }
-
-    description.content = meta.description || DEFAULT_SITE_DESCRIPTION;
+    setMetaName("description", meta.description || DEFAULT_SITE_DESCRIPTION);
+    setCanonicalLink(canonicalUrl);
+    setMetaProperty("og:type", "website");
+    setMetaProperty("og:site_name", SITE_NAME);
+    setMetaProperty("og:title", meta.title);
+    setMetaProperty("og:description", meta.description);
+    setMetaProperty("og:url", canonicalUrl);
+    setMetaProperty("og:image", imageUrl);
+    setMetaProperty("og:locale", SITE_LOCALE);
+    setJsonLd("route-json-ld", getRouteStructuredData(meta));
   }, [pathname]);
 
   return null;

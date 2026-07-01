@@ -1,20 +1,110 @@
-export const DEFAULT_SITE_DESCRIPTION =
-  "Sitio oficial de la Federación de Asociaciones de Kendo de Costa Rica: comunidad, galería y dojos afiliados.";
+import seoData from "./seo-data.json";
 
-export const ROUTE_META: Record<string, { title: string; description: string }> = {
-  "/": {
-    title: "Federación de Asociaciones de Kendo de Costa Rica",
-    description:
-      "Conoce la Federación de Asociaciones de Kendo de Costa Rica y su comunidad de práctica.",
-  },
-  "/galeria": {
-    title: "Galería | Federación de Asociaciones de Kendo de Costa Rica",
-    description:
-      "Galería oficial de la comunidad, entrenamientos y actividades de kendo en Costa Rica.",
-  },
-  "/afiliados": {
-    title: "Afiliados | Federación de Asociaciones de Kendo de Costa Rica",
-    description:
-      "Información de contacto, horarios y ubicación de dojos afiliados a la federación.",
-  },
-};
+type SchemaType = "WebPage" | "CollectionPage";
+
+interface SeoData {
+  siteUrl: string;
+  siteName: string;
+  defaultDescription: string;
+  locale: string;
+  language: string;
+  logo: string;
+  defaultImage: string;
+  organization: {
+    sport: string;
+    areaServed: string;
+  };
+  routes: Record<string, RouteMeta>;
+}
+
+export interface RouteMeta {
+  path: string;
+  title: string;
+  description: string;
+  image: string;
+  schemaType: SchemaType;
+}
+
+type StructuredData = Record<string, unknown>;
+
+const DATA = seoData as SeoData;
+
+export const SITE_URL = DATA.siteUrl.replace(/\/$/, "");
+export const SITE_NAME = DATA.siteName;
+export const DEFAULT_SITE_DESCRIPTION = DATA.defaultDescription;
+export const SITE_LOCALE = DATA.locale;
+export const SITE_LANGUAGE = DATA.language;
+export const ROUTE_META = DATA.routes;
+
+export const ROUTE_PATHS = Object.keys(ROUTE_META);
+
+export function absoluteUrl(path: string) {
+  if (/^https?:\/\//.test(path)) return path;
+
+  return path === "/" ? `${SITE_URL}/` : `${SITE_URL}${path}`;
+}
+
+export function getRouteMeta(pathname: string) {
+  return ROUTE_META[pathname] ?? ROUTE_META["/"];
+}
+
+export function getCanonicalUrl(meta: RouteMeta) {
+  return absoluteUrl(meta.path);
+}
+
+export function getRouteImageUrl(meta: RouteMeta) {
+  return absoluteUrl(meta.image || DATA.defaultImage);
+}
+
+export function getRouteStructuredData(meta: RouteMeta): StructuredData {
+  const canonicalUrl = getCanonicalUrl(meta);
+  const organizationId = `${SITE_URL}/#organization`;
+  const websiteId = `${SITE_URL}/#website`;
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SportsOrganization",
+        "@id": organizationId,
+        name: SITE_NAME,
+        url: `${SITE_URL}/`,
+        logo: absoluteUrl(DATA.logo),
+        description: DEFAULT_SITE_DESCRIPTION,
+        sport: DATA.organization.sport,
+        areaServed: {
+          "@type": "Country",
+          name: DATA.organization.areaServed,
+        },
+      },
+      {
+        "@type": "WebSite",
+        "@id": websiteId,
+        url: `${SITE_URL}/`,
+        name: SITE_NAME,
+        inLanguage: SITE_LANGUAGE,
+        publisher: {
+          "@id": organizationId,
+        },
+      },
+      {
+        "@type": meta.schemaType,
+        "@id": `${canonicalUrl}#webpage`,
+        url: canonicalUrl,
+        name: meta.title,
+        description: meta.description,
+        inLanguage: SITE_LANGUAGE,
+        isPartOf: {
+          "@id": websiteId,
+        },
+        about: {
+          "@id": organizationId,
+        },
+        primaryImageOfPage: {
+          "@type": "ImageObject",
+          url: getRouteImageUrl(meta),
+        },
+      },
+    ],
+  };
+}

@@ -12,8 +12,6 @@ export interface GalleryImage {
   objectPosition?: string;
   title: string;
   tag: string;
-  likes: number;
-  date?: string; // ISO 8601, e.g. "2024-11-03"
 }
 
 export type IconKey =

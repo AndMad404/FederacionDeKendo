@@ -18,7 +18,6 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     objectPosition: "center 70%",
     title: "Comunidad de kendo",
     tag: "Conviviendo como un equipo",
-    likes: 214,
   },
   {
     id: 2,
@@ -33,7 +32,6 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     thumbnailHeight: 320,
     title: "Combates con armadura",
     tag: "Bogu geiko",
-    likes: 189,
   },
   {
     id: 3,
@@ -48,7 +46,6 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     thumbnailHeight: 213,
     title: "Armaduras",
     tag: "Bogu",
-    likes: 342,
   },
   {
     id: 4,
@@ -63,7 +60,6 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     thumbnailHeight: 213,
     title: "Entrenamiento a todos los niveles",
     tag: "Mitori geiko",
-    likes: 97,
   },
   {
     id: 5,
@@ -78,7 +74,6 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     thumbnailHeight: 480,
     title: "Vestimenta tradicional",
     tag: "Keikogi",
-    likes: 156,
   },
   {
     id: 6,
@@ -93,7 +88,6 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     thumbnailHeight: 213,
     title: "Técnica",
     tag: "Kirikaeshi",
-    likes: 278,
   },
   {
     id: 7,
@@ -108,7 +102,6 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     thumbnailHeight: 213,
     title: "Kendokas para toda la vida",
     tag: "Apto para edades de 7+",
-    likes: 133,
   },
   {
     id: 8,
@@ -123,6 +116,5 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     thumbnailHeight: 303,
     title: "Combate competitivo",
     tag: "Shiai",
-    likes: 401,
   },
 ];
