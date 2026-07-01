@@ -89,7 +89,26 @@ function managedHead(route) {
     "\\u003c",
   );
 
-  return [
+  const managedTags = [
+    route.preloadImage
+      ? [
+          `    <link rel="preload" href="${escapeAttribute(route.preloadImage.href)}"`,
+          '      as="image"',
+          route.preloadImage.type
+            ? `      type="${escapeAttribute(route.preloadImage.type)}"`
+            : "",
+          '      fetchpriority="high"',
+          route.preloadImage.srcSet
+            ? `      imagesrcset="${escapeAttribute(route.preloadImage.srcSet)}"`
+            : "",
+          route.preloadImage.sizes
+            ? `      imagesizes="${escapeAttribute(route.preloadImage.sizes)}"`
+            : "",
+          "    />",
+        ]
+          .filter(Boolean)
+          .join("\n")
+      : "",
     `    <link rel="canonical" href="${escapeAttribute(canonicalUrl)}" />`,
     '    <meta property="og:type" content="website" />',
     `    <meta property="og:site_name" content="${escapeAttribute(seoData.siteName)}" />`,
@@ -99,11 +118,14 @@ function managedHead(route) {
     `    <meta property="og:image" content="${escapeAttribute(imageUrl)}" />`,
     `    <meta property="og:locale" content="${escapeAttribute(seoData.locale)}" />`,
     `    <script type="application/ld+json" id="${ROUTE_JSON_LD_ID}">${jsonLd}</script>`,
-  ].join("\n");
+  ];
+
+  return managedTags.filter(Boolean).join("\n");
 }
 
 function stripManagedHead(html) {
   return html
+    .replace(/\n\s*<link\s+rel="preload"[^>]*\s+as="image"[^>]*>/gi, "")
     .replace(/\n\s*<link\s+rel="canonical"[^>]*>/gi, "")
     .replace(/\n\s*<meta\s+property="og:[^"]+"[^>]*>/gi, "")
     .replace(

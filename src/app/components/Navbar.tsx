@@ -4,8 +4,8 @@ import { Menu, X } from "lucide-react";
 
 const NAV_LINKS = [
   { to: "/", label: "Inicio", end: true },
-  { to: "/galeria", label: "Galería" },
-  { to: "/afiliados", label: "Afiliados" },
+  { to: "/galeria/", label: "Galería" },
+  { to: "/afiliados/", label: "Afiliados" },
 ];
 
 const focusRingClass =

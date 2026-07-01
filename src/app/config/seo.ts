@@ -38,6 +38,12 @@ export const ROUTE_META = DATA.routes;
 
 export const ROUTE_PATHS = Object.keys(ROUTE_META);
 
+function normalizeRoutePath(pathname: string) {
+  if (pathname === "/") return pathname;
+
+  return pathname.endsWith("/") ? pathname : `${pathname}/`;
+}
+
 export function absoluteUrl(path: string) {
   if (/^https?:\/\//.test(path)) return path;
 
@@ -45,7 +51,7 @@ export function absoluteUrl(path: string) {
 }
 
 export function getRouteMeta(pathname: string) {
-  return ROUTE_META[pathname] ?? ROUTE_META["/"];
+  return ROUTE_META[normalizeRoutePath(pathname)] ?? ROUTE_META["/"];
 }
 
 export function getCanonicalUrl(meta: RouteMeta) {

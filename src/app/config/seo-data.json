@@ -16,20 +16,38 @@
       "title": "Federación de Asociaciones de Kendo de Costa Rica",
       "description": "Conoce la Federación de Asociaciones de Kendo de Costa Rica y su comunidad de práctica.",
       "image": "/images/gallery/kendo-gallery-08-1600.webp",
+      "preloadImage": {
+        "href": "/images/gallery/kendo-gallery-08-960.webp",
+        "type": "image/webp",
+        "srcSet": "/images/gallery/thumbs/kendo-gallery-08-480.webp 480w, /images/gallery/kendo-gallery-08-960.webp 960w, /images/gallery/kendo-gallery-08-1600.webp 1600w",
+        "sizes": "100vw"
+      },
       "schemaType": "WebPage"
     },
-    "/galeria": {
-      "path": "/galeria",
+    "/galeria/": {
+      "path": "/galeria/",
       "title": "Galería | Federación de Asociaciones de Kendo de Costa Rica",
       "description": "Galería oficial de la comunidad, entrenamientos y actividades de kendo en Costa Rica.",
       "image": "/images/gallery/kendo-gallery-08-1600.webp",
+      "preloadImage": {
+        "href": "/images/gallery/kendo-gallery-08-960.webp",
+        "type": "image/webp",
+        "srcSet": "/images/gallery/thumbs/kendo-gallery-08-480.webp 480w, /images/gallery/kendo-gallery-08-960.webp 960w, /images/gallery/kendo-gallery-08-1600.webp 1600w",
+        "sizes": "100vw"
+      },
       "schemaType": "CollectionPage"
     },
-    "/afiliados": {
-      "path": "/afiliados",
+    "/afiliados/": {
+      "path": "/afiliados/",
       "title": "Afiliados | Federación de Asociaciones de Kendo de Costa Rica",
       "description": "Información de contacto, horarios y ubicación de dojos afiliados a la federación.",
       "image": "/images/affiliates/kendo-affiliates-1200.webp",
+      "preloadImage": {
+        "href": "/images/affiliates/kendo-affiliates-768.avif",
+        "type": "image/avif",
+        "srcSet": "/images/affiliates/kendo-affiliates-768.avif 768w, /images/affiliates/kendo-affiliates-1200.avif 1200w",
+        "sizes": "(min-width: 1024px) 1200px, 100vw"
+      },
       "schemaType": "CollectionPage"
     }
   }

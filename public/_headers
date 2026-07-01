@@ -4,5 +4,11 @@
 /galeria
   Link: </images/gallery/kendo-gallery-08-960.webp>; rel=preload; as=image; fetchpriority=high; imagesrcset="/images/gallery/thumbs/kendo-gallery-08-480.webp 480w, /images/gallery/kendo-gallery-08-960.webp 960w, /images/gallery/kendo-gallery-08-1600.webp 1600w"; imagesizes="100vw"
 
+/galeria/
+  Link: </images/gallery/kendo-gallery-08-960.webp>; rel=preload; as=image; fetchpriority=high; imagesrcset="/images/gallery/thumbs/kendo-gallery-08-480.webp 480w, /images/gallery/kendo-gallery-08-960.webp 960w, /images/gallery/kendo-gallery-08-1600.webp 1600w"; imagesizes="100vw"
+
 /afiliados
+  Link: </images/affiliates/kendo-affiliates-768.avif>; rel=preload; as=image; type=image/avif; fetchpriority=high; imagesrcset="/images/affiliates/kendo-affiliates-768.avif 768w, /images/affiliates/kendo-affiliates-1200.avif 1200w"; imagesizes="(min-width: 1024px) 1200px, 100vw"
+
+/afiliados/
   Link: </images/affiliates/kendo-affiliates-768.avif>; rel=preload; as=image; type=image/avif; fetchpriority=high; imagesrcset="/images/affiliates/kendo-affiliates-768.avif 768w, /images/affiliates/kendo-affiliates-1200.avif 1200w"; imagesizes="(min-width: 1024px) 1200px, 100vw"
