@@ -78,21 +78,23 @@ function InfoCell({ item, side }: { item: InfoItem; side: "left" | "right" }) {
 function ScheduleRow({ days, hours }: Pick<ScheduleSlot, "days" | "hours">) {
   return (
     <div className={SCHEDULE_GRID}>
-      <p className="text-center text-sm [overflow-wrap:anywhere] md:col-start-2 md:text-left [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:col-start-auto [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
+      <dt className="text-center text-sm [overflow-wrap:anywhere] md:col-start-2 md:text-left [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:col-start-auto [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
         {days}
-      </p>
-      <p className="text-center [overflow-wrap:anywhere] md:col-start-5 md:text-left [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:col-start-auto [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
+      </dt>
+      <dd className="text-center [overflow-wrap:anywhere] md:col-start-5 md:text-left [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:col-start-auto [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
         {hours}
-      </p>
+      </dd>
     </div>
   );
 }
 
 function DojoInfo({
+  headingId,
   title,
   info,
   schedule,
 }: {
+  headingId: string;
   title: string;
   info: InfoItem[];
   schedule: ScheduleSlot[];
@@ -101,10 +103,16 @@ function DojoInfo({
     schedule.length > 0 && schedule.every((slot) => slot.location === schedule[0].location);
 
   return (
-    <section className="mb-6 flex flex-col justify-center gap-2 rounded-3xl border border-blue-500 bg-black/70 px-6 py-4 text-white [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:mb-0 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:justify-center [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:gap-1 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:rounded-2xl [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:px-3 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:py-2">
-      <p className="w-full text-center text-2xl font-bold gap-2 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-center [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-base [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
+    <section
+      aria-labelledby={headingId}
+      className="mb-6 flex flex-col justify-center gap-2 rounded-3xl border border-blue-500 bg-black/70 px-6 py-4 text-white [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:mb-0 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:justify-center [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:gap-1 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:rounded-2xl [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:px-3 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:py-2"
+    >
+      <h2
+        id={headingId}
+        className="w-full text-center text-2xl font-bold gap-2 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-center [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-base [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight"
+      >
         {title}
-      </p>
+      </h2>
 
       <div className="grid gap-2 md:gap-4 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:gap-1">
         {getInfoRows(info).map(([leftItem, rightItem]) => (
@@ -116,16 +124,19 @@ function DojoInfo({
       </div>
 
       <div className="grid gap-2 text-center [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:gap-1 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left">
-        <p className="w-full text-center text-xl font-bold lg:text-2xl [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-center [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-sm [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
+        <h3 className="w-full text-center text-xl font-bold lg:text-2xl [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-center [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-sm [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
           Horario de clases:
-        </p>
+        </h3>
         <div className="grid gap-1 text-base lg:gap-4 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-xs [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
           {allSlotsShareLocation ? (
-            <div className="[@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left">
-              <p className="text-lg font-bold [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-sm [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
+            <section
+              aria-label={schedule[0].location}
+              className="[@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left"
+            >
+              <h4 className="text-lg font-bold [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-sm [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
                 {schedule[0].location}
-              </p>
-              <div className="grid gap-1">
+              </h4>
+              <dl className="grid gap-1">
                 {schedule.map((slot) => (
                   <ScheduleRow
                     key={`${slot.days}-${slot.hours}`}
@@ -133,16 +144,22 @@ function DojoInfo({
                     hours={slot.hours}
                   />
                 ))}
-              </div>
-            </div>
+              </dl>
+            </section>
           ) : (
             schedule.map((slot) => (
-              <div key={slot.location} className="[@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left">
-                <p className="text-lg font-bold [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-sm [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
+              <section
+                key={slot.location}
+                aria-label={slot.location}
+                className="[@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left"
+              >
+                <h4 className="text-lg font-bold [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-sm [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
                   {slot.location}
-                </p>
-                <ScheduleRow days={slot.days} hours={slot.hours} />
-              </div>
+                </h4>
+                <dl>
+                  <ScheduleRow days={slot.days} hours={slot.hours} />
+                </dl>
+              </section>
             ))
           )}
         </div>
@@ -154,8 +171,12 @@ function DojoInfo({
 function InfoCard() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-8 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:grid-cols-2 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:gap-3">
-      {DOJOS.map((dojo) => (
-        <DojoInfo key={dojo.title} {...dojo} />
+      {DOJOS.map((dojo, index) => (
+        <DojoInfo
+          key={dojo.title}
+          headingId={`dojo-${index + 1}-title`}
+          {...dojo}
+        />
       ))}
     </div>
   );
@@ -163,7 +184,13 @@ function InfoCard() {
 
 export function AfiliadosSection() {
   return (
-    <main className="rounded-3xl bg-stone-950 md:h-full md:overflow-y-auto lg:overflow-hidden [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:overflow-y-auto">
+    <section
+      aria-labelledby="affiliates-title"
+      className="rounded-3xl bg-stone-950 md:h-full md:overflow-y-auto lg:overflow-hidden [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:overflow-y-auto"
+    >
+      <h1 id="affiliates-title" className="sr-only">
+        Dojos afiliados
+      </h1>
       <div className="relative flex min-h-[530px] items-center justify-center overflow-hidden rounded-3xl pt-6 lg:h-full lg:min-h-0 lg:pt-0 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:min-h-[calc(100dvh-4rem-10px)] [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:items-start [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:overflow-y-auto [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:py-2">
         <picture className="absolute inset-0 h-full w-full">
           <source
@@ -192,6 +219,6 @@ export function AfiliadosSection() {
           <InfoCard />
         </div>
       </div>
-    </main>
+    </section>
   );
 }

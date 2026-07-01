@@ -19,7 +19,10 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <nav className="fixed left-0 right-0 top-0 z-50 bg-stone-950 backdrop-blur">
+    <nav
+      aria-label="Navegación principal"
+      className="fixed left-0 right-0 top-0 z-50 bg-stone-950 backdrop-blur"
+    >
       <div className="mx-auto my-[5px] flex h-16 max-w-6xl items-center justify-between px-6">
         <Link
           to="/"

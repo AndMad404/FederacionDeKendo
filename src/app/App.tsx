@@ -48,13 +48,13 @@ export default function App() {
       <RouteMetadata />
       <Navbar />
 
-      <div className="min-h-[calc(100dvh_-_4rem_-_10px)] flex-1 px-2.5 pt-[calc(4rem_+_10px)] [@media_(min-width:768px)_and_(min-height:640px)]:min-h-0 [@media_(min-width:768px)_and_(min-height:640px)]:overflow-hidden">
+      <main className="min-h-[calc(100dvh_-_4rem_-_10px)] flex-1 px-2.5 pt-[calc(4rem_+_10px)] [@media_(min-width:768px)_and_(min-height:640px)]:min-h-0 [@media_(min-width:768px)_and_(min-height:640px)]:overflow-hidden">
         <Routes>
           <Route path="/" element={<HeroSection />} />
           <Route path="/galeria" element={<GallerySection />} />
           <Route path="/afiliados" element={<AfiliadosSection />} />
         </Routes>
-      </div>
+      </main>
 
       <Footer />
     </div>

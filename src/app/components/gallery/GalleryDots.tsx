@@ -12,7 +12,10 @@ export function GalleryDots({
   onSelect,
 }: GalleryDotsProps) {
   return (
-    <div className="flex h-4 items-center justify-center gap-3 [@media_(orientation:landscape)_and_(max-height:480px)]:h-3 [@media_(orientation:landscape)_and_(max-height:480px)]:gap-2">
+    <nav
+      aria-label="Selector de imágenes de galería"
+      className="flex h-4 items-center justify-center gap-3 [@media_(orientation:landscape)_and_(max-height:480px)]:h-3 [@media_(orientation:landscape)_and_(max-height:480px)]:gap-2"
+    >
       {images.map((image, index) => (
         <button
           type="button"
@@ -27,6 +30,6 @@ export function GalleryDots({
           }`}
         />
       ))}
-    </div>
+    </nav>
   );
 }

@@ -2,26 +2,38 @@ export function Footer() {
   return (
     <footer className="bg-stone-950 text-white">
       <div className="mx-auto grid max-w-6xl grid-cols-1 justify-items-center gap-5 px-4 py-4 text-center md:grid-cols-2 md:gap-10 md:px-6 md:py-3 lg:px-0">
-        <div className="flex max-w-md flex-col items-center gap-3 md:gap-2">
+        <section
+          aria-labelledby="footer-purpose-title"
+          className="flex max-w-md flex-col items-center gap-3 md:gap-2"
+        >
           <div className="flex items-center justify-center gap-3">
             <div className="flex items-baseline gap-1">
-              <p className="text-base font-extrabold tracking-widest text-white">
+              <h2
+                id="footer-purpose-title"
+                className="text-base font-extrabold tracking-widest text-white"
+              >
                 Propósito del
-              </p>
-              <p className="text-base font-bold text-red-400">
+              </h2>
+              <span className="text-base font-bold text-red-400">
                 KENDO
-              </p>
+              </span>
             </div>
           </div>
           <p className="text-sm leading-relaxed">
             El concepto del Kendo es disciplinar el carácter humano a través de la aplicación de los principios de la Katana.
           </p>
-        </div>
+        </section>
 
-        <div className="flex max-w-md flex-col items-center gap-3 md:gap-2">
-          <p className="text-center text-base font-bold tracking-wide">
+        <section
+          aria-labelledby="footer-contact-title"
+          className="flex max-w-md flex-col items-center gap-3 md:gap-2"
+        >
+          <h2
+            id="footer-contact-title"
+            className="text-center text-base font-bold tracking-wide"
+          >
             Contactos de la Federación
-          </p>
+          </h2>
           <div className="flex flex-col items-center justify-center sm:text-center md:flex-row">
             <ul className="flex flex-col gap-1 text-sm">
               <li>
@@ -34,7 +46,7 @@ export function Footer() {
               </li>
             </ul>
           </div>
-        </div>
+        </section>
       </div>
       <div className="px-4 pb-4 md:pb-3">
         <p className="text-center text-xs text-white/50">
