@@ -46,9 +46,18 @@ export default function App() {
     <div className="flex min-h-dvh flex-col bg-stone-950 [@media_(min-width:768px)_and_(min-height:640px)]:h-dvh [@media_(min-width:768px)_and_(min-height:640px)]:overflow-hidden">
       <ScrollToTop />
       <RouteMetadata />
+      <a
+        href="#main-content"
+        className="fixed left-4 top-4 z-[60] -translate-y-20 rounded bg-white px-4 py-2 text-sm font-bold text-stone-950 shadow-lg transition focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        Saltar al contenido principal
+      </a>
       <Navbar />
 
-      <main className="min-h-[calc(100dvh_-_4rem_-_10px)] flex-1 px-2.5 pt-[calc(4rem_+_10px)] [@media_(min-width:768px)_and_(min-height:640px)]:min-h-0 [@media_(min-width:768px)_and_(min-height:640px)]:overflow-hidden">
+      <main
+        id="main-content"
+        className="min-h-[calc(100dvh_-_4rem_-_10px)] flex-1 px-2.5 pt-[calc(4rem_+_10px)] [@media_(min-width:768px)_and_(min-height:640px)]:min-h-0 [@media_(min-width:768px)_and_(min-height:640px)]:overflow-hidden"
+      >
         <Routes>
           <Route path="/" element={<HeroSection />} />
           <Route path="/galeria" element={<GallerySection />} />

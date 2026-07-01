@@ -3,6 +3,8 @@ import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import type { GalleryImage } from "../types";
 
 const LIGHTBOX_IMAGE_SIZES = "(max-width: 640px) 92vw, 75vw";
+const focusRingClass =
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-300";
 
 interface LightboxProps {
   image: GalleryImage;
@@ -104,9 +106,9 @@ export function Lightbox({
           type="button"
           aria-label="Cerrar galería"
           onClick={onClose}
-          className="absolute -top-14 right-0 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-red-700 text-white transition-colors hover:bg-red-600"
+          className={`absolute -top-14 right-0 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-red-700 text-white transition-colors hover:bg-red-600 ${focusRingClass}`}
         >
-          <X size={20} />
+          <X size={20} aria-hidden="true" />
         </button>
 
         <div className="mx-auto w-fit max-w-full overflow-hidden rounded-3xl">
@@ -131,9 +133,9 @@ export function Lightbox({
                 event.stopPropagation();
                 onPrev();
               }}
-              className="fixed left-3 top-1/2 z-50 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-blue-500 bg-white/10 transition-colors hover:bg-white/20 md:left-6 md:h-12 md:w-12"
+              className={`fixed left-3 top-1/2 z-50 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-blue-500 bg-white/10 transition-colors hover:bg-white/20 md:left-6 md:h-12 md:w-12 ${focusRingClass}`}
             >
-              <ChevronLeft size={22} />
+              <ChevronLeft size={22} aria-hidden="true" />
             </button>
             <button
               type="button"
@@ -142,9 +144,9 @@ export function Lightbox({
                 event.stopPropagation();
                 onNext();
               }}
-              className="fixed right-3 top-1/2 z-50 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-blue-500 bg-white/10 transition-colors hover:bg-white/20 md:right-6 md:h-12 md:w-12"
+              className={`fixed right-3 top-1/2 z-50 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-blue-500 bg-white/10 transition-colors hover:bg-white/20 md:right-6 md:h-12 md:w-12 ${focusRingClass}`}
             >
-              <ChevronRight size={22} />
+              <ChevronRight size={22} aria-hidden="true" />
             </button>
           </div>
 

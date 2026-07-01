@@ -1,6 +1,8 @@
 import type { GalleryImage } from "../../types";
 
 const THUMBNAIL_SIZES = "(min-width: 768px) 168px, 17vw";
+const focusRingClass =
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300";
 
 interface ThumbnailProps {
   image: GalleryImage;
@@ -13,7 +15,7 @@ function Thumbnail({ image, onClick }: ThumbnailProps) {
       type="button"
       aria-label={`Ver imagen: ${image.title}`}
       onClick={onClick}
-      className="group relative aspect-[4/3] h-full w-full cursor-pointer overflow-hidden rounded-lg bg-stone-800"
+      className={`group relative aspect-[4/3] h-full w-full cursor-pointer overflow-hidden rounded-lg bg-stone-800 ${focusRingClass}`}
     >
       <img
         src={image.thumbnailSrc}

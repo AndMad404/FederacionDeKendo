@@ -1,5 +1,8 @@
 import type { GalleryImage } from "../../types";
 
+const focusRingClass =
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-300";
+
 interface GalleryDotsProps {
   images: GalleryImage[];
   activeIndex: number;
@@ -23,7 +26,7 @@ export function GalleryDots({
           aria-current={index === activeIndex ? "true" : undefined}
           key={image.id}
           onClick={() => onSelect(index)}
-          className={`rounded-full transition-all duration-300 ${
+          className={`rounded-full transition-all duration-300 ${focusRingClass} ${
             index === activeIndex
               ? "h-3 w-5 bg-red-400 sm:h-4 sm:w-6 [@media_(orientation:landscape)_and_(max-height:480px)]:h-2.5"
               : "h-3 w-3 bg-blue-500/70 hover:bg-blue-400/80 sm:h-4 sm:w-4 [@media_(orientation:landscape)_and_(max-height:480px)]:h-2.5 [@media_(orientation:landscape)_and_(max-height:480px)]:w-2.5"

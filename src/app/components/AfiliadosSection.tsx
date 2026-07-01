@@ -4,6 +4,8 @@ import { DOJOS } from "../data/dojos";
 import type { IconKey, InfoItem, ScheduleSlot } from "../types";
 
 const highPriorityImageProps = { fetchpriority: "high" } as const;
+const focusRingClass =
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-300";
 
 const ICON_MAP: Record<IconKey, ReactNode> = {
   mail: <Mail />,
@@ -66,7 +68,7 @@ function InfoCell({ item, side }: { item: InfoItem; side: "left" | "right" }) {
           href={item.href}
           target="_blank"
           rel="noreferrer"
-          className="block text-base underline-offset-4 transition-colors duration-200 [overflow-wrap:anywhere] hover:text-blue-400 hover:underline lg:text-base [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-xs [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight"
+          className={`block text-base underline-offset-4 transition-colors duration-200 [overflow-wrap:anywhere] hover:text-blue-400 hover:underline lg:text-base [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-xs [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight ${focusRingClass}`}
         >
           {item.value}
         </a>

@@ -1,3 +1,6 @@
+const focusRingClass =
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-300";
+
 export function Footer() {
   return (
     <footer className="bg-stone-950 text-white">
@@ -38,7 +41,7 @@ export function Footer() {
             <ul className="flex flex-col gap-1 text-sm">
               <li>
                 <a
-                  className="hover:text-blue-400"
+                  className={`hover:text-blue-400 ${focusRingClass}`}
                   href="mailto:secretaria.fedekendo@outlook.com"
                 >
                   secretaria.fedekendo@outlook.com

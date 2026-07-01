@@ -3,6 +3,8 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { GalleryImage } from "../../types";
 
 const highPriorityImageProps = { fetchpriority: "high" } as const;
+const focusRingClass =
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-300";
 
 interface NavArrowProps {
   direction: "left" | "right";
@@ -15,12 +17,12 @@ function NavArrow({ direction, onClick }: NavArrowProps) {
       type="button"
       aria-label={direction === "left" ? "Imagen anterior" : "Imagen siguiente"}
       onClick={onClick}
-      className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-blue-500 bg-black/80 transition-colors hover:bg-red-700 [@media_(orientation:landscape)_and_(max-height:480px)]:h-8 [@media_(orientation:landscape)_and_(max-height:480px)]:w-8"
+      className={`pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-blue-500 bg-black/80 transition-colors hover:bg-red-700 [@media_(orientation:landscape)_and_(max-height:480px)]:h-8 [@media_(orientation:landscape)_and_(max-height:480px)]:w-8 ${focusRingClass}`}
     >
       {direction === "left" ? (
-        <ChevronLeft size={20} className="text-white" />
+        <ChevronLeft size={20} aria-hidden="true" className="text-white" />
       ) : (
-        <ChevronRight size={20} className="text-white" />
+        <ChevronRight size={20} aria-hidden="true" className="text-white" />
       )}
     </button>
   );
@@ -83,7 +85,7 @@ export function FeaturedImage({
       <button
         type="button"
         aria-label={`${image.title}. ${image.tag}. ${positionLabel}. Abrir imagen`}
-        className="absolute inset-0 z-10 block h-full w-full cursor-pointer"
+        className={`absolute inset-0 z-10 block h-full w-full cursor-pointer ${focusRingClass}`}
         onClick={onOpen}
       >
         <span className="sr-only">Abrir imagen</span>

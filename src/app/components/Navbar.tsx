@@ -8,8 +8,11 @@ const NAV_LINKS = [
   { to: "/afiliados", label: "Afiliados" },
 ];
 
+const focusRingClass =
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-300";
+
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `text-base tracking-wide transition-colors duration-200 ${
+  `text-base tracking-wide transition-colors duration-200 ${focusRingClass} ${
     isActive
       ? "border-b border-blue-500 pb-0.5 text-blue-400"
       : "text-white hover:text-red-400"
@@ -19,15 +22,13 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <nav
-      aria-label="Navegación principal"
-      className="fixed left-0 right-0 top-0 z-50 bg-stone-950 backdrop-blur"
-    >
+    <header className="fixed left-0 right-0 top-0 z-50 bg-stone-950 backdrop-blur">
+      <nav aria-label="Navegación principal">
       <div className="mx-auto my-[5px] flex h-16 max-w-6xl items-center justify-between px-6">
         <Link
           to="/"
           onClick={() => setOpen(false)}
-          className="flex min-w-0 items-center gap-3"
+          className={`flex min-w-0 items-center gap-3 ${focusRingClass}`}
         >
           <picture>
             <source
@@ -49,49 +50,56 @@ export function Navbar() {
           </span>
         </Link>
 
-        <div className="hidden items-center gap-8 md:flex">
+        <ul className="hidden items-center gap-8 md:flex">
           {NAV_LINKS.map((link) => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              end={link.end}
-              className={navLinkClass}
-            >
-              {link.label}
-            </NavLink>
+            <li key={link.to}>
+              <NavLink
+                to={link.to}
+                end={link.end}
+                className={navLinkClass}
+              >
+                {link.label}
+              </NavLink>
+            </li>
           ))}
-        </div>
+        </ul>
 
         <button
           type="button"
-          className="text-gray-400 hover:text-white md:hidden"
+          className={`text-gray-400 hover:text-white md:hidden ${focusRingClass}`}
           aria-controls="mobile-menu"
           aria-expanded={open}
           aria-label={open ? "Cerrar menú" : "Abrir menú"}
           onClick={() => setOpen(!open)}
         >
-          {open ? <X size={22} /> : <Menu size={22} />}
+          {open ? (
+            <X size={22} aria-hidden="true" />
+          ) : (
+            <Menu size={22} aria-hidden="true" />
+          )}
         </button>
       </div>
 
       {open && (
-        <div
+        <ul
           id="mobile-menu"
           className="flex flex-col items-center gap-5 bg-stone-950 px-6 py-5 text-center md:hidden"
         >
           {NAV_LINKS.map((link) => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              end={link.end}
-              className={navLinkClass}
-              onClick={() => setOpen(false)}
-            >
-              {link.label}
-            </NavLink>
+            <li key={link.to}>
+              <NavLink
+                to={link.to}
+                end={link.end}
+                className={navLinkClass}
+                onClick={() => setOpen(false)}
+              >
+                {link.label}
+              </NavLink>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
-    </nav>
+      </nav>
+    </header>
   );
 }
