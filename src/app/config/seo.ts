@@ -12,7 +12,7 @@ interface SeoData {
   defaultImage: string;
   organization: {
     sport: string;
-    areaServed: string;
+    areaServed?: string;
   };
   routes: Record<string, RouteMeta>;
 }
@@ -66,23 +66,24 @@ export function getRouteStructuredData(meta: RouteMeta): StructuredData {
   const canonicalUrl = getCanonicalUrl(meta);
   const organizationId = `${SITE_URL}/#organization`;
   const websiteId = `${SITE_URL}/#website`;
+  const organizationData: StructuredData = {
+    "@type": "SportsOrganization",
+    "@id": organizationId,
+    name: SITE_NAME,
+    url: `${SITE_URL}/`,
+    logo: absoluteUrl(DATA.logo),
+    description: DEFAULT_SITE_DESCRIPTION,
+    sport: DATA.organization.sport,
+  };
+
+  if (DATA.organization.areaServed) {
+    organizationData.areaServed = DATA.organization.areaServed;
+  }
 
   return {
     "@context": "https://schema.org",
     "@graph": [
-      {
-        "@type": "SportsOrganization",
-        "@id": organizationId,
-        name: SITE_NAME,
-        url: `${SITE_URL}/`,
-        logo: absoluteUrl(DATA.logo),
-        description: DEFAULT_SITE_DESCRIPTION,
-        sport: DATA.organization.sport,
-        areaServed: {
-          "@type": "Country",
-          name: DATA.organization.areaServed,
-        },
-      },
+      organizationData,
       {
         "@type": "WebSite",
         "@id": websiteId,

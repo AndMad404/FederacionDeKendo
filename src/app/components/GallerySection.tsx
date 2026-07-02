@@ -29,12 +29,12 @@ export function GallerySection() {
   return (
     <section
       aria-labelledby="gallery-title"
-      className="h-[calc(100dvh-4rem-10px)] overflow-hidden bg-stone-950 md:h-full md:min-h-0"
+      className="overflow-hidden bg-stone-950 md:h-full md:min-h-0"
     >
       <h1 id="gallery-title" className="sr-only">
         Galería de kendo
       </h1>
-      <div className="mx-auto flex h-full min-h-0 flex-col">
+      <div className="mx-auto flex min-h-0 flex-col md:h-full">
         <div className="flex min-h-0 flex-1 flex-col gap-4">
           <div className="flex min-h-0 flex-1 flex-col gap-2 [@media_(orientation:landscape)_and_(max-height:480px)]:gap-1">
             <FeaturedImage

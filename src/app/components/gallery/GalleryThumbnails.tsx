@@ -46,7 +46,7 @@ export function GalleryThumbnails({
     <div
       role="group"
       aria-label="Miniaturas de galería"
-      className="grid h-14 grid-cols-6 gap-1.5 sm:h-16 sm:gap-2 md:h-20 [@media_(orientation:landscape)_and_(max-height:480px)]:h-11 [@media_(orientation:landscape)_and_(max-height:480px)]:gap-1"
+      className="grid h-14 grid-cols-6 gap-1.5 sm:h-16 sm:gap-2 md:h-20 [@media_(orientation:landscape)_and_(max-height:480px)]:hidden"
     >
       {images.map((image, index) => (
         <Thumbnail

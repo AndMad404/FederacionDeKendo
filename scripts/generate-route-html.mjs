@@ -32,23 +32,24 @@ function routeStructuredData(route) {
   const canonicalUrl = absoluteUrl(route.path);
   const organizationId = `${siteUrl}/#organization`;
   const websiteId = `${siteUrl}/#website`;
+  const organizationData = {
+    "@type": "SportsOrganization",
+    "@id": organizationId,
+    name: seoData.siteName,
+    url: `${siteUrl}/`,
+    logo: absoluteUrl(seoData.logo),
+    description: seoData.defaultDescription,
+    sport: seoData.organization.sport,
+  };
+
+  if (seoData.organization.areaServed) {
+    organizationData.areaServed = seoData.organization.areaServed;
+  }
 
   return {
     "@context": "https://schema.org",
     "@graph": [
-      {
-        "@type": "SportsOrganization",
-        "@id": organizationId,
-        name: seoData.siteName,
-        url: `${siteUrl}/`,
-        logo: absoluteUrl(seoData.logo),
-        description: seoData.defaultDescription,
-        sport: seoData.organization.sport,
-        areaServed: {
-          "@type": "Country",
-          name: seoData.organization.areaServed,
-        },
-      },
+      organizationData,
       {
         "@type": "WebSite",
         "@id": websiteId,

@@ -12,7 +12,7 @@ const focusRingClass =
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-300";
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `text-base tracking-wide transition-colors duration-200 ${focusRingClass} ${
+  `text-base tracking-wide transition-colors duration-200 [@media_(orientation:landscape)_and_(max-height:480px)]:text-sm ${focusRingClass} ${
     isActive
       ? "border-b border-blue-500 pb-0.5 text-blue-400"
       : "text-white hover:text-red-400"
@@ -24,7 +24,7 @@ export function Navbar() {
   return (
     <header className="fixed left-0 right-0 top-0 z-50 bg-stone-950 backdrop-blur">
       <nav aria-label="Navegación principal">
-      <div className="mx-auto my-[5px] flex h-16 max-w-6xl items-center justify-between px-6">
+      <div className="mx-auto my-[5px] flex h-16 max-w-6xl items-center justify-between px-6 [@media_(orientation:landscape)_and_(max-height:480px)]:my-[3px] [@media_(orientation:landscape)_and_(max-height:480px)]:h-12 [@media_(orientation:landscape)_and_(max-height:480px)]:px-5">
         <Link
           to="/"
           onClick={() => setOpen(false)}
@@ -40,17 +40,17 @@ export function Navbar() {
               src="/images/logo/fakcr-lockup-224.png"
               alt=""
               aria-hidden="true"
-              className="h-14 w-14 shrink-0 rounded-full bg-white object-contain"
+              className="h-14 w-14 shrink-0 rounded-full bg-white object-contain [@media_(orientation:landscape)_and_(max-height:480px)]:h-10 [@media_(orientation:landscape)_and_(max-height:480px)]:w-10"
               width="56"
               height="56"
             />
           </picture>
-          <span className="max-w-[11rem] text-sm font-semibold leading-tight tracking-wide text-white sm:max-w-none sm:text-base">
+          <span className="max-w-[11rem] text-sm font-semibold leading-tight tracking-wide text-white sm:max-w-none sm:text-base [@media_(orientation:landscape)_and_(max-height:480px)]:text-sm">
             Federación de<br className="sm:hidden" /> Asociaciones de Kendo
           </span>
         </Link>
 
-        <ul className="hidden items-center gap-8 md:flex">
+        <ul className="hidden items-center gap-8 md:flex [@media_(orientation:landscape)_and_(max-height:480px)]:gap-6">
           {NAV_LINKS.map((link) => (
             <li key={link.to}>
               <NavLink

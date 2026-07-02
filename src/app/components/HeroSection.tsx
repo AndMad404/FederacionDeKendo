@@ -2,7 +2,7 @@ const highPriorityImageProps = { fetchpriority: "high" } as const;
 
 function HeroBanner() {
   return (
-    <header className="relative flex min-h-[calc(100dvh-4rem-10px)] items-stretch overflow-hidden rounded-2xl sm:rounded-3xl [@media_(min-width:768px)_and_(min-height:640px)]:h-full [@media_(min-width:768px)_and_(min-height:640px)]:min-h-0">
+    <header className="relative flex h-[clamp(520px,calc(100svh_-_4rem_-_10px),680px)] items-stretch overflow-hidden rounded-2xl sm:rounded-3xl [@media_(orientation:landscape)_and_(max-height:480px)]:h-[calc(100svh_-_3rem_-_6px)] [@media_(min-width:768px)_and_(min-height:640px)]:h-full [@media_(min-width:768px)_and_(min-height:640px)]:min-h-0">
       <picture className="absolute inset-0 h-full w-full">
         <source
           srcSet="/images/gallery/thumbs/kendo-gallery-08-480.webp 480w, /images/gallery/kendo-gallery-08-960.webp 960w, /images/gallery/kendo-gallery-08-1600.webp 1600w"

@@ -103,7 +103,7 @@ function RouteMetadata() {
 
 export default function App() {
   return (
-    <div className="flex min-h-dvh flex-col bg-stone-950 [@media_(min-width:768px)_and_(min-height:640px)]:h-dvh [@media_(min-width:768px)_and_(min-height:640px)]:overflow-hidden">
+    <div className="flex min-h-svh flex-col bg-stone-950 [@media_(min-width:768px)_and_(min-height:640px)]:h-dvh [@media_(min-width:768px)_and_(min-height:640px)]:overflow-hidden">
       <ScrollToTop />
       <RouteMetadata />
       <a
@@ -116,7 +116,7 @@ export default function App() {
 
       <main
         id="main-content"
-        className="min-h-[calc(100dvh_-_4rem_-_10px)] flex-1 px-2.5 pt-[calc(4rem_+_10px)] [@media_(min-width:768px)_and_(min-height:640px)]:min-h-0 [@media_(min-width:768px)_and_(min-height:640px)]:overflow-hidden"
+        className="min-h-[calc(100svh_-_4rem_-_10px)] flex-1 px-2.5 pt-[calc(4rem_+_10px)] [@media_(orientation:landscape)_and_(max-height:480px)]:min-h-[calc(100svh_-_3rem_-_6px)] [@media_(orientation:landscape)_and_(max-height:480px)]:pt-[calc(3rem_+_6px)] [@media_(min-width:768px)_and_(min-height:640px)]:min-h-0 [@media_(min-width:768px)_and_(min-height:640px)]:overflow-hidden"
       >
         <Routes>
           <Route path="/" element={<HeroSection />} />

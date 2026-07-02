@@ -2,13 +2,12 @@
   "siteUrl": "https://fak-kendo.pages.dev",
   "siteName": "Federación de Asociaciones de Kendo",
   "defaultDescription": "Sitio oficial de la Federación de Asociaciones de Kendo: comunidad, galería y dojos afiliados.",
-  "locale": "es_CR",
-  "language": "es-CR",
+  "locale": "es_LA",
+  "language": "es",
   "logo": "/images/logo/fakcr-logo-640.webp",
   "defaultImage": "/images/gallery/kendo-gallery-08-1600.webp",
   "organization": {
-    "sport": "Kendo",
-    "areaServed": "Costa Rica"
+    "sport": "Kendo"
   },
   "routes": {
     "/": {
@@ -27,7 +26,7 @@
     "/galeria/": {
       "path": "/galeria/",
       "title": "Galería | Federación de Asociaciones de Kendo",
-      "description": "Galería oficial de la comunidad, entrenamientos y actividades de kendo en Costa Rica.",
+      "description": "Galería oficial de la comunidad, entrenamientos y actividades de kendo.",
       "image": "/images/gallery/kendo-gallery-08-1600.webp",
       "preloadImage": {
         "href": "/images/gallery/kendo-gallery-08-960.webp",

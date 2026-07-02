@@ -1,6 +1,6 @@
-# Federación de Asociaciones de Kendo de Costa Rica
+# Federación de Asociaciones de Kendo
 
-Sitio oficial de la Federación de Asociaciones de Kendo de Costa Rica.
+Sitio oficial de la Federación de Asociaciones de Kendo.
 
 ## Pages
 

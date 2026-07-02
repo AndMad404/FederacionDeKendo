@@ -90,7 +90,7 @@ export function Lightbox({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 [@media_(orientation:landscape)_and_(max-height:480px)]:p-2"
       onClick={onClose}
     >
       <div
@@ -98,7 +98,7 @@ export function Lightbox({
         role="dialog"
         aria-modal="true"
         aria-labelledby="lightbox-title"
-        className="relative w-full max-w-3xl"
+        className="relative flex max-h-[calc(100svh-2rem)] w-full max-w-3xl flex-col items-center [@media_(orientation:landscape)_and_(max-height:480px)]:flex-row [@media_(orientation:landscape)_and_(max-height:480px)]:max-w-[calc(100vw-7rem)] [@media_(orientation:landscape)_and_(max-height:480px)]:justify-center [@media_(orientation:landscape)_and_(max-height:480px)]:gap-3"
         onClick={(event) => event.stopPropagation()}
       >
         <button
@@ -106,12 +106,12 @@ export function Lightbox({
           type="button"
           aria-label="Cerrar galería"
           onClick={onClose}
-          className={`absolute -top-14 right-0 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-red-700 text-white transition-colors hover:bg-red-600 ${focusRingClass}`}
+          className={`fixed right-4 top-4 z-[60] flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-red-700 text-white transition-colors hover:bg-red-600 [@media_(orientation:landscape)_and_(max-height:480px)]:right-2 [@media_(orientation:landscape)_and_(max-height:480px)]:top-2 [@media_(orientation:landscape)_and_(max-height:480px)]:h-9 [@media_(orientation:landscape)_and_(max-height:480px)]:w-9 ${focusRingClass}`}
         >
           <X size={20} aria-hidden="true" />
         </button>
 
-        <div className="mx-auto w-fit max-w-full overflow-hidden rounded-3xl">
+        <div className="mx-auto min-h-0 w-fit max-w-full overflow-hidden rounded-3xl [@media_(orientation:landscape)_and_(max-height:480px)]:mx-0 [@media_(orientation:landscape)_and_(max-height:480px)]:max-w-[68vw] [@media_(orientation:landscape)_and_(max-height:480px)]:rounded-2xl">
           <img
             src={image.src}
             srcSet={image.srcSet}
@@ -120,11 +120,11 @@ export function Lightbox({
             width={image.width}
             height={image.height}
             decoding="async"
-            className="block w-auto max-w-full max-h-[58dvh] object-contain sm:max-h-[75vh]"
+            className="block w-auto max-w-full max-h-[calc(100svh-11rem)] object-contain sm:max-h-[calc(100svh-12rem)] [@media_(orientation:landscape)_and_(max-height:480px)]:max-h-[calc(100svh-1rem)]"
           />
         </div>
 
-        <div className="mt-4 flex items-center justify-center text-white">
+        <div className="mt-4 flex shrink-0 items-center justify-center text-white [@media_(orientation:landscape)_and_(max-height:480px)]:mt-0">
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -150,14 +150,14 @@ export function Lightbox({
             </button>
           </div>
 
-          <div className="max-w-full rounded-3xl border border-blue-500 bg-black/80 px-6 py-3 text-center shadow-xl backdrop-blur-sm">
-            <p id="lightbox-title" className="text-2xl font-bold">
+          <div className="max-w-full rounded-3xl border border-blue-500 bg-black/80 px-6 py-3 text-center shadow-xl backdrop-blur-sm [@media_(orientation:landscape)_and_(max-height:480px)]:max-w-[22rem] [@media_(orientation:landscape)_and_(max-height:480px)]:rounded-2xl [@media_(orientation:landscape)_and_(max-height:480px)]:px-4 [@media_(orientation:landscape)_and_(max-height:480px)]:py-2">
+            <p id="lightbox-title" className="text-2xl font-bold [@media_(orientation:landscape)_and_(max-height:480px)]:text-lg">
               {image.title}
             </p>
-            <p className="text-base font-bold uppercase tracking-widest text-red-400">
+            <p className="text-base font-bold uppercase tracking-widest text-red-400 [@media_(orientation:landscape)_and_(max-height:480px)]:text-xs">
               {image.tag}
             </p>
-            <p className="text-base">
+            <p className="text-base [@media_(orientation:landscape)_and_(max-height:480px)]:text-xs">
               {positionLabel}
             </p>
           </div>

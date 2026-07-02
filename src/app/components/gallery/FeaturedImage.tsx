@@ -46,9 +46,8 @@ export function FeaturedImage({
   onNext,
 }: FeaturedImageProps) {
   const positionLabel = `${index + 1} / ${total}`;
-
   return (
-    <figure className="group relative min-h-0 w-full flex-1 cursor-pointer overflow-hidden rounded-2xl bg-stone-800 sm:rounded-3xl [@media_(orientation:landscape)_and_(max-height:480px)]:h-[62dvh] [@media_(orientation:landscape)_and_(max-height:480px)]:flex-none">
+    <figure className="group relative h-[clamp(420px,62svh,620px)] w-full flex-none cursor-pointer overflow-hidden rounded-2xl bg-stone-800 sm:rounded-3xl md:min-h-0 md:flex-1 [@media_(orientation:landscape)_and_(max-height:480px)]:h-[calc(100svh_-_3rem_-_6px)] [@media_(orientation:landscape)_and_(max-height:480px)]:flex-none">
       <img
         key={image.id}
         src={image.src}
@@ -69,14 +68,14 @@ export function FeaturedImage({
       />
 
       <figcaption className="absolute bottom-0 left-0 right-0 flex justify-center p-3 sm:block sm:p-6 [@media_(orientation:landscape)_and_(max-height:480px)]:justify-start [@media_(orientation:landscape)_and_(max-height:480px)]:p-2">
-        <div className="inline-flex max-w-full flex-col rounded-2xl border border-blue-500 bg-black/70 px-4 py-3 text-center text-white shadow-xl backdrop-blur-sm sm:rounded-3xl sm:px-5 sm:py-4 sm:text-left [@media_(orientation:landscape)_and_(max-height:480px)]:px-3 [@media_(orientation:landscape)_and_(max-height:480px)]:py-2">
-          <p className="text-xl font-bold sm:text-2xl [@media_(orientation:landscape)_and_(max-height:480px)]:text-lg">
+        <div className="inline-flex max-w-full flex-col rounded-2xl border border-blue-500 bg-black/70 px-4 py-3 text-center text-white shadow-xl backdrop-blur-sm sm:rounded-3xl sm:px-5 sm:py-4 sm:text-left [@media_(orientation:landscape)_and_(max-height:480px)]:rounded-xl [@media_(orientation:landscape)_and_(max-height:480px)]:px-3 [@media_(orientation:landscape)_and_(max-height:480px)]:py-1.5">
+          <p className="text-xl font-bold sm:text-2xl [@media_(orientation:landscape)_and_(max-height:480px)]:text-base">
             {image.title}
           </p>
-          <p className="text-sm font-bold uppercase tracking-widest text-red-400 sm:text-base [@media_(orientation:landscape)_and_(max-height:480px)]:text-xs">
+          <p className="text-sm font-bold uppercase tracking-widest text-red-400 sm:text-base [@media_(orientation:landscape)_and_(max-height:480px)]:text-[10px]">
             {image.tag}
           </p>
-          <p className="text-sm sm:text-base [@media_(orientation:landscape)_and_(max-height:480px)]:text-xs">
+          <p className="text-sm sm:text-base [@media_(orientation:landscape)_and_(max-height:480px)]:text-[10px]">
             {positionLabel}
           </p>
         </div>
