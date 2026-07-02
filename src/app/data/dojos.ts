@@ -17,6 +17,12 @@ export const DOJOS: DojoData[] = [
         href: "tel:+50688699205",
       },
       {
+        icon: "instagram",
+        label: "Instagram",
+        value: "@kendocostarica",
+        href: "https://www.instagram.com/kendocostarica/",
+      },
+      {
         icon: "mapPin",
         label: "Moravia / Guadalupe",
         value: "Ver ubicación",
@@ -27,12 +33,6 @@ export const DOJOS: DojoData[] = [
         label: "Curridabat",
         value: "Ver ubicación",
         href: "https://maps.app.goo.gl/jKnHfSwpWiobTCkN6",
-      },
-      {
-        icon: "instagram",
-        label: "Instagram",
-        value: "@kendocostarica",
-        href: "https://www.instagram.com/kendocostarica/",
       },
     ],
     schedule: [
