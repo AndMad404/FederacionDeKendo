@@ -61,14 +61,14 @@ function InfoCell({ item, side }: { item: InfoItem; side: "left" | "right" }) {
         {ICON_MAP[item.icon]}
       </span>
       <div className={`${textColumn} min-w-0`}>
-        <p className="text-xl font-bold lg:text-lg [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-sm [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
+        <p className="text-xl font-bold lg:text-lg [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-xl [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
           {item.label}
         </p>
         <a
           href={item.href}
           target="_blank"
           rel="noreferrer"
-          className={`block text-base underline-offset-4 transition-colors duration-200 [overflow-wrap:anywhere] hover:text-blue-400 hover:underline lg:text-base [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-xs [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight ${focusRingClass}`}
+          className={`block text-base underline-offset-4 transition-colors duration-200 [overflow-wrap:anywhere] hover:text-blue-400 hover:underline lg:text-base [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-base [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight ${focusRingClass}`}
         >
           {item.value}
         </a>
@@ -80,7 +80,7 @@ function InfoCell({ item, side }: { item: InfoItem; side: "left" | "right" }) {
 function ScheduleRow({ days, hours }: Pick<ScheduleSlot, "days" | "hours">) {
   return (
     <div className={SCHEDULE_GRID}>
-      <dt className="text-center text-sm [overflow-wrap:anywhere] md:col-start-2 md:text-left [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:col-start-auto [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
+      <dt className="text-center text-[16px] [overflow-wrap:anywhere] md:col-start-2 md:text-left [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:col-start-auto [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
         {days}
       </dt>
       <dd className="text-center [overflow-wrap:anywhere] md:col-start-5 md:text-left [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:col-start-auto [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
@@ -111,7 +111,7 @@ function DojoInfo({
     >
       <h2
         id={headingId}
-        className="w-full text-center text-2xl font-bold gap-2 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-center [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-base [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight"
+        className="w-full text-center text-2xl font-bold gap-2 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-center [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-2xl [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight"
       >
         {title}
       </h2>
@@ -126,16 +126,16 @@ function DojoInfo({
       </div>
 
       <div className="grid gap-2 text-center [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:gap-1 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left">
-        <h3 className="w-full text-center text-xl font-bold lg:text-2xl [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-center [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-sm [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
+        <h3 className="w-full text-center text-2xl font-bold [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-center [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-2xl [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
           Horario de clases:
         </h3>
-        <div className="grid gap-1 text-base lg:gap-4 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-xs [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
+        <div className="grid gap-1 text-base lg:gap-4 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-base [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
           {allSlotsShareLocation ? (
             <section
               aria-label={schedule[0].location}
               className="[@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left"
             >
-              <h4 className="text-lg font-bold [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-sm [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
+              <h4 className="text-lg font-bold [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-lg [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
                 {schedule[0].location}
               </h4>
               <dl className="grid gap-1">
@@ -155,7 +155,7 @@ function DojoInfo({
                 aria-label={slot.location}
                 className="[@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left"
               >
-                <h4 className="text-lg font-bold [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-sm [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
+                <h4 className="text-lg font-bold [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-left [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-lg [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
                   {slot.location}
                 </h4>
                 <dl>

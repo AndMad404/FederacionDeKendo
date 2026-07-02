@@ -13,16 +13,16 @@ export function Footer() {
             <div className="flex items-baseline gap-1">
               <h2
                 id="footer-purpose-title"
-                className="text-base font-extrabold tracking-widest text-white"
+                className="text-lg font-extrabold tracking-widest text-white"
               >
                 Propósito del
               </h2>
-              <span className="text-base font-bold text-red-400">
+              <span className="text-lg font-bold text-red-400">
                 KENDO
               </span>
             </div>
           </div>
-          <p className="text-sm leading-relaxed">
+          <p className="text-base leading-relaxed">
             El concepto del Kendo es disciplinar el carácter humano a través de la aplicación de los principios de la Katana.
           </p>
         </section>
@@ -33,12 +33,12 @@ export function Footer() {
         >
           <h2
             id="footer-contact-title"
-            className="text-center text-base font-bold tracking-wide"
+            className="text-center text-lg font-bold tracking-wide"
           >
             Contactos de la Federación
           </h2>
           <div className="flex flex-col items-center justify-center sm:text-center md:flex-row">
-            <ul className="flex flex-col gap-1 text-sm">
+            <ul className="flex flex-col gap-1 text-base">
               <li>
                 <a
                   className={`hover:text-blue-400 ${focusRingClass}`}

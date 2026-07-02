@@ -9,8 +9,8 @@ import {
   DEFAULT_SITE_DESCRIPTION,
   SITE_LOCALE,
   SITE_NAME,
+  getRouteImageMetadata,
   getCanonicalUrl,
-  getRouteImageUrl,
   getRouteMeta,
   getRouteStructuredData,
 } from "./config/seo";
@@ -83,7 +83,7 @@ function RouteMetadata() {
   useEffect(() => {
     const meta = getRouteMeta(pathname);
     const canonicalUrl = getCanonicalUrl(meta);
-    const imageUrl = getRouteImageUrl(meta);
+    const image = getRouteImageMetadata(meta);
 
     document.title = meta.title;
     setMetaName("description", meta.description || DEFAULT_SITE_DESCRIPTION);
@@ -93,8 +93,18 @@ function RouteMetadata() {
     setMetaProperty("og:title", meta.title);
     setMetaProperty("og:description", meta.description);
     setMetaProperty("og:url", canonicalUrl);
-    setMetaProperty("og:image", imageUrl);
+    setMetaProperty("og:image", image.url);
+    setMetaProperty("og:image:secure_url", image.url);
+    setMetaProperty("og:image:type", "image/png");
+    setMetaProperty("og:image:width", String(image.width));
+    setMetaProperty("og:image:height", String(image.height));
+    setMetaProperty("og:image:alt", image.alt);
     setMetaProperty("og:locale", SITE_LOCALE);
+    setMetaName("twitter:card", "summary_large_image");
+    setMetaName("twitter:title", meta.title);
+    setMetaName("twitter:description", meta.description);
+    setMetaName("twitter:image", image.url);
+    setMetaName("twitter:image:alt", image.alt);
     setJsonLd("route-json-ld", getRouteStructuredData(meta));
   }, [pathname]);
 

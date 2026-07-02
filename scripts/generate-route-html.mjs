@@ -30,6 +30,7 @@ function absoluteUrl(value) {
 
 function routeStructuredData(route) {
   const canonicalUrl = absoluteUrl(route.path);
+  const imageUrl = absoluteUrl(route.image || seoData.defaultImage);
   const organizationId = `${siteUrl}/#organization`;
   const websiteId = `${siteUrl}/#website`;
   const organizationData = {
@@ -75,7 +76,10 @@ function routeStructuredData(route) {
         },
         primaryImageOfPage: {
           "@type": "ImageObject",
-          url: absoluteUrl(route.image || seoData.defaultImage),
+          url: imageUrl,
+          width: seoData.defaultImageWidth,
+          height: seoData.defaultImageHeight,
+          caption: seoData.defaultImageAlt,
         },
       },
     ],
@@ -117,7 +121,17 @@ function managedHead(route) {
     `    <meta property="og:description" content="${escapeAttribute(route.description)}" />`,
     `    <meta property="og:url" content="${escapeAttribute(canonicalUrl)}" />`,
     `    <meta property="og:image" content="${escapeAttribute(imageUrl)}" />`,
+    `    <meta property="og:image:secure_url" content="${escapeAttribute(imageUrl)}" />`,
+    '    <meta property="og:image:type" content="image/png" />',
+    `    <meta property="og:image:width" content="${escapeAttribute(seoData.defaultImageWidth)}" />`,
+    `    <meta property="og:image:height" content="${escapeAttribute(seoData.defaultImageHeight)}" />`,
+    `    <meta property="og:image:alt" content="${escapeAttribute(seoData.defaultImageAlt)}" />`,
     `    <meta property="og:locale" content="${escapeAttribute(seoData.locale)}" />`,
+    '    <meta name="twitter:card" content="summary_large_image" />',
+    `    <meta name="twitter:title" content="${escapeAttribute(route.title)}" />`,
+    `    <meta name="twitter:description" content="${escapeAttribute(route.description)}" />`,
+    `    <meta name="twitter:image" content="${escapeAttribute(imageUrl)}" />`,
+    `    <meta name="twitter:image:alt" content="${escapeAttribute(seoData.defaultImageAlt)}" />`,
     `    <script type="application/ld+json" id="${ROUTE_JSON_LD_ID}">${jsonLd}</script>`,
   ];
 
@@ -129,6 +143,7 @@ function stripManagedHead(html) {
     .replace(/\n\s*<link\s+rel="preload"[^>]*\s+as="image"[^>]*>/gi, "")
     .replace(/\n\s*<link\s+rel="canonical"[^>]*>/gi, "")
     .replace(/\n\s*<meta\s+property="og:[^"]+"[^>]*>/gi, "")
+    .replace(/\n\s*<meta\s+name="twitter:[^"]+"[^>]*>/gi, "")
     .replace(
       new RegExp(
         `\\n\\s*<script\\s+type="application/ld\\+json"\\s+id="${ROUTE_JSON_LD_ID}">[\\s\\S]*?<\\/script>`,

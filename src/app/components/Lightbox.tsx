@@ -154,7 +154,7 @@ export function Lightbox({
             <p id="lightbox-title" className="text-2xl font-bold [@media_(orientation:landscape)_and_(max-height:480px)]:text-lg">
               {image.title}
             </p>
-            <p className="text-base font-bold uppercase tracking-widest text-red-400 [@media_(orientation:landscape)_and_(max-height:480px)]:text-xs">
+            <p className="text-lg font-bold uppercase tracking-widest text-red-400 [@media_(orientation:landscape)_and_(max-height:480px)]:text-xs">
               {image.tag}
             </p>
             <p className="text-base [@media_(orientation:landscape)_and_(max-height:480px)]:text-xs">

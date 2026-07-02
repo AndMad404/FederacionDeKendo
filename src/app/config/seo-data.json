@@ -5,7 +5,10 @@
   "locale": "es_LA",
   "language": "es",
   "logo": "/images/logo/fakcr-logo-640.webp",
-  "defaultImage": "/images/gallery/kendo-gallery-08-1600.webp",
+  "defaultImage": "/images/social/kendo-social-card.png",
+  "defaultImageAlt": "Tarjeta social de la Federación de Asociaciones de Kendo",
+  "defaultImageWidth": 1200,
+  "defaultImageHeight": 630,
   "organization": {
     "sport": "Kendo"
   },
@@ -14,7 +17,7 @@
       "path": "/",
       "title": "Inicio | Federación de Asociaciones de Kendo",
       "description": "Conoce la Federación de Asociaciones de Kendo y su comunidad de práctica.",
-      "image": "/images/gallery/kendo-gallery-08-1600.webp",
+      "image": "/images/social/kendo-social-card.png",
       "preloadImage": {
         "href": "/images/gallery/kendo-gallery-08-960.webp",
         "type": "image/webp",
@@ -27,7 +30,7 @@
       "path": "/galeria/",
       "title": "Galería | Federación de Asociaciones de Kendo",
       "description": "Galería oficial de la comunidad, entrenamientos y actividades de kendo.",
-      "image": "/images/gallery/kendo-gallery-08-1600.webp",
+      "image": "/images/social/kendo-social-card.png",
       "preloadImage": {
         "href": "/images/gallery/kendo-gallery-08-960.webp",
         "type": "image/webp",
@@ -40,7 +43,7 @@
       "path": "/afiliados/",
       "title": "Dojos afiliados | Federación de Asociaciones de Kendo",
       "description": "Información de contacto, horarios y ubicación de dojos afiliados a la federación.",
-      "image": "/images/affiliates/kendo-affiliates-1200.webp",
+      "image": "/images/social/kendo-social-card.png",
       "preloadImage": {
         "href": "/images/affiliates/kendo-affiliates-768.avif",
         "type": "image/avif",

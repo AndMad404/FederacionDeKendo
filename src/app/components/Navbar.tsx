@@ -12,7 +12,7 @@ const focusRingClass =
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-300";
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `text-base tracking-wide transition-colors duration-200 [@media_(orientation:landscape)_and_(max-height:480px)]:text-sm ${focusRingClass} ${
+  `text-lg tracking-wide transition-colors duration-200 [@media_(orientation:landscape)_and_(max-height:480px)]:text-base ${focusRingClass} ${
     isActive
       ? "border-b border-blue-500 pb-0.5 text-blue-400"
       : "text-white hover:text-red-400"
@@ -45,7 +45,7 @@ export function Navbar() {
               height="56"
             />
           </picture>
-          <span className="max-w-[11rem] text-sm font-semibold leading-tight tracking-wide text-white sm:max-w-none sm:text-base [@media_(orientation:landscape)_and_(max-height:480px)]:text-sm">
+          <span className="max-w-[11rem] text-lg font-semibold leading-tight tracking-wide text-white sm:max-w-none [@media_(orientation:landscape)_and_(max-height:480px)]:text-base">
             Federación de<br className="sm:hidden" /> Asociaciones de Kendo
           </span>
         </Link>

@@ -10,6 +10,9 @@ interface SeoData {
   language: string;
   logo: string;
   defaultImage: string;
+  defaultImageAlt: string;
+  defaultImageWidth: number;
+  defaultImageHeight: number;
   organization: {
     sport: string;
     areaServed?: string;
@@ -34,6 +37,9 @@ export const SITE_NAME = DATA.siteName;
 export const DEFAULT_SITE_DESCRIPTION = DATA.defaultDescription;
 export const SITE_LOCALE = DATA.locale;
 export const SITE_LANGUAGE = DATA.language;
+export const DEFAULT_SOCIAL_IMAGE_ALT = DATA.defaultImageAlt;
+export const DEFAULT_SOCIAL_IMAGE_WIDTH = DATA.defaultImageWidth;
+export const DEFAULT_SOCIAL_IMAGE_HEIGHT = DATA.defaultImageHeight;
 export const ROUTE_META = DATA.routes;
 
 export const ROUTE_PATHS = Object.keys(ROUTE_META);
@@ -62,6 +68,15 @@ export function getRouteImageUrl(meta: RouteMeta) {
   return absoluteUrl(meta.image || DATA.defaultImage);
 }
 
+export function getRouteImageMetadata(meta: RouteMeta) {
+  return {
+    url: getRouteImageUrl(meta),
+    alt: DATA.defaultImageAlt,
+    width: DATA.defaultImageWidth,
+    height: DATA.defaultImageHeight,
+  };
+}
+
 export function getRouteStructuredData(meta: RouteMeta): StructuredData {
   const canonicalUrl = getCanonicalUrl(meta);
   const organizationId = `${SITE_URL}/#organization`;
@@ -79,6 +94,8 @@ export function getRouteStructuredData(meta: RouteMeta): StructuredData {
   if (DATA.organization.areaServed) {
     organizationData.areaServed = DATA.organization.areaServed;
   }
+
+  const image = getRouteImageMetadata(meta);
 
   return {
     "@context": "https://schema.org",
@@ -109,7 +126,10 @@ export function getRouteStructuredData(meta: RouteMeta): StructuredData {
         },
         primaryImageOfPage: {
           "@type": "ImageObject",
-          url: getRouteImageUrl(meta),
+          url: image.url,
+          width: image.width,
+          height: image.height,
+          caption: image.alt,
         },
       },
     ],

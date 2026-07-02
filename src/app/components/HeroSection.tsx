@@ -26,7 +26,7 @@ function HeroBanner() {
         <div className="mx-auto max-w-3xl rounded-2xl border border-blue-500/70 bg-black/70 px-3 py-3 shadow-2xl sm:px-5 [@media_(orientation:landscape)_and_(max-height:480px)]:px-2 [@media_(orientation:landscape)_and_(max-height:480px)]:pt-px [@media_(orientation:landscape)_and_(max-height:480px)]:pb-1 [@media_(min-width:768px)_and_(min-height:640px)]:rounded-3xl [@media_(min-width:768px)_and_(min-height:640px)]:px-10 [@media_(min-width:768px)_and_(min-height:640px)]:py-5">
           <h1
             id="home-title"
-            className="text-xl font-bold leading-tight tracking-wide text-white sm:text-2xl [@media_(min-width:768px)_and_(min-height:640px)]:text-[clamp(1.5rem,4vw,2.75rem)]"
+            className="text-lg font-bold leading-tight tracking-wide text-white sm:text-xl [@media_(min-width:768px)_and_(min-height:640px)]:text-[clamp(1.25rem,3vw,2rem)]"
           >
             FEDERACIÓN DE ASOCIACIONES DE KENDO
           </h1>
@@ -34,12 +34,12 @@ function HeroBanner() {
 
         <div className="mx-auto flex max-w-2xl flex-col items-center gap-1 rounded-2xl border border-blue-500/70 bg-black/70 px-3 py-3 shadow-2xl sm:px-5 [@media_(orientation:landscape)_and_(max-height:480px)]:px-2 [@media_(orientation:landscape)_and_(max-height:480px)]:pt-px [@media_(orientation:landscape)_and_(max-height:480px)]:pb-1 [@media_(min-width:768px)_and_(min-height:640px)]:rounded-3xl [@media_(min-width:768px)_and_(min-height:640px)]:px-10 [@media_(min-width:768px)_and_(min-height:640px)]:py-5">
           <h2 className="text-lg font-semibold leading-tight tracking-tight text-white sm:text-xl [@media_(min-width:768px)_and_(min-height:640px)]:text-[clamp(1.25rem,3vw,2rem)]">
-            EL CAMINO DE LA ESPADA
+            KENDO - 剣道
             <br />
-            剣道
+            EL CAMINO DE LA ESPADA
           </h2>
 
-          <p className="max-w-sm text-sm leading-snug text-white sm:max-w-md [@media_(min-width:768px)_and_(min-height:640px)]:text-base [@media_(min-width:768px)_and_(min-height:640px)]:leading-relaxed">
+          <p className="max-w-sm text-lg leading-snug text-white sm:max-w-md [@media_(min-width:768px)_and_(min-height:640px)]:text-lg [@media_(min-width:768px)_and_(min-height:640px)]:leading-relaxed">
             Únete a nuestra comunidad y descubre este arte marcial japonés.
             <br />
             Clases para todos los niveles, de principiante a dan avanzado.
