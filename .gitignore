@@ -8,6 +8,7 @@ dist-ssr/
 .cache/
 .eslintcache
 *.tsbuildinfo
+local/
 
 # Environment
 .env
