@@ -172,7 +172,7 @@ function DojoInfo({
 
 function InfoCard() {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-8 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:grid-cols-2 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:gap-3">
+    <div className="grid grid-cols-1 xl:grid-cols-2 xl:gap-8 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:grid-cols-2 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:gap-3">
       {DOJOS.map((dojo, index) => (
         <DojoInfo
           key={dojo.title}
@@ -188,12 +188,12 @@ export function AfiliadosSection() {
   return (
     <section
       aria-labelledby="affiliates-title"
-      className="rounded-3xl bg-stone-950 md:h-full md:overflow-y-auto lg:overflow-hidden [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:overflow-y-auto"
+      className="rounded-3xl bg-stone-950 md:h-full md:overflow-y-auto xl:overflow-hidden [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:overflow-y-auto"
     >
       <h1 id="affiliates-title" className="sr-only">
         Dojos afiliados
       </h1>
-      <div className="relative flex min-h-[530px] items-center justify-center overflow-hidden rounded-3xl pt-6 lg:h-full lg:min-h-0 lg:pt-0 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:min-h-[calc(100dvh-4rem-10px)] [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:items-start [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:overflow-y-auto [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:py-2">
+      <div className="relative flex min-h-[530px] items-center justify-center overflow-hidden rounded-3xl pt-6 xl:h-full xl:min-h-0 xl:pt-0 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:min-h-[calc(100dvh-4rem-10px)] [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:items-start [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:overflow-y-auto [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:py-2">
         <picture className="absolute inset-0 h-full w-full">
           <source
             srcSet="/images/affiliates/kendo-affiliates-768.avif 768w, /images/affiliates/kendo-affiliates-1200.avif 1200w"

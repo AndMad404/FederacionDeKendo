@@ -32,17 +32,15 @@ type StructuredData = Record<string, unknown>;
 
 const DATA = seoData as SeoData;
 
-export const SITE_URL = DATA.siteUrl.replace(/\/$/, "");
+const SITE_URL = DATA.siteUrl.replace(/\/$/, "");
 export const SITE_NAME = DATA.siteName;
 export const DEFAULT_SITE_DESCRIPTION = DATA.defaultDescription;
 export const SITE_LOCALE = DATA.locale;
-export const SITE_LANGUAGE = DATA.language;
-export const DEFAULT_SOCIAL_IMAGE_ALT = DATA.defaultImageAlt;
-export const DEFAULT_SOCIAL_IMAGE_WIDTH = DATA.defaultImageWidth;
-export const DEFAULT_SOCIAL_IMAGE_HEIGHT = DATA.defaultImageHeight;
-export const ROUTE_META = DATA.routes;
-
-export const ROUTE_PATHS = Object.keys(ROUTE_META);
+const SITE_LANGUAGE = DATA.language;
+const DEFAULT_SOCIAL_IMAGE_ALT = DATA.defaultImageAlt;
+const DEFAULT_SOCIAL_IMAGE_WIDTH = DATA.defaultImageWidth;
+const DEFAULT_SOCIAL_IMAGE_HEIGHT = DATA.defaultImageHeight;
+const ROUTE_META = DATA.routes;
 
 function normalizeRoutePath(pathname: string) {
   if (pathname === "/") return pathname;
@@ -50,7 +48,7 @@ function normalizeRoutePath(pathname: string) {
   return pathname.endsWith("/") ? pathname : `${pathname}/`;
 }
 
-export function absoluteUrl(path: string) {
+function absoluteUrl(path: string) {
   if (/^https?:\/\//.test(path)) return path;
 
   return path === "/" ? `${SITE_URL}/` : `${SITE_URL}${path}`;
@@ -64,16 +62,16 @@ export function getCanonicalUrl(meta: RouteMeta) {
   return absoluteUrl(meta.path);
 }
 
-export function getRouteImageUrl(meta: RouteMeta) {
+function getRouteImageUrl(meta: RouteMeta) {
   return absoluteUrl(meta.image || DATA.defaultImage);
 }
 
 export function getRouteImageMetadata(meta: RouteMeta) {
   return {
     url: getRouteImageUrl(meta),
-    alt: DATA.defaultImageAlt,
-    width: DATA.defaultImageWidth,
-    height: DATA.defaultImageHeight,
+    alt: DEFAULT_SOCIAL_IMAGE_ALT,
+    width: DEFAULT_SOCIAL_IMAGE_WIDTH,
+    height: DEFAULT_SOCIAL_IMAGE_HEIGHT,
   };
 }
 
