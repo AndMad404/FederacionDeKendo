@@ -18,7 +18,7 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     thumbnailSrcSet: thumbnailSrcSet("kendo-gallery-01"),
     thumbnailWidth: 320,
     thumbnailHeight: 160,
-    mobileObjectPosition: "5%",
+    mobileObjectPosition: "25%",
     title: "Practicantes en seiza",
     tag: "Reiho",
   },
