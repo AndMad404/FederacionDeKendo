@@ -98,7 +98,7 @@ export function Lightbox({
         role="dialog"
         aria-modal="true"
         aria-labelledby="lightbox-title"
-        className="relative flex max-h-[calc(100svh-2rem)] w-full max-w-3xl flex-col items-center [@media_(orientation:landscape)_and_(max-height:640px)]:flex-row [@media_(orientation:landscape)_and_(max-height:640px)]:max-w-[calc(100vw-7rem)] [@media_(orientation:landscape)_and_(max-height:640px)]:justify-center [@media_(orientation:landscape)_and_(max-height:640px)]:gap-3"
+        className="relative flex max-h-[calc(100svh-2rem)] w-full max-w-3xl flex-col items-center [@media_(orientation:landscape)_and_(max-height:640px)]:flex-row [@media_(orientation:landscape)_and_(max-height:640px)]:max-w-[calc(100vw-2rem)] [@media_(orientation:landscape)_and_(max-height:640px)]:justify-center [@media_(orientation:landscape)_and_(max-height:640px)]:gap-3"
         onClick={(event) => event.stopPropagation()}
       >
         <button
@@ -111,7 +111,7 @@ export function Lightbox({
           <X size={20} aria-hidden="true" />
         </button>
 
-        <div className="mx-auto min-h-0 w-fit max-w-full overflow-hidden rounded-3xl [@media_(orientation:landscape)_and_(max-height:640px)]:mx-0 [@media_(orientation:landscape)_and_(max-height:640px)]:max-w-[68vw] [@media_(orientation:landscape)_and_(max-height:640px)]:rounded-2xl">
+        <div className="mx-auto min-h-0 w-fit max-w-full overflow-hidden rounded-3xl [@media_(orientation:landscape)_and_(max-height:640px)]:mx-0 [@media_(orientation:landscape)_and_(max-height:640px)]:min-w-0 [@media_(orientation:landscape)_and_(max-height:640px)]:max-w-[60vw] [@media_(orientation:landscape)_and_(max-height:640px)]:rounded-2xl">
           <img
             src={image.src}
             srcSet={image.srcSet}
@@ -124,33 +124,20 @@ export function Lightbox({
           />
         </div>
 
-        <div className="mt-4 flex shrink-0 items-center justify-center text-white [@media_(orientation:landscape)_and_(max-height:640px)]:mt-0">
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              aria-label="Imagen anterior"
-              onClick={(event) => {
-                event.stopPropagation();
-                onPrev();
-              }}
-              className={`fixed left-3 top-1/2 z-50 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-blue-500 bg-white/10 transition-colors hover:bg-white/20 md:left-6 md:h-12 md:w-12 ${focusRingClass}`}
-            >
-              <ChevronLeft size={22} aria-hidden="true" />
-            </button>
-            <button
-              type="button"
-              aria-label="Imagen siguiente"
-              onClick={(event) => {
-                event.stopPropagation();
-                onNext();
-              }}
-              className={`fixed right-3 top-1/2 z-50 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-blue-500 bg-white/10 transition-colors hover:bg-white/20 md:right-6 md:h-12 md:w-12 ${focusRingClass}`}
-            >
-              <ChevronRight size={22} aria-hidden="true" />
-            </button>
-          </div>
+        <div className="mt-4 flex w-full shrink-0 items-center justify-center gap-3 text-white [@media_(orientation:landscape)_and_(max-height:640px)]:mt-0 [@media_(orientation:landscape)_and_(max-height:640px)]:w-60 [@media_(orientation:landscape)_and_(max-height:640px)]:gap-2">
+          <button
+            type="button"
+            aria-label="Imagen anterior"
+            onClick={(event) => {
+              event.stopPropagation();
+              onPrev();
+            }}
+            className={`flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-blue-400 bg-black/85 shadow-xl shadow-black/40 transition-colors hover:bg-blue-950/90 md:h-12 md:w-12 ${focusRingClass}`}
+          >
+            <ChevronLeft size={24} aria-hidden="true" />
+          </button>
 
-          <div className="max-w-full rounded-3xl border border-blue-500 bg-black/80 px-6 py-3 text-center shadow-xl backdrop-blur-sm [@media_(orientation:landscape)_and_(max-height:640px)]:max-w-[22rem] [@media_(orientation:landscape)_and_(max-height:640px)]:rounded-2xl [@media_(orientation:landscape)_and_(max-height:640px)]:px-4 [@media_(orientation:landscape)_and_(max-height:640px)]:py-2">
+          <div className="min-w-0 max-w-[calc(100vw-8rem)] flex-1 rounded-3xl border border-blue-500 bg-black/85 px-5 py-3 text-center shadow-xl shadow-black/40 backdrop-blur-sm [@media_(orientation:landscape)_and_(max-height:640px)]:max-w-none [@media_(orientation:landscape)_and_(max-height:640px)]:rounded-2xl [@media_(orientation:landscape)_and_(max-height:640px)]:px-3 [@media_(orientation:landscape)_and_(max-height:640px)]:py-2">
             <p id="lightbox-title" className="text-2xl font-bold [@media_(orientation:landscape)_and_(max-height:640px)]:text-lg">
               {image.title}
             </p>
@@ -161,6 +148,18 @@ export function Lightbox({
               {positionLabel}
             </p>
           </div>
+
+          <button
+            type="button"
+            aria-label="Imagen siguiente"
+            onClick={(event) => {
+              event.stopPropagation();
+              onNext();
+            }}
+            className={`flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-blue-400 bg-black/85 shadow-xl shadow-black/40 transition-colors hover:bg-blue-950/90 md:h-12 md:w-12 ${focusRingClass}`}
+          >
+            <ChevronRight size={24} aria-hidden="true" />
+          </button>
         </div>
       </div>
     </div>
