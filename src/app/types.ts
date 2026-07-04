@@ -15,6 +15,7 @@ export interface GalleryImage {
   thumbnailHeight: number;
   disableObjectPosition?: boolean;
   objectPosition?: string;
+  mobileObjectPosition?: string;
   title: string;
   tag: string;
 }

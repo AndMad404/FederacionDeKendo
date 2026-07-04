@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { GalleryImage } from "../../types";
 
 const highPriorityImageProps = { fetchpriority: "high" } as const;
+const defaultFeaturedObjectPosition = "center 0%";
 const focusRingClass =
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-300";
 
@@ -54,7 +55,11 @@ export function FeaturedImage({
     ? undefined
     : ({
         "--gallery-featured-object-position":
-          image.objectPosition ?? "center 0%",
+          image.objectPosition ?? defaultFeaturedObjectPosition,
+        "--gallery-featured-mobile-object-position":
+          image.mobileObjectPosition ??
+          image.objectPosition ??
+          defaultFeaturedObjectPosition,
       } as CSSProperties);
   const objectPositionClass = image.disableObjectPosition
     ? "gallery-featured-image--native-position"
