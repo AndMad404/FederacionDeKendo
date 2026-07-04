@@ -3,12 +3,17 @@ export interface GalleryImage {
   src: string;
   srcSet?: string;
   sizes?: string;
+  featuredSrc?: string;
+  featuredSrcSet?: string;
+  featuredWidth?: number;
+  featuredHeight?: number;
   width: number;
   height: number;
   thumbnailSrc: string;
   thumbnailSrcSet?: string;
   thumbnailWidth: number;
   thumbnailHeight: number;
+  disableObjectPosition?: boolean;
   objectPosition?: string;
   title: string;
   tag: string;

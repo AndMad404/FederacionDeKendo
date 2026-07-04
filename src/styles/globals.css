@@ -225,3 +225,14 @@
 html {
   font-size: var(--font-size);
 }
+
+.gallery-featured-image:not(.gallery-featured-image--native-position) {
+  object-position: var(--gallery-featured-object-position, center 0%);
+}
+
+@media (orientation: landscape) and (max-height: 640px) {
+  .gallery-featured-image {
+    height: 100%;
+    width: 100%;
+  }
+}

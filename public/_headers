@@ -1,11 +1,11 @@
 /
-  Link: </images/gallery/kendo-gallery-08-960.webp>; rel=preload; as=image; fetchpriority=high; imagesrcset="/images/gallery/thumbs/kendo-gallery-08-480.webp 480w, /images/gallery/kendo-gallery-08-960.webp 960w, /images/gallery/kendo-gallery-08-1600.webp 1600w"; imagesizes="100vw"
+  Link: </images/hero/kendo-hero-formacion-960.webp?v=20260704-0120>; rel=preload; as=image; fetchpriority=high; imagesrcset="/images/hero/kendo-hero-formacion-480.webp?v=20260704-0120 480w, /images/hero/kendo-hero-formacion-960.webp?v=20260704-0120 960w, /images/hero/kendo-hero-formacion-1500.webp?v=20260704-0120 1500w"; imagesizes="100vw"
 
 /galeria
-  Link: </images/gallery/kendo-gallery-08-960.webp>; rel=preload; as=image; fetchpriority=high; imagesrcset="/images/gallery/thumbs/kendo-gallery-08-480.webp 480w, /images/gallery/kendo-gallery-08-960.webp 960w, /images/gallery/kendo-gallery-08-1600.webp 1600w"; imagesizes="100vw"
+  Link: </images/gallery/kendo-gallery-01.webp?v=20260704-0200>; rel=preload; as=image; fetchpriority=high; imagesrcset="/images/gallery/thumbs/kendo-gallery-01-480.webp?v=20260704-0200 480w, /images/gallery/kendo-gallery-01.webp?v=20260704-0200 1474w"; imagesizes="100vw"
 
 /galeria/
-  Link: </images/gallery/kendo-gallery-08-960.webp>; rel=preload; as=image; fetchpriority=high; imagesrcset="/images/gallery/thumbs/kendo-gallery-08-480.webp 480w, /images/gallery/kendo-gallery-08-960.webp 960w, /images/gallery/kendo-gallery-08-1600.webp 1600w"; imagesizes="100vw"
+  Link: </images/gallery/kendo-gallery-01.webp?v=20260704-0200>; rel=preload; as=image; fetchpriority=high; imagesrcset="/images/gallery/thumbs/kendo-gallery-01-480.webp?v=20260704-0200 480w, /images/gallery/kendo-gallery-01.webp?v=20260704-0200 1474w"; imagesizes="100vw"
 
 /afiliados
   Link: </images/affiliates/kendo-affiliates-768.avif>; rel=preload; as=image; type=image/avif; fetchpriority=high; imagesrcset="/images/affiliates/kendo-affiliates-768.avif 768w, /images/affiliates/kendo-affiliates-1200.avif 1200w"; imagesizes="(min-width: 1024px) 1200px, 100vw"

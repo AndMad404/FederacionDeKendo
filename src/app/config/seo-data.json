@@ -19,9 +19,9 @@
       "description": "Conoce la Federación de Asociaciones de Kendo y su comunidad de práctica.",
       "image": "/images/social/kendo-social-card.png",
       "preloadImage": {
-        "href": "/images/gallery/kendo-gallery-08-960.webp",
+        "href": "/images/hero/kendo-hero-formacion-960.webp?v=20260704-0120",
         "type": "image/webp",
-        "srcSet": "/images/gallery/thumbs/kendo-gallery-08-480.webp 480w, /images/gallery/kendo-gallery-08-960.webp 960w, /images/gallery/kendo-gallery-08-1600.webp 1600w",
+        "srcSet": "/images/hero/kendo-hero-formacion-480.webp?v=20260704-0120 480w, /images/hero/kendo-hero-formacion-960.webp?v=20260704-0120 960w, /images/hero/kendo-hero-formacion-1500.webp?v=20260704-0120 1500w",
         "sizes": "100vw"
       },
       "schemaType": "WebPage"
@@ -32,9 +32,9 @@
       "description": "Galería oficial de la comunidad, entrenamientos y actividades de kendo.",
       "image": "/images/social/kendo-social-card.png",
       "preloadImage": {
-        "href": "/images/gallery/kendo-gallery-08-960.webp",
+        "href": "/images/gallery/kendo-gallery-01.webp?v=20260704-0200",
         "type": "image/webp",
-        "srcSet": "/images/gallery/thumbs/kendo-gallery-08-480.webp 480w, /images/gallery/kendo-gallery-08-960.webp 960w, /images/gallery/kendo-gallery-08-1600.webp 1600w",
+        "srcSet": "/images/gallery/thumbs/kendo-gallery-01-480.webp?v=20260704-0200 480w, /images/gallery/kendo-gallery-01.webp?v=20260704-0200 1474w",
         "sizes": "100vw"
       },
       "schemaType": "CollectionPage"
