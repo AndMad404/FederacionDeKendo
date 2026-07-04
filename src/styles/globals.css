@@ -227,7 +227,16 @@ html {
 }
 
 .gallery-featured-image:not(.gallery-featured-image--native-position) {
-  object-position: var(--gallery-featured-object-position, center 0%);
+  object-position: var(
+    --gallery-featured-mobile-object-position,
+    var(--gallery-featured-object-position, center 0%)
+  );
+}
+
+@media (min-width: 640px) {
+  .gallery-featured-image:not(.gallery-featured-image--native-position) {
+    object-position: var(--gallery-featured-object-position, center 0%);
+  }
 }
 
 @media (orientation: landscape) and (max-height: 640px) {
