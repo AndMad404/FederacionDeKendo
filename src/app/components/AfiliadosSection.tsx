@@ -107,7 +107,7 @@ function DojoInfo({
   return (
     <section
       aria-labelledby={headingId}
-      className="mb-6 flex flex-col justify-around gap-2 rounded-3xl border border-blue-500 bg-black/70 px-6 py-4 text-white [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:mb-0 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:justify-around [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:gap-1 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:rounded-2xl [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:px-3 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:py-2"
+      className="mb-6 flex flex-col justify-between gap-2 rounded-3xl border border-blue-500 bg-black/70 px-6 py-4 text-white [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:mb-0 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:justify-between [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:gap-1 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:rounded-2xl [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:px-3 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:py-2"
     >
       <h2
         id={headingId}
@@ -129,7 +129,7 @@ function DojoInfo({
         <h3 className="w-full text-center text-2xl font-bold [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-center [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-2xl [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
           Horario de clases:
         </h3>
-        <div className="grid gap-1 text-base lg:gap-4 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-base [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
+        <div className="grid gap-2 text-base [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:text-base [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:leading-tight">
           {allSlotsShareLocation ? (
             <section
               aria-label={schedule[0].location}
