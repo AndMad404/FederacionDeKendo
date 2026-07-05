@@ -31,9 +31,7 @@ function HeroBanner() {
             id="home-title"
             className="text-lg font-bold leading-tight tracking-wide text-white sm:text-xl [@media_(min-width:768px)_and_(min-height:640px)]:text-[clamp(1.25rem,3vw,2rem)]"
           >
-            KENDO - 剣道
-            <br />
-            EL CAMINO DE LA ESPADA
+            KENDO - EL CAMINO DE LA ESPADA
           </h1>
         </div>
 
@@ -43,9 +41,12 @@ function HeroBanner() {
           </h2>
 
           <p className="max-w-sm text-lg leading-snug text-white sm:max-w-md [@media_(min-width:768px)_and_(min-height:640px)]:text-lg [@media_(min-width:768px)_and_(min-height:640px)]:leading-relaxed">
-            Federacion de kendo Costa Rica y unete para descubrir este arte marcial japonés.
+            <b>
+              La Federacion de asociaciones de kendo 
+            </b> 
+              &nbsp;te invita a descubrir este arte marcial japonés.
             <br />
-            Clases para todos los niveles y edades.
+              Clases para todos los niveles y edades.
           </p>
         </div>
       </div>
