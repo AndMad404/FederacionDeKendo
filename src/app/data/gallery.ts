@@ -106,8 +106,8 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     thumbnailSrcSet: thumbnailSrcSet("kendo-gallery-07"),
     thumbnailWidth: 320,
     thumbnailHeight: 180,
-    title: "Kendokas para toda la vida",
-    tag: "Apto para edades de 7+",
+    title: "Kirikaeshi",
+    tag: "Tecnica",
   },
   {
     id: 8,
