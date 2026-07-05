@@ -25,7 +25,7 @@ function HeroBanner() {
 
       <div className="absolute inset-0 bg-black/30" aria-hidden="true" />
 
-      <div className="relative z-10 flex w-full flex-col justify-between gap-3 px-4 py-4 text-center sm:px-6 [@media_(orientation:landscape)_and_(max-height:640px)]:justify-center [@media_(orientation:landscape)_and_(max-height:640px)]:gap-2 [@media_(orientation:landscape)_and_(max-height:640px)]:px-2 [@media_(orientation:landscape)_and_(max-height:640px)]:py-2 [@media_(min-width:768px)_and_(min-height:640px)]:px-10 [@media_(min-width:768px)_and_(min-height:640px)]:py-4">
+      <div className="relative z-10 flex w-full flex-col justify-between gap-3 px-4 py-4 text-center sm:px-6 [@media_(orientation:landscape)_and_(max-height:640px)]:gap-2 [@media_(orientation:landscape)_and_(max-height:640px)]:px-2 [@media_(orientation:landscape)_and_(max-height:640px)]:py-2 [@media_(min-width:768px)_and_(min-height:640px)]:px-10 [@media_(min-width:768px)_and_(min-height:640px)]:py-4">
         <div className="mx-auto max-w-3xl rounded-2xl border border-blue-500/70 bg-black/70 shadow-2xl p-3">
           <h1
             id="home-title"

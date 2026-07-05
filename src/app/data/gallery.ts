@@ -75,6 +75,8 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     thumbnailSrcSet: thumbnailSrcSet("kendo-gallery-05"),
     thumbnailWidth: 320,
     thumbnailHeight: 320,
+    objectPosition: "center",
+    mobileObjectPosition: "center 0%",
     title: "Uniforme",
     tag: "Gi y Hakama",
   },
