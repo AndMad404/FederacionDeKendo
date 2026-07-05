@@ -20,6 +20,29 @@ export interface GalleryImage {
   tag: string;
 }
 
+export type CalendarEventType =
+  | "Examen"
+  | "Torneo"
+  | "Seminario"
+  | "Entrenamiento especial"
+  | "Actividad federativa";
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  date: string;
+  startTime?: string;
+  endTime?: string;
+  location?: string;
+  summary?: string;
+  type?: CalendarEventType;
+  organizer?: string;
+  infoUrl?: string;
+  googleCalendarUrl?: string;
+  ctaLabel?: string;
+  timeZone?: string;
+}
+
 export type IconKey =
   | "mail"
   | "phone"
