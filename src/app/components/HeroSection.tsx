@@ -1,9 +1,113 @@
+import { MapPin } from "lucide-react";
+import { HERO_CALENDAR_EVENTS } from "../data/calendarEvents";
+import type { CalendarEvent } from "../types";
+
 const highPriorityImageProps = { fetchpriority: "high" } as const;
 const imageVersion = "v=20260704-0120";
+const maxHeroEvents = 4;
+const getTodayIsoDate = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
+const todayIso = getTodayIsoDate();
+const heroEvents = HERO_CALENDAR_EVENTS
+  .filter((event) => event.date >= todayIso)
+  .sort((a, b) =>
+    `${a.date}-${a.startTime ?? ""}`.localeCompare(
+      `${b.date}-${b.startTime ?? ""}`,
+    ),
+  )
+  .slice(0, maxHeroEvents);
+const eventDateFormatter = new Intl.DateTimeFormat("es-CR", {
+  day: "numeric",
+  month: "short",
+  timeZone: "UTC",
+});
+
+function formatEventDate(date: string) {
+  return eventDateFormatter.format(new Date(`${date}T00:00:00.000Z`));
+}
+
+function formatEventTime({ startTime, endTime }: CalendarEvent) {
+  if (!startTime) {
+    return "Todo el día";
+  }
+
+  return endTime ? `${startTime} - ${endTime}` : startTime;
+}
+
+function getEventVisibilityClass(index: number) {
+  if (index === 2) {
+    return "[@media_(orientation:landscape)_and_(max-height:640px)]:hidden";
+  }
+
+  if (index === 3) {
+    return "hidden lg:flex [@media_(orientation:landscape)_and_(min-height:641px)]:flex";
+  }
+
+  return "";
+}
+
+function UpcomingEventsSection() {
+  if (heroEvents.length === 0) {
+    return null;
+  }
+
+  return (
+    <section
+      aria-labelledby="upcoming-events-title"
+      className="mx-auto w-full max-w-6xl px-1 pt-2.5 pb-0 text-white sm:px-4"
+    >
+      <div className="mb-4 flex items-center justify-center text-center font-semibold text-white">
+        <h2
+          id="upcoming-events-title"
+          className="text-lg font-bold leading-tight sm:text-xl [@media_(min-width:768px)_and_(min-height:640px)]:text-[clamp(1.25rem,3vw,2rem)]"
+        >
+          Calendario de Proximos Eventos
+        </h2>
+      </div>
+
+      <ul className="grid gap-3 [@media_(orientation:landscape)_and_(max-height:640px)]:grid-cols-2 [@media_(orientation:landscape)_and_(min-height:641px)]:grid-cols-4 lg:grid-cols-4">
+        {heroEvents.map((event, index) => (
+          <li
+            key={event.id}
+            className={`flex items-center gap-3 rounded-lg border border-blue-500/70 bg-white/[0.06] p-3 ${getEventVisibilityClass(index)}`}
+          >
+            <time
+              dateTime={event.date}
+              className="shrink-0 rounded-md bg-white/10 px-2.5 py-2 text-center text-lg font-bold uppercase leading-tight text-blue-100"
+            >
+              {formatEventDate(event.date)}
+            </time>
+            <div className="min-w-0">
+              <p className="text-base font-bold leading-tight">
+                {event.title}
+              </p>
+              <p className="text-base leading-tight text-white/75">
+                {formatEventTime(event)}
+              </p>
+              {event.location ? (
+                <p className="mt-1 flex items-center gap-1 text-sm leading-tight text-white/70">
+                  <MapPin className="size-3.5 shrink-0 text-red-300" aria-hidden="true" />
+                  <span className="min-w-0 truncate">{event.location}</span>
+                </p>
+              ) : null}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
 
 function HeroBanner() {
   return (
-    <header className="relative flex h-[clamp(520px,calc(100svh_-_4rem_-_10px),680px)] items-stretch overflow-hidden rounded-2xl sm:rounded-3xl [@media_(orientation:landscape)_and_(max-height:640px)]:h-auto [@media_(orientation:landscape)_and_(max-height:640px)]:min-h-[calc(100svh_-_3rem_-_6px)] [@media_(min-width:768px)_and_(min-height:640px)]:h-full [@media_(min-width:768px)_and_(min-height:640px)]:min-h-0">
+    <header className="relative flex h-[clamp(520px,calc(100svh_-_4rem_-_10px),680px)] items-stretch overflow-hidden rounded-2xl sm:rounded-3xl [@media_(orientation:landscape)_and_(max-height:640px)]:h-auto [@media_(orientation:landscape)_and_(max-height:640px)]:min-h-[calc(100svh_-_3rem_-_6px)] [@media_(min-width:768px)_and_(min-height:640px)]:h-[calc(100%_-_11rem)] [@media_(min-width:768px)_and_(min-height:640px)]:min-h-[380px]">
       <picture className="absolute inset-0 h-full w-full">
         <source
           srcSet={`/images/hero/kendo-hero-formacion-480.webp?${imageVersion} 480w, /images/hero/kendo-hero-formacion-960.webp?${imageVersion} 960w, /images/hero/kendo-hero-formacion-1500.webp?${imageVersion} 1500w`}
@@ -55,9 +159,10 @@ export function HeroSection() {
   return (
     <section
       aria-labelledby="home-title"
-      className="[@media_(min-width:768px)_and_(min-height:640px)]:h-full"
+      className="[@media_(min-width:768px)_and_(min-height:640px)]:h-full [@media_(min-width:768px)_and_(min-height:640px)]:overflow-y-auto"
     >
       <HeroBanner />
+      <UpcomingEventsSection />
     </section>
   );
 }

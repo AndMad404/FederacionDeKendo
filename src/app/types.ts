@@ -20,6 +20,15 @@ export interface GalleryImage {
   tag: string;
 }
 
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  date: string;
+  startTime?: string;
+  endTime?: string;
+  location?: string;
+}
+
 export type IconKey =
   | "mail"
   | "phone"
