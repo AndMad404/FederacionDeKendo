@@ -107,7 +107,7 @@ function DojoInfo({
   return (
     <section
       aria-labelledby={headingId}
-      className="mb-6 flex flex-col justify-center gap-2 rounded-3xl border border-blue-500 bg-black/70 px-6 py-4 text-white [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:mb-0 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:justify-center [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:gap-1 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:rounded-2xl [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:px-3 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:py-2"
+      className="mb-6 flex flex-col justify-around gap-2 rounded-3xl border border-blue-500 bg-black/70 px-6 py-4 text-white [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:mb-0 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:justify-around [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:gap-1 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:rounded-2xl [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:px-3 [@media_(orientation:landscape)_and_(min-width:768px)_and_(max-height:480px)]:py-2"
     >
       <h2
         id={headingId}
