@@ -1,6 +1,6 @@
 import type { CalendarEvent } from "../types";
 
-export const HERO_CALENDAR_EVENTS: CalendarEvent[] = [
+export const CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: "federacion-examen-2026-08-01",
     title: "Examen",
