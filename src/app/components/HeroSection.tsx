@@ -63,7 +63,7 @@ function UpcomingEventsSection() {
       aria-labelledby="upcoming-events-title"
       className="mx-auto w-full max-w-6xl px-1 pt-2.5 pb-0 text-white sm:px-4"
     >
-      <div className="mb-4 flex items-center justify-center text-center font-semibold text-white">
+      <div className="mb-2.5 flex items-center justify-center text-center font-semibold text-white">
         <h2
           id="upcoming-events-title"
           className="text-lg font-bold leading-tight sm:text-xl [@media_(min-width:768px)_and_(min-height:640px)]:text-[clamp(1.25rem,3vw,2rem)]"
