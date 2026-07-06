@@ -61,6 +61,10 @@ function getEventStartDate(event: CalendarEvent) {
 }
 
 function getEventEndDate(event: CalendarEvent) {
+  if (event.endDate) {
+    return createLocalDate(event.endDate, event.endTime);
+  }
+
   if (event.endTime) {
     return createLocalDate(event.date, event.endTime);
   }

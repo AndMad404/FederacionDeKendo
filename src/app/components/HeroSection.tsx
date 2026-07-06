@@ -5,7 +5,7 @@ const imageVersion = "v=20260704-0120";
 
 function HeroBanner() {
   return (
-    <header className="relative flex h-[clamp(520px,calc(100svh_-_4rem_-_10px),680px)] items-stretch overflow-hidden rounded-2xl sm:rounded-3xl [@media_(orientation:landscape)_and_(max-height:640px)]:h-auto [@media_(orientation:landscape)_and_(max-height:640px)]:min-h-[calc(100svh_-_3rem_-_6px)] [@media_(min-width:768px)_and_(min-height:640px)]:h-auto [@media_(min-width:768px)_and_(min-height:640px)]:min-h-[380px] [@media_(min-width:768px)_and_(min-height:640px)]:flex-1">
+    <header className="relative flex h-[clamp(520px,calc(100svh_-_4rem_-_10px),680px)] items-stretch overflow-hidden rounded-2xl sm:rounded-3xl [@media_(orientation:landscape)_and_(max-height:640px)]:h-auto [@media_(orientation:landscape)_and_(max-height:640px)]:min-h-[calc(100svh_-_3rem_-_6px)] [@media_(min-width:768px)_and_(min-height:640px)]:h-auto [@media_(min-width:768px)_and_(min-height:640px)]:min-h-[300px] [@media_(min-width:768px)_and_(min-height:640px)]:flex-1">
       <picture className="absolute inset-0 h-full w-full">
         <source
           srcSet={`/images/hero/kendo-hero-formacion-480.webp?${imageVersion} 480w, /images/hero/kendo-hero-formacion-960.webp?${imageVersion} 960w, /images/hero/kendo-hero-formacion-1500.webp?${imageVersion} 1500w`}

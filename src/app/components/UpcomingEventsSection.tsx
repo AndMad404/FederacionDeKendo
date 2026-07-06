@@ -1,4 +1,4 @@
-import { MapPin } from "lucide-react";
+import { ExternalLink, MapPin } from "lucide-react";
 import { CALENDAR_EVENTS } from "../data/calendarEvents";
 import type { CalendarEvent } from "../types";
 import { getUpcomingEvents } from "../utils/calendarEvents";
@@ -7,11 +7,31 @@ const maxHomepageEvents = 4;
 const eventDateFormatter = new Intl.DateTimeFormat("es-CR", {
   day: "2-digit",
   month: "short",
+  year: "numeric",
   timeZone: "UTC",
 });
 
+function formatCalendarDate(date: Date) {
+  return eventDateFormatter.format(date).replace(".", "").toUpperCase();
+}
+
 function formatEventDate(date: string) {
-  return eventDateFormatter.format(new Date(`${date}T00:00:00.000Z`));
+  return formatCalendarDate(new Date(`${date}T00:00:00.000Z`));
+}
+
+function getInclusiveEndDate(date: string) {
+  const endDate = new Date(`${date}T00:00:00.000Z`);
+  endDate.setUTCDate(endDate.getUTCDate() - 1);
+
+  return formatCalendarDate(endDate);
+}
+
+function formatEventDateRange({ date, endDate }: CalendarEvent) {
+  if (!endDate) {
+    return formatEventDate(date);
+  }
+
+  return `${formatEventDate(date)} - ${getInclusiveEndDate(endDate)}`;
 }
 
 function formatEventTime({ startTime, endTime }: CalendarEvent) {
@@ -20,6 +40,15 @@ function formatEventTime({ startTime, endTime }: CalendarEvent) {
   }
 
   return endTime ? `${startTime} - ${endTime}` : startTime;
+}
+
+function getLocationMapUrl(location: string) {
+  const params = new URLSearchParams({
+    api: "1",
+    query: location,
+  });
+
+  return `https://www.google.com/maps/search/?${params.toString()}`;
 }
 
 function getEventVisibilityClass(index: number) {
@@ -48,43 +77,62 @@ export function UpcomingEventsSection() {
   return (
     <section
       aria-labelledby="upcoming-events-title"
-      className="mx-auto w-full max-w-6xl px-1 pt-2.5 pb-0 text-white sm:px-4 [@media_(min-width:768px)_and_(min-height:640px)]:pb-2"
+      className="mx-auto w-full max-w-6xl px-1 pt-2.5 pb-0 text-white sm:px-4 [@media_(min-width:768px)_and_(min-height:640px)]:pb-1 [@media_(min-width:768px)_and_(min-height:640px)]:pt-1.5"
     >
-      <div className="mb-2.5 flex items-center justify-center text-center font-semibold text-white">
+      <div className="mb-2.5 flex items-center justify-center text-center font-semibold text-white lg:mb-2">
         <h2
           id="upcoming-events-title"
-          className="text-lg font-bold leading-tight sm:text-xl [@media_(min-width:768px)_and_(min-height:640px)]:text-[clamp(1.25rem,3vw,2rem)]"
+          className="text-lg font-bold leading-tight sm:text-xl [@media_(min-width:768px)_and_(min-height:640px)]:text-2xl"
         >
           Calendario de Proximos Eventos
         </h2>
       </div>
 
-      <ul className="grid gap-3 [@media_(orientation:landscape)_and_(max-height:640px)]:grid-cols-2 [@media_(orientation:landscape)_and_(min-height:641px)]:grid-cols-4 lg:grid-cols-4">
-        {homepageEvents.map((event, index) => (
-          <li
-            key={event.id}
-            className={`grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-1 rounded-lg border border-blue-500/70 bg-white/[0.06] p-3 [@media_(orientation:landscape)_and_(min-height:641px)]:flex [@media_(orientation:landscape)_and_(min-height:641px)]:flex-col-reverse [@media_(orientation:landscape)_and_(min-height:641px)]:justify-around [@media_(orientation:landscape)_and_(min-height:641px)]:gap-3 [@media_(orientation:landscape)_and_(min-height:641px)]:text-center lg:flex lg:flex-col-reverse lg:justify-around lg:gap-3 lg:text-center ${getEventVisibilityClass(index)}`}
-          >
-            <time
-              dateTime={event.date}
-              className="col-start-1 row-start-1 row-end-3 shrink-0 rounded-md bg-white/10 px-2.5 py-2 text-center text-lg font-bold uppercase leading-tight text-blue-100"
+      <ul className="grid gap-3 [@media_(orientation:landscape)_and_(max-height:640px)]:grid-cols-2 [@media_(orientation:landscape)_and_(min-height:641px)]:grid-cols-4 lg:grid-cols-4 lg:gap-2">
+        {homepageEvents.map((event, index) => {
+          const eventDateLabel = formatEventDateRange(event);
+          const locationDescriptionId = `${event.id}-location-description`;
+
+          return (
+            <li
+              key={event.id}
+              className={`grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-2 rounded-lg border border-blue-500/70 bg-white/[0.06] p-3 [@media_(orientation:landscape)_and_(min-height:641px)]:flex [@media_(orientation:landscape)_and_(min-height:641px)]:flex-col [@media_(orientation:landscape)_and_(min-height:641px)]:justify-around [@media_(orientation:landscape)_and_(min-height:641px)]:gap-2 [@media_(orientation:landscape)_and_(min-height:641px)]:text-center lg:flex lg:flex-col lg:justify-around lg:gap-1.5 lg:p-2 lg:text-center ${getEventVisibilityClass(index)}`}
             >
-              {formatEventDate(event.date)}
-            </time>
-            {event.location ? (
-              <p className="col-start-2 row-start-3 flex min-w-0 justify-end gap-1 text-right text-sm leading-tight text-white/70 [@media_(orientation:landscape)_and_(min-height:641px)]:justify-center [@media_(orientation:landscape)_and_(min-height:641px)]:text-center lg:justify-center lg:text-center">
-                <MapPin className="size-3.5 shrink-0 text-red-300" aria-hidden="true" />
-                <span className="min-w-0 truncate">{event.location}</span>
+              <p className="col-start-2 row-start-1 min-w-0 text-right text-base font-bold leading-tight [@media_(orientation:landscape)_and_(min-height:641px)]:text-center lg:text-center lg:text-sm">
+                {event.title}
               </p>
-            ) : null}
-            <p className="col-start-2 row-start-2 min-w-0 text-right text-base leading-tight text-white/75 [@media_(orientation:landscape)_and_(min-height:641px)]:text-center lg:text-center">
-              {formatEventTime(event)}
-            </p>
-            <p className="col-start-2 row-start-1 min-w-0 text-right text-lg font-bold leading-tight [@media_(orientation:landscape)_and_(min-height:641px)]:text-center lg:text-center">
-              {event.title}
-            </p>
-          </li>
-        ))}
+
+              <time
+                dateTime={event.date}
+                className="col-start-1 row-start-1 max-w-[10rem] shrink-0 rounded-md bg-white/10 px-2.5 py-2 text-center text-sm font-bold uppercase leading-tight text-blue-100 [@media_(orientation:landscape)_and_(min-height:641px)]:max-w-none [@media_(orientation:landscape)_and_(min-height:641px)]:text-base lg:max-w-none lg:px-2 lg:py-1.5 lg:text-sm"
+              >
+                {eventDateLabel}
+              </time>
+
+              <p className="col-start-1 row-start-2 text-center text-sm leading-tight text-white/75 [@media_(orientation:landscape)_and_(min-height:641px)]:text-base lg:text-sm">
+                {formatEventTime(event)}
+              </p>
+
+              {event.location ? (
+                <a
+                  href={getLocationMapUrl(event.location)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Abrir ubicación de ${event.title} en Google Maps`}
+                  aria-describedby={locationDescriptionId}
+                  className="col-start-2 row-start-2 inline-flex min-h-11 min-w-0 items-center justify-self-end rounded-full border border-blue-400/70 bg-black/60 px-3 py-1.5 text-sm font-semibold leading-tight text-blue-100 transition-colors hover:bg-blue-950/90 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-black [@media_(orientation:landscape)_and_(min-height:641px)]:justify-self-center [@media_(orientation:landscape)_and_(min-height:641px)]:text-xs lg:min-h-8 lg:justify-self-center lg:px-2.5 lg:py-1 lg:text-xs"
+                >
+                  <MapPin className="mr-1.5 size-3.5 shrink-0 text-red-300" aria-hidden="true" />
+                  <span>Ver ubicación</span>
+                  <ExternalLink className="ml-1.5 size-3 shrink-0" aria-hidden="true" />
+                  <span id={locationDescriptionId} className="sr-only">
+                    Dirección: {event.location}. Abre Google Maps en una pestaña nueva.
+                  </span>
+                </a>
+              ) : null}
+            </li>
+          );
+        })}
       </ul>
     </section>
   );
