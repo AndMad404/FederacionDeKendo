@@ -17,7 +17,7 @@ function HeroBanner() {
           alt="Grupo de practicantes de kendo reunidos despues de una actividad"
           width={1500}
           height={750}
-          className="absolute inset-0 h-full w-full object-cover object-center"
+          className="absolute inset-0 h-full w-full object-cover object-center lg:object-[50%_42%]"
           loading="eager"
           {...highPriorityImageProps}
         />
@@ -26,7 +26,7 @@ function HeroBanner() {
       <div className="absolute inset-0 bg-black/30" aria-hidden="true" />
 
       <div className="relative z-10 flex w-full flex-col justify-between gap-3 px-4 py-4 text-center sm:px-6 [@media_(orientation:landscape)_and_(max-height:640px)]:gap-2 [@media_(orientation:landscape)_and_(max-height:640px)]:px-2 [@media_(orientation:landscape)_and_(max-height:640px)]:py-2 [@media_(min-width:768px)_and_(min-height:640px)]:px-10 [@media_(min-width:768px)_and_(min-height:640px)]:py-4">
-        <div className="mx-auto max-w-3xl rounded-2xl border border-blue-500/70 bg-black/70 shadow-2xl p-3">
+        <div className="mx-auto max-w-3xl rounded-2xl border border-blue-500/70 bg-black/70 p-3">
           <h1
             id="home-title"
             className="text-lg font-bold leading-tight tracking-wide text-white sm:text-xl [@media_(min-width:768px)_and_(min-height:640px)]:text-[clamp(1.25rem,3vw,2rem)]"
@@ -35,7 +35,7 @@ function HeroBanner() {
           </h1>
         </div>
 
-        <div className="mx-auto flex max-w-2xl flex-col items-center gap-1 rounded-2xl border border-blue-500/70 bg-black/70 px-3 py-3 shadow-2xl">
+        <div className="mx-auto flex max-w-2xl flex-col items-center gap-1 rounded-2xl border border-blue-500/70 bg-black/70 px-3 py-3">
           <h2 className="text-lg font-semibold leading-tight tracking-tight text-white sm:text-xl [@media_(min-width:768px)_and_(min-height:640px)]:text-[clamp(1.25rem,3vw,2rem)]">
 
           </h2>

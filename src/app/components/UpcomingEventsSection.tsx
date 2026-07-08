@@ -1,9 +1,11 @@
-import { ExternalLink, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { CALENDAR_EVENTS } from "../data/calendarEvents";
 import type { CalendarEvent } from "../types";
 import { getUpcomingEvents } from "../utils/calendarEvents";
 
 const maxHomepageEvents = 4;
+const locationPillClass =
+  "col-start-2 row-start-2 inline-flex min-h-11 min-w-0 items-center justify-self-end rounded-full border border-blue-400/70 bg-black/60 px-3 py-1.5 text-sm font-semibold leading-tight text-blue-100 transition-colors [@media_(orientation:landscape)_and_(min-height:641px)]:justify-self-center [@media_(orientation:landscape)_and_(min-height:641px)]:text-xs lg:min-h-8 lg:justify-self-center lg:px-2.5 lg:py-1 lg:text-xs";
 const eventDateFormatter = new Intl.DateTimeFormat("es-CR", {
   day: "2-digit",
   month: "short",
@@ -91,6 +93,7 @@ export function UpcomingEventsSection() {
       <ul className="grid gap-3 [@media_(orientation:landscape)_and_(max-height:640px)]:grid-cols-2 [@media_(orientation:landscape)_and_(min-height:641px)]:grid-cols-4 lg:grid-cols-4 lg:gap-2">
         {homepageEvents.map((event, index) => {
           const eventDateLabel = formatEventDateRange(event);
+          const locationUrl = event.location ? getLocationMapUrl(event.location) : undefined;
           const locationDescriptionId = `${event.id}-location-description`;
 
           return (
@@ -113,23 +116,26 @@ export function UpcomingEventsSection() {
                 {formatEventTime(event)}
               </p>
 
-              {event.location ? (
+              {locationUrl ? (
                 <a
-                  href={getLocationMapUrl(event.location)}
+                  href={locationUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`Abrir ubicación de ${event.title} en Google Maps`}
                   aria-describedby={locationDescriptionId}
-                  className="col-start-2 row-start-2 inline-flex min-h-11 min-w-0 items-center justify-self-end rounded-full border border-blue-400/70 bg-black/60 px-3 py-1.5 text-sm font-semibold leading-tight text-blue-100 transition-colors hover:bg-blue-950/90 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-black [@media_(orientation:landscape)_and_(min-height:641px)]:justify-self-center [@media_(orientation:landscape)_and_(min-height:641px)]:text-xs lg:min-h-8 lg:justify-self-center lg:px-2.5 lg:py-1 lg:text-xs"
+                  className={`${locationPillClass} hover:bg-blue-950/90 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-black`}
                 >
                   <MapPin className="mr-1.5 size-3.5 shrink-0 text-red-300" aria-hidden="true" />
                   <span>Ver ubicación</span>
-                  <ExternalLink className="ml-1.5 size-3 shrink-0" aria-hidden="true" />
                   <span id={locationDescriptionId} className="sr-only">
                     Dirección: {event.location}. Abre Google Maps en una pestaña nueva.
                   </span>
                 </a>
-              ) : null}
+              ) : (
+                <span className={`${locationPillClass} border-white/20 text-white/65`}>
+                  Pendiente de confirmar
+                </span>
+              )}
             </li>
           );
         })}

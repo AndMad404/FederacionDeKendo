@@ -39,7 +39,6 @@ export interface CalendarEvent {
   type?: CalendarEventType;
   organizer?: string;
   infoUrl?: string;
-  googleCalendarUrl?: string;
   ctaLabel?: string;
   timeZone?: string;
 }

@@ -1,0 +1,60 @@
+name: Sync calendar events
+
+on:
+  schedule:
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-calendar-events
+  cancel-in-progress: false
+
+jobs:
+  sync-calendar:
+    name: Sync Google Calendar into site data
+    runs-on: ubuntu-latest
+    env:
+      CALENDAR_ICS_URL: ${{ secrets.CALENDAR_ICS_URL }}
+      CALENDAR_LOOKAHEAD_MONTHS: "6"
+      CALENDAR_MIN_FUTURE_EVENTS: "12"
+      CALENDAR_TIME_ZONE: America/Costa_Rica
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Sync calendar events
+        run: pnpm run sync:calendar
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Commit calendar changes
+        run: |
+          if [[ -z "$(git status --porcelain src/app/data/calendarEvents.ts)" ]]; then
+            echo "No calendar changes to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/app/data/calendarEvents.ts
+          git commit -m "chore: sync calendar events"
+          git push

@@ -8,6 +8,7 @@
     "postbuild": "node scripts/generate-route-html.mjs",
     "dev": "vite",
     "typecheck": "tsc --noEmit",
+    "sync:calendar": "node scripts/sync-calendar-events.mjs",
     "images:responsive": "node scripts/generate-responsive-images.mjs"
   },
   "dependencies": {
