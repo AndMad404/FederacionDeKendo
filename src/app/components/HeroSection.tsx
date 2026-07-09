@@ -31,7 +31,10 @@ function HeroBanner() {
             id="home-title"
             className="text-lg font-bold leading-tight tracking-wide text-white sm:text-xl [@media_(min-width:768px)_and_(min-height:640px)]:text-[clamp(1.25rem,3vw,2rem)]"
           >
-            KENDO - EL CAMINO DE LA ESPADA
+            KENDO
+            <span className="hidden sm:inline"> - </span>
+            <br className="sm:hidden" />
+            EL CAMINO DE LA ESPADA
           </h1>
         </div>
 
