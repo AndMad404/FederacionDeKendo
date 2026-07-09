@@ -138,13 +138,13 @@ export function Lightbox({
           </button>
 
           <div className="min-w-0 max-w-[calc(100vw-8rem)] flex-1 rounded-3xl border border-blue-500 bg-black/85 px-5 py-3 text-center shadow-xl shadow-black/40 backdrop-blur-sm [@media_(orientation:landscape)_and_(max-height:640px)]:max-w-none [@media_(orientation:landscape)_and_(max-height:640px)]:rounded-2xl [@media_(orientation:landscape)_and_(max-height:640px)]:px-3 [@media_(orientation:landscape)_and_(max-height:640px)]:py-2">
-            <p id="lightbox-title" className="text-2xl font-bold [@media_(orientation:landscape)_and_(max-height:640px)]:text-lg">
+            <p id="lightbox-title" className="text-xl font-bold sm:text-2xl [@media_(orientation:landscape)_and_(max-height:640px)]:text-base">
               {image.title}
             </p>
-            <p className="text-lg font-bold uppercase tracking-widest text-red-400 [@media_(orientation:landscape)_and_(max-height:640px)]:text-xs">
+            <p className="text-sm font-bold uppercase tracking-widest text-red-400 sm:text-base [@media_(orientation:landscape)_and_(max-height:640px)]:text-[10px]">
               {image.tag}
             </p>
-            <p className="text-base [@media_(orientation:landscape)_and_(max-height:640px)]:text-xs">
+            <p className="text-sm sm:text-base [@media_(orientation:landscape)_and_(max-height:640px)]:text-[10px]">
               {positionLabel}
             </p>
           </div>
