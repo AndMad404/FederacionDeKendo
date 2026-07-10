@@ -18,6 +18,7 @@ export interface GalleryImage {
   mobileObjectPosition?: string;
   title: string;
   tag: string;
+  description?: string;
 }
 
 export type CalendarEventType =

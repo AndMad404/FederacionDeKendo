@@ -21,6 +21,8 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     mobileObjectPosition: "25%",
     title: "Practicantes en seiza",
     tag: "Reiho",
+    description:
+      "La posicion de seiza marca el inicio y cierre de la practica con respeto, atencion y disciplina.",
   },
   {
     id: 2,
@@ -35,6 +37,8 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     thumbnailHeight: 180,
     title: "Combates con armadura",
     tag: "Bogu geiko",
+    description:
+      "Practicantes con bogu aplican distancia, timing y precision durante ejercicios de combate controlado.",
   },
   {
     id: 3,
@@ -49,6 +53,8 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     thumbnailHeight: 213,
     title: "Armaduras",
     tag: "Bogu",
+    description:
+      "Detalle del equipo de proteccion usado en kendo: men, kote, do y tare listos para la practica.",
   },
   {
     id: 4,
@@ -61,8 +67,10 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     thumbnailSrcSet: thumbnailSrcSet("kendo-gallery-04"),
     thumbnailWidth: 320,
     thumbnailHeight: 160,
-    title: "Entrenamiento a todos los niveles",
+    title: "Entrenamiento multinivel",
     tag: "Mitori geiko",
+    description:
+      "La observacion activa permite aprender ritmo, postura y etiqueta antes de entrar al combate.",
   },
   {
     id: 5,
@@ -79,6 +87,8 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     mobileObjectPosition: "center 0%",
     title: "Uniforme",
     tag: "Gi y Hakama",
+    description:
+      "El gi y la hakama forman el uniforme tradicional, preparado para moverse con orden y seguridad.",
   },
   {
     id: 6,
@@ -93,7 +103,9 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     thumbnailHeight: 160,
     disableObjectPosition: true,
     title: "Comunidad de kendo",
-    tag: "Conviviendo como un equipo",
+    tag: "Equipo y convivencia",
+    description:
+      "La comunidad crece compartiendo entrenamientos, apoyo entre practicantes y momentos fuera del dojo.",
   },
   {
     id: 7,
@@ -108,6 +120,8 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     thumbnailHeight: 180,
     title: "Kirikaeshi",
     tag: "Tecnica",
+    description:
+      "Kirikaeshi trabaja cortes repetidos, desplazamiento y respiracion para fortalecer fundamentos.",
   },
   {
     id: 8,
@@ -123,5 +137,7 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     disableObjectPosition: true,
     title: "Combate competitivo",
     tag: "Shiai",
+    description:
+      "El shiai pone a prueba tecnica, decision y respeto dentro de un formato competitivo.",
   },
 ];

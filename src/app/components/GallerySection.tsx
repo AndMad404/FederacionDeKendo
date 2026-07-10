@@ -50,6 +50,8 @@ export function GallerySection() {
                 event.stopPropagation();
                 next();
               }}
+              onSwipePrev={prev}
+              onSwipeNext={next}
             />
 
             <GalleryThumbnails
