@@ -28,7 +28,7 @@ function HeroBanner() {
 
       <div className="relative z-10 flex w-full flex-col justify-between gap-3 px-4 py-4 text-center sm:px-6 land-sm:gap-2 land-sm:px-2 land-sm:py-2 tall-md:px-10 tall-md:py-4">
         <div className="mx-auto max-w-3xl text-white">
-          <PageTitle id="home-title" className="normal-case leading-tight">
+          <PageTitle id="home-title" className="normal-case">
             KENDO
             <span className="hidden sm:inline"> - </span>
             <br className="sm:hidden" />
