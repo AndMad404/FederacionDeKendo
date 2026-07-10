@@ -33,7 +33,7 @@ function NavArrow({ direction, isActive, onClick }: NavArrowProps) {
       type="button"
       aria-label={direction === "left" ? "Imagen anterior" : "Imagen siguiente"}
       onClick={onClick}
-      className={`pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full border border-blue-500 bg-black/80 transition-colors hover:bg-red-700 ${
+      className={`pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full border border-blue-500/70 bg-black/70 transition-colors hover:bg-red-700 ${
         isActive ? activeArrowClass : ""
       } ${focusRingClass}`}
     >

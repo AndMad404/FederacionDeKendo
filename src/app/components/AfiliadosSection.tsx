@@ -100,7 +100,7 @@ function DojoInfo({
   return (
     <section
       aria-labelledby={headingId}
-      className="mb-6 flex flex-col justify-between gap-2 rounded-3xl border border-blue-500 bg-black/70 px-6 py-4 text-white land-compact:mb-0 land-compact:gap-1 land-compact:rounded-2xl land-compact:px-3 land-compact:py-2"
+      className="mb-6 flex flex-col justify-between gap-2 rounded-3xl border border-blue-500/70 bg-black/70 px-6 py-4 text-white land-compact:mb-0 land-compact:gap-1 land-compact:rounded-2xl land-compact:px-3 land-compact:py-2"
     >
       <h2
         id={headingId}

@@ -7,7 +7,7 @@ import { focusRingClass } from "../styles/shared";
 
 const LIGHTBOX_IMAGE_SIZES = "(max-width: 640px) 92vw, 75vw";
 const arrowButtonClass =
-  "flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-blue-400 bg-black/85 shadow-xl shadow-black/40 transition-colors hover:bg-blue-950/90 md:h-12 md:w-12";
+  "flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-blue-400 bg-black/70 shadow-xl shadow-black/40 transition-colors hover:bg-blue-950/90 md:h-12 md:w-12";
 const activeArrowClass = "border-red-400 bg-red-700 text-white";
 type ArrowDirection = "left" | "right";
 
@@ -134,7 +134,7 @@ export function Lightbox({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 land-sm:p-2"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 land-sm:p-2"
       onClick={onClose}
     >
       <div
@@ -157,7 +157,7 @@ export function Lightbox({
           <X size={20} aria-hidden="true" />
         </button>
 
-        <div className="flex h-[min(54svh,32rem)] min-h-0 w-full items-center justify-center overflow-hidden rounded-3xl bg-black/40 sm:h-[min(68svh,36rem)] land-sm:h-[calc(100svh-9.5rem)] land-sm:rounded-2xl">
+        <div className="flex h-[min(54svh,32rem)] min-h-0 w-full items-center justify-center overflow-hidden rounded-3xl bg-black/70 sm:h-[min(68svh,36rem)] land-sm:h-[calc(100svh-9.5rem)] land-sm:rounded-2xl">
           <img
             src={image.src}
             srcSet={image.srcSet}
@@ -185,7 +185,7 @@ export function Lightbox({
             <ChevronLeft size={24} aria-hidden="true" />
           </button>
 
-          <div className="col-span-2 row-start-2 grid min-h-[9.5rem] w-full min-w-0 max-w-full grid-rows-[auto_auto_minmax(0,1fr)_auto] items-center rounded-2xl border border-blue-500 bg-black/85 px-4 py-3 text-center shadow-xl shadow-black/40 backdrop-blur-sm sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:max-w-none sm:items-center sm:rounded-3xl sm:px-5 sm:py-4 land-sm:col-span-1 land-sm:col-start-2 land-sm:row-start-1 land-sm:min-h-0 land-sm:rounded-2xl land-sm:px-3 land-sm:py-2">
+          <div className="col-span-2 row-start-2 grid min-h-[9.5rem] w-full min-w-0 max-w-full grid-rows-[auto_auto_minmax(0,1fr)_auto] items-center rounded-2xl border border-blue-500/70 bg-black/70 px-4 py-3 text-center shadow-xl shadow-black/40 backdrop-blur-sm sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:max-w-none sm:items-center sm:rounded-3xl sm:px-5 sm:py-4 land-sm:col-span-1 land-sm:col-start-2 land-sm:row-start-1 land-sm:min-h-0 land-sm:rounded-2xl land-sm:px-3 land-sm:py-2">
             <p
               id="lightbox-title"
               className="line-clamp-2 text-xl font-bold leading-tight land-sm:text-base"

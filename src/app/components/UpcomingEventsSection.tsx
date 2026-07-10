@@ -5,7 +5,7 @@ import { getUpcomingEvents } from "../utils/calendarEvents";
 
 const maxHomepageEvents = 4;
 const locationPillClass =
-  "col-start-2 row-start-2 inline-flex min-h-11 min-w-0 items-center justify-center justify-self-end rounded-full border border-blue-400/70 bg-black/60 px-3 py-1.5 text-center text-sm font-semibold leading-tight text-blue-100 transition-colors land-tall:justify-self-center lg:min-h-8 lg:justify-self-center lg:px-2.5 lg:py-1";
+  "col-start-2 row-start-2 inline-flex min-h-11 min-w-0 items-center justify-center justify-self-end rounded-full border border-blue-400/70 bg-black/70 px-3 py-1.5 text-center text-sm font-semibold leading-tight text-blue-100 transition-colors land-tall:justify-self-center lg:min-h-8 lg:justify-self-center lg:px-2.5 lg:py-1";
 const eventDateFormatter = new Intl.DateTimeFormat("es-CR", {
   day: "2-digit",
   month: "short",

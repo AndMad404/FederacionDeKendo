@@ -12,7 +12,7 @@ const NAV_LINKS = [
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   `text-lg tracking-wide transition-colors duration-200 land-sm:text-base ${focusRingClass} ${
     isActive
-      ? "border-b border-blue-500 pb-0.5 text-blue-400"
+      ? "border-b border-blue-500/70 pb-0.5 text-blue-400"
       : "text-white hover:text-red-400"
   }`;
 
