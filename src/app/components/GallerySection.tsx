@@ -34,7 +34,7 @@ export function GallerySection() {
     >
       <PageTitle
         id="gallery-title"
-        className="pointer-events-none absolute left-1/2 top-3 z-30 -translate-x-1/2 sm:top-5"
+        className="pointer-events-none absolute left-1/2 top-3 z-30 -translate-x-1/2 land-compact:top-2"
       >
         Galería de kendo
       </PageTitle>
