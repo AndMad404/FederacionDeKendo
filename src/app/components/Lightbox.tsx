@@ -192,17 +192,17 @@ export function Lightbox({
             >
               {displayTitle}
             </p>
-            <p className="truncate text-sm font-bold uppercase tracking-widest text-red-400 land-sm:text-[10px]">
+            <p className="truncate text-sm pt-1 font-bold uppercase tracking-widest text-red-400 land-sm:text-[10px]">
               {displayTag}
             </p>
             {displayDescription && (
               <div id="lightbox-description" className="min-h-0">
-                <p className="text-xs leading-snug text-stone-200 land-sm:text-[10px] land-sm:leading-tight">
+                <p className="text-sm leading-snug text-stone-200 land-sm:text-[10px] land-sm:leading-tight">
                   {displayDescription}
                 </p>
               </div>
             )}
-            <p className="text-sm land-sm:text-[10px]">
+            <p className="text-xs land-sm:text-[10px]">
               {positionLabel}
             </p>
           </div>

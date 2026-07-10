@@ -157,7 +157,7 @@ export function FeaturedImage({
           <p className="text-xl font-bold leading-tight sm:text-2xl land-sm:text-base">
             {displayTitle}
           </p>
-          <p className="pt-[1pt] truncate text-base font-bold uppercase tracking-widest text-red-400 sm:text-base land-sm:text-[10px]">
+          <p className="pt-1 truncate text-base font-bold uppercase tracking-widest text-red-400 sm:text-base land-sm:text-[10px]">
             {displayTag}
           </p>
           {previewText && (

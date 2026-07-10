@@ -39,18 +39,14 @@ function HeroBanner() {
         </div>
 
         <div className="mx-auto flex max-w-2xl flex-col items-center gap-1 rounded-2xl border border-blue-500/70 bg-black/70 px-3 py-3 text-white">
-          <h2 className="text-lg font-semibold leading-tight tracking-tight sm:text-xl tall-md:text-[clamp(1.25rem,3vw,2rem)]">
-
-          </h2>
-
-          <p className="max-w-sm text-lg leading-snug sm:max-w-md tall-md:leading-relaxed">
+          <h2 className="max-w-sm text-lg leading-snug sm:max-w-md tall-md:leading-relaxed">
             <b>
               La Federacion de asociaciones de kendo 
             </b> 
               &nbsp;te invita a descubrir este arte marcial japonés.
             <br />
               Clases para todos los niveles y edades.
-          </p>
+          </h2>
         </div>
       </div>
     </header>

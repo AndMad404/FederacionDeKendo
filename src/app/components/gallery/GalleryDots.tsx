@@ -13,7 +13,8 @@ export function GalleryDots({
   onSelect,
 }: GalleryDotsProps) {
   return (
-    <nav
+    <div
+      role="group"
       aria-label="Selector de imágenes de galería"
       className="flex h-4 items-center justify-center gap-3 land-sm:hidden"
     >
@@ -31,6 +32,6 @@ export function GalleryDots({
           }`}
         />
       ))}
-    </nav>
+    </div>
   );
 }
