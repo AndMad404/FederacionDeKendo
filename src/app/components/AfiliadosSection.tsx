@@ -3,6 +3,7 @@ import { Globe, Mail, MapPin, Phone } from "lucide-react";
 import { DOJOS } from "../data/dojos";
 import type { IconKey, InfoItem, ScheduleSlot } from "../types";
 import { focusRingClass } from "../styles/shared";
+import { PageTitle } from "./PageTitle";
 
 const highPriorityImageProps = { fetchpriority: "high" } as const;
 
@@ -174,11 +175,14 @@ export function AfiliadosSection() {
   return (
     <section
       aria-labelledby="affiliates-title"
-      className="rounded-3xl bg-stone-950 md:h-full md:overflow-y-auto xl:overflow-hidden land-compact:overflow-y-auto"
+      className="relative rounded-3xl bg-stone-950 md:h-full md:overflow-y-auto xl:overflow-hidden land-compact:overflow-y-auto"
     >
-      <h1 id="affiliates-title" className="sr-only">
+      <PageTitle
+        id="affiliates-title"
+        className="pointer-events-none absolute left-1/2 top-3 z-30 -translate-x-1/2 sm:top-5"
+      >
         Dojos afiliados
-      </h1>
+      </PageTitle>
       <div className="relative flex min-h-[530px] items-center justify-center overflow-hidden rounded-3xl pt-6 xl:h-full xl:min-h-0 xl:pt-0 land-compact:min-h-[calc(100dvh-4rem-10px)] land-compact:items-start land-compact:overflow-y-auto land-compact:py-2">
         <picture className="absolute inset-0 h-full w-full">
           <source
@@ -203,7 +207,7 @@ export function AfiliadosSection() {
           />
         </picture>
         <div className="absolute inset-0 rounded-3xl bg-black/30" aria-hidden="true" />
-        <div className="relative z-10 w-full max-w-4xl px-4 sm:px-6 md:max-w-5xl lg:max-w-6xl xl:max-w-7xl land-compact:max-w-none land-compact:px-2">
+        <div className="relative z-10 w-full max-w-4xl px-4 pt-16 sm:px-6 sm:pt-20 md:max-w-5xl lg:max-w-6xl xl:max-w-7xl land-compact:max-w-none land-compact:px-2 land-compact:pt-14">
           <InfoCard />
         </div>
       </div>

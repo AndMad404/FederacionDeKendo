@@ -5,6 +5,7 @@ import { GALLERY_IMAGES } from "../data/gallery";
 import { useCarousel } from "../hooks/useCarousel";
 import { useGalleryLightbox } from "../hooks/useGalleryLightbox";
 import { Lightbox } from "./Lightbox";
+import { PageTitle } from "./PageTitle";
 
 const THUMBS_COUNT = 6;
 
@@ -31,12 +32,12 @@ export function GallerySection() {
       aria-labelledby="gallery-title"
       className="relative overflow-hidden bg-stone-950 tall-md:h-full tall-md:min-h-0"
     >
-      <h1
+      <PageTitle
         id="gallery-title"
-        className="pointer-events-none absolute left-1/2 top-3 z-30 max-w-[calc(100%-1.5rem)] -translate-x-1/2 rounded-lg border border-blue-500/70 bg-black/70 px-3 py-2 text-center text-xl font-bold uppercase tracking-wide text-white shadow-xl sm:top-5"
+        className="pointer-events-none absolute left-1/2 top-3 z-30 -translate-x-1/2 sm:top-5"
       >
         Galería de kendo
-      </h1>
+      </PageTitle>
       <div className="mx-auto flex min-h-0 flex-col tall-md:h-full land-sm:pt-2">
         <div className="flex min-h-0 flex-1 flex-col gap-4">
           <div className="flex min-h-0 flex-1 flex-col gap-2 land-sm:gap-1">

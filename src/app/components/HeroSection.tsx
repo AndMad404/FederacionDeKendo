@@ -1,4 +1,5 @@
 import { UpcomingEventsSection } from "./UpcomingEventsSection";
+import { PageTitle } from "./PageTitle";
 
 const highPriorityImageProps = { fetchpriority: "high" } as const;
 const imageVersion = "v=20260704-0120";
@@ -26,16 +27,13 @@ function HeroBanner() {
       <div className="absolute inset-0 bg-black/30" aria-hidden="true" />
 
       <div className="relative z-10 flex w-full flex-col justify-between gap-3 px-4 py-4 text-center sm:px-6 land-sm:gap-2 land-sm:px-2 land-sm:py-2 tall-md:px-10 tall-md:py-4">
-        <div className="mx-auto max-w-3xl rounded-2xl border border-blue-500/70 bg-black/70 p-3 text-white">
-          <h1
-            id="home-title"
-            className="text-xl font-bold leading-tight tracking-wide"
-          >
+        <div className="mx-auto max-w-3xl text-white">
+          <PageTitle id="home-title" className="normal-case leading-tight">
             KENDO
             <span className="hidden sm:inline"> - </span>
             <br className="sm:hidden" />
             EL CAMINO DE LA ESPADA
-          </h1>
+          </PageTitle>
         </div>
 
         <div className="mx-auto flex max-w-2xl flex-col items-center gap-1 rounded-2xl border border-blue-500/70 bg-black/70 px-3 py-3 text-white">
