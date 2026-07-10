@@ -1,6 +1,6 @@
 # Federacion de Asociaciones de Kendo
 
-Sitio oficial de la Federacion de Asociaciones de Kendo, desarrollado con React, TypeScript, Tailwind CSS y Vite a partir del diseno base en Figma.
+Sitio oficial de la Federacion de Asociaciones de Kendo, desarrollado con React, TypeScript, Tailwind CSS y Vite a partir del diseño base en Figma.
 
 ## Desarrollo
 
