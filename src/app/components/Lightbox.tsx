@@ -197,7 +197,7 @@ export function Lightbox({
               {displayTag}
             </p>
             {displayDescription && (
-              <div id="lightbox-description" className="min-h-0 pt-1">
+              <div id="lightbox-description" className="min-h-0">
                 <p className="text-xs leading-snug text-stone-200 [@media_(orientation:landscape)_and_(max-height:640px)]:text-[10px] [@media_(orientation:landscape)_and_(max-height:640px)]:leading-tight">
                   {displayDescription}
                 </p>
