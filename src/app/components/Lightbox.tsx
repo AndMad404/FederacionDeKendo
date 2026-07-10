@@ -3,10 +3,9 @@ import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import type { GalleryImage } from "../types";
 import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
 import { getGalleryDisplayText } from "./gallery/galleryText";
+import { focusRingClass } from "../styles/shared";
 
 const LIGHTBOX_IMAGE_SIZES = "(max-width: 640px) 92vw, 75vw";
-const focusRingClass =
-  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-300";
 const arrowButtonClass =
   "flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-blue-400 bg-black/85 shadow-xl shadow-black/40 transition-colors hover:bg-blue-950/90 md:h-12 md:w-12";
 const activeArrowClass = "border-red-400 bg-red-700 text-white";
@@ -135,7 +134,7 @@ export function Lightbox({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 [@media_(orientation:landscape)_and_(max-height:640px)]:p-2"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 land-sm:p-2"
       onClick={onClose}
     >
       <div
@@ -144,7 +143,7 @@ export function Lightbox({
         aria-modal="true"
         aria-labelledby="lightbox-title"
         aria-describedby={displayDescription ? "lightbox-description" : undefined}
-        className="relative flex max-h-[calc(100svh-2rem)] w-full max-w-5xl touch-pan-y flex-col items-center gap-3 text-white [@media_(orientation:landscape)_and_(max-height:640px)]:max-w-[calc(100vw-2rem)] [@media_(orientation:landscape)_and_(max-height:640px)]:gap-2"
+        className="relative flex max-h-[calc(100svh-2rem)] w-full max-w-5xl touch-pan-y flex-col items-center gap-3 text-white land-sm:max-w-[calc(100vw-2rem)] land-sm:gap-2"
         onClick={(event) => event.stopPropagation()}
         {...swipeHandlers}
       >
@@ -153,12 +152,12 @@ export function Lightbox({
           type="button"
           aria-label="Cerrar galería"
           onClick={onClose}
-          className={`fixed right-4 top-4 z-[60] flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-red-700 text-white transition-colors hover:bg-red-600 [@media_(orientation:landscape)_and_(max-height:640px)]:right-2 [@media_(orientation:landscape)_and_(max-height:640px)]:top-2 ${focusRingClass}`}
+          className={`fixed right-4 top-4 z-[60] flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-red-700 text-white transition-colors hover:bg-red-600 land-sm:right-2 land-sm:top-2 ${focusRingClass}`}
         >
           <X size={20} aria-hidden="true" />
         </button>
 
-        <div className="flex h-[min(54svh,32rem)] min-h-0 w-full items-center justify-center overflow-hidden rounded-3xl bg-black/40 sm:h-[min(68svh,36rem)] [@media_(orientation:landscape)_and_(max-height:640px)]:h-[calc(100svh-9.5rem)] [@media_(orientation:landscape)_and_(max-height:640px)]:rounded-2xl">
+        <div className="flex h-[min(54svh,32rem)] min-h-0 w-full items-center justify-center overflow-hidden rounded-3xl bg-black/40 sm:h-[min(68svh,36rem)] land-sm:h-[calc(100svh-9.5rem)] land-sm:rounded-2xl">
           <img
             src={image.src}
             srcSet={image.srcSet}
@@ -171,7 +170,7 @@ export function Lightbox({
           />
         </div>
 
-        <div className="grid w-full max-w-[22rem] grid-cols-[auto_auto] items-center justify-between gap-x-[min(75%,calc(100%_-_5.5rem))] gap-y-[clamp(1.5rem,5vw,2.25rem)] sm:max-w-[calc(100vw-4rem)] sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:justify-around sm:gap-x-4 sm:gap-y-3 [@media_(orientation:landscape)_and_(max-height:640px)]:max-w-[calc(100vw-5rem)] [@media_(orientation:landscape)_and_(max-height:640px)]:grid-cols-[auto_minmax(0,1fr)_auto] [@media_(orientation:landscape)_and_(max-height:640px)]:gap-x-3">
+        <div className="grid w-full max-w-[22rem] grid-cols-[auto_auto] items-center justify-between gap-x-[min(75%,calc(100%_-_5.5rem))] gap-y-[clamp(1.5rem,5vw,2.25rem)] sm:max-w-[calc(100vw-4rem)] sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:justify-around sm:gap-x-4 sm:gap-y-3 land-sm:max-w-[calc(100vw-5rem)] land-sm:grid-cols-[auto_minmax(0,1fr)_auto] land-sm:gap-x-3">
           <button
             type="button"
             aria-label="Imagen anterior"
@@ -186,24 +185,24 @@ export function Lightbox({
             <ChevronLeft size={24} aria-hidden="true" />
           </button>
 
-          <div className="col-span-2 row-start-2 grid min-h-[9.5rem] w-full min-w-0 max-w-full grid-rows-[auto_auto_minmax(0,1fr)_auto] items-center rounded-2xl border border-blue-500 bg-black/85 px-4 py-3 text-center shadow-xl shadow-black/40 backdrop-blur-sm sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:max-w-none sm:items-center sm:rounded-3xl sm:px-5 sm:py-4 [@media_(orientation:landscape)_and_(max-height:640px)]:col-span-1 [@media_(orientation:landscape)_and_(max-height:640px)]:col-start-2 [@media_(orientation:landscape)_and_(max-height:640px)]:row-start-1 [@media_(orientation:landscape)_and_(max-height:640px)]:min-h-0 [@media_(orientation:landscape)_and_(max-height:640px)]:rounded-2xl [@media_(orientation:landscape)_and_(max-height:640px)]:px-3 [@media_(orientation:landscape)_and_(max-height:640px)]:py-2">
+          <div className="col-span-2 row-start-2 grid min-h-[9.5rem] w-full min-w-0 max-w-full grid-rows-[auto_auto_minmax(0,1fr)_auto] items-center rounded-2xl border border-blue-500 bg-black/85 px-4 py-3 text-center shadow-xl shadow-black/40 backdrop-blur-sm sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:max-w-none sm:items-center sm:rounded-3xl sm:px-5 sm:py-4 land-sm:col-span-1 land-sm:col-start-2 land-sm:row-start-1 land-sm:min-h-0 land-sm:rounded-2xl land-sm:px-3 land-sm:py-2">
             <p
               id="lightbox-title"
-              className="line-clamp-2 text-xl font-bold leading-tight [@media_(orientation:landscape)_and_(max-height:640px)]:text-base"
+              className="line-clamp-2 text-xl font-bold leading-tight land-sm:text-base"
             >
               {displayTitle}
             </p>
-            <p className="truncate text-sm font-bold uppercase tracking-widest text-red-400 [@media_(orientation:landscape)_and_(max-height:640px)]:text-[10px]">
+            <p className="truncate text-sm font-bold uppercase tracking-widest text-red-400 land-sm:text-[10px]">
               {displayTag}
             </p>
             {displayDescription && (
               <div id="lightbox-description" className="min-h-0">
-                <p className="text-xs leading-snug text-stone-200 [@media_(orientation:landscape)_and_(max-height:640px)]:text-[10px] [@media_(orientation:landscape)_and_(max-height:640px)]:leading-tight">
+                <p className="text-xs leading-snug text-stone-200 land-sm:text-[10px] land-sm:leading-tight">
                   {displayDescription}
                 </p>
               </div>
             )}
-            <p className="text-sm [@media_(orientation:landscape)_and_(max-height:640px)]:text-[10px]">
+            <p className="text-sm land-sm:text-[10px]">
               {positionLabel}
             </p>
           </div>

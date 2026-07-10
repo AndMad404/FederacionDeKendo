@@ -14,11 +14,10 @@ import {
   getMobileDescriptionPreview,
   SEE_MORE_LABEL,
 } from "./galleryText";
+import { focusRingClass } from "../../styles/shared";
 
 const highPriorityImageProps = { fetchpriority: "high" } as const;
 const defaultFeaturedObjectPosition = "center 0%";
-const focusRingClass =
-  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-300";
 const activeArrowClass = "border-red-400 bg-red-700";
 type ArrowDirection = "left" | "right";
 
@@ -133,7 +132,7 @@ export function FeaturedImage({
   }, []);
 
   return (
-    <figure className="gallery-featured-frame group relative h-[clamp(420px,62svh,620px)] w-full flex-none cursor-pointer overflow-hidden rounded-2xl bg-stone-800 sm:rounded-3xl [@media_(min-width:768px)_and_(min-height:640px)]:min-h-0 [@media_(min-width:768px)_and_(min-height:640px)]:flex-1 [@media_(orientation:landscape)_and_(max-height:640px)]:h-[calc(100svh_-_3rem_-_6px)] [@media_(orientation:landscape)_and_(max-height:640px)]:flex-none">
+    <figure className="gallery-featured-frame group relative h-[clamp(420px,62svh,620px)] w-full flex-none cursor-pointer overflow-hidden rounded-2xl bg-stone-800 sm:rounded-3xl tall-md:min-h-0 tall-md:flex-1 land-sm:h-[calc(100svh_-_3rem_-_6px)] land-sm:flex-none">
       <img
         key={image.id}
         src={featuredSrc}
@@ -153,16 +152,16 @@ export function FeaturedImage({
         aria-hidden="true"
       />
 
-      <figcaption className="absolute bottom-0 left-0 right-0 flex justify-center p-3 sm:block sm:p-6 [@media_(orientation:landscape)_and_(max-height:640px)]:justify-start [@media_(orientation:landscape)_and_(max-height:640px)]:p-2">
-        <div className="grid min-h-[9.5rem] w-full max-w-[22rem] grid-rows-[auto_auto_minmax(0,1fr)_auto] items-center rounded-2xl border border-blue-500 bg-black/75 px-4 py-3 text-center text-white shadow-xl backdrop-blur-sm sm:items-start sm:rounded-3xl sm:px-5 sm:py-4 sm:text-left [@media_(orientation:landscape)_and_(max-height:640px)]:min-h-0 [@media_(orientation:landscape)_and_(max-height:640px)]:max-w-[16rem] [@media_(orientation:landscape)_and_(max-height:640px)]:rounded-xl [@media_(orientation:landscape)_and_(max-height:640px)]:px-3 [@media_(orientation:landscape)_and_(max-height:640px)]:py-1.5">
-          <p className="text-xl font-bold leading-tight sm:text-2xl [@media_(orientation:landscape)_and_(max-height:640px)]:text-base">
+      <figcaption className="absolute bottom-0 left-0 right-0 flex justify-center p-3 sm:block sm:p-6 land-sm:justify-start land-sm:p-2">
+        <div className="grid min-h-[9.5rem] w-full max-w-[22rem] grid-rows-[auto_auto_minmax(0,1fr)_auto] items-center rounded-2xl border border-blue-500 bg-black/75 px-4 py-3 text-center text-white shadow-xl backdrop-blur-sm sm:items-start sm:rounded-3xl sm:px-5 sm:py-4 sm:text-left land-sm:min-h-0 land-sm:max-w-[16rem] land-sm:rounded-xl land-sm:px-3 land-sm:py-1.5">
+          <p className="text-xl font-bold leading-tight sm:text-2xl land-sm:text-base">
             {displayTitle}
           </p>
-          <p className="truncate text-sm font-bold uppercase tracking-widest text-red-400 sm:text-base [@media_(orientation:landscape)_and_(max-height:640px)]:text-[10px]">
+          <p className="truncate text-sm font-bold uppercase tracking-widest text-red-400 sm:text-base land-sm:text-[10px]">
             {displayTag}
           </p>
           {previewText && (
-            <p className="text-xs leading-snug text-stone-200 sm:text-sm [@media_(orientation:landscape)_and_(max-height:640px)]:text-[10px] [@media_(orientation:landscape)_and_(max-height:640px)]:leading-tight">
+            <p className="text-xs leading-snug text-stone-200 sm:text-sm land-sm:text-[10px] land-sm:leading-tight">
               {previewText}
               {descriptionPreview?.isTruncated && (
                 <span
@@ -174,7 +173,7 @@ export function FeaturedImage({
               )}
             </p>
           )}
-          <p className="text-sm sm:text-base [@media_(orientation:landscape)_and_(max-height:640px)]:text-[10px]">
+          <p className="text-sm sm:text-base land-sm:text-[10px]">
             {positionLabel}
           </p>
         </div>

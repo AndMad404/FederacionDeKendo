@@ -1,7 +1,7 @@
-export const GALLERY_TITLE_MAX_LENGTH = 32;
-export const GALLERY_TAG_MAX_LENGTH = 20;
-export const GALLERY_DESCRIPTION_MAX_LENGTH = 200;
-export const MOBILE_DESCRIPTION_MAX_LENGTH = 70;
+const GALLERY_TITLE_MAX_LENGTH = 32;
+const GALLERY_TAG_MAX_LENGTH = 20;
+const GALLERY_DESCRIPTION_MAX_LENGTH = 200;
+const MOBILE_DESCRIPTION_MAX_LENGTH = 70;
 export const SEE_MORE_LABEL = "Ver mas >>";
 
 const ellipsis = "...";
@@ -20,7 +20,7 @@ function truncateAtWord(value: string, maxLength: number) {
   return truncated.slice(0, lastSpace);
 }
 
-export function truncateText(value: string, maxLength: number) {
+function truncateText(value: string, maxLength: number) {
   const text = value.trim();
 
   if (text.length <= maxLength) return text;

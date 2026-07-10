@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, NavLink } from "react-router";
 import { Menu, X } from "lucide-react";
+import { focusRingClass } from "../styles/shared";
 
 const NAV_LINKS = [
   { to: "/", label: "Inicio", end: true },
@@ -8,11 +9,8 @@ const NAV_LINKS = [
   { to: "/afiliados/", label: "Afiliados" },
 ];
 
-const focusRingClass =
-  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-300";
-
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `text-lg tracking-wide transition-colors duration-200 [@media_(orientation:landscape)_and_(max-height:640px)]:text-base ${focusRingClass} ${
+  `text-lg tracking-wide transition-colors duration-200 land-sm:text-base ${focusRingClass} ${
     isActive
       ? "border-b border-blue-500 pb-0.5 text-blue-400"
       : "text-white hover:text-red-400"
@@ -24,7 +22,7 @@ export function Navbar() {
   return (
     <header className="fixed left-0 right-0 top-0 z-50 bg-stone-950 backdrop-blur">
       <nav aria-label="Navegación principal">
-      <div className="mx-auto my-[5px] flex h-16 max-w-6xl items-center justify-between px-6 [@media_(orientation:landscape)_and_(max-height:640px)]:my-[3px] [@media_(orientation:landscape)_and_(max-height:640px)]:h-12 [@media_(orientation:landscape)_and_(max-height:640px)]:px-5">
+      <div className="mx-auto my-[5px] flex h-16 max-w-6xl items-center justify-between px-6 land-sm:my-[3px] land-sm:h-12 land-sm:px-5">
         <Link
           to="/"
           onClick={() => setOpen(false)}
@@ -40,17 +38,17 @@ export function Navbar() {
               src="/images/logo/fakcr-lockup-224.png"
               alt=""
               aria-hidden="true"
-              className="h-14 w-14 shrink-0 rounded-full bg-white object-contain [@media_(orientation:landscape)_and_(max-height:640px)]:h-10 [@media_(orientation:landscape)_and_(max-height:640px)]:w-10"
+              className="h-14 w-14 shrink-0 rounded-full bg-white object-contain land-sm:h-10 land-sm:w-10"
               width="56"
               height="56"
             />
           </picture>
-          <span className="max-w-[11rem] text-lg font-semibold leading-tight tracking-wide text-white sm:max-w-none [@media_(orientation:landscape)_and_(max-height:640px)]:text-base">
+          <span className="max-w-[11rem] text-lg font-semibold leading-tight tracking-wide text-white sm:max-w-none land-sm:text-base">
             Federación de<br className="sm:hidden" /> Asociaciones de Kendo
           </span>
         </Link>
 
-        <ul className="hidden items-center gap-8 md:flex [@media_(orientation:landscape)_and_(max-height:640px)]:gap-6">
+        <ul className="hidden items-center gap-8 md:flex land-sm:gap-6">
           {NAV_LINKS.map((link) => (
             <li key={link.to}>
               <NavLink

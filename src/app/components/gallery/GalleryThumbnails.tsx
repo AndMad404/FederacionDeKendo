@@ -1,8 +1,7 @@
 import type { GalleryImage } from "../../types";
+import { focusRingClass } from "../../styles/shared";
 
 const THUMBNAIL_SIZES = "(min-width: 768px) 168px, 17vw";
-const focusRingClass =
-  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300";
 
 interface ThumbnailProps {
   image: GalleryImage;
@@ -46,7 +45,7 @@ export function GalleryThumbnails({
     <div
       role="group"
       aria-label="Miniaturas de galería"
-      className="grid h-14 grid-cols-6 gap-1.5 sm:h-16 sm:gap-2 md:h-20 [@media_(orientation:landscape)_and_(max-height:640px)]:hidden"
+      className="grid h-14 grid-cols-6 gap-1.5 sm:h-16 sm:gap-2 md:h-20 land-sm:hidden"
     >
       {images.map((image, index) => (
         <Thumbnail
