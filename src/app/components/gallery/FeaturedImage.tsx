@@ -153,7 +153,7 @@ export function FeaturedImage({
       />
 
       <figcaption className="absolute bottom-0 left-0 right-0 flex justify-center p-3 sm:block sm:p-6 land-sm:justify-start land-sm:p-2">
-        <div className="grid min-h-[9.5rem] w-full max-w-[22rem] grid-rows-[auto_auto_minmax(0,1fr)_auto] items-center rounded-2xl border border-blue-500 bg-black/75 px-4 py-3 text-center text-white shadow-xl backdrop-blur-sm sm:items-start sm:rounded-3xl sm:px-5 sm:py-4 sm:text-left land-sm:min-h-0 land-sm:max-w-[16rem] land-sm:rounded-xl land-sm:px-3 land-sm:py-1.5">
+        <div className="grid min-h-[9.5rem] w-full max-w-[22rem] grid-rows-[auto_auto_minmax(0,1fr)_auto] items-center rounded-2xl border border-blue-500/70 bg-black/70 px-4 py-3 text-center text-white shadow-xl backdrop-blur-sm sm:items-start sm:rounded-3xl sm:px-5 sm:py-4 sm:text-left land-sm:min-h-0 land-sm:max-w-[16rem] land-sm:rounded-xl land-sm:px-3 land-sm:py-1.5">
           <p className="text-xl font-bold leading-tight sm:text-2xl land-sm:text-base">
             {displayTitle}
           </p>
