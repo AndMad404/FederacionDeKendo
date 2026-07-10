@@ -21,7 +21,7 @@ export interface GalleryImage {
   description?: string;
 }
 
-export type CalendarEventType =
+type CalendarEventType =
   | "Examen"
   | "Torneo"
   | "Seminario"
