@@ -1,10 +1,8 @@
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router";
 import { Navbar } from "./components/Navbar";
 import { HeroSection } from "./components/HeroSection";
 import { Footer } from "./components/Footer";
-import { GallerySection } from "./components/GallerySection";
-import { AfiliadosSection } from "./components/AfiliadosSection";
 import {
   DEFAULT_SITE_DESCRIPTION,
   SITE_LOCALE,
@@ -14,6 +12,13 @@ import {
   getRouteMeta,
   getRouteStructuredData,
 } from "./config/seo";
+
+const GallerySection = lazy(() =>
+  import("./components/GallerySection").then((m) => ({ default: m.GallerySection })),
+);
+const AfiliadosSection = lazy(() =>
+  import("./components/AfiliadosSection").then((m) => ({ default: m.AfiliadosSection })),
+);
 
 function setMetaName(name: string, content: string) {
   let meta = document.querySelector<HTMLMetaElement>(`meta[name="${name}"]`);
@@ -128,11 +133,13 @@ export default function App() {
         id="main-content"
         className="min-h-[calc(100svh_-_4rem_-_10px)] flex-1 px-2.5 pt-[calc(4rem_+_10px)] land-sm:min-h-[calc(100svh_-_3rem_-_6px)] land-sm:pt-[calc(3rem_+_6px)] tall-md:min-h-0 tall-md:overflow-hidden"
       >
-        <Routes>
-          <Route path="/" element={<HeroSection />} />
-          <Route path="/galeria" element={<GallerySection />} />
-          <Route path="/afiliados" element={<AfiliadosSection />} />
-        </Routes>
+        <Suspense fallback={null}>
+          <Routes>
+            <Route path="/" element={<HeroSection />} />
+            <Route path="/galeria" element={<GallerySection />} />
+            <Route path="/afiliados" element={<AfiliadosSection />} />
+          </Routes>
+        </Suspense>
       </main>
 
       <Footer />
