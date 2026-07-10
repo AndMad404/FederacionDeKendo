@@ -33,7 +33,7 @@ export function GallerySection() {
     >
       <h1
         id="gallery-title"
-        className="pointer-events-none absolute left-1/2 top-3 z-30 max-w-[calc(100%-1.5rem)] -translate-x-1/2 rounded-lg border border-blue-500/70 bg-black/70 px-3 py-2 text-center text-base font-bold uppercase tracking-wide text-white shadow-xl sm:top-5 sm:text-lg"
+        className="pointer-events-none absolute left-1/2 top-3 z-30 max-w-[calc(100%-1.5rem)] -translate-x-1/2 rounded-lg border border-blue-500/70 bg-black/70 px-3 py-2 text-center text-xl font-bold uppercase tracking-wide text-white shadow-xl sm:top-5"
       >
         Galería de kendo
       </h1>

@@ -29,7 +29,7 @@ function HeroBanner() {
         <div className="mx-auto max-w-3xl rounded-2xl border border-blue-500/70 bg-black/70 p-3 text-white">
           <h1
             id="home-title"
-            className="text-lg font-bold leading-tight tracking-wide sm:text-xl tall-md:text-[clamp(1.25rem,3vw,2rem)]"
+            className="text-xl font-bold leading-tight tracking-wide"
           >
             KENDO
             <span className="hidden sm:inline"> - </span>
