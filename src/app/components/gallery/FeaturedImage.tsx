@@ -157,23 +157,23 @@ export function FeaturedImage({
           <p className="text-xl font-bold leading-tight sm:text-2xl land-sm:text-base">
             {displayTitle}
           </p>
-          <p className="truncate text-sm font-bold uppercase tracking-widest text-red-400 sm:text-base land-sm:text-[10px]">
+          <p className="pt-[1pt] truncate text-base font-bold uppercase tracking-widest text-red-400 sm:text-base land-sm:text-[10px]">
             {displayTag}
           </p>
           {previewText && (
-            <p className="text-xs leading-snug text-stone-200 sm:text-sm land-sm:text-[10px] land-sm:leading-tight">
+            <p className="text-sm leading-snug text-stone-200 land-sm:text-[10px] land-sm:leading-tight">
               {previewText}
               {descriptionPreview?.isTruncated && (
                 <span
                   aria-hidden="true"
-                  className="block font-bold text-blue-100 underline underline-offset-2"
+                  className="block font-bold text-blue-100 underline underline-offset-2 transition-colors group-hover:text-red-400"
                 >
                   {SEE_MORE_LABEL}
                 </span>
               )}
             </p>
           )}
-          <p className="text-sm sm:text-base land-sm:text-[10px]">
+          <p className="text-xs land-sm:text-[10px]">
             {positionLabel}
           </p>
         </div>
