@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { render } from "../dist-ssr/entry-server.js";
 
 const ROOT = process.cwd();
 const DIST_DIR = path.join(ROOT, "dist");
@@ -167,6 +168,9 @@ function renderRouteHtml(route) {
     `<meta\n      name="description"\n      content="${escapeAttribute(description)}"\n    />`,
   );
 
+  const bodyHtml = render(route.path);
+  html = html.replace('<div id="root"></div>', `<div id="root">${bodyHtml}</div>`);
+
   return html.replace("</head>", `${managedHead(route)}\n  </head>`);
 }
 
@@ -201,6 +205,9 @@ function renderNotFoundHtml() {
     /<meta\s+name="robots"\s+content="[^"]*"\s*\/?>/i,
     '<meta name="robots" content="noindex, nofollow" />',
   );
+
+  const bodyHtml = render("/404-not-found/");
+  html = html.replace('<div id="root"></div>', `<div id="root">${bodyHtml}</div>`);
 
   return html;
 }
