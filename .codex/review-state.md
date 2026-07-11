@@ -29,11 +29,12 @@ SESSION_STATE:
     - published production responses for /, /galeria/, /afiliados/, robots.txt, sitemap.xml and trailing-slash redirects
   open_criticals: []
   open_structurals:
-    - unknown production URLs return HTTP 200 with homepage metadata and no route content, creating soft-404 behavior.
-    - dist route HTML contains route-specific head tags but no rendered body content, so route semantics depend on client-side React execution.
     - route metadata and JSON-LD generation are duplicated between src/app/config/seo.ts and scripts/generate-route-html.mjs, creating a drift risk.
     - private PDF composition and capture logic remain client-specific and must be extracted before adding a second client.
     - private PDF runtime dependencies are incomplete because Playwright has no Node manifest and Python packages are unpinned.
+  resolved_2026_07_11:
+    - "[404] unknown production URLs returned HTTP 200 with homepage metadata (soft-404). Fix: seo.ts getRouteMeta no longer falls back to '/' meta — returns dedicated NOT_FOUND_META (noindex:true). App.tsx adds wildcard Route + NotFoundSection component, and RouteMetadata sets robots=noindex/strips canonical+OG+JSON-LD for unmatched routes. generate-route-html.mjs now emits dist/404.html with robots noindex (Cloudflare Pages serves it with real 404 status automatically, no _redirects present)."
+    - "[SSR] initial HTML body was empty (<div id=\"root\"></div>), content depended entirely on client JS. Fix: added src/entry-server.tsx (renderToString via react-router StaticRouter, direct imports of route sections instead of React.lazy since renderToString is synchronous). vite.config.ts builds a second SSR bundle (isSsrBuild branch, no manualChunks). package.json build script now runs both client and --ssr builds. generate-route-html.mjs imports dist-ssr/entry-server.js and injects real per-route body HTML (and 404 body) before writing final route HTML. main.tsx switched from createRoot to hydrateRoot to reuse the prerendered markup."
   pending_review:
     - configurable private PDF engine extraction before onboarding another client
     - Search Console URL Inspection, Rich Results Test and field Core Web Vitals data, which require external Google property access

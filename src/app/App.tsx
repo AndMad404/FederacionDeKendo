@@ -3,6 +3,7 @@ import { Route, Routes, useLocation } from "react-router";
 import { Navbar } from "./components/Navbar";
 import { HeroSection } from "./components/HeroSection";
 import { Footer } from "./components/Footer";
+import { NotFoundSection } from "./components/NotFoundSection";
 import {
   DEFAULT_SITE_DESCRIPTION,
   SITE_LOCALE,
@@ -71,6 +72,14 @@ function setJsonLd(id: string, data: Record<string, unknown>) {
   script.text = JSON.stringify(data);
 }
 
+function removeElement(selector: string) {
+  document.querySelector(selector)?.remove();
+}
+
+function removeElements(selector: string) {
+  document.querySelectorAll(selector).forEach((el) => el.remove());
+}
+
 function ScrollToTop() {
   const { pathname } = useLocation();
 
@@ -87,11 +96,22 @@ function RouteMetadata() {
 
   useEffect(() => {
     const meta = getRouteMeta(pathname);
-    const canonicalUrl = getCanonicalUrl(meta);
-    const image = getRouteImageMetadata(meta);
 
     document.title = meta.title;
     setMetaName("description", meta.description || DEFAULT_SITE_DESCRIPTION);
+    setMetaName("robots", meta.noindex ? "noindex, nofollow" : "index, follow");
+
+    if (meta.noindex) {
+      removeElement('link[rel="canonical"]');
+      removeElements('meta[property^="og:"]');
+      removeElements('meta[name^="twitter:"]');
+      removeElement("script#route-json-ld");
+      return;
+    }
+
+    const canonicalUrl = getCanonicalUrl(meta);
+    const image = getRouteImageMetadata(meta);
+
     setCanonicalLink(canonicalUrl);
     setMetaProperty("og:type", "website");
     setMetaProperty("og:site_name", SITE_NAME);
@@ -110,7 +130,11 @@ function RouteMetadata() {
     setMetaName("twitter:description", meta.description);
     setMetaName("twitter:image", image.url);
     setMetaName("twitter:image:alt", image.alt);
-    setJsonLd("route-json-ld", getRouteStructuredData(meta));
+
+    const structuredData = getRouteStructuredData(meta);
+    if (structuredData) {
+      setJsonLd("route-json-ld", structuredData);
+    }
   }, [pathname]);
 
   return null;
@@ -138,6 +162,7 @@ export default function App() {
             <Route path="/" element={<HeroSection />} />
             <Route path="/galeria" element={<GallerySection />} />
             <Route path="/afiliados" element={<AfiliadosSection />} />
+            <Route path="*" element={<NotFoundSection />} />
           </Routes>
         </Suspense>
       </main>

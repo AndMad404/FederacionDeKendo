@@ -26,6 +26,8 @@ export interface RouteMeta {
   description: string;
   image: string;
   schemaType: SchemaType;
+  /** true para rutas que no deben indexarse (ej. 404). No aparecen en ROUTE_META. */
+  noindex?: boolean;
 }
 
 type StructuredData = Record<string, unknown>;
@@ -54,8 +56,17 @@ function absoluteUrl(path: string) {
   return path === "/" ? `${SITE_URL}/` : `${SITE_URL}${path}`;
 }
 
+const NOT_FOUND_META: RouteMeta = {
+  path: "/404/",
+  title: `Página no encontrada | ${SITE_NAME}`,
+  description: "La página que buscas no existe o fue movida.",
+  image: DATA.defaultImage,
+  schemaType: "WebPage",
+  noindex: true,
+};
+
 export function getRouteMeta(pathname: string) {
-  return ROUTE_META[normalizeRoutePath(pathname)] ?? ROUTE_META["/"];
+  return ROUTE_META[normalizeRoutePath(pathname)] ?? NOT_FOUND_META;
 }
 
 export function getCanonicalUrl(meta: RouteMeta) {
@@ -75,7 +86,9 @@ export function getRouteImageMetadata(meta: RouteMeta) {
   };
 }
 
-export function getRouteStructuredData(meta: RouteMeta): StructuredData {
+export function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
+  if (meta.noindex) return null;
+
   const canonicalUrl = getCanonicalUrl(meta);
   const organizationId = `${SITE_URL}/#organization`;
   const websiteId = `${SITE_URL}/#website`;

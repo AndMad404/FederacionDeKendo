@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { render } from "../dist-ssr/entry-server.js";
 
 const ROOT = process.cwd();
 const DIST_DIR = path.join(ROOT, "dist");
@@ -167,6 +168,9 @@ function renderRouteHtml(route) {
     `<meta\n      name="description"\n      content="${escapeAttribute(description)}"\n    />`,
   );
 
+  const bodyHtml = render(route.path);
+  html = html.replace('<div id="root"></div>', `<div id="root">${bodyHtml}</div>`);
+
   return html.replace("</head>", `${managedHead(route)}\n  </head>`);
 }
 
@@ -182,6 +186,41 @@ async function writeRouteHtml(route) {
   console.log(`generated ${path.relative(ROOT, outputPath)}`);
 }
 
+function renderNotFoundHtml() {
+  const title = `Página no encontrada | ${seoData.siteName}`;
+  const description = "La página que buscas no existe o fue movida.";
+  let html = stripManagedHead(baseHtml);
+
+  html = html.replace(
+    /<title>[\s\S]*?<\/title>/i,
+    `<title>${escapeText(title)}</title>`,
+  );
+
+  html = html.replace(
+    /<meta\s+name="description"\s+content="[^"]*"\s*\/?>/i,
+    `<meta\n      name="description"\n      content="${escapeAttribute(description)}"\n    />`,
+  );
+
+  html = html.replace(
+    /<meta\s+name="robots"\s+content="[^"]*"\s*\/?>/i,
+    '<meta name="robots" content="noindex, nofollow" />',
+  );
+
+  const bodyHtml = render("/404-not-found/");
+  html = html.replace('<div id="root"></div>', `<div id="root">${bodyHtml}</div>`);
+
+  return html;
+}
+
+async function writeNotFoundHtml() {
+  const outputPath = path.join(DIST_DIR, "404.html");
+
+  await writeFile(outputPath, renderNotFoundHtml(), "utf8");
+  console.log(`generated ${path.relative(ROOT, outputPath)}`);
+}
+
 for (const route of Object.values(seoData.routes)) {
   await writeRouteHtml(route);
 }
+
+await writeNotFoundHtml();

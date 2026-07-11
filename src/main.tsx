@@ -1,9 +1,10 @@
-import { createRoot } from "react-dom/client";
+import { hydrateRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
 import App from "./app/App.tsx";
 import "./styles/index.css";
 
-createRoot(document.getElementById("root")!).render(
+hydrateRoot(
+  document.getElementById("root")!,
   <BrowserRouter>
     <App />
   </BrowserRouter>,
