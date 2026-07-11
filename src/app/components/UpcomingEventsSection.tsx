@@ -87,7 +87,7 @@ export function UpcomingEventsSection() {
           id="upcoming-events-title"
           className="text-lg font-bold leading-tight sm:text-xl tall-md:text-2xl"
         >
-          Calendario de Proximos Eventos
+          Calendario de Próximos Eventos
         </h2>
       </div>
 
