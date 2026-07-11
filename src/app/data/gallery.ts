@@ -22,7 +22,7 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     title: "Practicantes en seiza",
     tag: "Reiho",
     description:
-      "La posicion de seiza marca el inicio y cierre de la practica con respeto, atencion y disciplina.",
+      "La posición de seiza marca el inicio y cierre de la práctica con respeto, atención y disciplina.",
   },
   {
     id: 2,
@@ -38,7 +38,7 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     title: "Combates con armadura",
     tag: "Bogu geiko",
     description:
-      "Practicantes con bogu aplican distancia, timing y precision durante ejercicios de combate controlado.",
+      "Practicantes con bogu aplican distancia, timing y precisión durante ejercicios de combate controlado.",
   },
   {
     id: 3,
@@ -54,7 +54,7 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     title: "Armaduras",
     tag: "Bogu",
     description:
-      "Detalle del equipo de proteccion usado en kendo: men, kote, do y tare listos para la practica.",
+      "Detalle del equipo de protección usado en kendo: men, kote, do y tare listos para la práctica.",
   },
   {
     id: 4,
@@ -70,7 +70,7 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     title: "Entrenamiento multinivel",
     tag: "Mitori geiko",
     description:
-      "La observacion activa permite aprender ritmo, postura y etiqueta antes de entrar al combate.",
+      "La observación activa permite aprender ritmo, postura y etiqueta antes de entrar al combate.",
   },
   {
     id: 5,
@@ -119,9 +119,9 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     thumbnailWidth: 320,
     thumbnailHeight: 180,
     title: "Kirikaeshi",
-    tag: "Tecnica",
+    tag: "Técnica",
     description:
-      "Kirikaeshi trabaja cortes repetidos, desplazamiento y respiracion para fortalecer fundamentos.",
+      "Kirikaeshi trabaja cortes repetidos, desplazamiento y respiración para fortalecer fundamentos.",
   },
   {
     id: 8,
@@ -138,6 +138,6 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     title: "Combate competitivo",
     tag: "Shiai",
     description:
-      "El shiai pone a prueba tecnica, decision y respeto dentro de un formato competitivo.",
+      "El shiai pone a prueba técnica, decisión y respeto dentro de un formato competitivo.",
   },
 ];

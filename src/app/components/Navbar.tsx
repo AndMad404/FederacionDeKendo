@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, NavLink } from "react-router";
 import { Menu, X } from "lucide-react";
 import { focusRingClass } from "../styles/shared";
@@ -18,6 +18,21 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key !== "Escape") return;
+
+      setOpen(false);
+      menuButtonRef.current?.focus();
+    }
+
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [open]);
 
   return (
     <header className="fixed left-0 right-0 top-0 z-50 bg-stone-950 backdrop-blur">
@@ -63,6 +78,7 @@ export function Navbar() {
         </ul>
 
         <button
+          ref={menuButtonRef}
           type="button"
           className={`text-gray-400 hover:text-white md:hidden ${focusRingClass}`}
           aria-controls="mobile-menu"

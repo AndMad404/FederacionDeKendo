@@ -15,7 +15,7 @@ function HeroBanner() {
         />
         <img
           src={`/images/hero/kendo-hero-formacion-1500.webp?${imageVersion}`}
-          alt="Grupo de practicantes de kendo reunidos despues de una actividad"
+          alt="Grupo de practicantes de kendo reunidos después de una actividad"
           width={1500}
           height={750}
           className="absolute inset-0 h-full w-full object-cover object-center lg:object-[50%_42%]"
@@ -39,11 +39,11 @@ function HeroBanner() {
         <div className="mx-auto flex max-w-2xl flex-col items-center gap-1 rounded-2xl border border-blue-500/70 bg-black/70 px-3 py-3 text-white">
           <h2 className="max-w-sm text-lg leading-snug sm:max-w-md tall-md:leading-relaxed">
             <b>
-              La Federacion de asociaciones de kendo 
-            </b> 
-              &nbsp;te invita a descubrir este arte marcial japonés.
+              La Federación de Asociaciones de Kendo
+            </b>
+            &nbsp;te invita a descubrir este arte marcial japonés.
             <br />
-              Clases para todos los niveles y edades.
+            Clases para todos los niveles y edades.
           </h2>
         </div>
       </div>
