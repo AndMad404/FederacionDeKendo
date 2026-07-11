@@ -2,7 +2,7 @@
 
 Documento de trabajo para la reunión con la Federación.
 
-**Estado de la revisión:** código y sitio publicado contrastados el 10 de julio de 2026.
+**Estado de la revisión:** código y sitio publicado contrastados el 10 de julio de 2026. Desde entonces hay cambios adicionales implementados en el código local (11 de julio), todavía no desplegados ni verificados en producción: ver §0.1.
 
 **Sitio revisado:** `https://fak-kendo.pages.dev`
 
@@ -31,6 +31,17 @@ Las futuras referencias promocionales de cada dojo no se mostrarán visualmente 
 | Referencias promocionales de dojos | No existen todavía | Cada dojo debe aportar y aprobar su propio contenido |
 
 Mientras estas decisiones sigan pendientes, los borradores de los dojos no usarán `FAK`, `FAKCR` ni el nombre largo de la Federación.
+
+### 0.1 Cambios técnicos implementados en código local (11 de julio, sin desplegar)
+
+Estos cambios no afectan textos ni diseño visible; se documentan porque cambian cómo Google y otros rastreadores ven el sitio.
+
+| Cambio | Qué resuelve | Impacto visible para el usuario |
+|---|---|---|
+| Página 404 real | Antes, una URL inventada (ej. `/cualquier-cosa`) mostraba el contenido de Inicio con código `200` ("todo OK"), confundiendo a los buscadores. Ahora existe una página "Página no encontrada" dedicada, con enlaces de vuelta a Inicio/Galería/Afiliados, y el servidor responde con el código correcto (`404`). | Ninguno para navegación normal; solo se ve al visitar una URL que no existe. |
+| Contenido inicial ya no depende de JavaScript | Antes, el HTML que recibía un buscador al cargar la página estaba vacío hasta que el navegador ejecutaba React. Ahora el texto visible (título, hero, eventos, galería, dojos) ya viene incluido en el HTML que se entrega primero. | Ninguno para la persona; el sitio se ve igual. Mejora cómo lo indexan los buscadores. |
+
+Pendiente antes de dar esto por cerrado: correr `pnpm build` y verificar en producción que ambos cambios funcionan como se espera (no se ha podido probar todavía en este equipo).
 
 ### Cambios recientes que ya aparecen en el sitio
 
