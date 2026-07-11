@@ -154,9 +154,9 @@ export function FeaturedImage({
 
       <figcaption className="absolute bottom-0 left-0 right-0 flex justify-center p-3 sm:block sm:p-6 land-sm:flex land-sm:justify-center land-sm:px-16 land-sm:py-2">
         <div className="grid w-full max-w-[28rem] items-center rounded-2xl border border-blue-500/70 bg-black/70 px-4 py-3 text-center text-white shadow-xl backdrop-blur-sm sm:items-start sm:rounded-3xl sm:px-5 sm:py-4 sm:text-left land-sm:max-w-[28rem] land-sm:grid-cols-[minmax(0,1fr)_auto] land-sm:grid-rows-[auto_auto] land-sm:gap-x-6 land-sm:rounded-xl land-sm:px-4 land-sm:py-2">
-          <p className="text-xl font-bold leading-tight sm:text-2xl land-sm:text-base">
+          <h2 className="text-xl font-bold leading-tight sm:text-2xl land-sm:text-base">
             {displayTitle}
-          </p>
+          </h2>
           <p className="pt-1 truncate text-base font-bold uppercase tracking-widest text-red-400 sm:text-base land-sm:text-[10px]">
             {displayTag}
           </p>

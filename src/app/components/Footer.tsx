@@ -12,13 +12,13 @@ export function Footer() {
             <div className="flex items-baseline gap-1">
               <h2
                 id="footer-purpose-title"
-                className="text-lg font-extrabold tracking-widest text-white"
+                className="flex items-baseline gap-1 text-lg font-extrabold tracking-widest text-white"
               >
-                Propósito del
+                Propósito del{" "}
+                <span className="text-lg font-bold text-red-400">
+                  KENDO
+                </span>
               </h2>
-              <span className="text-lg font-bold text-red-400">
-                KENDO
-              </span>
             </div>
           </div>
           <p className="text-base leading-relaxed">

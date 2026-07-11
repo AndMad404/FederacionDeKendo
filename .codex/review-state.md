@@ -23,6 +23,8 @@ SESSION_STATE:
     - C:/Users/and_m/Documents/Profesional/HerramientaPDFSEO root structure
     - C:/Users/and_m/Documents/Profesional/HerramientaPDFSEO/projects/federacion-kendo structure
     - private PDF generator dependency and artifact boundaries
+    - current h1-h4 hierarchy across Home, Galería, Afiliados, Lightbox, events and Footer
+    - semantic heading patch for FeaturedImage, Lightbox, event cards and Footer
   open_criticals: []
   open_structurals:
     - dist route HTML contains route-specific head tags but no rendered body content, so route semantics depend on client-side React execution.
