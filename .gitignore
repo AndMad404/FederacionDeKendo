@@ -38,6 +38,11 @@ tmp/
 # Codex local attachments
 .codex-remote-attachments/
 
+# Private PDF production tooling
+docs/assets/textos-seo/
+scripts/capture-textos-seo-assets.cjs
+scripts/generate-textos-seo-pdf.py
+
 # Static hosting / deploy
 .vercel/
 .netlify/
