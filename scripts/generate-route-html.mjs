@@ -182,6 +182,38 @@ async function writeRouteHtml(route) {
   console.log(`generated ${path.relative(ROOT, outputPath)}`);
 }
 
+function renderNotFoundHtml() {
+  const title = `Página no encontrada | ${seoData.siteName}`;
+  const description = "La página que buscas no existe o fue movida.";
+  let html = stripManagedHead(baseHtml);
+
+  html = html.replace(
+    /<title>[\s\S]*?<\/title>/i,
+    `<title>${escapeText(title)}</title>`,
+  );
+
+  html = html.replace(
+    /<meta\s+name="description"\s+content="[^"]*"\s*\/?>/i,
+    `<meta\n      name="description"\n      content="${escapeAttribute(description)}"\n    />`,
+  );
+
+  html = html.replace(
+    /<meta\s+name="robots"\s+content="[^"]*"\s*\/?>/i,
+    '<meta name="robots" content="noindex, nofollow" />',
+  );
+
+  return html;
+}
+
+async function writeNotFoundHtml() {
+  const outputPath = path.join(DIST_DIR, "404.html");
+
+  await writeFile(outputPath, renderNotFoundHtml(), "utf8");
+  console.log(`generated ${path.relative(ROOT, outputPath)}`);
+}
+
 for (const route of Object.values(seoData.routes)) {
   await writeRouteHtml(route);
 }
+
+await writeNotFoundHtml();
