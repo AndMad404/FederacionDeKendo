@@ -8,6 +8,8 @@ dist-ssr/
 .cache/
 .eslintcache
 *.tsbuildinfo
+__pycache__/
+*.py[cod]
 local/
 
 # Environment
