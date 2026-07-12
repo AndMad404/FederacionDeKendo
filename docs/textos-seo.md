@@ -2,7 +2,7 @@
 
 Documento de trabajo para la reunión con la Federación.
 
-**Estado de la revisión:** código y sitio publicado contrastados el 10 de julio de 2026. Desde entonces hay cambios adicionales implementados en el código local (11 de julio), todavía no desplegados ni verificados en producción: ver §0.1.
+**Estado de la revisión:** código y sitio publicado contrastados el 10 de julio de 2026. Los cambios técnicos del 11 de julio están implementados y verificados mediante TypeScript y build local, pero todavía requieren despliegue y comprobación final en producción: ver §0.1.
 
 **Sitio revisado:** `https://fak-kendo.pages.dev`
 
@@ -32,7 +32,7 @@ Las futuras referencias promocionales de cada dojo no se mostrarán visualmente 
 
 Mientras estas decisiones sigan pendientes, los borradores de los dojos no usarán `FAK`, `FAKCR` ni el nombre largo de la Federación.
 
-### 0.1 Cambios técnicos implementados en código local (11 de julio, sin desplegar)
+### 0.1 Cambios técnicos implementados y verificados localmente (11 de julio, sin desplegar)
 
 Estos cambios no afectan textos ni diseño visible; se documentan porque cambian cómo Google y otros rastreadores ven el sitio.
 
@@ -40,8 +40,15 @@ Estos cambios no afectan textos ni diseño visible; se documentan porque cambian
 |---|---|---|
 | Página 404 real | Antes, una URL inventada (ej. `/cualquier-cosa`) mostraba el contenido de Inicio con código `200` ("todo OK"), confundiendo a los buscadores. Ahora existe una página "Página no encontrada" dedicada, con enlaces de vuelta a Inicio/Galería/Afiliados, y el servidor responde con el código correcto (`404`). | Ninguno para navegación normal; solo se ve al visitar una URL que no existe. |
 | Contenido inicial ya no depende de JavaScript | Antes, el HTML que recibía un buscador al cargar la página estaba vacío hasta que el navegador ejecutaba React. Ahora el texto visible (título, hero, eventos, galería, dojos) ya viene incluido en el HTML que se entrega primero. | Ninguno para la persona; el sitio se ve igual. Mejora cómo lo indexan los buscadores. |
+| Hidratación consistente | El servidor y el navegador renderizan el mismo componente `App`. En desarrollo se usa `createRoot` porque Vite entrega un contenedor vacío; en el HTML prerenderizado se usa `hydrateRoot`. Esto evita que React descarte el HTML inicial por diferencias entre ambos árboles. | Ninguno. Evita errores de consola, render duplicado y posibles parpadeos durante la carga. |
+| Fuente única de rutas SEO | Inicio, Galería y Afiliados se definen en un manifiesto validado que comparten React Router, el prerender y el sitemap. | Ninguno. Reduce el riesgo de publicar una ruta sin metadatos o sin incluirla en el sitemap. |
+| Política única de etiquetas | El HTML inicial y la navegación en React consumen la misma descripción de canonical, robots, Open Graph, Twitter Cards y JSON-LD. | Ninguno. Evita diferencias entre una recarga directa y la navegación interna. |
+| Sitemap automático | `dist/sitemap.xml` se genera durante el build desde las rutas indexables; ya no existe una copia manual en `public/`. | Ninguno. El archivo público conserva las mismas tres URL actuales. |
+| Configuración validada | El build se detiene si una ruta SEO no contiene los campos requeridos o usa un componente o tipo de schema no reconocido. | Ninguno. Detecta errores de configuración antes del despliegue. |
 
-Pendiente antes de dar esto por cerrado: correr `pnpm build` y verificar en producción que ambos cambios funcionan como se espera (no se ha podido probar todavía en este equipo).
+La verificación local `pnpm run typecheck` y `pnpm build` finalizó correctamente. El build generó Inicio, Galería, Afiliados, la página 404 y `dist/sitemap.xml`. Cada ruta indexable contiene una sola meta description, robots, canonical y bloque JSON-LD; la página 404 contiene `noindex` y omite canonical y JSON-LD.
+
+Pendiente antes de dar esto por cerrado: desplegar el build y comprobar en producción el código HTTP de la página 404, el sitemap generado, el HTML entregado, la navegación interna de metadatos y la ausencia de errores React `#418` y `#423`.
 
 ### Cambios recientes que ya aparecen en el sitio
 
@@ -69,7 +76,7 @@ Estos cambios no alteran la apariencia de las capturas. Están implementados en 
 | Afiliados / sede | `h4` | Nombre de la sede | Publicado |
 | Footer | `h2` | Propósito del KENDO / Contactos de la Federación | Implementado localmente |
 
-El build continúa generando un cuerpo inicial con `<div id="root"></div>`. La jerarquía anterior aparece cuando React se ejecuta; hacerla parte del HTML inicial requeriría una fase separada de prerenderizado o SSG.
+El build ya incluye esta jerarquía dentro de `<div id="root">...</div>` para Inicio, Galería, Afiliados y 404. `scripts/generate-route-html.mjs` obtiene el markup desde el bundle SSR y React lo hidrata en el navegador sin volver a construir el árbol completo.
 
 ---
 

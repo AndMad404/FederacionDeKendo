@@ -1,6 +1,8 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import {
+  getRouteHeadDescriptors,
+  getRouteManifest,
   getRouteMeta,
   getRouteSeoPayload,
   render,
@@ -8,10 +10,6 @@ import {
 
 const ROOT = process.cwd();
 const DIST_DIR = path.join(ROOT, "dist");
-const SEO_DATA_PATH = path.join(ROOT, "src", "app", "config", "seo-data.json");
-const ROUTE_JSON_LD_ID = "route-json-ld";
-
-const seoData = JSON.parse(await readFile(SEO_DATA_PATH, "utf8"));
 const baseHtml = await readFile(path.join(DIST_DIR, "index.html"), "utf8");
 
 function escapeAttribute(value) {
@@ -27,67 +25,36 @@ function escapeText(value) {
 }
 
 function managedHead(route) {
-  const seo = getRouteSeoPayload(route);
-  const jsonLd = JSON.stringify(seo.structuredData).replaceAll(
-    "<",
-    "\\u003c",
-  );
+  return getRouteHeadDescriptors(route)
+    .map((descriptor) => {
+      const attributes = Object.entries(descriptor.attributes)
+        .map(([name, value]) => `${name}="${escapeAttribute(value)}"`)
+        .join(" ");
+      const opening = `${descriptor.tag} data-route-seo ${attributes}`;
 
-  const managedTags = [
-    route.preloadImage
-      ? [
-          `    <link rel="preload" href="${escapeAttribute(route.preloadImage.href)}"`,
-          '      as="image"',
-          route.preloadImage.type
-            ? `      type="${escapeAttribute(route.preloadImage.type)}"`
-            : "",
-          '      fetchpriority="high"',
-          route.preloadImage.srcSet
-            ? `      imagesrcset="${escapeAttribute(route.preloadImage.srcSet)}"`
-            : "",
-          route.preloadImage.sizes
-            ? `      imagesizes="${escapeAttribute(route.preloadImage.sizes)}"`
-            : "",
-          "    />",
-        ]
-          .filter(Boolean)
-          .join("\n")
-      : "",
-    `    <link rel="canonical" href="${escapeAttribute(seo.canonicalUrl)}" />`,
-    '    <meta property="og:type" content="website" />',
-    `    <meta property="og:site_name" content="${escapeAttribute(seo.siteName)}" />`,
-    `    <meta property="og:title" content="${escapeAttribute(seo.title)}" />`,
-    `    <meta property="og:description" content="${escapeAttribute(seo.description)}" />`,
-    `    <meta property="og:url" content="${escapeAttribute(seo.canonicalUrl)}" />`,
-    `    <meta property="og:image" content="${escapeAttribute(seo.image.url)}" />`,
-    `    <meta property="og:image:secure_url" content="${escapeAttribute(seo.image.url)}" />`,
-    '    <meta property="og:image:type" content="image/png" />',
-    `    <meta property="og:image:width" content="${escapeAttribute(seo.image.width)}" />`,
-    `    <meta property="og:image:height" content="${escapeAttribute(seo.image.height)}" />`,
-    `    <meta property="og:image:alt" content="${escapeAttribute(seo.image.alt)}" />`,
-    `    <meta property="og:locale" content="${escapeAttribute(seo.locale)}" />`,
-    '    <meta name="twitter:card" content="summary_large_image" />',
-    `    <meta name="twitter:title" content="${escapeAttribute(seo.title)}" />`,
-    `    <meta name="twitter:description" content="${escapeAttribute(seo.description)}" />`,
-    `    <meta name="twitter:image" content="${escapeAttribute(seo.image.url)}" />`,
-    `    <meta name="twitter:image:alt" content="${escapeAttribute(seo.image.alt)}" />`,
-    `    <script type="application/ld+json" id="${ROUTE_JSON_LD_ID}">${jsonLd}</script>`,
-  ];
+      if (descriptor.tag === "script") {
+        return `    <${opening}>${descriptor.text ?? ""}</script>`;
+      }
 
-  return managedTags.filter(Boolean).join("\n");
+      return `    <${opening} />`;
+    })
+    .join("\n");
 }
 
 function stripManagedHead(html) {
   return html
+    .replace(/\n\s*<(?:link|meta)\s+[^>]*data-route-seo[^>]*>/gi, "")
+    .replace(
+      /\n\s*<script\s+[^>]*data-route-seo[^>]*>[\s\S]*?<\/script>/gi,
+      "",
+    )
     .replace(/\n\s*<link\s+rel="preload"[^>]*\s+as="image"[^>]*>/gi, "")
     .replace(/\n\s*<link\s+rel="canonical"[^>]*>/gi, "")
+    .replace(/\n\s*<meta\s+name="(?:description|robots)"[^>]*>/gi, "")
     .replace(/\n\s*<meta\s+property="og:[^"]+"[^>]*>/gi, "")
     .replace(/\n\s*<meta\s+name="twitter:[^"]+"[^>]*>/gi, "")
     .replace(
-      new RegExp(
-        `\\n\\s*<script\\s+type="application/ld\\+json"\\s+id="${ROUTE_JSON_LD_ID}">[\\s\\S]*?<\\/script>`,
-        "gi",
-      ),
+      /\n\s*<script\s+type="application\/ld\+json"[^>]*>[\s\S]*?<\/script>/gi,
       "",
     );
 }
@@ -99,11 +66,6 @@ function renderRouteHtml(route) {
   html = html.replace(
     /<title>[\s\S]*?<\/title>/i,
     `<title>${escapeText(seo.title)}</title>`,
-  );
-
-  html = html.replace(
-    /<meta\s+name="description"\s+content="[^"]*"\s*\/?>/i,
-    `<meta\n      name="description"\n      content="${escapeAttribute(seo.description)}"\n    />`,
   );
 
   const bodyHtml = render(route.path);
@@ -133,20 +95,10 @@ function renderNotFoundHtml() {
     `<title>${escapeText(seo.title)}</title>`,
   );
 
-  html = html.replace(
-    /<meta\s+name="description"\s+content="[^"]*"\s*\/?>/i,
-    `<meta\n      name="description"\n      content="${escapeAttribute(seo.description)}"\n    />`,
-  );
-
-  html = html.replace(
-    /<meta\s+name="robots"\s+content="[^"]*"\s*\/?>/i,
-    `<meta name="robots" content="${escapeAttribute(seo.robots)}" />`,
-  );
-
   const bodyHtml = render("/404-not-found/");
   html = html.replace('<div id="root"></div>', `<div id="root">${bodyHtml}</div>`);
 
-  return html;
+  return html.replace("</head>", `${managedHead(getRouteMeta("/404-not-found/"))}\n  </head>`);
 }
 
 async function writeNotFoundHtml() {
@@ -156,8 +108,26 @@ async function writeNotFoundHtml() {
   console.log(`generated ${path.relative(ROOT, outputPath)}`);
 }
 
-for (const route of Object.values(seoData.routes)) {
+const routes = getRouteManifest();
+
+for (const route of routes) {
   await writeRouteHtml(route);
 }
 
 await writeNotFoundHtml();
+
+const sitemap = [
+  '<?xml version="1.0" encoding="UTF-8"?>',
+  '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+  ...routes.flatMap((route) => {
+    const canonicalUrl = getRouteSeoPayload(route).canonicalUrl;
+    return canonicalUrl
+      ? ["  <url>", `    <loc>${escapeText(canonicalUrl)}</loc>`, "  </url>"]
+      : [];
+  }),
+  "</urlset>",
+  "",
+].join("\n");
+
+await writeFile(path.join(DIST_DIR, "sitemap.xml"), sitemap, "utf8");
+console.log("generated dist\\sitemap.xml");

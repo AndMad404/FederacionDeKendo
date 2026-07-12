@@ -15,6 +15,7 @@
   "routes": {
     "/": {
       "path": "/",
+      "component": "home",
       "title": "Inicio | Federación de Asociaciones de Kendo",
       "description": "Conoce la Federación de Asociaciones de Kendo y su comunidad de práctica.",
       "image": "/images/social/kendo-social-card.png",
@@ -28,6 +29,7 @@
     },
     "/galeria/": {
       "path": "/galeria/",
+      "component": "gallery",
       "title": "Galería | Federación de Asociaciones de Kendo",
       "description": "Galería oficial de la comunidad, entrenamientos y actividades de kendo.",
       "image": "/images/social/kendo-social-card.png",
@@ -41,6 +43,7 @@
     },
     "/afiliados/": {
       "path": "/afiliados/",
+      "component": "affiliates",
       "title": "Dojos afiliados | Federación de Asociaciones de Kendo",
       "description": "Información de contacto, horarios y ubicación de dojos afiliados a la federación.",
       "image": "/images/social/kendo-social-card.png",
