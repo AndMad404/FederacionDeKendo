@@ -4,8 +4,11 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr",
+    "postbuild": "node scripts/generate-route-html.mjs",
     "dev": "vite",
+    "typecheck": "tsc --noEmit",
+    "sync:calendar": "node scripts/sync-calendar-events.mjs",
     "images:responsive": "node scripts/generate-responsive-images.mjs"
   },
   "dependencies": {

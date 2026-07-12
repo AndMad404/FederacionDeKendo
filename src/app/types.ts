@@ -3,17 +3,45 @@ export interface GalleryImage {
   src: string;
   srcSet?: string;
   sizes?: string;
+  featuredSrc?: string;
+  featuredSrcSet?: string;
+  featuredWidth?: number;
+  featuredHeight?: number;
   width: number;
   height: number;
   thumbnailSrc: string;
   thumbnailSrcSet?: string;
   thumbnailWidth: number;
   thumbnailHeight: number;
+  disableObjectPosition?: boolean;
   objectPosition?: string;
+  mobileObjectPosition?: string;
   title: string;
   tag: string;
-  likes: number;
-  date?: string; // ISO 8601, e.g. "2024-11-03"
+  description?: string;
+}
+
+type CalendarEventType =
+  | "Examen"
+  | "Torneo"
+  | "Seminario"
+  | "Entrenamiento especial"
+  | "Actividad federativa";
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  date: string;
+  endDate?: string;
+  startTime?: string;
+  endTime?: string;
+  location?: string;
+  summary?: string;
+  type?: CalendarEventType;
+  organizer?: string;
+  infoUrl?: string;
+  ctaLabel?: string;
+  timeZone?: string;
 }
 
 export type IconKey =

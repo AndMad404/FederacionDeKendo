@@ -17,6 +17,12 @@ export const DOJOS: DojoData[] = [
         href: "tel:+50688699205",
       },
       {
+        icon: "instagram",
+        label: "Instagram",
+        value: "@kendocostarica",
+        href: "https://www.instagram.com/kendocostarica/",
+      },
+      {
         icon: "mapPin",
         label: "Moravia / Guadalupe",
         value: "Ver ubicación",
@@ -28,23 +34,17 @@ export const DOJOS: DojoData[] = [
         value: "Ver ubicación",
         href: "https://maps.app.goo.gl/jKnHfSwpWiobTCkN6",
       },
-      {
-        icon: "instagram",
-        label: "Instagram",
-        value: "@kendocostarica",
-        href: "https://www.instagram.com/kendocostarica/",
-      },
     ],
     schedule: [
       {
         location: "Moravia / Guadalupe",
         days: "Lunes, Miércoles y Viernes",
-        hours: "8:15 - 9:30 PM",
+        hours: "8:15 PM - 9:30 PM",
       },
       {
         location: "Curridabat",
         days: "Martes y Jueves",
-        hours: "7:15 - 8:30 PM",
+        hours: "7:15 PM - 8:30 PM",
       },
     ],
   },
@@ -80,7 +80,7 @@ export const DOJOS: DojoData[] = [
       {
         location: "Colegio Europeo",
         days: "Viernes",
-        hours: "7:00 - 9:00 PM",
+        hours: "7:00 PM - 9:00 PM",
       },
       {
         location: "Colegio Europeo",
@@ -90,7 +90,7 @@ export const DOJOS: DojoData[] = [
       {
         location: "Colegio Europeo",
         days: "Sábado",
-        hours: "12:15 - 2:00 PM",
+        hours: "12:15 PM - 2:00 PM",
       },
     ],
   },

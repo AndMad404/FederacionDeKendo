@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Federación de Asociaciones de Kendo</title>
+  <desc id="desc">Tarjeta social horizontal para compartir el sitio oficial de la Federación de Asociaciones de Kendo.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0c0a09"/>
+      <stop offset="0.56" stop-color="#111827"/>
+      <stop offset="1" stop-color="#020617"/>
+    </linearGradient>
+    <filter id="panel-shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="28" stdDeviation="22" flood-color="#000000" flood-opacity=".45"/>
+    </filter>
+    <style>
+      .sans { font-family: Arial, Helvetica, sans-serif; }
+      .bold { font-weight: 700; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <rect x="72" y="72" width="720" height="488" rx="28" fill="#000000" fill-opacity=".62" stroke="#3b82f6" stroke-width="2" filter="url(#panel-shadow)"/>
+
+  <text class="sans bold" x="118" y="174" fill="#60a5fa" font-size="22" letter-spacing="1.2">SITIO OFICIAL</text>
+  <text class="sans bold" x="116" y="226" fill="#ffffff" font-size="52">
+    <tspan x="116" dy="0">Federación de</tspan>
+    <tspan x="116" dy="62">Asociaciones de Kendo</tspan>
+  </text>
+  <text class="sans bold" x="118" y="326" fill="#f8fafc" font-size="30">El camino de la espada</text>
+  <text class="sans" x="118" y="374" fill="#dbeafe" font-size="22">
+    <tspan x="118" dy="0">Comunidad, galería y dojos afiliados para practicar</tspan>
+    <tspan x="118" dy="31">kendo con disciplina, respeto y continuidad.</tspan>
+  </text>
+  <text class="sans bold" x="118" y="486" fill="#93c5fd" font-size="24">fak-kendo.pages.dev</text>
+
+</svg>

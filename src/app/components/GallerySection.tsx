@@ -5,6 +5,7 @@ import { GALLERY_IMAGES } from "../data/gallery";
 import { useCarousel } from "../hooks/useCarousel";
 import { useGalleryLightbox } from "../hooks/useGalleryLightbox";
 import { Lightbox } from "./Lightbox";
+import { PageTitle } from "./PageTitle";
 
 const THUMBS_COUNT = 6;
 
@@ -27,10 +28,19 @@ export function GallerySection() {
   );
 
   return (
-    <main className="h-[calc(100dvh-4rem-10px)] overflow-hidden bg-stone-950 md:h-full md:min-h-0">
-      <div className="mx-auto flex h-full min-h-0 flex-col">
+    <section
+      aria-labelledby="gallery-title"
+      className="relative overflow-hidden bg-stone-950 tall-md:h-full tall-md:min-h-0"
+    >
+      <PageTitle
+        id="gallery-title"
+        className="pointer-events-none absolute left-1/2 top-3 z-30 -translate-x-1/2 land-compact:top-2"
+      >
+        Galería de kendo
+      </PageTitle>
+      <div className="mx-auto flex min-h-0 flex-col tall-md:h-full">
         <div className="flex min-h-0 flex-1 flex-col gap-4">
-          <div className="flex min-h-0 flex-1 flex-col gap-2 [@media_(orientation:landscape)_and_(max-height:480px)]:gap-1">
+          <div className="flex min-h-0 flex-1 flex-col gap-2 land-sm:gap-1">
             <FeaturedImage
               image={featured}
               index={index}
@@ -44,6 +54,8 @@ export function GallerySection() {
                 event.stopPropagation();
                 next();
               }}
+              onSwipePrev={prev}
+              onSwipeNext={next}
             />
 
             <GalleryThumbnails
@@ -73,6 +85,6 @@ export function GallerySection() {
           onNext={showNext}
         />
       )}
-    </main>
+    </section>
   );
 }

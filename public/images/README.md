@@ -61,6 +61,9 @@ The script generates:
 - `public/images/gallery/thumbs/kendo-gallery-08-160.webp`
 - `public/images/gallery/thumbs/kendo-gallery-08-320.webp`
 - `public/images/gallery/thumbs/kendo-gallery-08-480.webp`
+- `public/images/gallery/kendo-gallery-08-banner-480.webp`
+- `public/images/gallery/kendo-gallery-08-banner-960.webp`
+- `public/images/gallery/kendo-gallery-08-banner-1600.webp`
 - `public/images/gallery/kendo-gallery-08-960.webp`
 - `public/images/gallery/kendo-gallery-08-1600.webp`
 

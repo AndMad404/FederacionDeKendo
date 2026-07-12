@@ -1,4 +1,5 @@
 import type { GalleryImage } from "../../types";
+import { focusRingClass } from "../../styles/shared";
 
 const THUMBNAIL_SIZES = "(min-width: 768px) 168px, 17vw";
 
@@ -13,7 +14,7 @@ function Thumbnail({ image, onClick }: ThumbnailProps) {
       type="button"
       aria-label={`Ver imagen: ${image.title}`}
       onClick={onClick}
-      className="group relative aspect-[4/3] h-full w-full cursor-pointer overflow-hidden rounded-lg bg-stone-800"
+      className={`group relative aspect-[4/3] h-full w-full cursor-pointer overflow-hidden rounded-lg bg-stone-800 ${focusRingClass}`}
     >
       <img
         src={image.thumbnailSrc}
@@ -41,7 +42,11 @@ export function GalleryThumbnails({
   onSelect,
 }: GalleryThumbnailsProps) {
   return (
-    <div className="grid h-14 grid-cols-6 gap-1.5 sm:h-16 sm:gap-2 md:h-20 [@media_(orientation:landscape)_and_(max-height:480px)]:h-11 [@media_(orientation:landscape)_and_(max-height:480px)]:gap-1">
+    <div
+      role="group"
+      aria-label="Miniaturas de galería"
+      className="grid h-14 grid-cols-6 gap-1.5 sm:h-16 sm:gap-2 md:h-20 land-sm:hidden"
+    >
       {images.map((image, index) => (
         <Thumbnail
           key={image.id}

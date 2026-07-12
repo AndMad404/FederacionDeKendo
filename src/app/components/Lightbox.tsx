@@ -1,8 +1,15 @@
-import { useEffect, useRef, type RefObject } from "react";
+import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import type { GalleryImage } from "../types";
+import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
+import { getGalleryDisplayText } from "./gallery/galleryText";
+import { focusRingClass } from "../styles/shared";
 
 const LIGHTBOX_IMAGE_SIZES = "(max-width: 640px) 92vw, 75vw";
+const arrowButtonClass =
+  "flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-blue-400 bg-black/70 shadow-xl shadow-black/40 transition-colors hover:bg-blue-950/90 md:h-12 md:w-12";
+const activeArrowClass = "border-red-400 bg-red-700 text-white";
+type ArrowDirection = "left" | "right";
 
 interface LightboxProps {
   image: GalleryImage;
@@ -25,10 +32,49 @@ export function Lightbox({
 }: LightboxProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const feedbackTimeoutRef = useRef<number | null>(null);
+  const [activeArrow, setActiveArrow] = useState<ArrowDirection | null>(null);
   const positionLabel = `${index + 1} / ${total}`;
+  const { displayTitle, displayTag, displayDescription } = getGalleryDisplayText(image);
+
+  const showArrowFeedback = useCallback((direction: ArrowDirection) => {
+    setActiveArrow(direction);
+
+    if (feedbackTimeoutRef.current !== null) {
+      window.clearTimeout(feedbackTimeoutRef.current);
+    }
+
+    feedbackTimeoutRef.current = window.setTimeout(() => {
+      setActiveArrow(null);
+      feedbackTimeoutRef.current = null;
+    }, 220);
+  }, []);
+
+  const handlePrev = useCallback(() => {
+    showArrowFeedback("left");
+    onPrev();
+  }, [onPrev, showArrowFeedback]);
+
+  const handleNext = useCallback(() => {
+    showArrowFeedback("right");
+    onNext();
+  }, [onNext, showArrowFeedback]);
+
+  const { swipeHandlers } = useSwipeNavigation({
+    onSwipeLeft: handleNext,
+    onSwipeRight: handlePrev,
+  });
 
   useEffect(() => {
     closeBtnRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (feedbackTimeoutRef.current !== null) {
+        window.clearTimeout(feedbackTimeoutRef.current);
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -38,11 +84,14 @@ export function Lightbox({
   }, [triggerRef]);
 
   useEffect(() => {
-    const previousOverflow = document.body.style.overflow;
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+    const previousBodyOverflow = document.body.style.overflow;
+    document.documentElement.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
 
     return () => {
-      document.body.style.overflow = previousOverflow;
+      document.documentElement.style.overflow = previousHtmlOverflow;
+      document.body.style.overflow = previousBodyOverflow;
     };
   }, []);
 
@@ -56,10 +105,10 @@ export function Lightbox({
           onClose();
           break;
         case "ArrowLeft":
-          onPrev();
+          handlePrev();
           break;
         case "ArrowRight":
-          onNext();
+          handleNext();
           break;
         case "Tab": {
           const focusable = dialog!.querySelectorAll<HTMLElement>(
@@ -84,11 +133,11 @@ export function Lightbox({
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [onClose, onPrev, onNext]);
+  }, [handleNext, handlePrev, onClose]);
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 land-sm:p-2"
       onClick={onClose}
     >
       <div
@@ -96,20 +145,22 @@ export function Lightbox({
         role="dialog"
         aria-modal="true"
         aria-labelledby="lightbox-title"
-        className="relative w-full max-w-3xl"
+        aria-describedby={displayDescription ? "lightbox-description" : undefined}
+        className="relative flex max-h-[calc(100svh-2rem)] w-full max-w-5xl touch-pan-y flex-col items-center gap-3 text-white land-sm:h-[calc(100svh-1rem)] land-sm:max-h-none land-sm:max-w-[calc(100vw-2rem)] land-sm:gap-0"
         onClick={(event) => event.stopPropagation()}
+        {...swipeHandlers}
       >
         <button
           ref={closeBtnRef}
           type="button"
           aria-label="Cerrar galería"
           onClick={onClose}
-          className="absolute -top-14 right-0 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-red-700 text-white transition-colors hover:bg-red-600"
+          className={`fixed right-4 top-4 z-[60] flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-red-700 text-white transition-colors hover:bg-red-600 land-sm:right-2 land-sm:top-2 ${focusRingClass}`}
         >
-          <X size={20} />
+          <X size={20} aria-hidden="true" />
         </button>
 
-        <div className="mx-auto w-fit max-w-full overflow-hidden rounded-3xl">
+        <div className="flex h-[min(54svh,32rem)] min-h-0 w-full items-center justify-center overflow-hidden rounded-3xl bg-black/70 sm:h-[min(68svh,36rem)] land-sm:h-full land-sm:flex-none land-sm:rounded-2xl">
           <img
             src={image.src}
             srcSet={image.srcSet}
@@ -118,47 +169,60 @@ export function Lightbox({
             width={image.width}
             height={image.height}
             decoding="async"
-            className="block w-auto max-w-full max-h-[58dvh] object-contain sm:max-h-[75vh]"
+            className="block h-auto max-h-full w-auto max-w-full rounded-3xl object-contain land-sm:h-full land-sm:max-h-none land-sm:w-full land-sm:max-w-none"
           />
         </div>
 
-        <div className="mt-4 flex items-center justify-center text-white">
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              aria-label="Imagen anterior"
-              onClick={(event) => {
-                event.stopPropagation();
-                onPrev();
-              }}
-              className="fixed left-3 top-1/2 z-50 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-blue-500 bg-white/10 transition-colors hover:bg-white/20 md:left-6 md:h-12 md:w-12"
-            >
-              <ChevronLeft size={22} />
-            </button>
-            <button
-              type="button"
-              aria-label="Imagen siguiente"
-              onClick={(event) => {
-                event.stopPropagation();
-                onNext();
-              }}
-              className="fixed right-3 top-1/2 z-50 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-blue-500 bg-white/10 transition-colors hover:bg-white/20 md:right-6 md:h-12 md:w-12"
-            >
-              <ChevronRight size={22} />
-            </button>
-          </div>
+        <div className="grid w-full max-w-[22rem] grid-cols-[auto_auto] items-center justify-between gap-x-[min(75%,calc(100%_-_5.5rem))] gap-y-[clamp(1.5rem,5vw,2.25rem)] sm:max-w-[calc(100vw-4rem)] sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:justify-around sm:gap-x-4 sm:gap-y-3 land-sm:absolute land-sm:inset-0 land-sm:z-10 land-sm:block land-sm:max-w-none">
+          <button
+            type="button"
+            aria-label="Imagen anterior"
+            onClick={(event) => {
+              event.stopPropagation();
+              handlePrev();
+            }}
+            className={`${arrowButtonClass} ${
+              activeArrow === "left" ? activeArrowClass : ""
+            } justify-self-end sm:justify-self-center land-sm:absolute land-sm:left-3 land-sm:top-1/2 land-sm:-translate-y-1/2 ${focusRingClass}`}
+          >
+            <ChevronLeft size={24} aria-hidden="true" />
+          </button>
 
-          <div className="max-w-full rounded-3xl border border-blue-500 bg-black/80 px-6 py-3 text-center shadow-xl backdrop-blur-sm">
-            <p id="lightbox-title" className="text-2xl font-bold">
-              {image.title}
+          <div className="col-span-2 row-start-2 grid min-h-[9.5rem] w-full min-w-0 max-w-full grid-rows-[auto_auto_minmax(0,1fr)_auto] items-center rounded-2xl border border-blue-500/70 bg-black/70 px-4 py-3 text-center shadow-xl shadow-black/40 backdrop-blur-sm sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:max-w-none sm:items-center sm:rounded-3xl sm:px-5 sm:py-4 land-sm:absolute land-sm:bottom-3 land-sm:left-1/2 land-sm:w-[min(28rem,calc(100%_-_6rem))] land-sm:-translate-x-1/2 land-sm:min-h-0 land-sm:grid-cols-[minmax(0,1fr)_auto] land-sm:grid-rows-[auto_auto] land-sm:gap-x-4 land-sm:gap-y-1 land-sm:rounded-2xl land-sm:px-3 land-sm:py-2 land-sm:text-left">
+            <h2
+              id="lightbox-title"
+              className="line-clamp-2 text-xl font-bold leading-tight land-sm:col-start-1 land-sm:row-start-1 land-sm:text-base"
+            >
+              {displayTitle}
+            </h2>
+            <p className="truncate text-sm pt-1 font-bold uppercase tracking-widest text-red-400 land-sm:col-start-2 land-sm:row-start-1 land-sm:justify-self-end land-sm:pt-0 land-sm:text-right land-sm:text-[10px]">
+              {displayTag}
             </p>
-            <p className="text-base font-bold uppercase tracking-widest text-red-400">
-              {image.tag}
-            </p>
-            <p className="text-base">
+            {displayDescription && (
+              <div id="lightbox-description" className="min-h-0 land-sm:col-start-1 land-sm:row-start-2">
+                <p className="text-sm leading-snug text-stone-200 land-sm:line-clamp-2 land-sm:text-[10px] land-sm:leading-tight">
+                  {displayDescription}
+                </p>
+              </div>
+            )}
+            <p className="text-xs land-sm:col-start-2 land-sm:row-start-2 land-sm:justify-self-end land-sm:self-end land-sm:text-right land-sm:text-[10px]">
               {positionLabel}
             </p>
           </div>
+
+          <button
+            type="button"
+            aria-label="Imagen siguiente"
+            onClick={(event) => {
+              event.stopPropagation();
+              handleNext();
+            }}
+            className={`${arrowButtonClass} ${
+              activeArrow === "right" ? activeArrowClass : ""
+            } justify-self-start sm:col-start-3 sm:justify-self-center land-sm:absolute land-sm:right-3 land-sm:top-1/2 land-sm:-translate-y-1/2 ${focusRingClass}`}
+          >
+            <ChevronRight size={24} aria-hidden="true" />
+          </button>
         </div>
       </div>
     </div>

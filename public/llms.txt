@@ -1,9 +1,9 @@
-# Federación de Asociaciones de Kendo de Costa Rica
+# Federación de Asociaciones de Kendo
 
-Sitio oficial de la Federación de Asociaciones de Kendo de Costa Rica.
+Sitio oficial de la Federación de Asociaciones de Kendo.
 
 ## Pages
 
 - [Inicio](https://fak-kendo.pages.dev/)
-- [Galería](https://fak-kendo.pages.dev/galeria)
-- [Afiliados](https://fak-kendo.pages.dev/afiliados)
+- [Galería](https://fak-kendo.pages.dev/galeria/)
+- [Afiliados](https://fak-kendo.pages.dev/afiliados/)
