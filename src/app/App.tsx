@@ -27,7 +27,7 @@ function applyRouteHead(pathname: string) {
 
   document
     .querySelectorAll(
-      '[data-route-seo], link[rel="canonical"], link[rel="preload"][as="image"], meta[name="description"], meta[name="robots"], meta[property^="og:"], meta[name^="twitter:"], script#route-json-ld',
+      '[data-route-seo], link[rel="canonical"], link[rel="preload"][as="image"], meta[name="description"], meta[name="robots"], meta[property^="og:"], script#route-json-ld',
     )
     .forEach((element) => element.remove());
 

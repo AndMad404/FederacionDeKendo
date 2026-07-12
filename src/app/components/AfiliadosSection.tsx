@@ -48,6 +48,7 @@ function InfoCell({ item, side }: { item: InfoItem; side: "left" | "right" }) {
     side === "left" ? "col-start-1" : "md:col-start-4 land-compact:col-start-1";
   const textColumn =
     side === "left" ? "col-start-2" : "md:col-start-5 land-compact:col-start-2";
+  const valueTextSize = item.icon === "mail" ? "text-sm sm:text-base" : "text-base";
 
   return (
     <Fragment>
@@ -62,7 +63,7 @@ function InfoCell({ item, side }: { item: InfoItem; side: "left" | "right" }) {
           href={item.href}
           target="_blank"
           rel="noreferrer"
-          className={`block text-base underline-offset-4 transition-colors duration-200 [overflow-wrap:anywhere] hover:text-blue-400 hover:underline land-compact:leading-tight ${focusRingClass}`}
+          className={`block ${valueTextSize} underline-offset-4 transition-colors duration-200 [overflow-wrap:anywhere] hover:text-blue-400 hover:underline land-compact:leading-tight ${focusRingClass}`}
         >
           {item.value}
         </a>

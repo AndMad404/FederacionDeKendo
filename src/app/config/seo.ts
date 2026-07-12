@@ -304,16 +304,6 @@ export function getRouteHeadDescriptors(meta: RouteMeta): HeadDescriptor[] {
       tag: "meta" as const,
       attributes: { property, content },
     })),
-    ...[
-      ["twitter:card", "summary_large_image"],
-      ["twitter:title", seo.title],
-      ["twitter:description", seo.description],
-      ["twitter:image", seo.image.url],
-      ["twitter:image:alt", seo.image.alt],
-    ].map(([name, content]) => ({
-      tag: "meta" as const,
-      attributes: { name, content },
-    })),
   );
 
   if (seo.structuredData) {

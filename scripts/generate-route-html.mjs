@@ -52,7 +52,6 @@ function stripManagedHead(html) {
     .replace(/\n\s*<link\s+rel="canonical"[^>]*>/gi, "")
     .replace(/\n\s*<meta\s+name="(?:description|robots)"[^>]*>/gi, "")
     .replace(/\n\s*<meta\s+property="og:[^"]+"[^>]*>/gi, "")
-    .replace(/\n\s*<meta\s+name="twitter:[^"]+"[^>]*>/gi, "")
     .replace(
       /\n\s*<script\s+type="application\/ld\+json"[^>]*>[\s\S]*?<\/script>/gi,
       "",
