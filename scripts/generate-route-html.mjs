@@ -1,6 +1,10 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { render } from "../dist-ssr/entry-server.js";
+import {
+  getRouteMeta,
+  getRouteSeoPayload,
+  render,
+} from "../dist-ssr/entry-server.js";
 
 const ROOT = process.cwd();
 const DIST_DIR = path.join(ROOT, "dist");
@@ -9,7 +13,6 @@ const ROUTE_JSON_LD_ID = "route-json-ld";
 
 const seoData = JSON.parse(await readFile(SEO_DATA_PATH, "utf8"));
 const baseHtml = await readFile(path.join(DIST_DIR, "index.html"), "utf8");
-const siteUrl = seoData.siteUrl.replace(/\/$/, "");
 
 function escapeAttribute(value) {
   return String(value)
@@ -23,74 +26,9 @@ function escapeText(value) {
   return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;");
 }
 
-function absoluteUrl(value) {
-  if (/^https?:\/\//.test(value)) return value;
-
-  return value === "/" ? `${siteUrl}/` : `${siteUrl}${value}`;
-}
-
-function routeStructuredData(route) {
-  const canonicalUrl = absoluteUrl(route.path);
-  const imageUrl = absoluteUrl(route.image || seoData.defaultImage);
-  const organizationId = `${siteUrl}/#organization`;
-  const websiteId = `${siteUrl}/#website`;
-  const organizationData = {
-    "@type": "SportsOrganization",
-    "@id": organizationId,
-    name: seoData.siteName,
-    url: `${siteUrl}/`,
-    logo: absoluteUrl(seoData.logo),
-    description: seoData.defaultDescription,
-    sport: seoData.organization.sport,
-  };
-
-  if (seoData.organization.areaServed) {
-    organizationData.areaServed = seoData.organization.areaServed;
-  }
-
-  return {
-    "@context": "https://schema.org",
-    "@graph": [
-      organizationData,
-      {
-        "@type": "WebSite",
-        "@id": websiteId,
-        url: `${siteUrl}/`,
-        name: seoData.siteName,
-        inLanguage: seoData.language,
-        publisher: {
-          "@id": organizationId,
-        },
-      },
-      {
-        "@type": route.schemaType,
-        "@id": `${canonicalUrl}#webpage`,
-        url: canonicalUrl,
-        name: route.title,
-        description: route.description,
-        inLanguage: seoData.language,
-        isPartOf: {
-          "@id": websiteId,
-        },
-        about: {
-          "@id": organizationId,
-        },
-        primaryImageOfPage: {
-          "@type": "ImageObject",
-          url: imageUrl,
-          width: seoData.defaultImageWidth,
-          height: seoData.defaultImageHeight,
-          caption: seoData.defaultImageAlt,
-        },
-      },
-    ],
-  };
-}
-
 function managedHead(route) {
-  const canonicalUrl = absoluteUrl(route.path);
-  const imageUrl = absoluteUrl(route.image || seoData.defaultImage);
-  const jsonLd = JSON.stringify(routeStructuredData(route)).replaceAll(
+  const seo = getRouteSeoPayload(route);
+  const jsonLd = JSON.stringify(seo.structuredData).replaceAll(
     "<",
     "\\u003c",
   );
@@ -115,24 +53,24 @@ function managedHead(route) {
           .filter(Boolean)
           .join("\n")
       : "",
-    `    <link rel="canonical" href="${escapeAttribute(canonicalUrl)}" />`,
+    `    <link rel="canonical" href="${escapeAttribute(seo.canonicalUrl)}" />`,
     '    <meta property="og:type" content="website" />',
-    `    <meta property="og:site_name" content="${escapeAttribute(seoData.siteName)}" />`,
-    `    <meta property="og:title" content="${escapeAttribute(route.title)}" />`,
-    `    <meta property="og:description" content="${escapeAttribute(route.description)}" />`,
-    `    <meta property="og:url" content="${escapeAttribute(canonicalUrl)}" />`,
-    `    <meta property="og:image" content="${escapeAttribute(imageUrl)}" />`,
-    `    <meta property="og:image:secure_url" content="${escapeAttribute(imageUrl)}" />`,
+    `    <meta property="og:site_name" content="${escapeAttribute(seo.siteName)}" />`,
+    `    <meta property="og:title" content="${escapeAttribute(seo.title)}" />`,
+    `    <meta property="og:description" content="${escapeAttribute(seo.description)}" />`,
+    `    <meta property="og:url" content="${escapeAttribute(seo.canonicalUrl)}" />`,
+    `    <meta property="og:image" content="${escapeAttribute(seo.image.url)}" />`,
+    `    <meta property="og:image:secure_url" content="${escapeAttribute(seo.image.url)}" />`,
     '    <meta property="og:image:type" content="image/png" />',
-    `    <meta property="og:image:width" content="${escapeAttribute(seoData.defaultImageWidth)}" />`,
-    `    <meta property="og:image:height" content="${escapeAttribute(seoData.defaultImageHeight)}" />`,
-    `    <meta property="og:image:alt" content="${escapeAttribute(seoData.defaultImageAlt)}" />`,
-    `    <meta property="og:locale" content="${escapeAttribute(seoData.locale)}" />`,
+    `    <meta property="og:image:width" content="${escapeAttribute(seo.image.width)}" />`,
+    `    <meta property="og:image:height" content="${escapeAttribute(seo.image.height)}" />`,
+    `    <meta property="og:image:alt" content="${escapeAttribute(seo.image.alt)}" />`,
+    `    <meta property="og:locale" content="${escapeAttribute(seo.locale)}" />`,
     '    <meta name="twitter:card" content="summary_large_image" />',
-    `    <meta name="twitter:title" content="${escapeAttribute(route.title)}" />`,
-    `    <meta name="twitter:description" content="${escapeAttribute(route.description)}" />`,
-    `    <meta name="twitter:image" content="${escapeAttribute(imageUrl)}" />`,
-    `    <meta name="twitter:image:alt" content="${escapeAttribute(seoData.defaultImageAlt)}" />`,
+    `    <meta name="twitter:title" content="${escapeAttribute(seo.title)}" />`,
+    `    <meta name="twitter:description" content="${escapeAttribute(seo.description)}" />`,
+    `    <meta name="twitter:image" content="${escapeAttribute(seo.image.url)}" />`,
+    `    <meta name="twitter:image:alt" content="${escapeAttribute(seo.image.alt)}" />`,
     `    <script type="application/ld+json" id="${ROUTE_JSON_LD_ID}">${jsonLd}</script>`,
   ];
 
@@ -155,17 +93,17 @@ function stripManagedHead(html) {
 }
 
 function renderRouteHtml(route) {
-  const description = route.description || seoData.defaultDescription;
+  const seo = getRouteSeoPayload(route);
   let html = stripManagedHead(baseHtml);
 
   html = html.replace(
     /<title>[\s\S]*?<\/title>/i,
-    `<title>${escapeText(route.title)}</title>`,
+    `<title>${escapeText(seo.title)}</title>`,
   );
 
   html = html.replace(
     /<meta\s+name="description"\s+content="[^"]*"\s*\/?>/i,
-    `<meta\n      name="description"\n      content="${escapeAttribute(description)}"\n    />`,
+    `<meta\n      name="description"\n      content="${escapeAttribute(seo.description)}"\n    />`,
   );
 
   const bodyHtml = render(route.path);
@@ -187,23 +125,22 @@ async function writeRouteHtml(route) {
 }
 
 function renderNotFoundHtml() {
-  const title = `Página no encontrada | ${seoData.siteName}`;
-  const description = "La página que buscas no existe o fue movida.";
+  const seo = getRouteSeoPayload(getRouteMeta("/404-not-found/"));
   let html = stripManagedHead(baseHtml);
 
   html = html.replace(
     /<title>[\s\S]*?<\/title>/i,
-    `<title>${escapeText(title)}</title>`,
+    `<title>${escapeText(seo.title)}</title>`,
   );
 
   html = html.replace(
     /<meta\s+name="description"\s+content="[^"]*"\s*\/?>/i,
-    `<meta\n      name="description"\n      content="${escapeAttribute(description)}"\n    />`,
+    `<meta\n      name="description"\n      content="${escapeAttribute(seo.description)}"\n    />`,
   );
 
   html = html.replace(
     /<meta\s+name="robots"\s+content="[^"]*"\s*\/?>/i,
-    '<meta name="robots" content="noindex, nofollow" />',
+    `<meta name="robots" content="${escapeAttribute(seo.robots)}" />`,
   );
 
   const bodyHtml = render("/404-not-found/");

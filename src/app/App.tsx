@@ -1,25 +1,15 @@
-import { lazy, Suspense, useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Route, Routes, useLocation } from "react-router";
 import { Navbar } from "./components/Navbar";
 import { HeroSection } from "./components/HeroSection";
+import { GallerySection } from "./components/GallerySection";
+import { AfiliadosSection } from "./components/AfiliadosSection";
 import { Footer } from "./components/Footer";
 import { NotFoundSection } from "./components/NotFoundSection";
 import {
-  DEFAULT_SITE_DESCRIPTION,
-  SITE_LOCALE,
-  SITE_NAME,
-  getRouteImageMetadata,
-  getCanonicalUrl,
   getRouteMeta,
-  getRouteStructuredData,
+  getRouteSeoPayload,
 } from "./config/seo";
-
-const GallerySection = lazy(() =>
-  import("./components/GallerySection").then((m) => ({ default: m.GallerySection })),
-);
-const AfiliadosSection = lazy(() =>
-  import("./components/AfiliadosSection").then((m) => ({ default: m.AfiliadosSection })),
-);
 
 function setMetaName(name: string, content: string) {
   let meta = document.querySelector<HTMLMetaElement>(`meta[name="${name}"]`);
@@ -82,8 +72,14 @@ function removeElements(selector: string) {
 
 function ScrollToTop() {
   const { pathname } = useLocation();
+  const previousPathname = useRef(pathname);
 
   useEffect(() => {
+    const isInitialLoad = previousPathname.current === pathname;
+    previousPathname.current = pathname;
+
+    if (isInitialLoad || window.location.hash) return;
+
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
   }, [pathname]);
@@ -96,12 +92,13 @@ function RouteMetadata() {
 
   useEffect(() => {
     const meta = getRouteMeta(pathname);
+    const seo = getRouteSeoPayload(meta);
 
-    document.title = meta.title;
-    setMetaName("description", meta.description || DEFAULT_SITE_DESCRIPTION);
-    setMetaName("robots", meta.noindex ? "noindex, nofollow" : "index, follow");
+    document.title = seo.title;
+    setMetaName("description", seo.description);
+    setMetaName("robots", seo.robots);
 
-    if (meta.noindex) {
+    if (!seo.canonicalUrl) {
       removeElement('link[rel="canonical"]');
       removeElements('meta[property^="og:"]');
       removeElements('meta[name^="twitter:"]');
@@ -109,31 +106,27 @@ function RouteMetadata() {
       return;
     }
 
-    const canonicalUrl = getCanonicalUrl(meta);
-    const image = getRouteImageMetadata(meta);
-
-    setCanonicalLink(canonicalUrl);
+    setCanonicalLink(seo.canonicalUrl);
     setMetaProperty("og:type", "website");
-    setMetaProperty("og:site_name", SITE_NAME);
-    setMetaProperty("og:title", meta.title);
-    setMetaProperty("og:description", meta.description);
-    setMetaProperty("og:url", canonicalUrl);
-    setMetaProperty("og:image", image.url);
-    setMetaProperty("og:image:secure_url", image.url);
+    setMetaProperty("og:site_name", seo.siteName);
+    setMetaProperty("og:title", seo.title);
+    setMetaProperty("og:description", seo.description);
+    setMetaProperty("og:url", seo.canonicalUrl);
+    setMetaProperty("og:image", seo.image.url);
+    setMetaProperty("og:image:secure_url", seo.image.url);
     setMetaProperty("og:image:type", "image/png");
-    setMetaProperty("og:image:width", String(image.width));
-    setMetaProperty("og:image:height", String(image.height));
-    setMetaProperty("og:image:alt", image.alt);
-    setMetaProperty("og:locale", SITE_LOCALE);
+    setMetaProperty("og:image:width", String(seo.image.width));
+    setMetaProperty("og:image:height", String(seo.image.height));
+    setMetaProperty("og:image:alt", seo.image.alt);
+    setMetaProperty("og:locale", seo.locale);
     setMetaName("twitter:card", "summary_large_image");
-    setMetaName("twitter:title", meta.title);
-    setMetaName("twitter:description", meta.description);
-    setMetaName("twitter:image", image.url);
-    setMetaName("twitter:image:alt", image.alt);
+    setMetaName("twitter:title", seo.title);
+    setMetaName("twitter:description", seo.description);
+    setMetaName("twitter:image", seo.image.url);
+    setMetaName("twitter:image:alt", seo.image.alt);
 
-    const structuredData = getRouteStructuredData(meta);
-    if (structuredData) {
-      setJsonLd("route-json-ld", structuredData);
+    if (seo.structuredData) {
+      setJsonLd("route-json-ld", seo.structuredData);
     }
   }, [pathname]);
 
@@ -157,14 +150,12 @@ export default function App() {
         id="main-content"
         className="min-h-[calc(100svh_-_4rem_-_10px)] flex-1 px-2.5 pt-[calc(4rem_+_10px)] land-sm:min-h-[calc(100svh_-_3rem_-_6px)] land-sm:pt-[calc(3rem_+_6px)] tall-md:min-h-0 tall-md:overflow-hidden"
       >
-        <Suspense fallback={null}>
-          <Routes>
-            <Route path="/" element={<HeroSection />} />
-            <Route path="/galeria" element={<GallerySection />} />
-            <Route path="/afiliados" element={<AfiliadosSection />} />
-            <Route path="*" element={<NotFoundSection />} />
-          </Routes>
-        </Suspense>
+        <Routes>
+          <Route path="/" element={<HeroSection />} />
+          <Route path="/galeria" element={<GallerySection />} />
+          <Route path="/afiliados" element={<AfiliadosSection />} />
+          <Route path="*" element={<NotFoundSection />} />
+        </Routes>
       </main>
 
       <Footer />

@@ -32,12 +32,28 @@ export interface RouteMeta {
 
 type StructuredData = Record<string, unknown>;
 
+export interface RouteSeoPayload {
+  title: string;
+  description: string;
+  robots: "index, follow" | "noindex, nofollow";
+  canonicalUrl: string | null;
+  siteName: string;
+  locale: string;
+  image: {
+    url: string;
+    alt: string;
+    width: number;
+    height: number;
+  };
+  structuredData: StructuredData | null;
+}
+
 const DATA = seoData as SeoData;
 
 const SITE_URL = DATA.siteUrl.replace(/\/$/, "");
-export const SITE_NAME = DATA.siteName;
-export const DEFAULT_SITE_DESCRIPTION = DATA.defaultDescription;
-export const SITE_LOCALE = DATA.locale;
+const SITE_NAME = DATA.siteName;
+const DEFAULT_SITE_DESCRIPTION = DATA.defaultDescription;
+const SITE_LOCALE = DATA.locale;
 const SITE_LANGUAGE = DATA.language;
 const DEFAULT_SOCIAL_IMAGE_ALT = DATA.defaultImageAlt;
 const DEFAULT_SOCIAL_IMAGE_WIDTH = DATA.defaultImageWidth;
@@ -69,7 +85,7 @@ export function getRouteMeta(pathname: string) {
   return ROUTE_META[normalizeRoutePath(pathname)] ?? NOT_FOUND_META;
 }
 
-export function getCanonicalUrl(meta: RouteMeta) {
+function getCanonicalUrl(meta: RouteMeta) {
   return absoluteUrl(meta.path);
 }
 
@@ -77,7 +93,7 @@ function getRouteImageUrl(meta: RouteMeta) {
   return absoluteUrl(meta.image || DATA.defaultImage);
 }
 
-export function getRouteImageMetadata(meta: RouteMeta) {
+function getRouteImageMetadata(meta: RouteMeta) {
   return {
     url: getRouteImageUrl(meta),
     alt: DEFAULT_SOCIAL_IMAGE_ALT,
@@ -86,7 +102,7 @@ export function getRouteImageMetadata(meta: RouteMeta) {
   };
 }
 
-export function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
+function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
   if (meta.noindex) return null;
 
   const canonicalUrl = getCanonicalUrl(meta);
@@ -144,5 +160,20 @@ export function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
         },
       },
     ],
+  };
+}
+
+export function getRouteSeoPayload(meta: RouteMeta): RouteSeoPayload {
+  const noindex = Boolean(meta.noindex);
+
+  return {
+    title: meta.title,
+    description: meta.description || DEFAULT_SITE_DESCRIPTION,
+    robots: noindex ? "noindex, nofollow" : "index, follow",
+    canonicalUrl: noindex ? null : getCanonicalUrl(meta),
+    siteName: SITE_NAME,
+    locale: SITE_LOCALE,
+    image: getRouteImageMetadata(meta),
+    structuredData: getRouteStructuredData(meta),
   };
 }
