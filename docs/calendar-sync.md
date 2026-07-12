@@ -55,5 +55,7 @@ Local maintenance command:
 
 ```powershell
 $env:CALENDAR_ICS_URL="https://calendar.google.com/calendar/ical/.../basic.ics"
-npm.cmd run sync:calendar
+pnpm run sync:calendar
 ```
+
+If `pnpm` is not available directly in PowerShell, run `corepack pnpm run sync:calendar` instead.

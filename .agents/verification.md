@@ -2,26 +2,28 @@
 
 Use the narrowest verification that proves the requested change.
 
+Use the repository package manager, `pnpm`. If it is not available directly in Windows PowerShell, prefix the same command with `corepack` (for example, `corepack pnpm run build`).
+
 ## Default Commands
 
 For TypeScript or React changes:
 
 ```powershell
-npm.cmd run typecheck
-npm.cmd run build
+pnpm run typecheck
+pnpm run build
 ```
 
 For build-only/static output changes:
 
 ```powershell
-npm.cmd run build
+pnpm run build
 ```
 
 For responsive image pipeline changes:
 
 ```powershell
-npm.cmd run images:responsive
-npm.cmd run build
+pnpm run images:responsive
+pnpm run build
 ```
 
 ## SEO and Generated HTML Checks
@@ -29,7 +31,7 @@ npm.cmd run build
 After SEO/head changes:
 
 ```powershell
-npm.cmd run build
+pnpm run build
 rg -n "<title>|canonical|og:|twitter:|application/ld\\+json|google-site-verification" index.html dist src public
 ```
 

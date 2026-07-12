@@ -20,18 +20,17 @@ SESSION_STATE:
     - dist/galeria/index.html
     - dist/afiliados/index.html
     - public repository folder structure for SEO document deliverables
-    - C:/Users/and_m/Documents/Profesional/HerramientaPDFSEO root structure
-    - C:/Users/and_m/Documents/Profesional/HerramientaPDFSEO/projects/federacion-kendo structure
-    - private PDF generator dependency and artifact boundaries
     - current h1-h4 hierarchy across Home, Galería, Afiliados, Lightbox, events and Footer
     - semantic heading patch for FeaturedImage, Lightbox, event cards and Footer
     - 2026 SEO audit of route metadata, canonical URLs, structured data, headings, crawlable links, responsive images and initial HTML rendering
     - published production responses for /, /galeria/, /afiliados/, robots.txt, sitemap.xml and trailing-slash redirects
     - current SEO architecture after SSR prerender, 404 generation and shared RouteSeoPayload
-  open_criticals: []
+  open_criticals:
+    - mobile navbar menu button has only a 22px icon and no 44px minimum interactive area.
+    - gallery dot selector buttons use approximately 12px to 24px visual and interactive boxes instead of the project minimum 44px touch area.
   open_structurals:
-    - private PDF composition and capture logic remain client-specific and must be extracted before adding a second client.
-    - private PDF runtime dependencies are incomplete because Playwright has no Node manifest and Python packages are unpinned.
+    - repository-wide quality checks are not enforced on ordinary changes because the only GitHub Actions workflow is the calendar synchronization workflow.
+    - the visual system is not yet an intentional reusable design system; generic inherited CSS variables coexist with repeated Tailwind color, radius and control patterns in components.
   resolved_2026_07_11:
     - "[SEO ARCH] seo-data.json route records now form the validated route manifest used by React routing, prerender generation and the generated dist/sitemap.xml."
     - "[SEO HEAD] getRouteHeadDescriptors is the shared tag policy for client navigation and generated HTML; both adapters consume the same descriptors."
@@ -42,6 +41,9 @@ SESSION_STATE:
     - "[SEO SOURCE] route metadata and JSON-LD were calculated independently in React and generate-route-html.mjs. Fix: seo.ts now exposes one RouteSeoPayload used by App.tsx and the postbuild through the SSR bundle, including title, description, robots, canonical, social image, locale and structured data."
     - "[SCROLL] ScrollToTop forced the initial page position and could interfere with fragment links. Fix: initial load and URLs with a hash now preserve the browser position; automatic scrolling only applies to later pathname navigation."
   pending_review:
-    - configurable private PDF engine extraction before onboarding another client
     - Search Console URL Inspection, Rich Results Test and field Core Web Vitals data, which require external Google property access
     - approved visible dojo identity copy before considering per-dojo structured data
+    - inventory and specification of semantic design tokens and real UI component variants
+    - testing strategy and risk-based first Playwright scenarios
+    - architecture decision record comparing local state, URL state, Context, Zustand and Redux Toolkit
+    - visual migration plan for semantic colors, reusable surface patterns, typography roles and interactive-control primitives

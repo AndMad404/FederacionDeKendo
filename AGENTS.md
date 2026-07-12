@@ -30,12 +30,20 @@ Use the smallest mode that fits the user's request.
 
 If a request mixes review and implementation, review first, then ask or infer which findings should be applied.
 
+## Documentation Scope
+
+- Read `docs/documentation-scope.md` before creating project documentation.
+- Keep product architecture, accepted technical ADRs, quality rules, and operator documentation in this repository.
+- Keep personal learning, AI methodology, self-assessment, portfolio planning, and private tooling notes outside this repository.
+- Keep `.codex/review-state.md` limited to technical findings about this public project.
+
 ## Project-Specific Context
 
 - `src/app/App.tsx` is the route shell for `/`, `/galeria`, and `/afiliados`.
 - `src/app/config/seo-data.json` is the central source for route titles, descriptions, SEO text, locale/language, and organization metadata.
 - `src/app/config/seo.ts` and `scripts/generate-route-html.mjs` emit runtime and generated metadata from the SEO config.
-- `npm.cmd run build` also runs `postbuild`, generating route HTML under `dist/`.
+- `pnpm run build` also runs `postbuild`, generating route HTML under `dist/`.
+- If `pnpm` is not available directly in Windows PowerShell, use `corepack pnpm` with the same arguments.
 - For SEO/head changes, verify both source files and generated `dist` HTML.
 - For gallery or image work, inspect `src/app/data/gallery.ts`, gallery components, and responsive image outputs together.
 
