@@ -80,7 +80,7 @@ export function Navbar() {
         <button
           ref={menuButtonRef}
           type="button"
-          className={`text-gray-400 hover:text-white md:hidden ${focusRingClass}`}
+          className={`inline-flex size-11 shrink-0 items-center justify-center text-gray-400 hover:text-white md:hidden ${focusRingClass}`}
           aria-controls="mobile-menu"
           aria-expanded={open}
           aria-label={open ? "Cerrar menú" : "Abrir menú"}

@@ -25,12 +25,19 @@ SESSION_STATE:
     - 2026 SEO audit of route metadata, canonical URLs, structured data, headings, crawlable links, responsive images and initial HTML rendering
     - published production responses for /, /galeria/, /afiliados/, robots.txt, sitemap.xml and trailing-slash redirects
     - current SEO architecture after SSR prerender, 404 generation and shared RouteSeoPayload
+    - current touch-target implementation in Navbar.tsx and GalleryDots.tsx
+    - package scripts and GitHub Actions coverage for ordinary changes
+    - current globals.css token definitions and real semantic-token usage in app components
+    - current automated-test inventory and risk-based Playwright entry points
+    - presence and Git history of roadmap, project-baseline and decision-log control documents
   open_criticals:
     - mobile navbar menu button has only a 22px icon and no 44px minimum interactive area.
     - gallery dot selector buttons use approximately 12px to 24px visual and interactive boxes instead of the project minimum 44px touch area.
   open_structurals:
     - repository-wide quality checks are not enforced on ordinary changes because the only GitHub Actions workflow is the calendar synchronization workflow.
     - the visual system is not yet an intentional reusable design system; generic inherited CSS variables coexist with repeated Tailwind color, radius and control patterns in components.
+    - there is no automated browser-test harness or test script, so critical routing, navigation, hydration, 404 and gallery interactions rely on manual regression checks.
+    - phase-control documentation is not currently reproducible from the repository because roadmap.md, project-baseline.md and decision-log.md are absent from both the tree and local Git history.
   resolved_2026_07_11:
     - "[SEO ARCH] seo-data.json route records now form the validated route manifest used by React routing, prerender generation and the generated dist/sitemap.xml."
     - "[SEO HEAD] getRouteHeadDescriptors is the shared tag policy for client navigation and generated HTML; both adapters consume the same descriptors."
@@ -43,7 +50,5 @@ SESSION_STATE:
   pending_review:
     - Search Console URL Inspection, Rich Results Test and field Core Web Vitals data, which require external Google property access
     - approved visible dojo identity copy before considering per-dojo structured data
-    - inventory and specification of semantic design tokens and real UI component variants
-    - testing strategy and risk-based first Playwright scenarios
     - architecture decision record comparing local state, URL state, Context, Zustand and Redux Toolkit
     - visual migration plan for semantic colors, reusable surface patterns, typography roles and interactive-control primitives
