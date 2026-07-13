@@ -30,9 +30,7 @@ SESSION_STATE:
     - current globals.css token definitions and real semantic-token usage in app components
     - current automated-test inventory and risk-based Playwright entry points
     - presence and Git history of roadmap, project-baseline and decision-log control documents
-  open_criticals:
-    - mobile navbar menu button has only a 22px icon and no 44px minimum interactive area.
-    - gallery dot selector buttons use approximately 12px to 24px visual and interactive boxes instead of the project minimum 44px touch area.
+  open_criticals: []
   open_structurals:
     - repository-wide quality checks are not enforced on ordinary changes because the only GitHub Actions workflow is the calendar synchronization workflow.
     - the visual system is not yet an intentional reusable design system; generic inherited CSS variables coexist with repeated Tailwind color, radius and control patterns in components.
@@ -47,6 +45,9 @@ SESSION_STATE:
     - "[SSR] initial HTML body was empty (<div id=\"root\"></div>), content depended entirely on client JS. Fix: added src/entry-server.tsx with renderToString and react-router StaticRouter. The server renders the shared App component, while App uses eager route imports so the server and client trees match. vite.config.ts builds a second SSR bundle, package.json runs both client and SSR builds, and generate-route-html.mjs injects real per-route body HTML. main.tsx uses createRoot for Vite development's empty container and hydrateRoot for prerendered production HTML."
     - "[SEO SOURCE] route metadata and JSON-LD were calculated independently in React and generate-route-html.mjs. Fix: seo.ts now exposes one RouteSeoPayload used by App.tsx and the postbuild through the SSR bundle, including title, description, robots, canonical, social image, locale and structured data."
     - "[SCROLL] ScrollToTop forced the initial page position and could interfere with fragment links. Fix: initial load and URLs with a hash now preserve the browser position; automatic scrolling only applies to later pathname navigation."
+  resolved_2026_07_13:
+    - "[RESPONSIVE] The mobile navbar menu button now has a 44px interactive area while preserving its 22px icon."
+    - "[RESPONSIVE] Gallery dot selectors now use separate 44px buttons around the existing visual indicators."
   pending_review:
     - Search Console URL Inspection, Rich Results Test and field Core Web Vitals data, which require external Google property access
     - approved visible dojo identity copy before considering per-dojo structured data

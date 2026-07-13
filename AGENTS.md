@@ -32,10 +32,17 @@ If a request mixes review and implementation, review first, then ask or infer wh
 
 ## Documentation Scope
 
-- Read `docs/documentation-scope.md` before creating project documentation.
-- Keep product architecture, accepted technical ADRs, quality rules, and operator documentation in this repository.
-- Keep personal learning, AI methodology, self-assessment, portfolio planning, and private tooling notes outside this repository.
-- Keep `.codex/review-state.md` limited to technical findings about this public project.
+- Extended project documentation is stored outside this runtime repository at
+  `../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/` in the owner's
+  local workspace.
+- For architecture, ADR, backlog, calendar-operation, or historical-document
+  work, read the relevant file from that location when it is available.
+- Never make application code, build scripts, tests, deployment, or workflows
+  depend on the private documentation repository.
+- If a future document becomes an input required by runtime or automation, keep
+  that required input in this repository.
+- Keep `.codex/review-state.md` limited to technical findings about this public
+  project.
 
 ## Project-Specific Context
 
