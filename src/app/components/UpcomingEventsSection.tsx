@@ -80,7 +80,7 @@ export function UpcomingEventsSection() {
   return (
     <section
       aria-labelledby="upcoming-events-title"
-      className="mx-auto w-full max-w-6xl px-1 pt-2.5 pb-0 text-white sm:px-4 tall-md:pb-1 tall-md:pt-1.5"
+      className="mx-auto w-full max-w-6xl pt-2.5 pb-0 text-white sm:px-4 tall-md:pb-1 tall-md:pt-1.5"
     >
       <div className="mb-2.5 flex items-center justify-center text-center font-semibold text-white lg:mb-2">
         <h2

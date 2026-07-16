@@ -3,7 +3,7 @@ import { focusRingClass } from "../styles/shared";
 export function Footer() {
   return (
     <footer className="bg-stone-950 text-white">
-      <div className="mx-auto grid max-w-6xl grid-cols-1 justify-items-center gap-5 px-4 py-4 text-center md:grid-cols-2 md:gap-10 md:px-6 md:py-3 lg:px-0">
+      <div className="mx-auto grid max-w-6xl grid-cols-1 justify-items-center gap-5 px-3 py-4 text-center md:grid-cols-2 md:gap-10 md:px-6 md:py-3 lg:px-0">
         <section
           aria-labelledby="footer-purpose-title"
           className="flex max-w-md flex-col items-center gap-3 md:gap-2"
