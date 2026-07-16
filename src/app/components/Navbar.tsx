@@ -58,9 +58,6 @@ export function Navbar() {
               height="56"
             />
           </picture>
-          <span className="max-w-[11rem] text-lg font-semibold leading-tight tracking-wide text-white sm:max-w-none land-sm:text-base">
-            Federación de<br className="sm:hidden" /> Asociaciones de Kendo
-          </span>
         </Link>
 
         <ul className="hidden items-center gap-8 md:flex land-sm:gap-6">
