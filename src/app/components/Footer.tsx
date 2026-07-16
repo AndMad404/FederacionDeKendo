@@ -8,8 +8,8 @@ export function Footer() {
           aria-labelledby="footer-purpose-title"
           className="flex max-w-md flex-col items-center gap-3 md:gap-2"
         >
-          <div className="flex items-center justify-center gap-3">
-            <div className="flex items-baseline gap-1">
+          <div className="flex items-center justify-center">
+            <div className="flex items-baseline">
               <h2
                 id="footer-purpose-title"
                 className="flex items-baseline gap-1 text-lg font-extrabold tracking-widest text-white"

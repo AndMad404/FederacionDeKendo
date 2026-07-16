@@ -35,13 +35,13 @@ export function Navbar() {
   }, [open]);
 
   return (
-    <header className="fixed left-0 right-0 top-0 z-50 bg-stone-950 backdrop-blur">
+    <header className="fixed inset-x-0 top-0 z-50 bg-stone-950 backdrop-blur">
       <nav aria-label="Navegación principal">
       <div className="mx-auto my-[5px] flex h-16 max-w-6xl items-center justify-between px-6 land-sm:my-[3px] land-sm:h-12 land-sm:px-5">
         <Link
           to="/"
           onClick={() => setOpen(false)}
-          className={`flex min-w-0 items-center gap-3 ${focusRingClass}`}
+          className={`flex min-w-0 items-center ${focusRingClass}`}
         >
           <picture>
             <source

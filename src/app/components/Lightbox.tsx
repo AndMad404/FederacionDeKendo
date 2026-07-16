@@ -160,7 +160,7 @@ export function Lightbox({
           <X size={20} aria-hidden="true" />
         </button>
 
-        <div className="flex h-[min(54svh,32rem)] min-h-0 w-full items-center justify-center overflow-hidden rounded-3xl bg-black/70 sm:h-[min(68svh,36rem)] land-sm:h-full land-sm:flex-none land-sm:rounded-2xl">
+        <div className="flex h-[min(54svh,32rem)] min-h-0 w-full items-center justify-center overflow-hidden rounded-3xl bg-black/70 sm:h-[min(68svh,36rem)] land-sm:h-full land-sm:flex-none">
           <img
             src={image.src}
             srcSet={image.srcSet}
