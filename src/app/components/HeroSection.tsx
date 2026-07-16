@@ -29,13 +29,15 @@ function HeroBanner() {
       <div className="relative z-10 flex w-full flex-col justify-between gap-3 px-4 py-4 text-center sm:px-6 land-sm:gap-2 land-sm:px-2 land-sm:py-2 tall-md:px-10 tall-md:py-4">
         <div className="mx-auto max-w-3xl text-white">
           <PageTitle id="home-title" className="normal-case">
-            Federación de Asociaciones de Kendo
+            Federación de Asociaciones
+            <br className="sm:hidden" />
+            de Kendo
           </PageTitle>
         </div>
 
         <div className="mx-auto flex max-w-2xl flex-col items-center gap-1 rounded-2xl border border-blue-500/70 bg-black/70 px-3 py-3 text-white">
           <h2 className="max-w-sm text-lg leading-snug sm:max-w-md tall-md:leading-relaxed">
-            Te invita a descubrir este arte marcial japonés.
+            Te invitamos a descubrir este arte marcial japonés.
             <br />
             Clases para todos los niveles y edades.
           </h2>
