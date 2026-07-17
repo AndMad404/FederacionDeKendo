@@ -32,7 +32,10 @@ SESSION_STATE:
     - presence and Git history of roadmap, project-baseline and decision-log control documents
     - repository-wide Tailwind utility redundancy pass across src/app components (spacing, gap, size and inset shorthands)
     - PageTitle placement consistency across Home, Galeria and Afiliados at standard and compact-landscape breakpoints
-  open_criticals: []
+    - desktop no-scroll invariant in AGENTS.md and .agents/verification.md against /, /calendario/, /galeria/ and /afiliados/ at 1366x768
+    - variable-content reachability for homepage events, gallery items and affiliated dojos
+  open_criticals:
+    - the documented and required /calendario/ route is absent from the route manifest, component map and navigation, so it renders the 404 page and events beyond the four-item homepage preview are unreachable.
   open_structurals:
     - repository-wide quality checks are not enforced on ordinary changes because the only GitHub Actions workflow is the calendar synchronization workflow.
     - the visual system is not yet a reusable design system; the documented rounded-3xl container convention and repeated Tailwind color and control patterns are still implemented directly in components rather than centralized as reusable primitives.
@@ -53,6 +56,8 @@ SESSION_STATE:
   resolved_2026_07_16:
     - "[TAILWIND] Repository-wide utility cleanup removed only no-effect classes and applied equivalent padding/inset shorthands. The final implementation preserves production geometry across /, /galeria/ and /afiliados/ at the validated 1280x720 viewport; typecheck and build pass."
     - "[DESIGN] At the design level, all primary component containers use rounded-3xl. Buttons, pills, badges, page titles, thumbnails and other internal controls are not primary component containers and may intentionally use rounded-full, rounded-lg, rounded-md or responsive radius overrides. Future cleanup must preserve this rounded-3xl container convention and must not treat the scoped internal radii as design drift."
+  resolved_2026_07_17:
+    - "[RESPONSIVE] The affiliates route now paginates the variable DOJOS collection in groups of two. Mobile keeps its stacked, vertically scrollable layout; desktop keeps at most two cards in the fixed viewport, exposes 44px previous/next controls when needed, and centers a single final card."
   pending_review:
     - Search Console URL Inspection, Rich Results Test and field Core Web Vitals data, which require external Google property access
     - approved visible dojo identity copy before considering per-dojo structured data

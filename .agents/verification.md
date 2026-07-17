@@ -59,6 +59,7 @@ For semantic or interactive UI changes, inspect:
 Use real route checks for:
 
 - `/`
+- `/calendario`
 - `/galeria`
 - `/afiliados`
 
@@ -68,6 +69,15 @@ Preferred viewport matrix:
 - 390x844
 - 768x1024
 - 1366x768
+
+At 1366x768, verify for every route that:
+
+- The navbar, main content, and footer are visible in the same viewport.
+- `document.documentElement.scrollHeight` equals its `clientHeight`.
+- The route's primary section does not have hidden or scrollable vertical
+  overflow (`scrollHeight` equals `clientHeight`).
+- Variable-length content remains reachable through an explicit bounded
+  interaction rather than desktop vertical scrolling.
 
 For landscape-specific issues, do not treat scaled portrait behavior as proof.
 

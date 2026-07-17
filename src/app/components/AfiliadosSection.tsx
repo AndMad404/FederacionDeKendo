@@ -1,11 +1,12 @@
-import { Fragment, type ReactNode } from "react";
-import { Globe, Mail, MapPin, Phone } from "lucide-react";
+import { Fragment, useState, type ReactNode } from "react";
+import { ChevronLeft, ChevronRight, Globe, Mail, MapPin, Phone } from "lucide-react";
 import { DOJOS } from "../data/dojos";
-import type { IconKey, InfoItem, ScheduleSlot } from "../types";
+import type { DojoData, IconKey, InfoItem, ScheduleSlot } from "../types";
 import { focusRingClass } from "../styles/shared";
 import { PageTitle } from "./PageTitle";
 
 const highPriorityImageProps = { fetchpriority: "high" } as const;
+const DOJOS_PER_PAGE = 2;
 
 const ICON_MAP: Record<IconKey, ReactNode> = {
   mail: <Mail />,
@@ -158,13 +159,27 @@ function DojoInfo({
   );
 }
 
-function InfoCard() {
+function InfoCard({
+  dojos,
+  startIndex,
+}: {
+  dojos: DojoData[];
+  startIndex: number;
+}) {
+  const desktopGridClass =
+    dojos.length === 1
+      ? "xl:mx-auto xl:max-w-3xl"
+      : "xl:grid-cols-2 xl:gap-8";
+
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-2 xl:gap-8 land-compact:grid-cols-2 land-compact:gap-3">
-      {DOJOS.map((dojo, index) => (
+    <div
+      id="affiliate-dojo-list"
+      className={`grid w-full grid-cols-1 land-compact:grid-cols-2 land-compact:gap-3 ${desktopGridClass}`}
+    >
+      {dojos.map((dojo, index) => (
         <DojoInfo
           key={dojo.title}
-          headingId={`dojo-${index + 1}-title`}
+          headingId={`dojo-${startIndex + index + 1}-title`}
           {...dojo}
         />
       ))}
@@ -172,7 +187,57 @@ function InfoCard() {
   );
 }
 
+function AffiliatePagination({
+  page,
+  totalPages,
+  onPageChange,
+}: {
+  page: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}) {
+  if (totalPages <= 1) return null;
+
+  return (
+    <nav
+      aria-label="Paginación de dojos afiliados"
+      className="mb-4 flex min-h-11 items-center justify-center gap-2 xl:absolute xl:right-6 xl:top-2 xl:z-20 xl:mb-0"
+    >
+      <button
+        type="button"
+        aria-label="Página anterior de dojos"
+        aria-controls="affiliate-dojo-list"
+        disabled={page === 0}
+        onClick={() => onPageChange(page - 1)}
+        className={`inline-flex size-11 items-center justify-center rounded-full border border-blue-400/70 bg-black/70 text-blue-100 transition-colors hover:bg-blue-950/90 disabled:cursor-not-allowed disabled:border-white/20 disabled:text-white/35 ${focusRingClass}`}
+      >
+        <ChevronLeft className="size-5" aria-hidden="true" />
+      </button>
+
+      <p className="min-w-20 text-center text-sm font-bold text-white" aria-live="polite">
+        {page + 1} de {totalPages}
+      </p>
+
+      <button
+        type="button"
+        aria-label="Página siguiente de dojos"
+        aria-controls="affiliate-dojo-list"
+        disabled={page === totalPages - 1}
+        onClick={() => onPageChange(page + 1)}
+        className={`inline-flex size-11 items-center justify-center rounded-full border border-blue-400/70 bg-black/70 text-blue-100 transition-colors hover:bg-blue-950/90 disabled:cursor-not-allowed disabled:border-white/20 disabled:text-white/35 ${focusRingClass}`}
+      >
+        <ChevronRight className="size-5" aria-hidden="true" />
+      </button>
+    </nav>
+  );
+}
+
 export function AfiliadosSection() {
+  const [page, setPage] = useState(0);
+  const totalPages = Math.max(1, Math.ceil(DOJOS.length / DOJOS_PER_PAGE));
+  const startIndex = page * DOJOS_PER_PAGE;
+  const visibleDojos = DOJOS.slice(startIndex, startIndex + DOJOS_PER_PAGE);
+
   return (
     <section
       aria-labelledby="affiliates-title"
@@ -208,8 +273,13 @@ export function AfiliadosSection() {
           />
         </picture>
         <div className="absolute inset-0 rounded-3xl bg-black/30" aria-hidden="true" />
-        <div className="relative z-10 w-full max-w-4xl px-4 pt-14 sm:px-6 md:max-w-5xl lg:max-w-6xl xl:max-w-7xl xl:pt-10 land-compact:max-w-none land-compact:px-2 land-compact:pt-14">
-          <InfoCard />
+        <div className="relative z-10 w-full max-w-4xl px-4 pt-14 sm:px-6 md:max-w-5xl lg:max-w-6xl xl:flex xl:h-full xl:max-w-7xl xl:items-center xl:pt-10 land-compact:max-w-none land-compact:px-2 land-compact:pt-14">
+          <AffiliatePagination
+            page={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+          <InfoCard dojos={visibleDojos} startIndex={startIndex} />
         </div>
       </div>
     </section>
