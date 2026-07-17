@@ -180,7 +180,7 @@ export function AfiliadosSection() {
     >
       <PageTitle
         id="affiliates-title"
-        className="pointer-events-none absolute left-1/2 top-5 z-30 -translate-x-1/2 land-compact:top-2"
+        className="pointer-events-none absolute left-1/2 top-4 z-30 -translate-x-1/2 land-compact:top-2"
       >
         Dojos afiliados
       </PageTitle>
@@ -208,7 +208,7 @@ export function AfiliadosSection() {
           />
         </picture>
         <div className="absolute inset-0 rounded-3xl bg-black/30" aria-hidden="true" />
-        <div className="relative z-10 w-full max-w-4xl px-4 pt-16 sm:px-6 sm:pt-20 md:max-w-5xl lg:max-w-6xl xl:max-w-7xl land-compact:max-w-none land-compact:px-2 land-compact:pt-14">
+        <div className="relative z-10 w-full max-w-4xl px-4 pt-14 sm:px-6 md:max-w-5xl lg:max-w-6xl xl:max-w-7xl xl:pt-10 land-compact:max-w-none land-compact:px-2 land-compact:pt-14">
           <InfoCard />
         </div>
       </div>

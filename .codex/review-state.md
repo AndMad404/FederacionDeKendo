@@ -31,6 +31,7 @@ SESSION_STATE:
     - current automated-test inventory and risk-based Playwright entry points
     - presence and Git history of roadmap, project-baseline and decision-log control documents
     - repository-wide Tailwind utility redundancy pass across src/app components (spacing, gap, size and inset shorthands)
+    - PageTitle placement consistency across Home, Galeria and Afiliados at standard and compact-landscape breakpoints
   open_criticals: []
   open_structurals:
     - repository-wide quality checks are not enforced on ordinary changes because the only GitHub Actions workflow is the calendar synchronization workflow.
