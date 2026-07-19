@@ -2,7 +2,11 @@ import { Fragment, useState, type ReactNode } from "react";
 import { ChevronLeft, ChevronRight, Globe, Mail, MapPin, Phone } from "lucide-react";
 import { DOJOS } from "../data/dojos";
 import type { DojoData, IconKey, InfoItem, ScheduleSlot } from "../types";
-import { focusRingClass } from "../styles/shared";
+import {
+  actionControlSurfaceClass,
+  focusRingClass,
+  panelSurfaceClass,
+} from "../styles/shared";
 import { PageTitle } from "./PageTitle";
 
 const highPriorityImageProps = { fetchpriority: "high" } as const;
@@ -28,7 +32,7 @@ const ICON_MAP: Record<IconKey, ReactNode> = {
 };
 
 const INFO_GRID =
-  "grid w-full grid-cols-[2rem_minmax(0,1fr)] items-center gap-x-4 gap-y-2 md:grid-cols-[2.5rem_minmax(11rem,1.1fr)_1.5rem_2.5rem_minmax(0,1fr)] md:gap-y-4 lg:grid-cols-[3rem_minmax(13rem,1.1fr)_2rem_3rem_minmax(0,1fr)] land-compact:grid-cols-[1.75rem_minmax(0,1fr)] land-compact:gap-x-2 land-compact:gap-y-1";
+  "grid w-full grid-cols-[2rem_minmax(0,1fr)] items-center gap-x-2 gap-y-2 sm:gap-x-4 md:grid-cols-[2.5rem_minmax(11rem,1.1fr)_1.5rem_2.5rem_minmax(0,1fr)] md:gap-y-4 lg:grid-cols-[3rem_minmax(13rem,1.1fr)_2rem_3rem_minmax(0,1fr)] land-compact:grid-cols-[1.75rem_minmax(0,1fr)] land-compact:gap-x-2 land-compact:gap-y-1";
 const SCHEDULE_GRID =
   "grid w-full grid-cols-1 items-center gap-y-1 text-center md:grid-cols-[2.5rem_minmax(0,1fr)_2rem_2.5rem_minmax(0,1fr)] md:gap-x-4 md:gap-y-4 lg:grid-cols-[3rem_minmax(0,1fr)_2.5rem_3rem_minmax(0,1fr)] land-compact:grid-cols-[minmax(0,1fr)_max-content] land-compact:items-baseline land-compact:gap-x-2 land-compact:text-left";
 
@@ -53,7 +57,7 @@ function InfoCell({ item, side }: { item: InfoItem; side: "left" | "right" }) {
 
   return (
     <Fragment>
-      <span className={`${iconColumn} flex h-8 w-8 items-center justify-center rounded-full bg-blue-500/20 text-red-400 [&>svg]:size-5 md:h-10 md:w-10 lg:h-12 lg:w-12 lg:[&>svg]:size-6 land-compact:h-7 land-compact:w-7 land-compact:[&>svg]:size-4`}>
+      <span className={`${iconColumn} flex size-8 items-center justify-center rounded-full bg-site-action/20 text-site-accent [&>svg]:size-5 md:size-10 lg:size-12 lg:[&>svg]:size-6 land-compact:size-7 land-compact:[&>svg]:size-4`}>
         {ICON_MAP[item.icon]}
       </span>
       <div className={`${textColumn} min-w-0`}>
@@ -64,7 +68,7 @@ function InfoCell({ item, side }: { item: InfoItem; side: "left" | "right" }) {
           href={item.href}
           target="_blank"
           rel="noreferrer"
-          className={`block ${valueTextSize} underline-offset-4 transition-colors duration-200 [overflow-wrap:anywhere] hover:text-blue-400 hover:underline land-compact:leading-tight ${focusRingClass}`}
+          className={`block ${valueTextSize} underline-offset-4 transition-colors duration-200 [overflow-wrap:anywhere] hover:text-site-action-soft hover:underline land-compact:leading-tight ${focusRingClass}`}
         >
           {item.value}
         </a>
@@ -76,7 +80,7 @@ function InfoCell({ item, side }: { item: InfoItem; side: "left" | "right" }) {
 function ScheduleRow({ days, hours }: Pick<ScheduleSlot, "days" | "hours">) {
   return (
     <div className={SCHEDULE_GRID}>
-      <dt className="text-center text-[16px] [overflow-wrap:anywhere] md:col-start-2 md:text-left land-compact:col-start-auto land-compact:leading-tight">
+      <dt className="text-center text-base [overflow-wrap:anywhere] md:col-start-2 md:text-left land-compact:col-start-auto land-compact:leading-tight">
         {days}
       </dt>
       <dd className="text-center [overflow-wrap:anywhere] md:col-start-5 md:text-left land-compact:col-start-auto land-compact:leading-tight">
@@ -103,7 +107,7 @@ function DojoInfo({
   return (
     <section
       aria-labelledby={headingId}
-      className="mb-6 flex flex-col justify-between gap-2 rounded-3xl border border-blue-500/70 bg-black/70 px-6 py-4 text-white land-compact:mb-0 land-compact:gap-1 land-compact:rounded-2xl land-compact:px-3 land-compact:py-2"
+      className={`mb-6 flex flex-col justify-between gap-2 rounded-3xl px-3 py-4 text-site-on-dark sm:px-6 land-compact:mb-0 land-compact:gap-1 land-compact:rounded-2xl land-compact:px-3 land-compact:py-2 ${panelSurfaceClass}`}
     >
       <h2
         id={headingId}
@@ -209,12 +213,12 @@ function AffiliatePagination({
         aria-controls="affiliate-dojo-list"
         disabled={page === 0}
         onClick={() => onPageChange(page - 1)}
-        className={`inline-flex size-11 items-center justify-center rounded-full border border-blue-400/70 bg-black/70 text-blue-100 transition-colors hover:bg-blue-950/90 disabled:cursor-not-allowed disabled:border-white/20 disabled:text-white/35 ${focusRingClass}`}
+        className={`inline-flex size-11 items-center justify-center rounded-full transition-colors hover:bg-site-action-hover/90 disabled:cursor-not-allowed disabled:border-site-on-dark/20 disabled:text-site-on-dark/35 ${actionControlSurfaceClass} ${focusRingClass}`}
       >
         <ChevronLeft className="size-5" aria-hidden="true" />
       </button>
 
-      <p className="min-w-20 text-center text-sm font-bold text-white" aria-live="polite">
+      <p className="min-w-20 text-center text-sm font-bold text-site-on-dark" aria-live="polite">
         {page + 1} de {totalPages}
       </p>
 
@@ -224,7 +228,7 @@ function AffiliatePagination({
         aria-controls="affiliate-dojo-list"
         disabled={page === totalPages - 1}
         onClick={() => onPageChange(page + 1)}
-        className={`inline-flex size-11 items-center justify-center rounded-full border border-blue-400/70 bg-black/70 text-blue-100 transition-colors hover:bg-blue-950/90 disabled:cursor-not-allowed disabled:border-white/20 disabled:text-white/35 ${focusRingClass}`}
+        className={`inline-flex size-11 items-center justify-center rounded-full transition-colors hover:bg-site-action-hover/90 disabled:cursor-not-allowed disabled:border-site-on-dark/20 disabled:text-site-on-dark/35 ${actionControlSurfaceClass} ${focusRingClass}`}
       >
         <ChevronRight className="size-5" aria-hidden="true" />
       </button>
@@ -241,7 +245,7 @@ export function AfiliadosSection() {
   return (
     <section
       aria-labelledby="affiliates-title"
-      className="relative rounded-3xl bg-stone-950 md:h-full md:overflow-y-auto xl:overflow-hidden land-compact:overflow-y-auto"
+      className="relative rounded-3xl bg-site-canvas md:h-full md:overflow-y-auto xl:overflow-hidden land-compact:overflow-y-auto"
     >
       <PageTitle
         id="affiliates-title"
@@ -272,7 +276,7 @@ export function AfiliadosSection() {
             className="h-full w-full object-cover"
           />
         </picture>
-        <div className="absolute inset-0 rounded-3xl bg-black/30" aria-hidden="true" />
+        <div className="absolute inset-0 rounded-3xl bg-site-overlay/30" aria-hidden="true" />
         <div className="relative z-10 w-full max-w-4xl px-4 pt-14 sm:px-6 md:max-w-5xl lg:max-w-6xl xl:flex xl:h-full xl:max-w-7xl xl:items-center xl:pt-10 land-compact:max-w-none land-compact:px-2 land-compact:pt-14">
           <AffiliatePagination
             page={page}

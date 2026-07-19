@@ -14,7 +14,7 @@ function Thumbnail({ image, onClick }: ThumbnailProps) {
       type="button"
       aria-label={`Ver imagen: ${image.title}`}
       onClick={onClick}
-      className={`group relative aspect-[4/3] h-full w-full cursor-pointer overflow-hidden rounded-lg bg-stone-800 ${focusRingClass}`}
+      className={`group relative aspect-[4/3] h-full w-full cursor-pointer overflow-hidden rounded-lg bg-site-media ${focusRingClass}`}
     >
       <img
         src={image.thumbnailSrc}

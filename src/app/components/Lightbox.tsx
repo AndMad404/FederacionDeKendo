@@ -3,12 +3,12 @@ import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import type { GalleryImage } from "../types";
 import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
 import { getGalleryDisplayText } from "./gallery/galleryText";
-import { focusRingClass } from "../styles/shared";
+import { focusRingClass, panelSurfaceClass } from "../styles/shared";
 
 const LIGHTBOX_IMAGE_SIZES = "(max-width: 640px) 92vw, 75vw";
 const arrowButtonClass =
-  "flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-blue-400 bg-black/70 shadow-xl shadow-black/40 transition-colors hover:bg-blue-950/90 md:h-12 md:w-12";
-const activeArrowClass = "border-red-400 bg-red-700 text-white";
+  "flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-site-action-soft bg-site-overlay/70 shadow-xl shadow-site-overlay/40 transition-colors hover:bg-site-action-hover/90 md:size-12";
+const activeArrowClass = "border-site-accent bg-site-accent-strong text-site-on-dark";
 type ArrowDirection = "left" | "right";
 
 interface LightboxProps {
@@ -137,7 +137,7 @@ export function Lightbox({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 land-sm:p-2"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-site-overlay/70 p-4 land-sm:p-2"
       onClick={onClose}
     >
       <div
@@ -146,7 +146,7 @@ export function Lightbox({
         aria-modal="true"
         aria-labelledby="lightbox-title"
         aria-describedby={displayDescription ? "lightbox-description" : undefined}
-        className="relative flex max-h-[calc(100svh-2rem)] w-full max-w-5xl touch-pan-y flex-col items-center gap-3 text-white land-sm:h-[calc(100svh-1rem)] land-sm:max-h-none land-sm:max-w-[calc(100vw-2rem)] land-sm:gap-0"
+        className="relative flex max-h-[calc(100svh-2rem)] w-full max-w-5xl touch-pan-y flex-col items-center gap-3 text-site-on-dark land-sm:h-[calc(100svh-1rem)] land-sm:max-h-none land-sm:max-w-[calc(100vw-2rem)] land-sm:gap-0"
         onClick={(event) => event.stopPropagation()}
         {...swipeHandlers}
       >
@@ -155,12 +155,12 @@ export function Lightbox({
           type="button"
           aria-label="Cerrar galería"
           onClick={onClose}
-          className={`fixed right-4 top-4 z-[60] flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-red-700 text-white transition-colors hover:bg-red-600 land-sm:right-2 land-sm:top-2 ${focusRingClass}`}
+          className={`fixed right-4 top-4 z-[60] flex size-11 cursor-pointer items-center justify-center rounded-full bg-site-accent-strong text-site-on-dark transition-colors hover:bg-site-accent-hover land-sm:right-2 land-sm:top-2 ${focusRingClass}`}
         >
           <X size={20} aria-hidden="true" />
         </button>
 
-        <div className="flex h-[min(54svh,32rem)] min-h-0 w-full items-center justify-center overflow-hidden rounded-3xl bg-black/70 sm:h-[min(68svh,36rem)] land-sm:h-full land-sm:flex-none">
+        <div className="flex h-[min(54svh,32rem)] min-h-0 w-full items-center justify-center overflow-hidden rounded-3xl bg-site-overlay/70 sm:h-[min(68svh,36rem)] land-sm:h-full land-sm:flex-none">
           <img
             src={image.src}
             srcSet={image.srcSet}
@@ -188,19 +188,19 @@ export function Lightbox({
             <ChevronLeft size={24} aria-hidden="true" />
           </button>
 
-          <div className="col-span-2 row-start-2 grid min-h-[9.5rem] w-full min-w-0 max-w-full grid-rows-[auto_auto_minmax(0,1fr)_auto] items-center rounded-2xl border border-blue-500/70 bg-black/70 px-4 py-3 text-center shadow-xl shadow-black/40 backdrop-blur-sm sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:max-w-none sm:items-center sm:rounded-3xl sm:px-5 sm:py-4 land-sm:absolute land-sm:bottom-3 land-sm:left-1/2 land-sm:w-[min(28rem,calc(100%_-_6rem))] land-sm:-translate-x-1/2 land-sm:min-h-0 land-sm:grid-cols-[minmax(0,1fr)_auto] land-sm:grid-rows-[auto_auto] land-sm:gap-x-4 land-sm:gap-y-1 land-sm:rounded-2xl land-sm:px-3 land-sm:py-2 land-sm:text-left">
+          <div className={`col-span-2 row-start-2 grid min-h-[9.5rem] w-full min-w-0 max-w-full grid-rows-[auto_auto_minmax(0,1fr)_auto] items-center rounded-2xl px-4 py-3 text-center shadow-xl shadow-site-overlay/40 backdrop-blur-sm sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:max-w-none sm:items-center sm:rounded-3xl sm:px-5 sm:py-4 land-sm:absolute land-sm:bottom-3 land-sm:left-1/2 land-sm:w-[min(28rem,calc(100%_-_6rem))] land-sm:-translate-x-1/2 land-sm:min-h-0 land-sm:grid-cols-[minmax(0,1fr)_auto] land-sm:grid-rows-[auto_auto] land-sm:gap-x-4 land-sm:gap-y-1 land-sm:rounded-2xl land-sm:px-3 land-sm:py-2 land-sm:text-left ${panelSurfaceClass}`}>
             <h2
               id="lightbox-title"
               className="line-clamp-2 text-xl font-bold leading-tight land-sm:col-start-1 land-sm:row-start-1 land-sm:text-base"
             >
               {displayTitle}
             </h2>
-            <p className="truncate text-sm pt-1 font-bold uppercase tracking-widest text-red-400 land-sm:col-start-2 land-sm:row-start-1 land-sm:justify-self-end land-sm:pt-0 land-sm:text-right land-sm:text-[10px]">
+            <p className="truncate pt-1 text-sm font-bold uppercase tracking-widest text-site-accent land-sm:col-start-2 land-sm:row-start-1 land-sm:justify-self-end land-sm:pt-0 land-sm:text-right land-sm:text-[10px]">
               {displayTag}
             </p>
             {displayDescription && (
               <div id="lightbox-description" className="min-h-0 land-sm:col-start-1 land-sm:row-start-2">
-                <p className="text-sm leading-snug text-stone-200 land-sm:line-clamp-2 land-sm:text-[10px] land-sm:leading-tight">
+                <p className="text-sm leading-snug text-site-subtle land-sm:line-clamp-2 land-sm:text-[10px] land-sm:leading-tight">
                   {displayDescription}
                 </p>
               </div>

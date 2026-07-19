@@ -12,8 +12,8 @@ const NAV_LINKS = [
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   `text-lg tracking-wide transition-colors duration-200 land-sm:text-base ${focusRingClass} ${
     isActive
-      ? "border-b border-blue-500/70 pb-0.5 text-blue-400"
-      : "text-white hover:text-red-400"
+      ? "border-b border-site-action/70 pb-0.5 text-site-action-soft"
+      : "text-site-on-dark hover:text-site-accent"
   }`;
 
 export function Navbar() {
@@ -35,7 +35,7 @@ export function Navbar() {
   }, [open]);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 bg-stone-950 backdrop-blur">
+    <header className="fixed inset-x-0 top-0 z-50 bg-site-canvas backdrop-blur">
       <nav aria-label="Navegación principal">
       <div className="mx-auto my-[5px] flex h-16 max-w-6xl items-center justify-between px-6 land-sm:my-[3px] land-sm:h-12 land-sm:px-5">
         <Link
@@ -53,7 +53,7 @@ export function Navbar() {
               src="/images/logo/fakcr-lockup-224.png"
               alt=""
               aria-hidden="true"
-              className="h-14 w-14 shrink-0 rounded-full bg-white object-contain land-sm:h-10 land-sm:w-10"
+              className="size-14 shrink-0 rounded-full bg-site-on-dark object-contain land-sm:size-10"
               width="56"
               height="56"
             />
@@ -77,7 +77,7 @@ export function Navbar() {
         <button
           ref={menuButtonRef}
           type="button"
-          className={`inline-flex size-11 shrink-0 items-center justify-center text-gray-400 hover:text-white md:hidden ${focusRingClass}`}
+          className={`inline-flex size-11 shrink-0 items-center justify-center text-site-muted hover:text-site-on-dark md:hidden ${focusRingClass}`}
           aria-controls="mobile-menu"
           aria-expanded={open}
           aria-label={open ? "Cerrar menú" : "Abrir menú"}
@@ -94,7 +94,7 @@ export function Navbar() {
       {open && (
         <ul
           id="mobile-menu"
-          className="flex flex-col items-center gap-5 bg-stone-950 px-6 py-5 text-center md:hidden"
+          className="flex flex-col items-center gap-5 bg-site-canvas px-6 py-5 text-center md:hidden"
         >
           {NAV_LINKS.map((link) => (
             <li key={link.to}>

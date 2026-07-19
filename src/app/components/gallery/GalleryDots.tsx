@@ -32,8 +32,8 @@ export function GalleryDots({
               aria-hidden="true"
               className={`rounded-full transition-all duration-300 ${
                 index === activeIndex
-                  ? "h-3 w-5 bg-red-400 sm:h-4 sm:w-6"
-                  : "h-3 w-3 bg-blue-500/70 group-hover:bg-blue-400/80 sm:h-4 sm:w-4"
+                  ? "h-3 w-5 bg-site-accent sm:h-4 sm:w-6"
+                  : "size-3 bg-site-action/70 group-hover:bg-site-action-soft/80 sm:size-4"
               }`}
             />
           </button>

@@ -30,7 +30,7 @@ export function GallerySection() {
   return (
     <section
       aria-labelledby="gallery-title"
-      className="relative overflow-hidden bg-stone-950 tall-md:h-full tall-md:min-h-0"
+      className="relative overflow-hidden bg-site-canvas tall-md:h-full tall-md:min-h-0"
     >
       <PageTitle
         id="gallery-title"
