@@ -31,8 +31,7 @@ function HeroBanner() {
         <div className="mx-auto max-w-3xl text-site-on-dark">
           <PageTitle id="home-title" className="normal-case" allowWrap>
             Federación de Asociaciones
-            <br className="sm:hidden" />
-            de Kendo
+            <span className="block sm:inline"> de Kendo</span>
           </PageTitle>
         </div>
 
