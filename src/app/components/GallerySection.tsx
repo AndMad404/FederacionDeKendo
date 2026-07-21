@@ -1,22 +1,13 @@
 import { FeaturedImage } from "./gallery/FeaturedImage";
-import { GalleryDots } from "./gallery/GalleryDots";
 import { GalleryThumbnails } from "./gallery/GalleryThumbnails";
 import { GALLERY_IMAGES } from "../data/gallery";
 import { useCarousel } from "../hooks/useCarousel";
 import { useGalleryLightbox } from "../hooks/useGalleryLightbox";
-import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
 import { Lightbox } from "./Lightbox";
 import { PageTitle } from "./PageTitle";
 
-const THUMBS_COUNT = 6;
-
 export function GallerySection() {
   const { index, prev, next, goTo } = useCarousel(GALLERY_IMAGES.length);
-  const { consumeSwipe, swipeHandlers } = useSwipeNavigation({
-    onSwipeLeft: next,
-    onSwipeRight: prev,
-    allowInteractiveTargets: true,
-  });
   const {
     closeLightbox,
     lightboxIndex,
@@ -28,11 +19,6 @@ export function GallerySection() {
   } = useGalleryLightbox(GALLERY_IMAGES);
 
   const featured = GALLERY_IMAGES[index];
-  const thumbs = Array.from(
-    { length: THUMBS_COUNT },
-    (_, offset) => GALLERY_IMAGES[(index + 1 + offset) % GALLERY_IMAGES.length],
-  );
-
   return (
     <section
       aria-labelledby="gallery-title"
@@ -64,29 +50,11 @@ export function GallerySection() {
               onSwipeNext={next}
             />
 
-            <div
-              className="flex touch-pan-y flex-col gap-2 land-sm:gap-1"
-              onClickCapture={(event) => {
-                if (!consumeSwipe()) return;
-
-                event.preventDefault();
-                event.stopPropagation();
-              }}
-              {...swipeHandlers}
-            >
-              <GalleryThumbnails
-                images={thumbs}
-                onSelect={(thumbIndex) =>
-                  goTo((index + 1 + thumbIndex) % GALLERY_IMAGES.length)
-                }
-              />
-
-              <GalleryDots
-                images={GALLERY_IMAGES}
-                activeIndex={index}
-                onSelect={goTo}
-              />
-            </div>
+            <GalleryThumbnails
+              images={GALLERY_IMAGES}
+              activeIndex={index}
+              onSelect={goTo}
+            />
           </div>
         </div>
       </div>

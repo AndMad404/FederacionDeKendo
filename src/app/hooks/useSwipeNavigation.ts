@@ -4,7 +4,6 @@ interface SwipeNavigationOptions {
   onSwipeLeft: () => void;
   onSwipeRight: () => void;
   threshold?: number;
-  allowInteractiveTargets?: boolean;
 }
 
 interface SwipeStart {
@@ -20,7 +19,6 @@ export function useSwipeNavigation({
   onSwipeLeft,
   onSwipeRight,
   threshold = defaultThreshold,
-  allowInteractiveTargets = false,
 }: SwipeNavigationOptions) {
   const startRef = useRef<SwipeStart | null>(null);
   const didSwipeRef = useRef(false);
@@ -30,7 +28,6 @@ export function useSwipeNavigation({
     const target = event.target as HTMLElement;
 
     if (
-      !allowInteractiveTargets &&
       target !== event.currentTarget &&
       target.closest(interactiveSelector)
     ) {
@@ -44,7 +41,7 @@ export function useSwipeNavigation({
     };
     didSwipeRef.current = false;
     event.currentTarget.setPointerCapture(event.pointerId);
-  }, [allowInteractiveTargets]);
+  }, []);
 
   const onPointerUp = useCallback(
     (event: ReactPointerEvent<HTMLElement>) => {
