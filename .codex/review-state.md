@@ -2,7 +2,7 @@
 
 ```yaml
 schema_version: 2
-last_updated: 2026-07-19
+last_updated: 2026-07-21
 contract: .agents/review-contract.md
 
 state_rules:
@@ -13,6 +13,38 @@ state_rules:
   - Legacy claims without reproducible evidence are historical, not current coverage.
 
 latest_session:
+  id: REV-2026-07-21-01
+  requested_scope: Validate the reported architecture-documentation staleness finding against the named documentation and current main.
+  actual_scope:
+    targets:
+      - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/architecture.md
+      - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/technical-backlog.md
+      - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/roadmap.md
+      - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/project-baseline.md
+      - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/decision-log.md
+      - Git history from b7e337af through 71875972
+    axes: [ARCH]
+    included:
+      - consistency of recorded dates and commit baselines
+      - current-main drift affecting affiliates and gallery architecture
+      - whether the calendar route is present on current main
+      - preservation of the approved Phase 1 baseline as historical evidence
+    excluded:
+      - full re-review of the current application architecture
+      - approval of the Phase 2 target architecture and ADRs
+      - unmerged Calendar_Page implementation quality
+  baseline:
+    commit: 71875972
+    worktree: clean
+    documentation_fingerprints:
+      architecture.md: AB8F6777D682B18C4B34AA14E9A7B53D07166803FCE45CE3695885AF1A97DDB4
+      technical-backlog.md: F7BFD28CCD17984AB48AE4D9C8F16165A6531BEA2897973A13167DB3ACFC503F
+      roadmap.md: B29B86BB8E9D2086E13A3E97269C4CB712758450F6DED3868E28304566AAF63B
+      project-baseline.md: 78FECEACB873ECC32885FB769AC1AB4D4A67BCADE2A917174A09201DFD1880CC
+      decision-log.md: 4F2B5648C11C8DF74C135E71E8130BFC85CA7DB75BE67C6E74893CF7E986FFEE
+  result: The architecture proposal is stale for current main; reconciliation must use the final post-calendar merge commit while preserving the Phase 1 baseline as historical evidence.
+
+prior_session:
   id: REV-2026-07-19-01
   requested_scope: Complete Tailwind and responsive audit of src/app/**/*.tsx and src/styles/globals.css, including typography, colors, radii, spacing, no-effect utilities, variant precedence, generated CSS, and the responsive cascade.
   actual_scope:
@@ -76,6 +108,38 @@ latest_resolution:
     - gallery frame computed flex was 0 0 auto at requested 1024x640 and 1 1 0% at requested 1024x641
 
 coverage:
+  - id: COV-2026-07-21-01
+    targets:
+      - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/architecture.md
+      - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/technical-backlog.md
+      - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/roadmap.md
+      - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/project-baseline.md
+      - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/decision-log.md
+      - Git history from b7e337af through 71875972
+    axes: [ARCH]
+    included:
+      - documentation baseline consistency
+      - supersession requirements
+      - affiliate and gallery drift
+      - calendar-route presence on current main
+    excluded:
+      - full current-architecture review
+      - target-architecture and ADR approval
+      - unmerged calendar branch review
+    depth: reviewed
+    evidence:
+      - architecture.md records 2026-07-13 and b7e337af
+      - git status reported clean main at 71875972 tracking origin/main
+      - git diff b7e337af..71875972 shows affiliate pagination and gallery navigation changes
+      - current seo-data.json and App.tsx contain only home, gallery, and affiliates route mappings
+      - git history locates CalendarSection changes on Calendary_Page rather than current main
+      - SHA-256 fingerprints recorded in REV-2026-07-21-01
+    baseline:
+      commit: 71875972
+      worktree: clean
+    status: current
+    result: STR-ARCH-005 validated; documentation reconciliation remains gated on the final calendar merge commit.
+
   - id: COV-2026-07-16-01
     targets:
       - src/app/components/AfiliadosSection.tsx
@@ -304,6 +368,21 @@ active_findings:
     evidence: migrated from v1 state; presence was not revalidated in this session
     introduced_in: legacy-v1
 
+  - id: STR-ARCH-005
+    level: STRUCTURAL
+    axis: ARCH
+    status: open
+    target: architecture.md, technical-backlog.md, roadmap.md, project-baseline.md, decision-log.md, and .codex/review-state.md
+    problem: The Phase 2 architecture proposal still describes b7e337af from 2026-07-13 even though current main is 71875972 and later commits changed affiliate pagination and gallery navigation.
+    fix: After the calendar work reaches main, reconcile the current architecture, review state, technical backlog, roadmap, and decision log against that single final commit; preserve project-baseline.md as the approved Phase 1 historical snapshot and add explicit supersession notes instead of rewriting its facts as current.
+    cost_of_deferring: Phase 2 could approve an architectural description that does not match the product being governed.
+    evidence:
+      - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/architecture.md:4-5 records 2026-07-13 and b7e337af
+      - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/architecture.md:37 and 50 omit the calendar route and CalendarSection
+      - git diff b7e337af..71875972 includes affiliate pagination and replacement of GalleryDots with scrollable GalleryThumbnails
+      - current main at 71875972 does not yet contain the calendar route in seo-data.json or App.tsx
+    introduced_in: REV-2026-07-21-01
+
 resolved_findings:
   - id: LEGACY-SEO-001
     status: resolved_legacy_unverified
@@ -394,6 +473,10 @@ resolved_findings:
     resolution: { resolved_ref: f35c9557 dirty worktree, checks: [typecheck, build, browser matrix] }
 
 pending_reviews:
+  - id: PEND-ARCH-002
+    target: Post-calendar documentation reconciliation against one final main commit
+    axes: [ARCH]
+    reason: The calendar implementation has not reached current main; reconciling now would create another knowingly temporary architecture baseline.
   - id: PEND-RESP-001
     target: exact 390x844 and 768x1024 inner-viewport geometry
     axes: [RESPONSIVE]
