@@ -53,7 +53,7 @@ function InfoCell({ item, side }: { item: InfoItem; side: "left" | "right" }) {
     side === "left" ? "col-start-1" : "md:col-start-4 land-compact:col-start-1";
   const textColumn =
     side === "left" ? "col-start-2" : "md:col-start-5 land-compact:col-start-2";
-  const valueTextSize = item.icon === "mail" ? "text-sm sm:text-base" : "text-base";
+  const valueTextSize = "text-base";
 
   return (
     <Fragment>
