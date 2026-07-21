@@ -2,7 +2,6 @@ import { UpcomingEventsSection } from "./UpcomingEventsSection";
 import { PageTitle } from "./PageTitle";
 import { panelSurfaceClass } from "../styles/shared";
 
-const highPriorityImageProps = { fetchpriority: "high" } as const;
 const imageVersion = "v=20260704-0120";
 
 function HeroBanner() {
@@ -21,7 +20,7 @@ function HeroBanner() {
           height={750}
           className="absolute inset-0 h-full w-full object-cover object-center lg:object-[50%_42%]"
           loading="eager"
-          {...highPriorityImageProps}
+          fetchpriority="high"
         />
       </picture>
 

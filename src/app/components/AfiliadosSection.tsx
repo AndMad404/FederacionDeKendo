@@ -9,7 +9,6 @@ import {
 } from "../styles/shared";
 import { PageTitle } from "./PageTitle";
 
-const highPriorityImageProps = { fetchpriority: "high" } as const;
 const DOJOS_PER_PAGE = 2;
 
 const ICON_MAP: Record<IconKey, ReactNode> = {
@@ -267,12 +266,12 @@ export function AfiliadosSection() {
           />
           <img
             src="/images/affiliates/kendo-affiliates.jpg"
-            alt="Nuestro dojo"
+            alt="Practicantes de kendo reunidos durante un entrenamiento en un dojo"
             width={1500}
             height={1001}
             loading="eager"
             decoding="async"
-            {...highPriorityImageProps}
+            fetchpriority="high"
             className="h-full w-full object-cover"
           />
         </picture>
