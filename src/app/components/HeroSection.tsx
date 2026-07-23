@@ -2,7 +2,6 @@ import { Link } from "react-router";
 import { UpcomingEventsSection } from "./UpcomingEventsSection";
 import { PageTitle } from "./PageTitle";
 import {
-  ctaLinkClass,
   focusRingClass,
   panelSurfaceClass,
 } from "../styles/shared";
@@ -44,6 +43,13 @@ function HeroBanner() {
             Te invitamos a descubrir este arte marcial japonés.
             <br />
             Clases para todos los niveles y edades.
+            <br />
+            <Link
+              to="/afiliados/"
+              className={`inline-flex min-h-11 items-center justify-center font-semibold text-site-action-soft underline decoration-site-action/70 underline-offset-4 transition-colors hover:text-site-accent ${focusRingClass}`}
+            >
+              Conoce nuestros dojos afiliados
+            </Link>
           </h2>
         </div>
       </div>
@@ -59,14 +65,6 @@ export function HeroSection() {
     >
       <HeroBanner />
       <UpcomingEventsSection />
-      <div className="flex justify-center py-2">
-        <Link
-          to="/afiliados/"
-          className={`${ctaLinkClass} ${focusRingClass}`}
-        >
-          Encuentra dónde practicar
-        </Link>
-      </div>
     </section>
   );
 }
