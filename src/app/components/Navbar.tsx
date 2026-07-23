@@ -5,6 +5,7 @@ import { focusRingClass } from "../styles/shared";
 
 const NAV_LINKS = [
   { to: "/", label: "Inicio", end: true },
+  { to: "/calendario/", label: "Calendario" },
   { to: "/galeria/", label: "Galería" },
   { to: "/afiliados/", label: "Afiliados" },
 ];

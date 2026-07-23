@@ -17,7 +17,7 @@ export function PageTitle({
   return (
     <h1
       id={id}
-      className={`rounded-lg px-3 py-2 text-center text-xl font-bold uppercase leading-tight tracking-wide text-site-on-dark shadow-xl ${panelSurfaceClass} ${whitespaceClass} ${className}`}
+      className={`rounded-lg px-3 py-2 text-center text-xl font-bold uppercase leading-tight tracking-wide text-site-on-dark ${panelSurfaceClass} ${whitespaceClass} ${className}`}
     >
       {children}
     </h1>

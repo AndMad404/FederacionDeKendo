@@ -312,6 +312,55 @@ function createEventId(title, date, uid, usedIds) {
   return id;
 }
 
+function getEventType(property) {
+  if (!property) {
+    return undefined;
+  }
+
+  const supportedTypes = new Map(
+    [
+      "Examen",
+      "Torneo",
+      "Seminario",
+      "Entrenamiento especial",
+      "Actividad federativa",
+    ].map((type) => [
+      type
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase(),
+      type,
+    ]),
+  );
+
+  for (const category of property.value.split(",")) {
+    const normalizedCategory = category
+      .trim()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+    const matchingType = supportedTypes.get(normalizedCategory);
+
+    if (matchingType) {
+      return matchingType;
+    }
+  }
+
+  return undefined;
+}
+
+function getOrganizer(property) {
+  if (!property) {
+    return undefined;
+  }
+
+  const commonName = property.params.CN
+    ? decodeIcsText(property.params.CN)
+    : undefined;
+
+  return commonName || property.value.replace(/^mailto:/i, "");
+}
+
 function parseCalendarEvent(properties, usedIds) {
   const status = properties.get("STATUS")?.value;
 
@@ -351,6 +400,9 @@ function parseCalendarEvent(properties, usedIds) {
 
   const location = properties.get("LOCATION")?.value;
   const summary = properties.get("DESCRIPTION")?.value;
+  const type = getEventType(properties.get("CATEGORIES"));
+  const organizer = getOrganizer(properties.get("ORGANIZER"));
+  const infoUrl = properties.get("URL")?.value;
 
   if (location) {
     event.location = location;
@@ -358,6 +410,18 @@ function parseCalendarEvent(properties, usedIds) {
 
   if (summary) {
     event.summary = summary;
+  }
+
+  if (type) {
+    event.type = type;
+  }
+
+  if (organizer) {
+    event.organizer = organizer;
+  }
+
+  if (infoUrl) {
+    event.infoUrl = infoUrl;
   }
 
   event.timeZone = start.timeZone ?? defaultTimeZone;
@@ -401,6 +465,10 @@ function serializeEvent(event) {
     ["endTime", event.endTime],
     ["location", event.location],
     ["summary", event.summary],
+    ["type", event.type],
+    ["organizer", event.organizer],
+    ["infoUrl", event.infoUrl],
+    ["ctaLabel", event.ctaLabel],
     ["timeZone", event.timeZone],
   ].filter(([, value]) => value);
 

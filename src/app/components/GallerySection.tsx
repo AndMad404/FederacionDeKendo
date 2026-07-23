@@ -1,5 +1,4 @@
 import { FeaturedImage } from "./gallery/FeaturedImage";
-import { GalleryDots } from "./gallery/GalleryDots";
 import { GalleryThumbnails } from "./gallery/GalleryThumbnails";
 import { GALLERY_IMAGES } from "../data/gallery";
 import { useCarousel } from "../hooks/useCarousel";
@@ -65,11 +64,6 @@ export function GallerySection() {
               }
             />
 
-            <GalleryDots
-              images={GALLERY_IMAGES}
-              activeIndex={index}
-              onSelect={goTo}
-            />
           </div>
         </div>
       </div>
