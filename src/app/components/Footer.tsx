@@ -1,6 +1,10 @@
-import { focusRingClass } from "../styles/shared";
+import { Link, useLocation } from "react-router";
+import { ctaLinkClass, focusRingClass } from "../styles/shared";
 
 export function Footer() {
+  const { pathname } = useLocation();
+  const isHome = pathname === "/";
+
   return (
     <footer className="bg-site-canvas text-site-on-dark">
       <div className="mx-auto grid max-w-6xl grid-cols-1 justify-items-center gap-5 px-3 py-4 text-center md:grid-cols-2 md:gap-10 md:px-6 md:py-3 lg:px-0">
@@ -24,6 +28,14 @@ export function Footer() {
           <p className="text-base leading-relaxed">
             El concepto del Kendo es disciplinar el carácter humano a través de la aplicación de los principios de la Katana.
           </p>
+          {isHome ? (
+            <Link
+              to="/afiliados/"
+              className={`${ctaLinkClass} ${focusRingClass}`}
+            >
+              Conoce nuestros dojos afiliados
+            </Link>
+          ) : null}
         </section>
 
         <section
@@ -45,6 +57,11 @@ export function Footer() {
                 >
                   secretaria.fedekendo@outlook.com
                 </a>
+              </li>
+              <li>
+                <span className="text-site-on-dark/75">
+                  Instagram: TODO — agregar enlace cuando se confirme el perfil
+                </span>
               </li>
             </ul>
           </div>
