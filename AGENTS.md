@@ -17,6 +17,7 @@ Stack:
 - Do not refactor unrelated code while implementing a narrow change.
 - Separate verified repo facts from suggestions or future ideas.
 - Treat legal, SEO metadata, and public copy constraints from the user as hard requirements.
+- When creating a commit, follow the message convention in `CONTRIBUTING.md`.
 - Use ASCII in repo instructions unless a file already requires non-ASCII text.
 
 ## Task Modes

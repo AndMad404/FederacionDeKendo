@@ -1,13 +1,16 @@
+import { Link } from "react-router";
 import { UpcomingEventsSection } from "./UpcomingEventsSection";
 import { PageTitle } from "./PageTitle";
-import { panelSurfaceClass } from "../styles/shared";
+import {
+  focusRingClass,
+  panelSurfaceClass,
+} from "../styles/shared";
 
-const highPriorityImageProps = { fetchpriority: "high" } as const;
 const imageVersion = "v=20260704-0120";
 
 function HeroBanner() {
   return (
-    <header className="relative flex h-[clamp(520px,calc(100svh_-_4rem_-_10px),680px)] items-stretch overflow-hidden rounded-3xl land-sm:h-auto land-sm:min-h-[calc(100svh_-_3rem_-_6px)] tall-md:h-auto tall-md:min-h-[300px] tall-md:flex-1">
+    <header className="relative flex h-[clamp(520px,calc(100svh_-_4rem_-_10px),680px)] items-stretch overflow-hidden rounded-3xl land-sm:h-auto land-sm:min-h-[calc(100svh_-_3rem_-_6px)] tall-md:h-auto tall-md:min-h-[230px] tall-md:flex-1">
       <picture className="absolute inset-0 h-full w-full">
         <source
           srcSet={`/images/hero/kendo-hero-formacion-480.webp?${imageVersion} 480w, /images/hero/kendo-hero-formacion-960.webp?${imageVersion} 960w, /images/hero/kendo-hero-formacion-1500.webp?${imageVersion} 1500w`}
@@ -21,7 +24,7 @@ function HeroBanner() {
           height={750}
           className="absolute inset-0 h-full w-full object-cover object-center lg:object-[50%_42%]"
           loading="eager"
-          {...highPriorityImageProps}
+          fetchpriority="high"
         />
       </picture>
 
@@ -31,8 +34,7 @@ function HeroBanner() {
         <div className="mx-auto max-w-3xl text-site-on-dark">
           <PageTitle id="home-title" className="normal-case" allowWrap>
             Federación de Asociaciones
-            <br className="sm:hidden" />
-            de Kendo
+            <span className="block sm:inline"> de Kendo</span>
           </PageTitle>
         </div>
 
@@ -41,6 +43,13 @@ function HeroBanner() {
             Te invitamos a descubrir este arte marcial japonés.
             <br />
             Clases para todos los niveles y edades.
+            <br />
+            <Link
+              to="/afiliados/"
+              className={`inline-flex min-h-11 items-center justify-center font-semibold text-site-action-soft underline decoration-site-action/70 underline-offset-4 transition-colors hover:text-site-accent ${focusRingClass}`}
+            >
+              Conoce nuestros dojos afiliados
+            </Link>
           </h2>
         </div>
       </div>

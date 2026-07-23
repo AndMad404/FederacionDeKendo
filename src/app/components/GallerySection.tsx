@@ -6,8 +6,6 @@ import { useGalleryLightbox } from "../hooks/useGalleryLightbox";
 import { Lightbox } from "./Lightbox";
 import { PageTitle } from "./PageTitle";
 
-const THUMBS_COUNT = 6;
-
 export function GallerySection() {
   const { index, prev, next, goTo } = useCarousel(GALLERY_IMAGES.length);
   const {
@@ -21,11 +19,6 @@ export function GallerySection() {
   } = useGalleryLightbox(GALLERY_IMAGES);
 
   const featured = GALLERY_IMAGES[index];
-  const thumbs = Array.from(
-    { length: THUMBS_COUNT },
-    (_, offset) => GALLERY_IMAGES[(index + 1 + offset) % GALLERY_IMAGES.length],
-  );
-
   return (
     <section
       aria-labelledby="gallery-title"
@@ -58,12 +51,10 @@ export function GallerySection() {
             />
 
             <GalleryThumbnails
-              images={thumbs}
-              onSelect={(thumbIndex) =>
-                goTo((index + 1 + thumbIndex) % GALLERY_IMAGES.length)
-              }
+              images={GALLERY_IMAGES}
+              activeIndex={index}
+              onSelect={goTo}
             />
-
           </div>
         </div>
       </div>

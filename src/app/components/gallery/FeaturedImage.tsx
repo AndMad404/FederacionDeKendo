@@ -16,7 +16,6 @@ import {
 } from "./galleryText";
 import { focusRingClass, panelSurfaceClass } from "../../styles/shared";
 
-const highPriorityImageProps = { fetchpriority: "high" } as const;
 const defaultFeaturedObjectPosition = "center 0%";
 const activeArrowClass = "border-site-accent bg-site-accent-strong";
 type ArrowDirection = "left" | "right";
@@ -143,7 +142,7 @@ export function FeaturedImage({
         height={featuredHeight}
         loading="eager"
         decoding="async"
-        {...highPriorityImageProps}
+        fetchpriority="high"
         style={imageStyle}
         className={`gallery-featured-image ${objectPositionClass} h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-105`}
       />
