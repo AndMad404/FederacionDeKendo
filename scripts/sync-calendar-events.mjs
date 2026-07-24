@@ -1,4 +1,3 @@
-import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -295,15 +294,13 @@ function slugify(value) {
     .slice(0, 72);
 }
 
-function createEventId(title, date, uid, usedIds) {
+function createEventId(title, date, usedIds) {
   const base = slugify(`${title}-${date}`) || "calendar-event";
-  const uidHash = uid ? createHash("sha1").update(uid).digest("hex").slice(0, 8) : "";
-  const initialId = uidHash ? `${base}-${uidHash}` : base;
-  let id = initialId;
+  let id = base;
   let suffix = 2;
 
   while (usedIds.has(id)) {
-    id = `${initialId}-${suffix}`;
+    id = `${base}-${suffix}`;
     suffix += 1;
   }
 
@@ -377,7 +374,7 @@ function parseCalendarEvent(properties, usedIds) {
   }
 
   const event = {
-    id: createEventId(title, start.date, properties.get("UID")?.value, usedIds),
+    id: createEventId(title, start.date, usedIds),
     title,
     date: start.date,
   };
