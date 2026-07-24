@@ -4,6 +4,7 @@ import { Navbar } from "./components/Navbar";
 import { HeroSection } from "./components/HeroSection";
 import { GallerySection } from "./components/GallerySection";
 import { AfiliadosSection } from "./components/AfiliadosSection";
+import { CalendarSection } from "./components/CalendarSection";
 import { Footer } from "./components/Footer";
 import { NotFoundSection } from "./components/NotFoundSection";
 import {
@@ -16,6 +17,7 @@ import {
 
 const ROUTE_COMPONENTS: Record<RouteComponent, ComponentType> = {
   home: HeroSection,
+  calendar: CalendarSection,
   gallery: GallerySection,
   affiliates: AfiliadosSection,
 };

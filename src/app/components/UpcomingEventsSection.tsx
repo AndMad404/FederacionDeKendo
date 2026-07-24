@@ -1,11 +1,13 @@
 import { MapPin } from "lucide-react";
+import { Link } from "react-router";
 import { CALENDAR_EVENTS } from "../data/calendarEvents";
 import type { CalendarEvent } from "../types";
 import { getUpcomingEvents } from "../utils/calendarEvents";
+import { actionControlSurfaceClass, focusRingClass } from "../styles/shared";
 
 const maxHomepageEvents = 4;
-const locationPillClass =
-  "col-start-2 row-start-2 inline-flex min-h-11 min-w-0 items-center justify-center justify-self-end rounded-full border border-blue-400/70 bg-black/70 px-3 py-1.5 text-center text-sm font-semibold leading-tight text-blue-100 transition-colors lg:min-h-8 lg:px-2.5 lg:py-1";
+const actionPillClass =
+  `inline-flex min-h-11 min-w-0 items-center justify-center rounded-full px-3 py-1.5 text-center text-sm font-semibold leading-tight transition-colors lg:min-h-8 lg:px-2.5 lg:py-1 ${actionControlSurfaceClass}`;
 const eventDateFormatter = new Intl.DateTimeFormat("es-CR", {
   day: "2-digit",
   month: "short",
@@ -37,14 +39,6 @@ function getEventDateRangeLabels({ date, endDate }: CalendarEvent) {
   };
 }
 
-function formatEventTime({ startTime, endTime }: CalendarEvent) {
-  if (!startTime) {
-    return "Todo el día";
-  }
-
-  return endTime ? `${startTime} - ${endTime}` : startTime;
-}
-
 function getLocationMapUrl(location: string) {
   const params = new URLSearchParams({
     api: "1",
@@ -60,7 +54,7 @@ function getEventVisibilityClass(index: number) {
   }
 
   if (index === 3) {
-    return "hidden lg:flex land-tall:flex";
+    return "hidden lg:flex land-sm:hidden land-tall:flex";
   }
 
   return "";
@@ -80,9 +74,9 @@ export function UpcomingEventsSection() {
   return (
     <section
       aria-labelledby="upcoming-events-title"
-      className="mx-auto w-full max-w-6xl pt-2.5 pb-0 text-white sm:px-4 tall-md:pb-1 tall-md:pt-1.5"
+      className="mx-auto w-full max-w-6xl pt-2.5 pb-0 text-site-on-dark sm:px-4 tall-md:pb-1 tall-md:pt-1.5"
     >
-      <div className="mb-2.5 flex items-center justify-center text-center font-semibold text-white lg:mb-2">
+      <div className="mb-2.5 flex items-center justify-center text-center font-semibold text-site-on-dark lg:mb-2">
         <h2
           id="upcoming-events-title"
           className="text-lg font-bold leading-tight sm:text-xl tall-md:text-2xl"
@@ -103,7 +97,7 @@ export function UpcomingEventsSection() {
           return (
             <li
               key={event.id}
-              className={`grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-2 rounded-lg border border-blue-500/70 bg-white/[0.06] p-3 land-tall:flex land-tall:flex-col land-tall:justify-around land-tall:gap-2 land-tall:text-center lg:flex lg:flex-col lg:justify-around lg:gap-1.5 lg:p-2 lg:text-center ${getEventVisibilityClass(index)}`}
+              className={`grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-2 rounded-lg border border-site-action/70 bg-site-on-dark/[0.06] p-3 land-tall:flex land-tall:flex-col land-tall:justify-around land-tall:gap-2 land-tall:text-center lg:flex lg:flex-col lg:justify-around lg:gap-1.5 lg:p-2 lg:text-center ${getEventVisibilityClass(index)}`}
             >
               <h3 className="col-start-2 row-start-1 min-w-0 text-right text-base font-bold leading-tight land-tall:text-center lg:text-center">
                 {event.title}
@@ -112,7 +106,7 @@ export function UpcomingEventsSection() {
               <time
                 dateTime={event.date}
                 aria-label={eventDateLabel}
-                className="col-start-1 row-start-1 max-w-[10rem] shrink-0 rounded-md bg-white/10 px-2.5 py-2 text-center text-sm font-bold uppercase leading-tight text-blue-100 land-tall:max-w-none lg:max-w-none lg:px-2 lg:py-1.5"
+                className="col-start-1 row-start-1 max-w-[10rem] shrink-0 rounded-md bg-site-on-dark/10 px-2.5 py-2 text-center text-sm font-bold uppercase leading-tight text-site-action-text land-tall:max-w-none lg:max-w-none lg:px-2 lg:py-1.5"
               >
                 <span className="whitespace-nowrap">{startDateLabel}</span>
                 {endDateLabel ? (
@@ -125,10 +119,6 @@ export function UpcomingEventsSection() {
                 ) : null}
               </time>
 
-              <p className="col-start-1 row-start-2 text-center text-sm leading-tight text-white/75">
-                {formatEventTime(event)}
-              </p>
-
               {locationUrl ? (
                 <a
                   href={locationUrl}
@@ -136,19 +126,27 @@ export function UpcomingEventsSection() {
                   rel="noopener noreferrer"
                   aria-label={`Abrir ubicación de ${event.title} en Google Maps`}
                   aria-describedby={locationDescriptionId}
-                  className={`${locationPillClass} hover:bg-blue-950/90 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-black`}
+                  className={`col-start-1 row-start-2 justify-self-center ${actionPillClass} hover:bg-site-action-hover/90 hover:text-site-on-dark ${focusRingClass}`}
                 >
-                  <MapPin className="mr-1.5 size-3.5 shrink-0 text-red-300" aria-hidden="true" />
-                  <span>Ver ubicación</span>
+                  <MapPin className="mr-1.5 size-3.5 shrink-0 text-site-accent-soft" aria-hidden="true" />
+                  <span>Cómo llegar</span>
                   <span id={locationDescriptionId} className="sr-only">
                     Dirección: {event.location}. Abre Google Maps en una pestaña nueva.
                   </span>
                 </a>
               ) : (
-                <span className={`${locationPillClass} border-white/20 text-white/65`}>
+                <span className={`col-start-1 row-start-2 justify-self-center ${actionPillClass} border-site-on-dark/20 text-site-on-dark/65`}>
                   Pendiente de confirmar
                 </span>
               )}
+
+              <Link
+                to={`/calendario/#${encodeURIComponent(event.id)}`}
+                aria-label={`Consultar detalles del evento ${event.title}`}
+                className={`col-start-2 row-start-2 justify-self-end ${actionPillClass} hover:bg-site-action-hover/90 hover:text-site-on-dark ${focusRingClass}`}
+              >
+                Detalles del evento
+              </Link>
             </li>
           );
         })}

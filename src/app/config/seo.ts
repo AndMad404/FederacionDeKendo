@@ -1,7 +1,7 @@
 import seoData from "./seo-data.json";
 
 type SchemaType = "WebPage" | "CollectionPage";
-export type RouteComponent = "home" | "gallery" | "affiliates";
+export type RouteComponent = "home" | "calendar" | "gallery" | "affiliates";
 
 export interface PreloadImage {
   href: string;
@@ -86,6 +86,7 @@ function assertSeoData(value: unknown): asserts value is SeoData {
 
   const validComponents = new Set<RouteComponent>([
     "home",
+    "calendar",
     "gallery",
     "affiliates",
   ]);

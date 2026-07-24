@@ -2,7 +2,7 @@
 
 ```yaml
 schema_version: 2
-last_updated: 2026-07-21
+last_updated: 2026-07-23
 contract: .agents/review-contract.md
 
 state_rules:
@@ -13,6 +13,41 @@ state_rules:
   - Legacy claims without reproducible evidence are historical, not current coverage.
 
 latest_session:
+  id: REV-2026-07-23-02
+  requested_scope: Compare render-time redundancies among the SPA pages without implementing changes.
+  actual_scope:
+    targets:
+      - src/app/App.tsx
+      - src/app/components/HeroSection.tsx
+      - src/app/components/CalendarSection.tsx
+      - src/app/components/GallerySection.tsx
+      - src/app/components/AfiliadosSection.tsx
+      - src/app/components/PageTitle.tsx
+    axes: [ARCH]
+    included:
+      - shared route shell
+      - repeated page-root composition
+      - repeated title placement
+      - repeated full-bleed image composition
+      - duplicated empty and populated render branches
+    excluded:
+      - implementation of proposed refactors
+      - component internals unrelated to cross-page rendering
+      - TypeScript, React hook, accessibility, performance, SEO, Tailwind, and responsive correctness
+      - runtime browser and production behavior
+  baseline:
+    commit: 43bc58cf
+    worktree: dirty
+    fingerprints:
+      App.tsx: E2B97193D32E30A42E8BFDF0E51BEA723B6A0372A45EECE41901358259323F68
+      HeroSection.tsx: 875AA65F508DBCB0DF4DEB369D03900CE73061CDBA85EF960000B0108E405860
+      CalendarSection.tsx: CE6987F47FCC062387853163D5DF24F72BDE812A599A529E8CDF9479C7E0FFCC
+      GallerySection.tsx: 60BB9D3BD3BF06F4E66C99E1D7ECE333D7A30B6F98EB51664CEF7A48C8F0BBC5
+      AfiliadosSection.tsx: 90FDAC22946140964649097D89671D9447A98D13F348DF993251027E3EC58308
+      PageTitle.tsx: E4A64A2BD0B309928141AB0A0C88CB6E6F4A5D4CE2FA5D0B9D3B3004A583F586
+  result: The SPA shell and PageTitle primitive already remove the broadest duplication; one structural duplication remains inside CalendarSection and one repeated floating-title preset remains across three pages.
+
+prior_architecture_documentation_session:
   id: REV-2026-07-21-01
   requested_scope: Validate the reported architecture-documentation staleness finding against the named documentation and current main.
   actual_scope:
@@ -82,6 +117,25 @@ prior_session:
   result: One responsive correctness defect, two structural issues, one responsive smell, and five Tailwind polish findings were recorded; the required 1366x768 no-scroll invariant passed on all four routes.
 
 latest_resolution:
+  id: FIX-2026-07-23-02
+  source_session: REV-2026-07-23-02
+  baseline:
+    commit: 43bc58cf
+    worktree: dirty
+    fingerprints:
+      PageTitle.tsx: 538E55BE3C5FC8D72FA445CDA2E907017585404B5400D375761449202D846D57
+      CalendarSection.tsx: 11F0692E64021767BD724335939D7464676BCB9A2A3A066A0DCFFA7DCE50DBAF
+      GallerySection.tsx: B9D032F0F614466AAE36166268807EC5DD945D637C91D332C40EF1174584A7EF
+      AfiliadosSection.tsx: DD89694A077C40BBEF8FA0B98BC62DCB5570FEB94A25F21B7A50143019048E34
+  resolved_findings:
+    - SMELL-ARCH-001
+  checks:
+    - corepack pnpm run typecheck passed
+    - corepack pnpm run build passed outside the sandbox
+    - source inspection found three placement="floating" consumers and one centralized positioning class
+    - generated calendario, galeria, and afiliados HTML retained the exact original floating-title class list
+
+previous_resolution:
   id: FIX-2026-07-19-01
   source_session: REV-2026-07-19-01
   baseline:
@@ -108,6 +162,77 @@ latest_resolution:
     - gallery frame computed flex was 0 0 auto at requested 1024x640 and 1 1 0% at requested 1024x641
 
 coverage:
+  - id: COV-2026-07-23-03
+    targets:
+      - src/app/components/PageTitle.tsx
+      - src/app/components/CalendarSection.tsx
+      - src/app/components/GallerySection.tsx
+      - src/app/components/AfiliadosSection.tsx
+      - dist/calendario/index.html
+      - dist/galeria/index.html
+      - dist/afiliados/index.html
+    axes: [ARCH]
+    included:
+      - implementation and verification of the shared floating PageTitle placement
+      - preservation of the existing rendered class list in all three consumers
+    excluded:
+      - unrelated local changes
+      - other PageTitle presentations
+      - pixel-level browser comparison
+      - production deployment behavior
+    depth: verified
+    evidence:
+      - corepack pnpm run typecheck passed
+      - corepack pnpm run build passed outside the sandbox
+      - source search found placement="floating" in CalendarSection, GallerySection, and AfiliadosSection
+      - source search found the full positioning class only in PageTitle
+      - generated route HTML contains the unchanged full positioning class for all three affected routes
+    baseline:
+      commit: 43bc58cf
+      worktree: dirty
+    status: current
+    result: SMELL-ARCH-001 resolved without changing the rendered floating-title utility list.
+
+  - id: COV-2026-07-23-02
+    targets:
+      - src/app/App.tsx
+      - src/app/components/HeroSection.tsx
+      - src/app/components/CalendarSection.tsx
+      - src/app/components/GallerySection.tsx
+      - src/app/components/AfiliadosSection.tsx
+      - src/app/components/PageTitle.tsx
+    axes: [ARCH]
+    included:
+      - shared route shell
+      - repeated page-root composition
+      - repeated title placement
+      - repeated full-bleed image composition
+      - duplicated empty and populated render branches
+    excluded:
+      - implementation
+      - unrelated component internals
+      - all non-ARCH axes
+      - runtime browser and production behavior
+    depth: reviewed
+    evidence:
+      - line-numbered inspection of all six targets
+      - exact rg comparison for aria-labelledby, PageTitle, picture, absolute inset, and viewport-height patterns
+      - SHA-256 fingerprints recorded in REV-2026-07-23-02
+    baseline:
+      commit: 43bc58cf
+      worktree: dirty
+    status: stale
+    stale_reason: PageTitle and all three floating-title consumers changed during FIX-2026-07-23-02.
+    file_results:
+      src/app/App.tsx: no finding; shared navbar, main, footer, route manifest, metadata, and scroll behavior are centralized
+      src/app/components/HeroSection.tsx: no finding; backdrop similarities have materially different semantics and responsive framing
+      src/app/components/CalendarSection.tsx: [STR-ARCH-006, SMELL-ARCH-001]
+      src/app/components/GallerySection.tsx: [SMELL-ARCH-001]
+      src/app/components/AfiliadosSection.tsx: [SMELL-ARCH-001]
+      src/app/components/PageTitle.tsx: [SMELL-ARCH-001]
+    verification_gaps:
+      - analysis-only review; no refactor was implemented or runtime-verified
+
   - id: COV-2026-07-21-01
     targets:
       - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/architecture.md
@@ -293,8 +418,41 @@ coverage:
       commit: f35c9557
       worktree: dirty
       target_fingerprint_sha256: a985e5dfe9392042130b9cc66ab0e0697b8bd34105781c707e8b6cba1b582cef
-    status: current
+    status: stale
+    stale_reason: CalendarSection.tsx and shared presentation targets changed after the recorded baseline.
     result: The nine listed findings were implemented and verified without changing the recorded color values or the 1366x768 route geometry.
+
+  - id: COV-2026-07-23-01
+    targets:
+      - src/app/components/CalendarSection.tsx
+      - src/app/components/EventDetailModal.tsx
+      - src/app/components/PageTitle.tsx
+      - src/app/components/Footer.tsx
+    axes: [A11Y, TAILWIND, SEO]
+    included:
+      - semantic heading levels on the calendar page and event dialog
+      - relative font sizes, weights, casing, and supporting-text hierarchy
+      - visible h1 hierarchy in the inspected route components
+    excluded:
+      - responsive geometry
+      - color contrast measurement
+      - other routes and components
+      - runtime screen-reader announcements
+    depth: reviewed
+    evidence:
+      - Select-String query for h1, h2, h3, PageTitle, and text-size utilities
+      - SHA-256 fingerprints recorded for all four targets
+      - baseline commit 43bc58cf with a dirty worktree
+    baseline:
+      commit: 43bc58cf
+      worktree: dirty
+      fingerprints:
+        CalendarSection.tsx: 7FB7C71115F48410EC68C2C4AFAC084E52F71F647B7EA411246D6261898B0E95
+        EventDetailModal.tsx: ABC80D05C3C99B3FF4D93F7585B1DDE405074528F7F3BF9CA6C9A89005001A52
+        PageTitle.tsx: E4A64A2BD0B309928141AB0A0C88CB6E6F4A5D4CE2FA5D0B9D3B3004A583F586
+        Footer.tsx: D1203595874C6970FDA39C363CBCDBF9CDD6690DC44812CF94C896DC296F6C2E
+    status: current
+    result: Semantic and visual heading order are sound after resolving POL-TW-006.
 
 legacy_coverage:
   status: evidence_incomplete
@@ -383,7 +541,34 @@ active_findings:
       - current main at 71875972 does not yet contain the calendar route in seo-data.json or App.tsx
     introduced_in: REV-2026-07-21-01
 
+  - id: STR-ARCH-006
+    level: STRUCTURAL
+    axis: ARCH
+    status: open
+    target: src/app/components/CalendarSection.tsx:278 and src/app/components/CalendarSection.tsx:343
+    problem: CalendarSection duplicates the complete page frame in its empty-events and populated-events render branches.
+    fix: Render one shared section with CalendarBackdrop and CalendarBanner, and choose only the body content conditionally inside that frame.
+    cost_of_deferring: Future changes to the calendar page shell can update one branch while silently leaving the other visually or responsively stale.
+    evidence:
+      - identical section attributes and classes at lines 280-285 and 345-350
+      - line-numbered source inspection at dirty-worktree fingerprint CE6987F47FCC062387853163D5DF24F72BDE812A599A529E8CDF9479C7E0FFCC
+    introduced_in: REV-2026-07-23-02
+
 resolved_findings:
+  - id: SMELL-ARCH-001
+    status: resolved
+    resolved_at: 2026-07-23
+    summary: PageTitle now owns the floating placement preset used by Calendar, Gallery, and Affiliates.
+    resolution:
+      resolved_ref: 43bc58cf dirty worktree fingerprints recorded in FIX-2026-07-23-02
+      checks: [typecheck, production and SSR build, source search, generated route HTML]
+  - id: POL-TW-006
+    status: resolved
+    resolved_at: 2026-07-23
+    summary: The calendar month h2 now uses text-lg beneath the shared text-xl PageTitle, matching the homepage's 20px to 18px hierarchy.
+    resolution:
+      resolved_ref: 43bc58cf dirty worktree fingerprint 7FB7C71115F48410EC68C2C4AFAC084E52F71F647B7EA411246D6261898B0E95
+      checks: [source inspection, pnpm run typecheck]
   - id: LEGACY-SEO-001
     status: resolved_legacy_unverified
     resolved_at: 2026-07-11

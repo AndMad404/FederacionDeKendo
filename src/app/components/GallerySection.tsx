@@ -26,7 +26,7 @@ export function GallerySection() {
     >
       <PageTitle
         id="gallery-title"
-        className="pointer-events-none absolute left-1/2 top-4 z-30 -translate-x-1/2 land-compact:top-2"
+        placement="floating"
       >
         Galería de kendo
       </PageTitle>

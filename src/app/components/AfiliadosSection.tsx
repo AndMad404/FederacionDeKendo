@@ -248,7 +248,7 @@ export function AfiliadosSection() {
     >
       <PageTitle
         id="affiliates-title"
-        className="pointer-events-none absolute left-1/2 top-4 z-30 -translate-x-1/2 land-compact:top-2"
+        placement="floating"
       >
         Dojos afiliados
       </PageTitle>

@@ -54,6 +54,24 @@ For semantic or interactive UI changes, inspect:
 - Decorative images use empty alt text
 - Meaningful images use descriptive alt text
 
+## Visual Change Checks
+
+For layout, spacing, component, or style changes:
+
+1. Restate the approved baseline and identify its source.
+2. Inspect the affected route at every target viewport named in the task.
+3. Compare the relevant outer margins, internal padding, gaps, dimensions,
+   alignment, component composition, tokens, and interactive states.
+4. Check document and component overflow, including content at its expected
+   maximum or variable length.
+5. Capture or record reproducible visual evidence when practical and list any
+   intentional deviation from the baseline.
+
+An exact, narrowly scoped correction needs only the affected viewport and
+nearby regression checks. A change to a shared primitive or responsive rule
+must also inspect its affected consumers. A successful typecheck or build does
+not prove visual correctness.
+
 ## Responsive Checks
 
 Use real route checks for:

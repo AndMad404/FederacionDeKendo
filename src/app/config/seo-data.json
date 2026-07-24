@@ -27,6 +27,20 @@
       },
       "schemaType": "WebPage"
     },
+    "/calendario/": {
+      "path": "/calendario/",
+      "component": "calendar",
+      "title": "Calendario de eventos | Federación de Asociaciones de Kendo",
+      "description": "Consulta los próximos torneos, exámenes, seminarios y actividades oficiales de la Federación de Asociaciones de Kendo.",
+      "image": "/images/social/kendo-social-card.png",
+      "preloadImage": {
+        "href": "/images/calendar/kendo-calendar-960.webp?v=20260723-1004",
+        "type": "image/webp",
+        "srcSet": "/images/calendar/kendo-calendar-480.webp?v=20260723-1004 480w, /images/calendar/kendo-calendar-960.webp?v=20260723-1004 960w, /images/calendar/kendo-calendar-1600.webp?v=20260723-1004 1600w",
+        "sizes": "100vw"
+      },
+      "schemaType": "CollectionPage"
+    },
     "/galeria/": {
       "path": "/galeria/",
       "component": "gallery",
