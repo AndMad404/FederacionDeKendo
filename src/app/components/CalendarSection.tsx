@@ -50,6 +50,17 @@ const contentPanelClassByCount: Record<number, string> = {
   3: "max-w-7xl xl:max-w-[77rem]",
   4: "max-w-7xl xl:max-w-[77rem]",
 };
+const legacyEventHashPattern = /-[a-f0-9]{8}$/i;
+
+function findEventByUrlId(events: CalendarEvent[], urlId: string) {
+  const exactMatch = events.find((event) => event.id === urlId);
+
+  if (exactMatch) return exactMatch;
+  if (!legacyEventHashPattern.test(urlId)) return undefined;
+
+  const cleanId = urlId.replace(legacyEventHashPattern, "");
+  return events.find((event) => event.id === cleanId);
+}
 
 function CalendarBackdrop() {
   return (
@@ -137,22 +148,31 @@ export function CalendarSection() {
         eventId = window.location.hash.slice(1);
       }
 
-      const matchingGroupIndex = eventGroups.findIndex((group) =>
-        group.events.some((event) => event.id === eventId),
-      );
+      const matchingEvent = findEventByUrlId(allEvents, eventId);
 
-      if (matchingGroupIndex === -1) {
+      if (!matchingEvent) {
         setSelectedEvent(null);
         return;
       }
 
+      const matchingGroupIndex = eventGroups.findIndex((group) =>
+        group.events.some((event) => event.id === matchingEvent.id),
+      );
       const matchingGroup = eventGroups[matchingGroupIndex];
       const matchingEventIndex = matchingGroup.events.findIndex(
-        (event) => event.id === eventId,
+        (event) => event.id === matchingEvent.id,
       );
       setGroupIndex(matchingGroupIndex);
       setPageIndex(Math.floor(matchingEventIndex / eventsPerPage));
-      setSelectedEvent(matchingGroup.events[matchingEventIndex]);
+      setSelectedEvent(matchingEvent);
+
+      if (matchingEvent.id !== eventId) {
+        window.history.replaceState(
+          null,
+          "",
+          `${window.location.pathname}${window.location.search}#${encodeURIComponent(matchingEvent.id)}`,
+        );
+      }
     }
 
     syncEventFromHash();
