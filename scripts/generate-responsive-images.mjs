@@ -76,6 +76,15 @@ const jobs = [
     ],
   },
   {
+    input: "public/images/calendar/kendo-calendar.jpg",
+    quality: WEBP_QUALITY,
+    outputs: [
+      "public/images/calendar/kendo-calendar-480.webp",
+      "public/images/calendar/kendo-calendar-960.webp",
+      "public/images/calendar/kendo-calendar-1600.webp",
+    ],
+  },
+  {
     input: "public/images/affiliates/kendo-affiliates.jpg",
     quality: AFFILIATES_WEBP_QUALITY,
     avifQuality: AFFILIATES_AVIF_QUALITY,

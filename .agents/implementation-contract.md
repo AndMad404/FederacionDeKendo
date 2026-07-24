@@ -39,6 +39,33 @@ Use this file when the user asks to apply, fix, build, implement, or change code
 - Keep responsive behavior component-scoped when possible.
 - Touch targets should be at least 44px for interactive mobile controls.
 
+### Visual Change Baseline
+
+Before editing a visual or layout concern, record the smallest baseline that
+can determine the intended result:
+
+1. Explicit user-approved requirements and measurements.
+2. An approved screenshot or rendered result from the current task.
+3. Existing product components, semantic tokens, and geometry.
+4. Figma only when the user confirms that it represents the current design.
+
+The baseline must name the affected routes and viewports plus the relevant
+outer margins, internal padding, gaps, dimensions, alignment, component
+composition, style tokens, and interactive states. Mark items that do not
+apply instead of inventing values.
+
+- For a material or ambiguous change to layout, composition, responsive
+  behavior, or shared primitives, present the baseline and obtain user
+  approval before editing.
+- An exact, narrowly scoped correction may proceed without a checkpoint when
+  its source and value are explicit.
+- When the available references do not determine a material decision, stop
+  and ask; do not silently treat the current implementation as approved.
+- Do not claim Figma fidelity when the Figma source is missing or stale.
+- Keep visual corrections separate from new behavior and unrelated refactors.
+  If they are inseparable, explain the dependency before editing and keep the
+  combined scope explicit.
+
 ## SEO and Metadata
 
 - Start with `src/app/config/seo-data.json`.
@@ -53,5 +80,7 @@ Use this file when the user asks to apply, fix, build, implement, or change code
 ## After Editing
 
 - Run the relevant commands from `.agents/verification.md`.
+- Compare visual changes against the approved baseline at the affected
+  viewports and record any intentional deviation.
 - Summarize changed files and verification results.
 - If a check fails, report the failure and the likely next step.

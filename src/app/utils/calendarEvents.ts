@@ -1,5 +1,10 @@
 import type { CalendarEvent } from "../types";
 
+export interface UpcomingEventGroup {
+  monthKey: string;
+  events: CalendarEvent[];
+}
+
 function parseDateParts(date: string) {
   const [year, month, day] = date.split("-").map(Number);
 
@@ -62,4 +67,24 @@ export function getUpcomingEvents(
     .filter((event) => getEventEndDate(event) >= now)
     .sort((a, b) => getEventStartDate(a).getTime() - getEventStartDate(b).getTime())
     .slice(0, max);
+}
+
+export function getUpcomingEventGroups(
+  events: readonly CalendarEvent[],
+  now = new Date(),
+) {
+  return getUpcomingEvents(events, now, events.length).reduce<
+    UpcomingEventGroup[]
+  >((groups, event) => {
+    const monthKey = event.date.slice(0, 7);
+    const currentGroup = groups[groups.length - 1];
+
+    if (currentGroup?.monthKey === monthKey) {
+      currentGroup.events.push(event);
+      return groups;
+    }
+
+    groups.push({ monthKey, events: [event] });
+    return groups;
+  }, []);
 }

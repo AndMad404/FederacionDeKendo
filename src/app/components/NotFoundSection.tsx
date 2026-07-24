@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { PageTitle } from "./PageTitle";
-import { focusRingClass } from "../styles/shared";
+import { focusRingClass, panelSurfaceClass } from "../styles/shared";
 
 const LINKS = [
   { to: "/", label: "Inicio" },
@@ -18,7 +18,7 @@ export function NotFoundSection() {
         Página no encontrada
       </PageTitle>
 
-      <p className="max-w-md text-base leading-relaxed text-white">
+      <p className="max-w-md text-base leading-relaxed text-site-on-dark">
         La página que buscas no existe o fue movida. Puedes continuar desde
         alguna de estas secciones.
       </p>
@@ -28,7 +28,7 @@ export function NotFoundSection() {
           <li key={link.to}>
             <Link
               to={link.to}
-              className={`rounded-lg border border-blue-500/70 bg-black/70 px-4 py-2 text-white transition-colors duration-200 hover:text-red-400 ${focusRingClass}`}
+              className={`rounded-lg px-4 py-2 text-site-on-dark transition-colors duration-200 hover:text-site-accent ${panelSurfaceClass} ${focusRingClass}`}
             >
               {link.label}
             </Link>

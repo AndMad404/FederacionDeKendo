@@ -4,6 +4,7 @@ import { Navbar } from "./components/Navbar";
 import { HeroSection } from "./components/HeroSection";
 import { GallerySection } from "./components/GallerySection";
 import { AfiliadosSection } from "./components/AfiliadosSection";
+import { CalendarSection } from "./components/CalendarSection";
 import { Footer } from "./components/Footer";
 import { NotFoundSection } from "./components/NotFoundSection";
 import {
@@ -16,6 +17,7 @@ import {
 
 const ROUTE_COMPONENTS: Record<RouteComponent, ComponentType> = {
   home: HeroSection,
+  calendar: CalendarSection,
   gallery: GallerySection,
   affiliates: AfiliadosSection,
 };
@@ -73,12 +75,12 @@ function RouteMetadata() {
 
 export default function App() {
   return (
-    <div className="flex min-h-svh flex-col bg-stone-950 tall-md:h-dvh tall-md:overflow-hidden">
+    <div className="flex min-h-svh flex-col bg-site-canvas tall-md:h-dvh tall-md:overflow-hidden">
       <ScrollToTop />
       <RouteMetadata />
       <a
         href="#main-content"
-        className="fixed left-4 top-4 z-[60] -translate-y-20 rounded bg-white px-4 py-2 text-sm font-bold text-stone-950 shadow-lg transition focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="fixed left-4 top-4 z-[60] -translate-y-20 rounded bg-site-on-dark px-4 py-2 text-sm font-bold text-site-canvas shadow-lg transition focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-site-action"
       >
         Saltar al contenido principal
       </a>

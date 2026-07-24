@@ -1,0 +1,8 @@
+# type(scope): observable outcome
+#
+# Problem: explain why the change is needed
+# Intent: describe the behavior or result this change should produce
+# Verification: list commands or checks, or explain why none were run
+#
+# Types: fix, feat, refactor, docs, test, build, ci, chore
+# See CONTRIBUTING.md for the complete convention.

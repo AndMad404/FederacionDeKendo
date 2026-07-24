@@ -4,6 +4,8 @@ Sitio oficial de la Federacion de Asociaciones de Kendo, desarrollado con React,
 
 ## Desarrollo
 
+Este repositorio usa pnpm. Si `pnpm` no esta disponible directamente en PowerShell, usa `corepack pnpm` con los mismos argumentos.
+
 Instala dependencias:
 
 ```bash
@@ -13,13 +15,13 @@ pnpm install
 Inicia el servidor local:
 
 ```bash
-pnpm dev
+pnpm run dev
 ```
 
 Genera el build de produccion:
 
 ```bash
-pnpm build
+pnpm run build
 ```
 
 ## Prerender e hidratacion
@@ -41,7 +43,7 @@ Despues de cambiar rutas, layout compartido o SSR, ejecuta:
 
 ```bash
 pnpm run typecheck
-pnpm build
+pnpm run build
 ```
 
 Verifica que `dist/index.html`, `dist/galeria/index.html`, `dist/afiliados/index.html` y `dist/404.html` contengan el body esperado. En el navegador no deben aparecer errores de hidratacion `#418` o `#423`.
@@ -57,13 +59,13 @@ Verifica que `dist/index.html`, `dist/galeria/index.html`, `dist/afiliados/index
 - el grafo JSON-LD base;
 - una descripcion comun de etiquetas para el navegador y el prerender.
 
-El build usa el mismo manifiesto para generar las paginas HTML y `dist/sitemap.xml`. No edites un sitemap manual en `public/`: al agregar o eliminar una ruta indexable, actualiza `seo-data.json` y el sitemap se regenerara con `pnpm build`.
+El build usa el mismo manifiesto para generar las paginas HTML y `dist/sitemap.xml`. No edites un sitemap manual en `public/`: al agregar o eliminar una ruta indexable, actualiza `seo-data.json` y el sitemap se regenerara con `pnpm run build`.
 
 Para incorporar una nueva pagina:
 
 1. Agrega su identificador a `RouteComponent` y su componente a `ROUTE_COMPONENTS`.
 2. Agrega un registro completo en `seo-data.json`.
-3. Ejecuta `pnpm run typecheck` y `pnpm build`.
+3. Ejecuta `pnpm run typecheck` y `pnpm run build`.
 4. Comprueba que aparezca en `dist/sitemap.xml` y que su HTML tenga una sola description, robots, canonical y bloque JSON-LD.
 
 Las entidades estructuradas especificas de una ruta se agregan mediante `ROUTE_STRUCTURED_DATA_BUILDERS`. Solo deben representar informacion visible, verdadera y aprobada.
@@ -75,13 +77,13 @@ Las variantes responsive de las imagenes LCP se generan desde los JPG fallback v
 Genera las variantes:
 
 ```bash
-pnpm images:responsive
+pnpm run images:responsive
 ```
 
 Si `pnpm` no esta disponible directo en PowerShell, usa:
 
 ```bash
-corepack pnpm images:responsive
+corepack pnpm run images:responsive
 ```
 
 Esto genera las variantes usadas por `srcSet` en Home, Galeria y Afiliados.

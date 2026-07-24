@@ -1,4 +1,3 @@
-import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -295,21 +294,68 @@ function slugify(value) {
     .slice(0, 72);
 }
 
-function createEventId(title, date, uid, usedIds) {
+function createEventId(title, date, usedIds) {
   const base = slugify(`${title}-${date}`) || "calendar-event";
-  const uidHash = uid ? createHash("sha1").update(uid).digest("hex").slice(0, 8) : "";
-  const initialId = uidHash ? `${base}-${uidHash}` : base;
-  let id = initialId;
+  let id = base;
   let suffix = 2;
 
   while (usedIds.has(id)) {
-    id = `${initialId}-${suffix}`;
+    id = `${base}-${suffix}`;
     suffix += 1;
   }
 
   usedIds.add(id);
 
   return id;
+}
+
+function getEventType(property) {
+  if (!property) {
+    return undefined;
+  }
+
+  const supportedTypes = new Map(
+    [
+      "Examen",
+      "Torneo",
+      "Seminario",
+      "Entrenamiento especial",
+      "Actividad federativa",
+    ].map((type) => [
+      type
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase(),
+      type,
+    ]),
+  );
+
+  for (const category of property.value.split(",")) {
+    const normalizedCategory = category
+      .trim()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+    const matchingType = supportedTypes.get(normalizedCategory);
+
+    if (matchingType) {
+      return matchingType;
+    }
+  }
+
+  return undefined;
+}
+
+function getOrganizer(property) {
+  if (!property) {
+    return undefined;
+  }
+
+  const commonName = property.params.CN
+    ? decodeIcsText(property.params.CN)
+    : undefined;
+
+  return commonName || property.value.replace(/^mailto:/i, "");
 }
 
 function parseCalendarEvent(properties, usedIds) {
@@ -328,7 +374,7 @@ function parseCalendarEvent(properties, usedIds) {
   }
 
   const event = {
-    id: createEventId(title, start.date, properties.get("UID")?.value, usedIds),
+    id: createEventId(title, start.date, usedIds),
     title,
     date: start.date,
   };
@@ -351,6 +397,9 @@ function parseCalendarEvent(properties, usedIds) {
 
   const location = properties.get("LOCATION")?.value;
   const summary = properties.get("DESCRIPTION")?.value;
+  const type = getEventType(properties.get("CATEGORIES"));
+  const organizer = getOrganizer(properties.get("ORGANIZER"));
+  const infoUrl = properties.get("URL")?.value;
 
   if (location) {
     event.location = location;
@@ -358,6 +407,18 @@ function parseCalendarEvent(properties, usedIds) {
 
   if (summary) {
     event.summary = summary;
+  }
+
+  if (type) {
+    event.type = type;
+  }
+
+  if (organizer) {
+    event.organizer = organizer;
+  }
+
+  if (infoUrl) {
+    event.infoUrl = infoUrl;
   }
 
   event.timeZone = start.timeZone ?? defaultTimeZone;
@@ -401,6 +462,10 @@ function serializeEvent(event) {
     ["endTime", event.endTime],
     ["location", event.location],
     ["summary", event.summary],
+    ["type", event.type],
+    ["organizer", event.organizer],
+    ["infoUrl", event.infoUrl],
+    ["ctaLabel", event.ctaLabel],
     ["timeZone", event.timeZone],
   ].filter(([, value]) => value);
 

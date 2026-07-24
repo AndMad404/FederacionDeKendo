@@ -1,11 +1,15 @@
-import { Fragment, type ReactNode } from "react";
-import { Globe, Mail, MapPin, Phone } from "lucide-react";
+import { Fragment, useState, type ReactNode } from "react";
+import { ChevronLeft, ChevronRight, Globe, Mail, MapPin, Phone } from "lucide-react";
 import { DOJOS } from "../data/dojos";
-import type { IconKey, InfoItem, ScheduleSlot } from "../types";
-import { focusRingClass } from "../styles/shared";
+import type { DojoData, IconKey, InfoItem, ScheduleSlot } from "../types";
+import {
+  actionControlSurfaceClass,
+  focusRingClass,
+  panelSurfaceClass,
+} from "../styles/shared";
 import { PageTitle } from "./PageTitle";
 
-const highPriorityImageProps = { fetchpriority: "high" } as const;
+const DOJOS_PER_PAGE = 2;
 
 const ICON_MAP: Record<IconKey, ReactNode> = {
   mail: <Mail />,
@@ -27,9 +31,9 @@ const ICON_MAP: Record<IconKey, ReactNode> = {
 };
 
 const INFO_GRID =
-  "grid w-full grid-cols-[2rem_minmax(0,1fr)] items-center gap-x-4 gap-y-2 md:grid-cols-[2.5rem_minmax(11rem,1.1fr)_1.5rem_2.5rem_minmax(0,1fr)] md:gap-y-4 lg:grid-cols-[3rem_minmax(13rem,1.1fr)_2rem_3rem_minmax(0,1fr)] land-compact:grid-cols-[1.75rem_minmax(0,1fr)] land-compact:gap-x-2 land-compact:gap-y-1";
+  "grid w-full grid-cols-[2rem_minmax(0,1fr)] items-center gap-x-2 gap-y-2 sm:gap-x-4 md:grid-cols-[2.5rem_minmax(11rem,1.1fr)_1.5rem_2.5rem_minmax(0,1fr)] md:gap-y-4 lg:grid-cols-[3rem_minmax(13rem,1.1fr)_2rem_3rem_minmax(0,1fr)] land-compact:grid-cols-[1.75rem_minmax(0,1fr)] land-compact:gap-x-2 land-compact:gap-y-1";
 const SCHEDULE_GRID =
-  "grid w-full grid-cols-1 items-center gap-y-1 text-center md:grid-cols-[2.5rem_minmax(0,1fr)_2rem_2.5rem_minmax(0,1fr)] md:gap-x-4 md:gap-y-4 lg:grid-cols-[3rem_minmax(0,1fr)_2.5rem_3rem_minmax(0,1fr)] land-compact:grid-cols-[minmax(0,1fr)_max-content] land-compact:items-baseline land-compact:gap-x-2 land-compact:gap-y-0 land-compact:text-left";
+  "grid w-full grid-cols-1 items-center gap-y-1 text-center md:grid-cols-[2.5rem_minmax(0,1fr)_2rem_2.5rem_minmax(0,1fr)] md:gap-x-4 md:gap-y-4 lg:grid-cols-[3rem_minmax(0,1fr)_2.5rem_3rem_minmax(0,1fr)] land-compact:grid-cols-[minmax(0,1fr)_max-content] land-compact:items-baseline land-compact:gap-x-2 land-compact:text-left";
 
 function getInfoRows(info: InfoItem[]) {
   return info.reduce<InfoItem[][]>((rows, item, index) => {
@@ -48,11 +52,11 @@ function InfoCell({ item, side }: { item: InfoItem; side: "left" | "right" }) {
     side === "left" ? "col-start-1" : "md:col-start-4 land-compact:col-start-1";
   const textColumn =
     side === "left" ? "col-start-2" : "md:col-start-5 land-compact:col-start-2";
-  const valueTextSize = item.icon === "mail" ? "text-sm sm:text-base" : "text-base";
+  const valueTextSize = "text-base";
 
   return (
     <Fragment>
-      <span className={`${iconColumn} flex h-8 w-8 items-center justify-center rounded-full bg-blue-500/20 text-red-400 [&>svg]:size-5 md:h-10 md:w-10 lg:h-12 lg:w-12 lg:[&>svg]:size-6 land-compact:h-7 land-compact:w-7 land-compact:[&>svg]:size-4`}>
+      <span className={`${iconColumn} flex size-8 items-center justify-center rounded-full bg-site-action/20 text-site-accent [&>svg]:size-5 md:size-10 lg:size-12 lg:[&>svg]:size-6 land-compact:size-7 land-compact:[&>svg]:size-4`}>
         {ICON_MAP[item.icon]}
       </span>
       <div className={`${textColumn} min-w-0`}>
@@ -63,7 +67,7 @@ function InfoCell({ item, side }: { item: InfoItem; side: "left" | "right" }) {
           href={item.href}
           target="_blank"
           rel="noreferrer"
-          className={`block ${valueTextSize} underline-offset-4 transition-colors duration-200 [overflow-wrap:anywhere] hover:text-blue-400 hover:underline land-compact:leading-tight ${focusRingClass}`}
+          className={`block ${valueTextSize} underline-offset-4 transition-colors duration-200 [overflow-wrap:anywhere] hover:text-site-action-soft hover:underline land-compact:leading-tight ${focusRingClass}`}
         >
           {item.value}
         </a>
@@ -75,7 +79,7 @@ function InfoCell({ item, side }: { item: InfoItem; side: "left" | "right" }) {
 function ScheduleRow({ days, hours }: Pick<ScheduleSlot, "days" | "hours">) {
   return (
     <div className={SCHEDULE_GRID}>
-      <dt className="text-center text-[16px] [overflow-wrap:anywhere] md:col-start-2 md:text-left land-compact:col-start-auto land-compact:leading-tight">
+      <dt className="text-center text-base [overflow-wrap:anywhere] md:col-start-2 md:text-left land-compact:col-start-auto land-compact:leading-tight">
         {days}
       </dt>
       <dd className="text-center [overflow-wrap:anywhere] md:col-start-5 md:text-left land-compact:col-start-auto land-compact:leading-tight">
@@ -83,6 +87,25 @@ function ScheduleRow({ days, hours }: Pick<ScheduleSlot, "days" | "hours">) {
       </dd>
     </div>
   );
+}
+
+function getScheduleGroups(schedule: ScheduleSlot[]) {
+  const slotsByLocation = new Map<string, ScheduleSlot[]>();
+
+  for (const slot of schedule) {
+    const locationSlots = slotsByLocation.get(slot.location);
+
+    if (locationSlots) {
+      locationSlots.push(slot);
+    } else {
+      slotsByLocation.set(slot.location, [slot]);
+    }
+  }
+
+  return Array.from(slotsByLocation, ([location, slots]) => ({
+    location,
+    slots,
+  }));
 }
 
 function DojoInfo({
@@ -96,13 +119,12 @@ function DojoInfo({
   info: InfoItem[];
   schedule: ScheduleSlot[];
 }) {
-  const allSlotsShareLocation =
-    schedule.length > 0 && schedule.every((slot) => slot.location === schedule[0].location);
+  const scheduleGroups = getScheduleGroups(schedule);
 
   return (
     <section
       aria-labelledby={headingId}
-      className="mb-6 flex flex-col justify-between gap-2 rounded-3xl border border-blue-500/70 bg-black/70 px-6 py-4 text-white land-compact:mb-0 land-compact:gap-1 land-compact:rounded-2xl land-compact:px-3 land-compact:py-2"
+      className={`mb-6 flex flex-col justify-between gap-2 rounded-3xl px-3 py-4 text-site-on-dark sm:px-6 land-compact:mb-0 land-compact:gap-1 land-compact:rounded-2xl land-compact:px-3 land-compact:py-2 ${panelSurfaceClass}`}
     >
       <h2
         id={headingId}
@@ -125,13 +147,13 @@ function DojoInfo({
           Horario de clases:
         </h3>
         <div className="grid gap-2 text-base land-compact:leading-tight">
-          {allSlotsShareLocation ? (
-            <section aria-label={schedule[0].location}>
+          {scheduleGroups.map(({ location, slots }) => (
+            <section key={location} aria-label={location}>
               <h4 className="text-lg font-bold land-compact:leading-tight">
-                {schedule[0].location}
+                {location}
               </h4>
-              <dl className="grid gap-1">
-                {schedule.map((slot) => (
+              <dl className={slots.length > 1 ? "grid gap-1" : undefined}>
+                {slots.map((slot) => (
                   <ScheduleRow
                     key={`${slot.days}-${slot.hours}`}
                     days={slot.days}
@@ -140,31 +162,34 @@ function DojoInfo({
                 ))}
               </dl>
             </section>
-          ) : (
-            schedule.map((slot) => (
-              <section key={slot.location} aria-label={slot.location}>
-                <h4 className="text-lg font-bold land-compact:leading-tight">
-                  {slot.location}
-                </h4>
-                <dl>
-                  <ScheduleRow days={slot.days} hours={slot.hours} />
-                </dl>
-              </section>
-            ))
-          )}
+          ))}
         </div>
       </div>
     </section>
   );
 }
 
-function InfoCard() {
+function InfoCard({
+  dojos,
+  startIndex,
+}: {
+  dojos: DojoData[];
+  startIndex: number;
+}) {
+  const desktopGridClass =
+    dojos.length === 1
+      ? "xl:mx-auto xl:max-w-3xl"
+      : "xl:grid-cols-2 xl:gap-8";
+
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-2 xl:gap-8 land-compact:grid-cols-2 land-compact:gap-3">
-      {DOJOS.map((dojo, index) => (
+    <div
+      id="affiliate-dojo-list"
+      className={`grid w-full grid-cols-1 land-compact:grid-cols-2 land-compact:gap-3 ${desktopGridClass}`}
+    >
+      {dojos.map((dojo, index) => (
         <DojoInfo
           key={dojo.title}
-          headingId={`dojo-${index + 1}-title`}
+          headingId={`dojo-${startIndex + index + 1}-title`}
           {...dojo}
         />
       ))}
@@ -172,15 +197,65 @@ function InfoCard() {
   );
 }
 
+function AffiliatePagination({
+  page,
+  totalPages,
+  onPageChange,
+}: {
+  page: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}) {
+  if (totalPages <= 1) return null;
+
+  return (
+    <nav
+      aria-label="Paginación de dojos afiliados"
+      className="mb-4 flex min-h-11 items-center justify-center gap-2 xl:absolute xl:right-6 xl:top-2 xl:z-20 xl:mb-0"
+    >
+      <button
+        type="button"
+        aria-label="Página anterior de dojos"
+        aria-controls="affiliate-dojo-list"
+        disabled={page === 0}
+        onClick={() => onPageChange(page - 1)}
+        className={`inline-flex size-11 items-center justify-center rounded-full transition-colors hover:bg-site-action-hover/90 disabled:cursor-not-allowed disabled:border-site-on-dark/20 disabled:text-site-on-dark/35 ${actionControlSurfaceClass} ${focusRingClass}`}
+      >
+        <ChevronLeft className="size-5" aria-hidden="true" />
+      </button>
+
+      <p className="min-w-20 text-center text-sm font-bold text-site-on-dark" aria-live="polite">
+        {page + 1} de {totalPages}
+      </p>
+
+      <button
+        type="button"
+        aria-label="Página siguiente de dojos"
+        aria-controls="affiliate-dojo-list"
+        disabled={page === totalPages - 1}
+        onClick={() => onPageChange(page + 1)}
+        className={`inline-flex size-11 items-center justify-center rounded-full transition-colors hover:bg-site-action-hover/90 disabled:cursor-not-allowed disabled:border-site-on-dark/20 disabled:text-site-on-dark/35 ${actionControlSurfaceClass} ${focusRingClass}`}
+      >
+        <ChevronRight className="size-5" aria-hidden="true" />
+      </button>
+    </nav>
+  );
+}
+
 export function AfiliadosSection() {
+  const [page, setPage] = useState(0);
+  const totalPages = Math.max(1, Math.ceil(DOJOS.length / DOJOS_PER_PAGE));
+  const startIndex = page * DOJOS_PER_PAGE;
+  const visibleDojos = DOJOS.slice(startIndex, startIndex + DOJOS_PER_PAGE);
+
   return (
     <section
       aria-labelledby="affiliates-title"
-      className="relative rounded-3xl bg-stone-950 md:h-full md:overflow-y-auto xl:overflow-hidden land-compact:overflow-y-auto"
+      className="relative rounded-3xl bg-site-canvas md:h-full md:overflow-y-auto xl:overflow-hidden land-compact:overflow-y-auto"
     >
       <PageTitle
         id="affiliates-title"
-        className="pointer-events-none absolute left-1/2 top-5 z-30 -translate-x-1/2 land-compact:top-2"
+        placement="floating"
       >
         Dojos afiliados
       </PageTitle>
@@ -198,18 +273,23 @@ export function AfiliadosSection() {
           />
           <img
             src="/images/affiliates/kendo-affiliates.jpg"
-            alt="Nuestro dojo"
+            alt="Practicantes de kendo reunidos durante un entrenamiento en un dojo"
             width={1500}
             height={1001}
             loading="eager"
             decoding="async"
-            {...highPriorityImageProps}
+            fetchpriority="high"
             className="h-full w-full object-cover"
           />
         </picture>
-        <div className="absolute inset-0 rounded-3xl bg-black/30" aria-hidden="true" />
-        <div className="relative z-10 w-full max-w-4xl px-4 pt-16 sm:px-6 sm:pt-20 md:max-w-5xl lg:max-w-6xl xl:max-w-7xl land-compact:max-w-none land-compact:px-2 land-compact:pt-14">
-          <InfoCard />
+        <div className="absolute inset-0 rounded-3xl bg-site-overlay/30" aria-hidden="true" />
+        <div className="relative z-10 w-full max-w-4xl px-4 pt-14 sm:px-6 md:max-w-5xl lg:max-w-6xl xl:flex xl:h-full xl:max-w-7xl xl:items-center xl:pt-10 land-compact:max-w-none land-compact:px-2 land-compact:pt-14">
+          <AffiliatePagination
+            page={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+          <InfoCard dojos={visibleDojos} startIndex={startIndex} />
         </div>
       </div>
     </section>
