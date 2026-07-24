@@ -1,12 +1,13 @@
 import { MapPin } from "lucide-react";
+import { Link } from "react-router";
 import { CALENDAR_EVENTS } from "../data/calendarEvents";
 import type { CalendarEvent } from "../types";
 import { getUpcomingEvents } from "../utils/calendarEvents";
-import { actionControlSurfaceClass } from "../styles/shared";
+import { actionControlSurfaceClass, focusRingClass } from "../styles/shared";
 
 const maxHomepageEvents = 4;
-const locationPillClass =
-  `col-start-2 row-start-2 inline-flex min-h-11 min-w-0 items-center justify-center justify-self-end rounded-full px-3 py-1.5 text-center text-sm font-semibold leading-tight transition-colors lg:min-h-8 lg:px-2.5 lg:py-1 ${actionControlSurfaceClass}`;
+const actionPillClass =
+  `inline-flex min-h-11 min-w-0 items-center justify-center rounded-full px-3 py-1.5 text-center text-sm font-semibold leading-tight transition-colors lg:min-h-8 lg:px-2.5 lg:py-1 ${actionControlSurfaceClass}`;
 const eventDateFormatter = new Intl.DateTimeFormat("es-CR", {
   day: "2-digit",
   month: "short",
@@ -36,14 +37,6 @@ function getEventDateRangeLabels({ date, endDate }: CalendarEvent) {
     startDateLabel,
     endDateLabel: endDate ? getInclusiveEndDate(endDate) : undefined,
   };
-}
-
-function formatEventTime({ startTime, endTime }: CalendarEvent) {
-  if (!startTime) {
-    return "Todo el día";
-  }
-
-  return endTime ? `${startTime} - ${endTime}` : startTime;
 }
 
 function getLocationMapUrl(location: string) {
@@ -126,10 +119,6 @@ export function UpcomingEventsSection() {
                 ) : null}
               </time>
 
-              <p className="col-start-1 row-start-2 text-center text-sm leading-tight text-site-on-dark/75">
-                {formatEventTime(event)}
-              </p>
-
               {locationUrl ? (
                 <a
                   href={locationUrl}
@@ -137,19 +126,27 @@ export function UpcomingEventsSection() {
                   rel="noopener noreferrer"
                   aria-label={`Abrir ubicación de ${event.title} en Google Maps`}
                   aria-describedby={locationDescriptionId}
-                  className={`${locationPillClass} hover:bg-site-action-hover/90 hover:text-site-on-dark focus:outline-none focus:ring-2 focus:ring-site-action-soft focus:ring-offset-2 focus:ring-offset-site-overlay`}
+                  className={`col-start-1 row-start-2 justify-self-center ${actionPillClass} hover:bg-site-action-hover/90 hover:text-site-on-dark ${focusRingClass}`}
                 >
                   <MapPin className="mr-1.5 size-3.5 shrink-0 text-site-accent-soft" aria-hidden="true" />
-                  <span>Ver ubicación</span>
+                  <span>Cómo llegar</span>
                   <span id={locationDescriptionId} className="sr-only">
                     Dirección: {event.location}. Abre Google Maps en una pestaña nueva.
                   </span>
                 </a>
               ) : (
-                <span className={`${locationPillClass} border-site-on-dark/20 text-site-on-dark/65`}>
+                <span className={`col-start-1 row-start-2 justify-self-center ${actionPillClass} border-site-on-dark/20 text-site-on-dark/65`}>
                   Pendiente de confirmar
                 </span>
               )}
+
+              <Link
+                to={`/calendario/#${encodeURIComponent(event.id)}`}
+                aria-label={`Consultar detalles del evento ${event.title}`}
+                className={`col-start-2 row-start-2 justify-self-end ${actionPillClass} hover:bg-site-action-hover/90 hover:text-site-on-dark ${focusRingClass}`}
+              >
+                Detalles del evento
+              </Link>
             </li>
           );
         })}

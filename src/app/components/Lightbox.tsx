@@ -3,11 +3,13 @@ import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import type { GalleryImage } from "../types";
 import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
 import { getGalleryDisplayText } from "./gallery/galleryText";
-import { focusRingClass, panelSurfaceClass } from "../styles/shared";
+import {
+  focusRingClass,
+  modalNavigationButtonClass,
+  panelSurfaceClass,
+} from "../styles/shared";
 
 const LIGHTBOX_IMAGE_SIZES = "(max-width: 640px) 92vw, 75vw";
-const arrowButtonClass =
-  "flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-site-action-soft bg-site-overlay/70 shadow-xl shadow-site-overlay/40 transition-colors hover:bg-site-action-hover/90 md:size-12";
 const activeArrowClass = "border-site-accent bg-site-accent-strong text-site-on-dark";
 type ArrowDirection = "left" | "right";
 
@@ -181,7 +183,7 @@ export function Lightbox({
               event.stopPropagation();
               handlePrev();
             }}
-            className={`${arrowButtonClass} ${
+            className={`${modalNavigationButtonClass} ${
               activeArrow === "left" ? activeArrowClass : ""
             } justify-self-end sm:justify-self-center land-sm:absolute land-sm:left-3 land-sm:top-1/2 land-sm:-translate-y-1/2 ${focusRingClass}`}
           >
@@ -217,7 +219,7 @@ export function Lightbox({
               event.stopPropagation();
               handleNext();
             }}
-            className={`${arrowButtonClass} ${
+            className={`${modalNavigationButtonClass} ${
               activeArrow === "right" ? activeArrowClass : ""
             } justify-self-start sm:col-start-3 sm:justify-self-center land-sm:absolute land-sm:right-3 land-sm:top-1/2 land-sm:-translate-y-1/2 ${focusRingClass}`}
           >

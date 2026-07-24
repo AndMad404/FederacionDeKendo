@@ -1,6 +1,15 @@
-import { CalendarDays, Clock, ExternalLink, MapPin, UserRound } from "lucide-react";
+import {
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  ExternalLink,
+  MapPin,
+  UserRound,
+} from "lucide-react";
 import type { RefObject } from "react";
 import type { CalendarEvent } from "../types";
+import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
 import {
   formatEventTime,
   getEventDateLabel,
@@ -9,20 +18,29 @@ import {
 import {
   actionControlSurfaceClass,
   focusRingClass,
+  modalNavigationButtonClass,
   panelSurfaceClass,
 } from "../styles/shared";
 import { ModalShell } from "./ui/ModalShell";
 
 interface EventDetailModalProps {
   event: CalendarEvent;
+  index: number;
+  total: number;
   triggerRef?: RefObject<HTMLElement | null>;
   onClose: () => void;
+  onPrevious: () => void;
+  onNext: () => void;
 }
 
 export function EventDetailModal({
   event,
+  index,
+  total,
   triggerRef,
   onClose,
+  onPrevious,
+  onNext,
 }: EventDetailModalProps) {
   const titleId = `event-detail-${event.id}-title`;
   const descriptionId = event.summary
@@ -31,6 +49,10 @@ export function EventDetailModal({
   const locationUrl = event.location
     ? getLocationMapUrl(event.location)
     : undefined;
+  const { swipeHandlers } = useSwipeNavigation({
+    onSwipeLeft: onNext,
+    onSwipeRight: onPrevious,
+  });
 
   return (
     <ModalShell
@@ -40,7 +62,7 @@ export function EventDetailModal({
       triggerRef={triggerRef}
       onClose={onClose}
     >
-      <article className="pr-10">
+      <article className="touch-pan-y pr-10" {...swipeHandlers}>
         {event.type ? (
           <p className="mb-2 text-sm font-bold uppercase tracking-widest text-site-accent">
             {event.type}
@@ -139,6 +161,33 @@ export function EventDetailModal({
             <ExternalLink className="ml-2 size-4" aria-hidden="true" />
             <span className="sr-only">. Abre en una pestaña nueva.</span>
           </a>
+        ) : null}
+
+        {total > 1 ? (
+          <nav
+            aria-label="Navegación entre eventos"
+            className="mt-6 flex min-h-11 items-center justify-center gap-4"
+          >
+            <button
+              type="button"
+              aria-label="Ver evento anterior"
+              onClick={onPrevious}
+              className={`${modalNavigationButtonClass} ${focusRingClass}`}
+            >
+              <ChevronLeft className="size-5" aria-hidden="true" />
+            </button>
+            <p className="min-w-24 text-center text-sm font-semibold" aria-live="polite">
+              Evento {index + 1} de {total}
+            </p>
+            <button
+              type="button"
+              aria-label="Ver evento siguiente"
+              onClick={onNext}
+              className={`${modalNavigationButtonClass} ${focusRingClass}`}
+            >
+              <ChevronRight className="size-5" aria-hidden="true" />
+            </button>
+          </nav>
         ) : null}
       </article>
     </ModalShell>
