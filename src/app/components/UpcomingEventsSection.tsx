@@ -1,52 +1,16 @@
 import { MapPin } from "lucide-react";
 import { Link } from "react-router";
 import { CALENDAR_EVENTS } from "../data/calendarEvents";
-import type { CalendarEvent } from "../types";
 import { getUpcomingEvents } from "../utils/calendarEvents";
+import {
+  getEventDateRangeLabels,
+  getLocationMapUrl,
+} from "../utils/calendarEventPresentation";
 import { actionControlSurfaceClass, focusRingClass } from "../styles/shared";
 
 const maxHomepageEvents = 4;
 const actionPillClass =
   `inline-flex min-h-11 min-w-0 items-center justify-center rounded-full px-3 py-1.5 text-center text-sm font-semibold leading-tight transition-colors lg:min-h-8 lg:px-2.5 lg:py-1 ${actionControlSurfaceClass}`;
-const eventDateFormatter = new Intl.DateTimeFormat("es-CR", {
-  day: "2-digit",
-  month: "short",
-  year: "numeric",
-  timeZone: "UTC",
-});
-
-function formatCalendarDate(date: Date) {
-  return eventDateFormatter.format(date).replace(".", "").toUpperCase();
-}
-
-function formatEventDate(date: string) {
-  return formatCalendarDate(new Date(`${date}T00:00:00.000Z`));
-}
-
-function getInclusiveEndDate(date: string) {
-  const endDate = new Date(`${date}T00:00:00.000Z`);
-  endDate.setUTCDate(endDate.getUTCDate() - 1);
-
-  return formatCalendarDate(endDate);
-}
-
-function getEventDateRangeLabels({ date, endDate }: CalendarEvent) {
-  const startDateLabel = formatEventDate(date);
-
-  return {
-    startDateLabel,
-    endDateLabel: endDate ? getInclusiveEndDate(endDate) : undefined,
-  };
-}
-
-function getLocationMapUrl(location: string) {
-  const params = new URLSearchParams({
-    api: "1",
-    query: location,
-  });
-
-  return `https://www.google.com/maps/search/?${params.toString()}`;
-}
 
 function getEventVisibilityClass(index: number) {
   if (index === 2) {

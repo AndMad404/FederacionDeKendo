@@ -89,6 +89,25 @@ function ScheduleRow({ days, hours }: Pick<ScheduleSlot, "days" | "hours">) {
   );
 }
 
+function getScheduleGroups(schedule: ScheduleSlot[]) {
+  const slotsByLocation = new Map<string, ScheduleSlot[]>();
+
+  for (const slot of schedule) {
+    const locationSlots = slotsByLocation.get(slot.location);
+
+    if (locationSlots) {
+      locationSlots.push(slot);
+    } else {
+      slotsByLocation.set(slot.location, [slot]);
+    }
+  }
+
+  return Array.from(slotsByLocation, ([location, slots]) => ({
+    location,
+    slots,
+  }));
+}
+
 function DojoInfo({
   headingId,
   title,
@@ -100,8 +119,7 @@ function DojoInfo({
   info: InfoItem[];
   schedule: ScheduleSlot[];
 }) {
-  const allSlotsShareLocation =
-    schedule.length > 0 && schedule.every((slot) => slot.location === schedule[0].location);
+  const scheduleGroups = getScheduleGroups(schedule);
 
   return (
     <section
@@ -129,13 +147,13 @@ function DojoInfo({
           Horario de clases:
         </h3>
         <div className="grid gap-2 text-base land-compact:leading-tight">
-          {allSlotsShareLocation ? (
-            <section aria-label={schedule[0].location}>
+          {scheduleGroups.map(({ location, slots }) => (
+            <section key={location} aria-label={location}>
               <h4 className="text-lg font-bold land-compact:leading-tight">
-                {schedule[0].location}
+                {location}
               </h4>
-              <dl className="grid gap-1">
-                {schedule.map((slot) => (
+              <dl className={slots.length > 1 ? "grid gap-1" : undefined}>
+                {slots.map((slot) => (
                   <ScheduleRow
                     key={`${slot.days}-${slot.hours}`}
                     days={slot.days}
@@ -144,18 +162,7 @@ function DojoInfo({
                 ))}
               </dl>
             </section>
-          ) : (
-            schedule.map((slot) => (
-              <section key={slot.location} aria-label={slot.location}>
-                <h4 className="text-lg font-bold land-compact:leading-tight">
-                  {slot.location}
-                </h4>
-                <dl>
-                  <ScheduleRow days={slot.days} hours={slot.hours} />
-                </dl>
-              </section>
-            ))
-          )}
+          ))}
         </div>
       </div>
     </section>

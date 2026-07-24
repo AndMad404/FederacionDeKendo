@@ -295,29 +295,16 @@ export function CalendarSection() {
     }, 2200);
   }
 
-  if (eventGroups.length === 0) {
-    return (
-      <section
-        aria-labelledby="calendar-title"
-        className="relative flex min-h-[calc(100svh_-_4rem_-_10px)] w-full flex-col overflow-hidden rounded-3xl bg-site-canvas text-site-on-dark land-sm:min-h-[calc(100svh_-_3rem_-_6px)] tall-md:h-full tall-md:min-h-0"
-      >
-        <CalendarBackdrop />
-        <CalendarBanner />
-        <div className="relative z-10 flex flex-1 items-center justify-center px-4">
-          <p className={`rounded-lg px-6 py-5 text-center text-lg ${panelSurfaceClass}`}>
-            No hay próximos eventos publicados.
-          </p>
-        </div>
-      </section>
-    );
-  }
-
   const currentGroup = eventGroups[groupIndex];
-  const pageCount = Math.ceil(currentGroup.events.length / eventsPerPage);
-  const visibleEvents = currentGroup.events.slice(
-    pageIndex * eventsPerPage,
-    (pageIndex + 1) * eventsPerPage,
-  );
+  const pageCount = currentGroup
+    ? Math.ceil(currentGroup.events.length / eventsPerPage)
+    : 0;
+  const visibleEvents = currentGroup
+    ? currentGroup.events.slice(
+        pageIndex * eventsPerPage,
+        (pageIndex + 1) * eventsPerPage,
+      )
+    : [];
   function changeMonth(nextIndex: number) {
     setGroupIndex(nextIndex);
     setPageIndex(0);
@@ -368,7 +355,8 @@ export function CalendarSection() {
       >
         <CalendarBackdrop />
         <CalendarBanner />
-        <div className="relative z-10 flex min-h-0 flex-1 items-start justify-center p-3 sm:p-4 xl:items-center land-sm:p-2">
+        {currentGroup ? (
+          <div className="relative z-10 flex min-h-0 flex-1 items-start justify-center p-3 sm:p-4 xl:items-center land-sm:p-2">
           <div
             className={`flex w-full touch-pan-y select-none flex-col justify-center gap-3 rounded-3xl px-3 py-4 text-center backdrop-blur-[2px] sm:px-2 land-sm:gap-2 land-sm:px-2 land-sm:py-2 ${contentPanelClassByCount[visibleEvents.length]} ${panelSurfaceClass}`}
             onPointerDown={startMonthSwipe}
@@ -547,7 +535,16 @@ export function CalendarSection() {
           </nav>
         ) : null}
           </div>
-        </div>
+          </div>
+        ) : (
+          <div className="relative z-10 flex flex-1 items-center justify-center px-4">
+            <p
+              className={`rounded-lg px-6 py-5 text-center text-lg ${panelSurfaceClass}`}
+            >
+              No hay próximos eventos publicados.
+            </p>
+          </div>
+        )}
       </section>
       {selectedEvent ? (
         <EventDetailModal

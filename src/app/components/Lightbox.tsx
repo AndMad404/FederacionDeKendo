@@ -1,7 +1,9 @@
-import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
+import { useCallback, useRef, type RefObject } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import type { GalleryImage } from "../types";
+import { useModalBehavior } from "../hooks/useModalBehavior";
 import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
+import { useTransientDirectionFeedback } from "../hooks/useTransientDirectionFeedback";
 import { getGalleryDisplayText } from "./gallery/galleryText";
 import {
   focusRingClass,
@@ -11,7 +13,6 @@ import {
 
 const LIGHTBOX_IMAGE_SIZES = "(max-width: 640px) 92vw, 75vw";
 const activeArrowClass = "border-site-accent bg-site-accent-strong text-site-on-dark";
-type ArrowDirection = "left" | "right";
 
 interface LightboxProps {
   image: GalleryImage;
@@ -32,25 +33,13 @@ export function Lightbox({
   onPrev,
   onNext,
 }: LightboxProps) {
-  const dialogRef = useRef<HTMLDivElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
-  const feedbackTimeoutRef = useRef<number | null>(null);
-  const [activeArrow, setActiveArrow] = useState<ArrowDirection | null>(null);
+  const {
+    activeDirection: activeArrow,
+    showDirection: showArrowFeedback,
+  } = useTransientDirectionFeedback();
   const positionLabel = `${index + 1} / ${total}`;
   const { displayTitle, displayTag, displayDescription } = getGalleryDisplayText(image);
-
-  const showArrowFeedback = useCallback((direction: ArrowDirection) => {
-    setActiveArrow(direction);
-
-    if (feedbackTimeoutRef.current !== null) {
-      window.clearTimeout(feedbackTimeoutRef.current);
-    }
-
-    feedbackTimeoutRef.current = window.setTimeout(() => {
-      setActiveArrow(null);
-      feedbackTimeoutRef.current = null;
-    }, 220);
-  }, []);
 
   const handlePrev = useCallback(() => {
     showArrowFeedback("left");
@@ -67,80 +56,30 @@ export function Lightbox({
     onSwipeRight: handlePrev,
   });
 
-  useEffect(() => {
-    closeBtnRef.current?.focus();
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      if (feedbackTimeoutRef.current !== null) {
-        window.clearTimeout(feedbackTimeoutRef.current);
+  const handleDialogKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        handlePrev();
+      } else if (event.key === "ArrowRight") {
+        event.preventDefault();
+        handleNext();
       }
-    };
-  }, []);
+    },
+    [handleNext, handlePrev],
+  );
 
-  useEffect(() => {
-    return () => {
-      triggerRef.current?.focus();
-    };
-  }, [triggerRef]);
-
-  useEffect(() => {
-    const previousHtmlOverflow = document.documentElement.style.overflow;
-    const previousBodyOverflow = document.body.style.overflow;
-    document.documentElement.style.overflow = "hidden";
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.documentElement.style.overflow = previousHtmlOverflow;
-      document.body.style.overflow = previousBodyOverflow;
-    };
-  }, []);
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-
-    function onKeyDown(event: KeyboardEvent) {
-      switch (event.key) {
-        case "Escape":
-          onClose();
-          break;
-        case "ArrowLeft":
-          handlePrev();
-          break;
-        case "ArrowRight":
-          handleNext();
-          break;
-        case "Tab": {
-          const focusable = dialog!.querySelectorAll<HTMLElement>(
-            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-          );
-          if (focusable.length === 0) break;
-
-          const first = focusable[0];
-          const last = focusable[focusable.length - 1];
-
-          if (event.shiftKey && document.activeElement === first) {
-            event.preventDefault();
-            last.focus();
-          } else if (!event.shiftKey && document.activeElement === last) {
-            event.preventDefault();
-            first.focus();
-          }
-          break;
-        }
-      }
-    }
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [handleNext, handlePrev, onClose]);
+  const { dialogRef, onBackdropInteraction } = useModalBehavior({
+    initialFocusRef: closeBtnRef,
+    triggerRef,
+    onClose,
+    onKeyDown: handleDialogKeyDown,
+  });
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-site-overlay/70 p-4 land-sm:p-2"
-      onClick={onClose}
+      onClick={onBackdropInteraction}
     >
       <div
         ref={dialogRef}

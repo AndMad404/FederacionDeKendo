@@ -21,10 +21,19 @@ function getInclusiveEndDate(date: string) {
   return formatCalendarDate(endDate);
 }
 
-export function getEventDateLabel({ date, endDate }: CalendarEvent) {
+export function getEventDateRangeLabels({ date, endDate }: CalendarEvent) {
   const startDateLabel = formatEventDate(date);
-  return endDate
-    ? `${startDateLabel} - ${getInclusiveEndDate(endDate)}`
+
+  return {
+    startDateLabel,
+    endDateLabel: endDate ? getInclusiveEndDate(endDate) : undefined,
+  };
+}
+
+export function getEventDateLabel(event: CalendarEvent) {
+  const { startDateLabel, endDateLabel } = getEventDateRangeLabels(event);
+  return endDateLabel
+    ? `${startDateLabel} - ${endDateLabel}`
     : startDateLabel;
 }
 

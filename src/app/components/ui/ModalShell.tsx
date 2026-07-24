@@ -1,20 +1,7 @@
-import {
-  useEffect,
-  useRef,
-  type ReactNode,
-  type RefObject,
-} from "react";
+import type { ReactNode, RefObject } from "react";
 import { X } from "lucide-react";
+import { useModalBehavior } from "../../hooks/useModalBehavior";
 import { focusRingClass } from "../../styles/shared";
-
-const focusableSelector = [
-  "a[href]",
-  "button:not([disabled])",
-  "input:not([disabled])",
-  "select:not([disabled])",
-  "textarea:not([disabled])",
-  '[tabindex]:not([tabindex="-1"])',
-].join(",");
 
 interface ModalShellProps {
   children: ReactNode;
@@ -23,6 +10,7 @@ interface ModalShellProps {
   closeLabel: string;
   triggerRef?: RefObject<HTMLElement | null>;
   onClose: () => void;
+  onKeyDown?: (event: KeyboardEvent) => void;
 }
 
 export function ModalShell({
@@ -32,84 +20,18 @@ export function ModalShell({
   closeLabel,
   triggerRef,
   onClose,
+  onKeyDown,
 }: ModalShellProps) {
-  const dialogRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    dialogRef.current?.focus();
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      triggerRef?.current?.focus();
-    };
-  }, [triggerRef]);
-
-  useEffect(() => {
-    const previousHtmlOverflow = document.documentElement.style.overflow;
-    const previousBodyOverflow = document.body.style.overflow;
-    document.documentElement.style.overflow = "hidden";
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.documentElement.style.overflow = previousHtmlOverflow;
-      document.body.style.overflow = previousBodyOverflow;
-    };
-  }, []);
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    const dialogElement = dialog;
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        onClose();
-        return;
-      }
-
-      if (event.key !== "Tab") return;
-
-      const focusableElements = Array.from(
-        dialogElement.querySelectorAll<HTMLElement>(focusableSelector),
-      ).filter((element) => !element.hidden);
-
-      if (focusableElements.length === 0) {
-        event.preventDefault();
-        dialogElement.focus();
-        return;
-      }
-
-      const first = focusableElements[0];
-      const last = focusableElements[focusableElements.length - 1];
-      const activeElement = document.activeElement;
-
-      if (
-        event.shiftKey &&
-        (activeElement === first || activeElement === dialogElement)
-      ) {
-        event.preventDefault();
-        last.focus();
-      } else if (
-        !event.shiftKey &&
-        (activeElement === last || activeElement === dialogElement)
-      ) {
-        event.preventDefault();
-        first.focus();
-      }
-    }
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
+  const { dialogRef, onBackdropInteraction } = useModalBehavior({
+    triggerRef,
+    onClose,
+    onKeyDown,
+  });
 
   return (
     <div
       className="fixed inset-0 z-[70] flex items-center justify-center bg-site-overlay/80 p-4 land-sm:p-2"
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget) onClose();
-      }}
+      onMouseDown={onBackdropInteraction}
     >
       <div
         ref={dialogRef}

@@ -1,14 +1,12 @@
 import {
   useCallback,
-  useEffect,
-  useRef,
-  useState,
   type CSSProperties,
   type MouseEvent,
 } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { GalleryImage } from "../../types";
 import { useSwipeNavigation } from "../../hooks/useSwipeNavigation";
+import { useTransientDirectionFeedback } from "../../hooks/useTransientDirectionFeedback";
 import {
   getGalleryDisplayText,
   getMobileDescriptionPreview,
@@ -18,7 +16,6 @@ import { focusRingClass, panelSurfaceClass } from "../../styles/shared";
 
 const defaultFeaturedObjectPosition = "center 0%";
 const activeArrowClass = "border-site-accent bg-site-accent-strong";
-type ArrowDirection = "left" | "right";
 
 interface NavArrowProps {
   direction: "left" | "right";
@@ -66,8 +63,10 @@ export function FeaturedImage({
   onSwipePrev,
   onSwipeNext,
 }: FeaturedImageProps) {
-  const feedbackTimeoutRef = useRef<number | null>(null);
-  const [activeArrow, setActiveArrow] = useState<ArrowDirection | null>(null);
+  const {
+    activeDirection: activeArrow,
+    showDirection: showArrowFeedback,
+  } = useTransientDirectionFeedback();
   const positionLabel = `${index + 1} / ${total}`;
   const { displayTitle, displayTag, displayDescription } = getGalleryDisplayText(image);
   const descriptionPreview = displayDescription
@@ -77,19 +76,6 @@ export function FeaturedImage({
     descriptionPreview?.isTruncated
       ? descriptionPreview.preview.slice(0, -SEE_MORE_LABEL.length).trimEnd()
       : descriptionPreview?.preview;
-  const showArrowFeedback = useCallback((direction: ArrowDirection) => {
-    setActiveArrow(direction);
-
-    if (feedbackTimeoutRef.current !== null) {
-      window.clearTimeout(feedbackTimeoutRef.current);
-    }
-
-    feedbackTimeoutRef.current = window.setTimeout(() => {
-      setActiveArrow(null);
-      feedbackTimeoutRef.current = null;
-    }, 220);
-  }, []);
-
   const handleSwipePrev = useCallback(() => {
     showArrowFeedback("left");
     onSwipePrev();
@@ -121,14 +107,6 @@ export function FeaturedImage({
   const objectPositionClass = image.disableObjectPosition
     ? "gallery-featured-image--native-position"
     : "";
-
-  useEffect(() => {
-    return () => {
-      if (feedbackTimeoutRef.current !== null) {
-        window.clearTimeout(feedbackTimeoutRef.current);
-      }
-    };
-  }, []);
 
   return (
     <figure className="gallery-featured-frame group relative h-[clamp(420px,62svh,620px)] w-full flex-none cursor-pointer overflow-hidden rounded-3xl bg-site-media tall-md:min-h-0 tall-md:flex-1 land-sm:h-[calc(100svh_-_3rem_-_6px)] land-sm:flex-none">

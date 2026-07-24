@@ -7,7 +7,7 @@ import {
   MapPin,
   UserRound,
 } from "lucide-react";
-import type { RefObject } from "react";
+import { useCallback, type RefObject } from "react";
 import type { CalendarEvent } from "../types";
 import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
 import {
@@ -53,6 +53,18 @@ export function EventDetailModal({
     onSwipeLeft: onNext,
     onSwipeRight: onPrevious,
   });
+  const handleDialogKeyDown = useCallback(
+    (keyboardEvent: KeyboardEvent) => {
+      if (keyboardEvent.key === "ArrowLeft") {
+        keyboardEvent.preventDefault();
+        onPrevious();
+      } else if (keyboardEvent.key === "ArrowRight") {
+        keyboardEvent.preventDefault();
+        onNext();
+      }
+    },
+    [onNext, onPrevious],
+  );
 
   return (
     <ModalShell
@@ -61,6 +73,7 @@ export function EventDetailModal({
       closeLabel={`Cerrar detalle de ${event.title}`}
       triggerRef={triggerRef}
       onClose={onClose}
+      onKeyDown={handleDialogKeyDown}
     >
       <article className="touch-pan-y pr-10" {...swipeHandlers}>
         {event.type ? (

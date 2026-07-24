@@ -119,6 +119,117 @@ prior_session:
   result: One responsive correctness defect, two structural issues, one responsive smell, and five Tailwind polish findings were recorded; the required 1366x768 no-scroll invariant passed on all four routes.
 
 latest_resolution:
+  id: FIX-2026-07-24-06
+  source_session: REV-2026-07-24-01
+  baseline:
+    commit: 3eb99cd0
+    worktree: dirty
+    fingerprints:
+      EventDetailModal.tsx: 48FB5739F62139501ECD2005DB028F8C8641C9F9E02DF19888D0DB6F6844FFA4
+      ModalShell.tsx: 4F26FAF166CE2EB3751E0A5100669C3A5EA3A31D96AA12623B4EA058855982F0
+      Lightbox.tsx: 04179A0B4E2970D7ACD3C074AEC7743328167C60874472F7C4097C28ECAFB09D
+      useModalBehavior.ts: 0D0317C215B7835D39434D77635FD8550E05C2913E06D9C60B7A47F65D35E507
+  resolved_findings:
+    - POL-A11Y-001
+  checks:
+    - corepack pnpm run typecheck passed
+    - corepack pnpm run build passed outside the sandbox
+    - local calendar modal navigated Examen to 3er Torneo with ArrowRight and back with ArrowLeft
+    - local calendar modal preserved focus containment with Tab, Escape close, hash cleanup, and scroll restoration
+    - local gallery modal preserved ArrowRight navigation from 1/8 to 2/8 and Escape close
+
+prior_resolution_2026_07_24_05:
+  id: FIX-2026-07-24-05
+  source_session: REV-2026-07-24-01
+  baseline:
+    commit: 3eb99cd0
+    worktree: dirty
+    fingerprints:
+      useTransientDirectionFeedback.ts: ABE00D26CC5167FAF5DEF5F30649E84A7A8E2F3264B06FC255E94A3BEA7DC516
+      Lightbox.tsx: 1A033D58293F92D703603B7916FCC3EE0539975F38CDD1FDAC7CE6D66592C05D
+      FeaturedImage.tsx: 9937325625E695CB2201009B2CC1A2DA3D15C9422228F67E12A0EB95E313404E
+  resolved_findings:
+    - SMELL-REACT-002
+  checks:
+    - corepack pnpm run typecheck passed
+    - corepack pnpm run build passed outside the sandbox
+    - source search found the 220ms timeout, reset, and cleanup only in useTransientDirectionFeedback.ts
+    - source inspection found both consumers binding activeDirection to their existing conditional active classes
+    - local gallery checks preserved featured-image and lightbox navigation, settled inactive classes, clean lightbox unmount, and an empty console error log
+
+prior_resolution_2026_07_24_04:
+  id: FIX-2026-07-24-04
+  source_session: REV-2026-07-24-01
+  baseline:
+    commit: 3eb99cd0
+    worktree: dirty
+    fingerprints:
+      AfiliadosSection.tsx: 98E0B3BB4FE775610AB7EF3D030BB24773A9E03C004D91F2148ECF7A22E142F9
+  resolved_findings:
+    - SMELL-ARCH-002
+  checks:
+    - corepack pnpm run typecheck passed
+    - corepack pnpm run build passed outside the sandbox
+    - source search found one normalized schedule-group render path and no allSlotsShareLocation branch
+    - local /afiliados/ at 1366x768 preserved two ordered Koken locations and one Heredia location with three ordered slots
+    - local /afiliados/ preserved single-slot and multi-slot dl classes, the no-scroll invariant, and an empty browser console error log
+
+prior_resolution_2026_07_24_03:
+  id: FIX-2026-07-24-03
+  source_session: REV-2026-07-24-01
+  baseline:
+    commit: 3eb99cd0
+    worktree: dirty
+    fingerprints:
+      useModalBehavior.ts: 0D0317C215B7835D39434D77635FD8550E05C2913E06D9C60B7A47F65D35E507
+      Lightbox.tsx: A9943DED4CBE2839D7BA94C849C771F8B3F52FEB119B61C2E80962F20602BB13
+      ModalShell.tsx: 7E45A39306260E084E5C957CB22DCA5505BAA0E60E8C3747DE8C19AE9C218DF6
+  resolved_findings:
+    - STR-REACT-001
+  checks:
+    - corepack pnpm run typecheck passed
+    - corepack pnpm run build passed outside the sandbox
+    - source search found modal lifecycle effects only in useModalBehavior.ts
+    - lightbox browser checks passed initial focus, Tab wrapping, arrow navigation, Escape, focus return, and scroll restoration
+    - event-modal browser checks passed initial focus, Tab wrapping, Escape, hash cleanup, focus return, and scroll restoration
+    - both browser flows produced no console errors
+
+prior_resolution_2026_07_24_02:
+  id: FIX-2026-07-24-02
+  source_session: REV-2026-07-24-01
+  baseline:
+    commit: 3eb99cd0
+    worktree: dirty
+    fingerprints:
+      UpcomingEventsSection.tsx: 8A4524F13E2C5CC250AAA67252909303A420C473C7DF2B1A64FB18D91C3DE747
+      calendarEventPresentation.ts: 8031A73A0EA5A13ED8A0AEFFF72C13429CFBE411156E5E5238B72E6B9A0A06E1
+  resolved_findings:
+    - STR-ARCH-007
+  checks:
+    - corepack pnpm run typecheck passed
+    - corepack pnpm run build passed outside the sandbox
+    - source search found date formatting and Google Maps URL construction only in calendarEventPresentation.ts
+    - local homepage at 1366x768 preserved all four date labels, three Google Maps URLs, and one pending-location state
+    - local homepage kept document scrollHeight equal to clientHeight and produced no browser console errors
+
+prior_resolution_2026_07_24_01:
+  id: FIX-2026-07-24-01
+  source_session: REV-2026-07-24-01
+  baseline:
+    commit: 3eb99cd0
+    worktree: dirty
+    fingerprints:
+      CalendarSection.tsx: DF590806F9617004ADC592875FC4F0184826402230AB1AA22FBAD97E7E74B8E0
+  resolved_findings:
+    - STR-ARCH-006
+  checks:
+    - corepack pnpm run typecheck passed
+    - corepack pnpm run build passed outside the sandbox
+    - source search found one calendar section, one CalendarBackdrop, and one CalendarBanner
+    - local /calendario/ at 1366x768 kept document and primary-section scrollHeight equal to clientHeight
+    - local /calendario/ rendered one calendar title and one calendar section with no browser console errors
+
+prior_resolution_2026_07_23:
   id: FIX-2026-07-23-02
   source_session: REV-2026-07-23-02
   baseline:
@@ -164,6 +275,265 @@ previous_resolution:
     - gallery frame computed flex was 0 0 auto at requested 1024x640 and 1 1 0% at requested 1024x641
 
 coverage:
+  - id: COV-2026-07-24-08
+    targets:
+      - finding POL-A11Y-001
+      - src/app/components/EventDetailModal.tsx
+      - src/app/components/ui/ModalShell.tsx
+      - src/app/components/Lightbox.tsx
+      - src/app/hooks/useModalBehavior.ts
+      - local routes /calendario/ and /galeria/
+    axes: [A11Y]
+    included:
+      - keyboard parity for ArrowLeft and ArrowRight between the event modal and gallery lightbox
+      - preservation of Tab focus containment and Escape close
+      - preservation of gallery keyboard navigation after preventing default arrow behavior
+      - TypeScript and production plus SSR build integrity
+    excluded:
+      - swipe gesture behavior
+      - production deployment behavior
+    depth: verified
+    evidence:
+      - corepack pnpm run typecheck passed
+      - corepack pnpm run build passed outside the sandbox
+      - calendar ArrowRight changed Examen, Evento 1 de 12, to 3er Torneo, Evento 2 de 12, and updated the URL fragment
+      - calendar ArrowLeft returned to Examen, Evento 1 de 12; Tab focused the close control and Escape removed the dialog and URL fragment
+      - gallery ArrowRight changed Practicantes en seiza, 1 / 8, to Combates con armadura, 2 / 8; Escape removed the dialog
+    baseline:
+      commit: 3eb99cd0
+      worktree: dirty
+      fingerprints:
+        EventDetailModal.tsx: 48FB5739F62139501ECD2005DB028F8C8641C9F9E02DF19888D0DB6F6844FFA4
+        ModalShell.tsx: 4F26FAF166CE2EB3751E0A5100669C3A5EA3A31D96AA12623B4EA058855982F0
+        Lightbox.tsx: 04179A0B4E2970D7ACD3C074AEC7743328167C60874472F7C4097C28ECAFB09D
+        useModalBehavior.ts: 0D0317C215B7835D39434D77635FD8550E05C2913E06D9C60B7A47F65D35E507
+    status: current
+    result: Calendar and gallery dialogs now expose the same left/right keyboard navigation contract.
+
+  - id: COV-2026-07-24-07
+    targets:
+      - findings STR-ARCH-006, STR-ARCH-007, STR-REACT-001, SMELL-ARCH-002, and SMELL-REACT-002
+      - src/app/components/CalendarSection.tsx
+      - src/app/components/UpcomingEventsSection.tsx
+      - src/app/utils/calendarEventPresentation.ts
+      - src/app/hooks/useModalBehavior.ts
+      - src/app/components/ui/ModalShell.tsx
+      - src/app/components/Lightbox.tsx
+      - src/app/components/AfiliadosSection.tsx
+      - src/app/hooks/useTransientDirectionFeedback.ts
+      - src/app/components/gallery/FeaturedImage.tsx
+      - local routes /, /calendario/, /galeria/, and /afiliados/
+    axes: [ARCH, REACT]
+    included:
+      - final current-state audit of all five component-redundancy resolutions
+      - unique shared sources and removal of the reviewed duplicate branches
+      - TypeScript and production plus SSR build integrity
+      - required 1366x768 no-scroll geometry on all four routes
+      - current Lightbox focus, keyboard navigation, Escape, focus return, and scroll restoration after the feedback refactor
+    excluded:
+      - unrelated active findings
+      - synthetic browser rendering of an empty calendar dataset
+      - runtime capture of the 220ms transient active frame
+      - production deployment behavior
+    depth: verified
+    evidence:
+      - corepack pnpm run typecheck passed on the final accumulated source state
+      - corepack pnpm run build passed outside the sandbox on the final accumulated source state
+      - git diff --check passed
+      - source counts found one CalendarSection frame, one CalendarBackdrop, and one CalendarBanner
+      - source searches found calendar date and map presentation only in calendarEventPresentation.ts
+      - source searches found modal lifecycle only in useModalBehavior.ts and direction-feedback timeout state only in useTransientDirectionFeedback.ts
+      - source searches found one affiliate schedule-group render path and no allSlotsShareLocation branch
+      - browser geometry at 1366x768 recorded document clientHeight and scrollHeight as 768 on all four routes; every primary section recorded equal clientHeight and scrollHeight
+      - current Lightbox opened with close focus and hidden overflow, wrapped Shift+Tab, navigated from 1/8 to 2/8 with ArrowRight, closed with Escape, restored trigger focus and overflow, and produced no console errors
+    baseline:
+      commit: 3eb99cd0
+      worktree: dirty
+      fingerprints:
+        CalendarSection.tsx: DF590806F9617004ADC592875FC4F0184826402230AB1AA22FBAD97E7E74B8E0
+        UpcomingEventsSection.tsx: 8A4524F13E2C5CC250AAA67252909303A420C473C7DF2B1A64FB18D91C3DE747
+        calendarEventPresentation.ts: 8031A73A0EA5A13ED8A0AEFFF72C13429CFBE411156E5E5238B72E6B9A0A06E1
+        useModalBehavior.ts: 0D0317C215B7835D39434D77635FD8550E05C2913E06D9C60B7A47F65D35E507
+        ModalShell.tsx: 7E45A39306260E084E5C957CB22DCA5505BAA0E60E8C3747DE8C19AE9C218DF6
+        Lightbox.tsx: 1A033D58293F92D703603B7916FCC3EE0539975F38CDD1FDAC7CE6D66592C05D
+        AfiliadosSection.tsx: 98E0B3BB4FE775610AB7EF3D030BB24773A9E03C004D91F2148ECF7A22E142F9
+        useTransientDirectionFeedback.ts: ABE00D26CC5167FAF5DEF5F30649E84A7A8E2F3264B06FC255E94A3BEA7DC516
+        FeaturedImage.tsx: 9937325625E695CB2201009B2CC1A2DA3D15C9422228F67E12A0EB95E313404E
+    status: stale
+    stale_reason: ModalShell and Lightbox changed after this baseline; current modal keyboard behavior is revalidated by COV-2026-07-24-08.
+    result: All five component-redundancy findings from REV-2026-07-24-01 are resolved and verified on the final accumulated worktree state.
+    verification_gaps:
+      - Calendar empty-state behavior is source- and type-verified without replacing generated event data.
+      - The 220ms active feedback frame is source-verified; navigation, settled state, and cleanup are runtime-verified.
+
+  - id: COV-2026-07-24-06
+    targets:
+      - src/app/hooks/useTransientDirectionFeedback.ts
+      - src/app/components/Lightbox.tsx
+      - src/app/components/gallery/FeaturedImage.tsx
+      - local /galeria/
+    axes: [REACT]
+    included:
+      - centralization of direction-feedback state
+      - 220ms timeout reset and unmount cleanup
+      - connection to both existing conditional active-class presentations
+      - preservation of featured-image and lightbox navigation
+    excluded:
+      - changes to the active visual class tokens
+      - swipe-gesture recognition itself
+      - production deployment behavior
+    depth: verified
+    evidence:
+      - corepack pnpm run typecheck passed
+      - corepack pnpm run build passed outside the sandbox
+      - source search found feedback timeout state and cleanup only in useTransientDirectionFeedback.ts
+      - source inspection found activeDirection connected to left/right conditional classes in both consumers
+      - featured-image navigation advanced from 1/8 through 3/8 and the right arrow had no active class after 300ms
+      - lightbox navigation advanced from 3/8 to 4/8 and the right arrow had no active class after 300ms
+      - lightbox closed with focus and overflow restored; browser console error log was empty
+    baseline:
+      commit: 3eb99cd0
+      worktree: dirty
+      fingerprints:
+        useTransientDirectionFeedback.ts: ABE00D26CC5167FAF5DEF5F30649E84A7A8E2F3264B06FC255E94A3BEA7DC516
+        Lightbox.tsx: 1A033D58293F92D703603B7916FCC3EE0539975F38CDD1FDAC7CE6D66592C05D
+        FeaturedImage.tsx: 9937325625E695CB2201009B2CC1A2DA3D15C9422228F67E12A0EB95E313404E
+    status: stale
+    stale_reason: Lightbox changed after this baseline; current gallery arrow navigation is revalidated by COV-2026-07-24-08.
+    result: SMELL-REACT-002 resolved with one transient direction-feedback hook.
+    verification_gap: The 220ms active frame is shorter than the browser-control click round trip; activation is source-verified while navigation and settled cleanup are runtime-verified.
+
+  - id: COV-2026-07-24-05
+    targets:
+      - src/app/components/AfiliadosSection.tsx
+      - src/app/data/dojos.ts
+      - local /afiliados/
+    axes: [ARCH]
+    included:
+      - normalization of schedule slots by location
+      - preservation of location and slot order
+      - preservation of single-slot and multi-slot definition-list presentation
+      - required 1366x768 no-scroll geometry
+    excluded:
+      - the remaining gallery feedback finding
+      - changes to public dojo data or copy
+      - production deployment behavior
+    depth: verified
+    evidence:
+      - corepack pnpm run typecheck passed
+      - corepack pnpm run build passed outside the sandbox
+      - source search found one getScheduleGroups pipeline and one scheduleGroups render path
+      - browser DOM preserved Moravia / Guadalupe then Curridabat with one slot each and no dl class
+      - browser DOM preserved Colegio Europeo once with three ordered slots and grid gap-1
+      - browser geometry at 1366x768 recorded document 768/768 and primary section 554/554 clientHeight/scrollHeight
+      - browser console error log was empty and screenshot inspection found no visual regression
+    baseline:
+      commit: 3eb99cd0
+      worktree: dirty
+      fingerprint: 98E0B3BB4FE775610AB7EF3D030BB24773A9E03C004D91F2148ECF7A22E142F9
+    status: current
+    result: SMELL-ARCH-002 resolved with one ordered location-group rendering pipeline.
+
+  - id: COV-2026-07-24-04
+    targets:
+      - src/app/hooks/useModalBehavior.ts
+      - src/app/components/Lightbox.tsx
+      - src/app/components/ui/ModalShell.tsx
+      - local /galeria/
+      - local /calendario/
+    axes: [REACT]
+    included:
+      - initial and return focus
+      - document scroll locking and restoration
+      - Escape handling
+      - Tab focus wrapping
+      - backdrop-target validation
+      - preservation of lightbox arrow-key navigation
+    excluded:
+      - visual redesign of either dialog
+      - swipe behavior unrelated to modal lifecycle
+      - transient arrow-feedback deduplication
+      - production deployment behavior
+    depth: verified
+    evidence:
+      - corepack pnpm run typecheck passed
+      - corepack pnpm run build passed outside the sandbox
+      - source searches found both consumers using useModalBehavior and lifecycle implementation only in the hook
+      - lightbox opened with close focus and hidden html/body overflow; Shift+Tab and Tab wrapped between last and first controls
+      - lightbox ArrowRight changed the title and position from 1/8 to 2/8; Escape restored focus to the original featured-image trigger and restored overflow
+      - event modal opened with the dialog focused and hidden html/body overflow; Shift+Tab and Tab wrapped between last and first controls
+      - event-modal Escape removed the hash, restored focus to the originating event button, and restored overflow
+      - browser console error log was empty
+    baseline:
+      commit: 3eb99cd0
+      worktree: dirty
+      fingerprints:
+        useModalBehavior.ts: 0D0317C215B7835D39434D77635FD8550E05C2913E06D9C60B7A47F65D35E507
+        Lightbox.tsx: A9943DED4CBE2839D7BA94C849C771F8B3F52FEB119B61C2E80962F20602BB13
+        ModalShell.tsx: 7E45A39306260E084E5C957CB22DCA5505BAA0E60E8C3747DE8C19AE9C218DF6
+    status: stale
+    stale_reason: Lightbox.tsx changed while resolving SMELL-REACT-002; current modal behavior was revalidated in COV-2026-07-24-07.
+    result: STR-REACT-001 resolved with shared modal lifecycle behavior and preserved specialized dialog rendering.
+
+  - id: COV-2026-07-24-03
+    targets:
+      - src/app/components/UpcomingEventsSection.tsx
+      - src/app/utils/calendarEventPresentation.ts
+      - local /
+    axes: [ARCH]
+    included:
+      - centralization of event date-range labels
+      - centralization of Google Maps URL construction
+      - preservation of homepage date and location output
+    excluded:
+      - the remaining component redundancy findings
+      - unrelated calendar-event selection logic
+      - production deployment behavior
+    depth: verified
+    evidence:
+      - corepack pnpm run typecheck passed
+      - corepack pnpm run build passed outside the sandbox
+      - exact source searches found no component-local eventDateFormatter, date-range helper, or getLocationMapUrl
+      - browser DOM at 1366x768 preserved four expected date labels, including two inclusive multi-day ranges
+      - browser DOM preserved three encoded Google Maps URLs and one pending-location presentation
+      - homepage document clientHeight and scrollHeight were both 768; browser console error log was empty
+    baseline:
+      commit: 3eb99cd0
+      worktree: dirty
+      fingerprints:
+        UpcomingEventsSection.tsx: 8A4524F13E2C5CC250AAA67252909303A420C473C7DF2B1A64FB18D91C3DE747
+        calendarEventPresentation.ts: 8031A73A0EA5A13ED8A0AEFFF72C13429CFBE411156E5E5238B72E6B9A0A06E1
+    status: current
+    result: STR-ARCH-007 resolved by making calendarEventPresentation.ts the single source for date ranges and map URLs.
+
+  - id: COV-2026-07-24-02
+    targets:
+      - src/app/components/CalendarSection.tsx
+      - local /calendario/
+    axes: [ARCH]
+    included:
+      - consolidation of the empty and populated page frame
+      - preservation of the populated calendar composition
+      - required 1366x768 no-scroll geometry
+    excluded:
+      - the remaining component redundancy findings
+      - synthetic browser rendering of an empty calendar dataset
+      - production deployment behavior
+    depth: verified
+    evidence:
+      - corepack pnpm run typecheck passed
+      - corepack pnpm run build passed outside the sandbox
+      - exact source searches found one calendar section, one CalendarBackdrop, and one CalendarBanner
+      - browser DOM snapshot preserved the calendar h1, month navigation, two visible event cards, and footer
+      - browser geometry at 1366x768 recorded document 768/768 and calendar section 554/554 clientHeight/scrollHeight
+      - browser console error log was empty
+    baseline:
+      commit: 3eb99cd0
+      worktree: dirty
+      fingerprint: DF590806F9617004ADC592875FC4F0184826402230AB1AA22FBAD97E7E74B8E0
+    status: current
+    result: STR-ARCH-006 resolved by rendering the shared frame once and selecting only the page body conditionally.
+
   - id: COV-2026-07-24-01
     targets:
       - src/app/components/**/*.tsx (14 files from the recorded inventory)
@@ -189,7 +559,8 @@ coverage:
     baseline:
       commit: bffe7fc5
       worktree: clean
-    status: current
+    status: stale
+    stale_reason: CalendarSection changed while resolving STR-ARCH-006; results for the other thirteen component targets remain useful but this folder-wide record no longer proves the current complete inventory.
     file_results:
       src/app/components/AfiliadosSection.tsx: [SMELL-ARCH-002]
       src/app/components/CalendarSection.tsx: [STR-ARCH-006]
@@ -587,75 +958,57 @@ active_findings:
       - current main at 71875972 does not yet contain the calendar route in seo-data.json or App.tsx
     introduced_in: REV-2026-07-21-01
 
-  - id: STR-ARCH-006
-    level: STRUCTURAL
-    axis: ARCH
-    status: open
-    target: src/app/components/CalendarSection.tsx:278 and src/app/components/CalendarSection.tsx:343
-    problem: CalendarSection duplicates the complete page frame in its empty-events and populated-events render branches.
-    fix: Render one shared section with CalendarBackdrop and CalendarBanner, and choose only the body content conditionally inside that frame.
-    cost_of_deferring: Future changes to the calendar page shell can update one branch while silently leaving the other visually or responsively stale.
-    evidence:
-      - identical section attributes and classes at lines 280-285 and 345-350
-      - revalidated at clean commit bffe7fc5 and fingerprint 11F0692E64021767BD724335939D7464676BCB9A2A3A066A0DCFFA7DCE50DBAF
-    introduced_in: REV-2026-07-23-02
-
-  - id: STR-ARCH-007
-    level: STRUCTURAL
-    axis: ARCH
-    status: open
-    target: src/app/components/UpcomingEventsSection.tsx:11-49
-    problem: UpcomingEventsSection reimplements the date-range and Google Maps presentation logic already centralized in calendarEventPresentation.ts.
-    fix: Export the structured date-range labels needed by the homepage from calendarEventPresentation.ts and import getLocationMapUrl instead of maintaining component-local copies.
-    cost_of_deferring: Date formatting, inclusive end-date rules, localization, or map URL behavior can diverge between the homepage, calendar, and event modal.
-    evidence:
-      - eventDateFormatter and its helper chain are duplicated at UpcomingEventsSection.tsx:11-39 and calendarEventPresentation.ts:3-27
-      - getLocationMapUrl is duplicated at UpcomingEventsSection.tsx:42-49 and calendarEventPresentation.ts:36-39
-      - clean baseline bffe7fc5; UpcomingEventsSection fingerprint 3A5387FB1A2D9B7A894F591A184591DA9E7C0FB43E2446F541F0D7CC90C8245B
-    introduced_in: REV-2026-07-24-01
-
-  - id: STR-REACT-001
-    level: STRUCTURAL
-    axis: REACT
-    status: open
-    target: src/app/components/Lightbox.tsx and src/app/components/ui/ModalShell.tsx
-    problem: Lightbox independently implements focus return, document scroll locking, Escape handling, focus trapping, backdrop closing, and dialog refs already owned by ModalShell.
-    fix: Extract a shared useModalBehavior hook or add a layout variant to ModalShell so Lightbox supplies its specialized rendering and arrow-key navigation without duplicating modal lifecycle effects.
-    cost_of_deferring: Fixes to modal lifecycle behavior must be made twice and the two dialogs can silently drift.
-    evidence:
-      - duplicated scroll-lock effects at Lightbox.tsx:88-99 and ModalShell.tsx:48-59
-      - overlapping focus-return and keyboard/focus-trap effects at Lightbox.tsx:82-138 and ModalShell.tsx:42-100
-      - clean baseline bffe7fc5; Lightbox fingerprint C563149C56B23884924277FA78273BC6AACB596D29AC17114769F3D57FB23456; ModalShell fingerprint 2D97637B7F3F9CAC9EFB787B8B60DD06E4C3B0651A863CDC0DD3D1AC50C2681E
-    introduced_in: REV-2026-07-24-01
-
-  - id: SMELL-ARCH-002
-    level: SMELL
-    axis: ARCH
-    status: open
-    target: src/app/components/AfiliadosSection.tsx:103-159
-    problem: DojoInfo duplicates the location section, heading, definition list, and schedule-row composition across two branches instead of rendering normalized location groups once.
-    fix: Group schedule slots by location first and map one shared location-section renderer for both single- and multi-location dojos.
-    cost_of_deferring: New schedules can repeat location headings and every markup change must stay synchronized across both branches.
-    evidence:
-      - allSlotsShareLocation branch at lines 132-146 and per-slot branch at lines 147-158 repeat the same semantic shell
-      - current dojo data exercises both branches
-      - clean baseline bffe7fc5; fingerprint DD89694A077C40BBEF8FA0B98BC62DCB5570FEB94A25F21B7A50143019048E34
-    introduced_in: REV-2026-07-24-01
+resolved_findings:
+  - id: POL-A11Y-001
+    status: resolved
+    resolved_at: 2026-07-24
+    summary: EventDetailModal now handles ArrowLeft and ArrowRight through the shared modal behavior path, matching Lightbox keyboard navigation.
+    resolution:
+      resolved_ref: 3eb99cd0 dirty worktree fingerprints recorded in FIX-2026-07-24-06
+      checks: [typecheck, production and SSR build, calendar and gallery keyboard browser flows]
 
   - id: SMELL-REACT-002
-    level: SMELL
-    axis: REACT
-    status: open
-    target: src/app/components/Lightbox.tsx:37-79 and src/app/components/gallery/FeaturedImage.tsx:69-131
-    problem: Lightbox and FeaturedImage duplicate the same transient arrow-feedback state, timeout reset, and unmount cleanup behavior.
-    fix: Extract a small useTransientDirectionFeedback hook returning activeDirection and showDirection.
-    cost_of_deferring: Feedback timing or cleanup changes require synchronized edits in both gallery interaction surfaces.
-    evidence:
-      - matching feedbackTimeoutRef, activeArrow, showArrowFeedback, 220ms timeout, and cleanup blocks in both targets
-      - clean baseline bffe7fc5; Lightbox fingerprint C563149C56B23884924277FA78273BC6AACB596D29AC17114769F3D57FB23456; FeaturedImage fingerprint 07448DD99D2D9C768AED9E91CD0014C4FF880471015BC7925B568A88530BBF88
-    introduced_in: REV-2026-07-24-01
+    status: resolved
+    resolved_at: 2026-07-24
+    summary: Lightbox and FeaturedImage now share transient direction state, timeout reset, and cleanup through useTransientDirectionFeedback.
+    resolution:
+      resolved_ref: 3eb99cd0 dirty worktree fingerprints recorded in FIX-2026-07-24-05
+      checks: [typecheck, production and SSR build, source search, gallery navigation and settled-state browser checks]
+    limitation: The 220ms active frame was source-verified because browser-control click completion exceeds the feedback window.
 
-resolved_findings:
+  - id: SMELL-ARCH-002
+    status: resolved
+    resolved_at: 2026-07-24
+    summary: Affiliate schedules now normalize slots into ordered location groups and render one shared semantic structure.
+    resolution:
+      resolved_ref: 3eb99cd0 dirty worktree fingerprint 98E0B3BB4FE775610AB7EF3D030BB24773A9E03C004D91F2148ECF7A22E142F9
+      checks: [typecheck, production and SSR build, source search, browser DOM, screenshot, and geometry at 1366x768]
+
+  - id: STR-REACT-001
+    status: resolved
+    resolved_at: 2026-07-24
+    summary: Lightbox and ModalShell now share modal focus, keyboard, scroll-lock, and backdrop-target behavior through useModalBehavior.
+    resolution:
+      resolved_ref: 3eb99cd0 dirty worktree fingerprints recorded in FIX-2026-07-24-03
+      checks: [typecheck, production and SSR build, source search, complete browser interaction flows for both dialogs]
+
+  - id: STR-ARCH-007
+    status: resolved
+    resolved_at: 2026-07-24
+    summary: UpcomingEventsSection now consumes shared date-range and Google Maps presentation utilities.
+    resolution:
+      resolved_ref: 3eb99cd0 dirty worktree fingerprints recorded in FIX-2026-07-24-02
+      checks: [typecheck, production and SSR build, source search, homepage DOM and geometry at 1366x768]
+
+  - id: STR-ARCH-006
+    status: resolved
+    resolved_at: 2026-07-24
+    summary: CalendarSection now renders one shared section, backdrop, and banner for both empty and populated event states.
+    resolution:
+      resolved_ref: 3eb99cd0 dirty worktree fingerprint DF590806F9617004ADC592875FC4F0184826402230AB1AA22FBAD97E7E74B8E0
+      checks: [typecheck, production and SSR build, source search, browser DOM and geometry at 1366x768]
+    limitation: The populated state was browser-verified; the empty branch was source- and type-verified without replacing the generated calendar dataset.
+
   - id: SMELL-ARCH-001
     status: resolved
     resolved_at: 2026-07-23
