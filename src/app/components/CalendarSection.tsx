@@ -350,7 +350,7 @@ export function CalendarSection() {
         <CalendarBanner />
         <div className="relative z-10 flex min-h-0 flex-1 items-start justify-center p-3 sm:p-4 xl:items-center land-sm:p-2">
           <div
-            className={`flex w-full touch-pan-y select-none flex-col justify-center gap-3 rounded-3xl px-1 py-4 text-center backdrop-blur-[2px] sm:px-2 land-sm:gap-2 land-sm:px-2 land-sm:py-2 ${contentPanelClassByCount[visibleEvents.length]} ${panelSurfaceClass}`}
+            className={`flex w-full touch-pan-y select-none flex-col justify-center gap-3 rounded-3xl px-3 py-4 text-center backdrop-blur-[2px] sm:px-2 land-sm:gap-2 land-sm:px-2 land-sm:py-2 ${contentPanelClassByCount[visibleEvents.length]} ${panelSurfaceClass}`}
             onPointerDown={startMonthSwipe}
             onPointerUp={finishMonthSwipe}
             onPointerCancel={() => {

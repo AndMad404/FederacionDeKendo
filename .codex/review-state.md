@@ -2,7 +2,7 @@
 
 ```yaml
 schema_version: 2
-last_updated: 2026-07-23
+last_updated: 2026-07-24
 contract: .agents/review-contract.md
 
 state_rules:
@@ -13,39 +13,41 @@ state_rules:
   - Legacy claims without reproducible evidence are historical, not current coverage.
 
 latest_session:
-  id: REV-2026-07-23-02
-  requested_scope: Compare render-time redundancies among the SPA pages without implementing changes.
+  id: REV-2026-07-24-01
+  requested_scope: Continue the prior redundancy review with component internals in scope and without implementing changes.
   actual_scope:
     targets:
-      - src/app/App.tsx
-      - src/app/components/HeroSection.tsx
-      - src/app/components/CalendarSection.tsx
-      - src/app/components/GallerySection.tsx
       - src/app/components/AfiliadosSection.tsx
+      - src/app/components/CalendarSection.tsx
+      - src/app/components/EventDetailModal.tsx
+      - src/app/components/Footer.tsx
+      - src/app/components/GallerySection.tsx
+      - src/app/components/HeroSection.tsx
+      - src/app/components/Lightbox.tsx
+      - src/app/components/Navbar.tsx
+      - src/app/components/NotFoundSection.tsx
       - src/app/components/PageTitle.tsx
-    axes: [ARCH]
+      - src/app/components/UpcomingEventsSection.tsx
+      - src/app/components/gallery/FeaturedImage.tsx
+      - src/app/components/gallery/GalleryThumbnails.tsx
+      - src/app/components/ui/ModalShell.tsx
+    axes: [ARCH, REACT]
     included:
-      - shared route shell
-      - repeated page-root composition
-      - repeated title placement
-      - repeated full-bleed image composition
-      - duplicated empty and populated render branches
+      - duplicated local helpers and presentation transformations
+      - duplicated component lifecycle and interaction effects
+      - duplicated conditional render branches
+      - repeated responsive render trees
+      - repeated pagination and navigation controls
     excluded:
       - implementation of proposed refactors
-      - component internals unrelated to cross-page rendering
-      - TypeScript, React hook, accessibility, performance, SEO, Tailwind, and responsive correctness
+      - TypeScript, Tailwind, accessibility, performance, SEO, and responsive correctness
+      - visual or pixel-level Figma comparison
       - runtime browser and production behavior
   baseline:
-    commit: 43bc58cf
-    worktree: dirty
-    fingerprints:
-      App.tsx: E2B97193D32E30A42E8BFDF0E51BEA723B6A0372A45EECE41901358259323F68
-      HeroSection.tsx: 875AA65F508DBCB0DF4DEB369D03900CE73061CDBA85EF960000B0108E405860
-      CalendarSection.tsx: CE6987F47FCC062387853163D5DF24F72BDE812A599A529E8CDF9479C7E0FFCC
-      GallerySection.tsx: 60BB9D3BD3BF06F4E66C99E1D7ECE333D7A30B6F98EB51664CEF7A48C8F0BBC5
-      AfiliadosSection.tsx: 90FDAC22946140964649097D89671D9447A98D13F348DF993251027E3EC58308
-      PageTitle.tsx: E4A64A2BD0B309928141AB0A0C88CB6E6F4A5D4CE2FA5D0B9D3B3004A583F586
-  result: The SPA shell and PageTitle primitive already remove the broadest duplication; one structural duplication remains inside CalendarSection and one repeated floating-title preset remains across three pages.
+    commit: bffe7fc5
+    worktree: clean
+    fingerprint: Per-file SHA-256 hashes recorded in COV-2026-07-24-01 evidence.
+  result: Four component-internal redundancy findings were added and STR-ARCH-006 was revalidated; repeated navigation markup in Navbar and control pairs in CalendarSection were judged intentional variants with shared data or styling already centralized.
 
 prior_architecture_documentation_session:
   id: REV-2026-07-21-01
@@ -162,6 +164,50 @@ previous_resolution:
     - gallery frame computed flex was 0 0 auto at requested 1024x640 and 1 1 0% at requested 1024x641
 
 coverage:
+  - id: COV-2026-07-24-01
+    targets:
+      - src/app/components/**/*.tsx (14 files from the recorded inventory)
+    axes: [ARCH, REACT]
+    included:
+      - duplicated local helpers and presentation transformations
+      - duplicated component lifecycle and interaction effects
+      - duplicated conditional render branches
+      - repeated responsive render trees
+      - repeated pagination and navigation controls
+    excluded:
+      - implementation
+      - TypeScript, Tailwind, accessibility, performance, SEO, and responsive correctness
+      - visual or pixel-level Figma comparison
+      - runtime browser and production behavior
+    depth: reviewed
+    evidence:
+      - git status --short returned no changes and git rev-parse --short HEAD returned bffe7fc5
+      - rg --files src/app/components -g '*.tsx' returned the exact 14-file inventory
+      - line-numbered and full-source inspection of every inventory target
+      - exact searches for eventDateFormatter, getLocationMapUrl, feedbackTimeoutRef, previousHtmlOverflow, focus trapping, NAV_LINKS.map, and paired chevron controls
+      - SHA-256 fingerprints: AfiliadosSection DD89694A077C40BBEF8FA0B98BC62DCB5570FEB94A25F21B7A50143019048E34; CalendarSection 11F0692E64021767BD724335939D7464676BCB9A2A3A066A0DCFFA7DCE50DBAF; EventDetailModal ABC80D05C3C99B3FF4D93F7585B1DDE405074528F7F3BF9CA6C9A89005001A52; Footer D1203595874C6970FDA39C363CBCDBF9CDD6690DC44812CF94C896DC296F6C2E; GallerySection B9D032F0F614466AAE36166268807EC5DD945D637C91D332C40EF1174584A7EF; HeroSection 875AA65F508DBCB0DF4DEB369D03900CE73061CDBA85EF960000B0108E405860; Lightbox C563149C56B23884924277FA78273BC6AACB596D29AC17114769F3D57FB23456; Navbar 72FF901122897A337F474EF4F2F33FDE2D8F17B2EDC69F119D5B3FB5EA24ECC9; NotFoundSection 9EA4F2A61F53004AB19743C43CF765D9D8169D3805EDD3A5B56987DEF4AB6A36; PageTitle 538E55BE3C5FC8D72FA445CDA2E907017585404B5400D375761449202D846D57; UpcomingEventsSection 3A5387FB1A2D9B7A894F591A184591DA9E7C0FB43E2446F541F0D7CC90C8245B; FeaturedImage 07448DD99D2D9C768AED9E91CD0014C4FF880471015BC7925B568A88530BBF88; GalleryThumbnails 5C3372DF57BFAA8AB67D08954CC2DB3D5F84F57A2DE64DDB3F8E17D86269C1C3; ModalShell 2D97637B7F3F9CAC9EFB787B8B60DD06E4C3B0651A863CDC0DD3D1AC50C2681E
+    baseline:
+      commit: bffe7fc5
+      worktree: clean
+    status: current
+    file_results:
+      src/app/components/AfiliadosSection.tsx: [SMELL-ARCH-002]
+      src/app/components/CalendarSection.tsx: [STR-ARCH-006]
+      src/app/components/EventDetailModal.tsx: no finding; shared modal lifecycle and calendar presentation helpers are consumed
+      src/app/components/Footer.tsx: no finding
+      src/app/components/GallerySection.tsx: no finding
+      src/app/components/HeroSection.tsx: no finding
+      src/app/components/Lightbox.tsx: [STR-REACT-001, SMELL-REACT-002]
+      src/app/components/Navbar.tsx: no finding; the desktop and mobile trees share NAV_LINKS and differ in container behavior and close handling
+      src/app/components/NotFoundSection.tsx: no finding
+      src/app/components/PageTitle.tsx: no finding
+      src/app/components/UpcomingEventsSection.tsx: [STR-ARCH-007]
+      src/app/components/gallery/FeaturedImage.tsx: [SMELL-REACT-002]
+      src/app/components/gallery/GalleryThumbnails.tsx: no finding
+      src/app/components/ui/ModalShell.tsx: [STR-REACT-001]
+    verification_gaps:
+      - analysis-only review; no refactor or runtime behavior was verified
+
   - id: COV-2026-07-23-03
     targets:
       - src/app/components/PageTitle.tsx
@@ -551,8 +597,63 @@ active_findings:
     cost_of_deferring: Future changes to the calendar page shell can update one branch while silently leaving the other visually or responsively stale.
     evidence:
       - identical section attributes and classes at lines 280-285 and 345-350
-      - line-numbered source inspection at dirty-worktree fingerprint CE6987F47FCC062387853163D5DF24F72BDE812A599A529E8CDF9479C7E0FFCC
+      - revalidated at clean commit bffe7fc5 and fingerprint 11F0692E64021767BD724335939D7464676BCB9A2A3A066A0DCFFA7DCE50DBAF
     introduced_in: REV-2026-07-23-02
+
+  - id: STR-ARCH-007
+    level: STRUCTURAL
+    axis: ARCH
+    status: open
+    target: src/app/components/UpcomingEventsSection.tsx:11-49
+    problem: UpcomingEventsSection reimplements the date-range and Google Maps presentation logic already centralized in calendarEventPresentation.ts.
+    fix: Export the structured date-range labels needed by the homepage from calendarEventPresentation.ts and import getLocationMapUrl instead of maintaining component-local copies.
+    cost_of_deferring: Date formatting, inclusive end-date rules, localization, or map URL behavior can diverge between the homepage, calendar, and event modal.
+    evidence:
+      - eventDateFormatter and its helper chain are duplicated at UpcomingEventsSection.tsx:11-39 and calendarEventPresentation.ts:3-27
+      - getLocationMapUrl is duplicated at UpcomingEventsSection.tsx:42-49 and calendarEventPresentation.ts:36-39
+      - clean baseline bffe7fc5; UpcomingEventsSection fingerprint 3A5387FB1A2D9B7A894F591A184591DA9E7C0FB43E2446F541F0D7CC90C8245B
+    introduced_in: REV-2026-07-24-01
+
+  - id: STR-REACT-001
+    level: STRUCTURAL
+    axis: REACT
+    status: open
+    target: src/app/components/Lightbox.tsx and src/app/components/ui/ModalShell.tsx
+    problem: Lightbox independently implements focus return, document scroll locking, Escape handling, focus trapping, backdrop closing, and dialog refs already owned by ModalShell.
+    fix: Extract a shared useModalBehavior hook or add a layout variant to ModalShell so Lightbox supplies its specialized rendering and arrow-key navigation without duplicating modal lifecycle effects.
+    cost_of_deferring: Fixes to modal lifecycle behavior must be made twice and the two dialogs can silently drift.
+    evidence:
+      - duplicated scroll-lock effects at Lightbox.tsx:88-99 and ModalShell.tsx:48-59
+      - overlapping focus-return and keyboard/focus-trap effects at Lightbox.tsx:82-138 and ModalShell.tsx:42-100
+      - clean baseline bffe7fc5; Lightbox fingerprint C563149C56B23884924277FA78273BC6AACB596D29AC17114769F3D57FB23456; ModalShell fingerprint 2D97637B7F3F9CAC9EFB787B8B60DD06E4C3B0651A863CDC0DD3D1AC50C2681E
+    introduced_in: REV-2026-07-24-01
+
+  - id: SMELL-ARCH-002
+    level: SMELL
+    axis: ARCH
+    status: open
+    target: src/app/components/AfiliadosSection.tsx:103-159
+    problem: DojoInfo duplicates the location section, heading, definition list, and schedule-row composition across two branches instead of rendering normalized location groups once.
+    fix: Group schedule slots by location first and map one shared location-section renderer for both single- and multi-location dojos.
+    cost_of_deferring: New schedules can repeat location headings and every markup change must stay synchronized across both branches.
+    evidence:
+      - allSlotsShareLocation branch at lines 132-146 and per-slot branch at lines 147-158 repeat the same semantic shell
+      - current dojo data exercises both branches
+      - clean baseline bffe7fc5; fingerprint DD89694A077C40BBEF8FA0B98BC62DCB5570FEB94A25F21B7A50143019048E34
+    introduced_in: REV-2026-07-24-01
+
+  - id: SMELL-REACT-002
+    level: SMELL
+    axis: REACT
+    status: open
+    target: src/app/components/Lightbox.tsx:37-79 and src/app/components/gallery/FeaturedImage.tsx:69-131
+    problem: Lightbox and FeaturedImage duplicate the same transient arrow-feedback state, timeout reset, and unmount cleanup behavior.
+    fix: Extract a small useTransientDirectionFeedback hook returning activeDirection and showDirection.
+    cost_of_deferring: Feedback timing or cleanup changes require synchronized edits in both gallery interaction surfaces.
+    evidence:
+      - matching feedbackTimeoutRef, activeArrow, showArrowFeedback, 220ms timeout, and cleanup blocks in both targets
+      - clean baseline bffe7fc5; Lightbox fingerprint C563149C56B23884924277FA78273BC6AACB596D29AC17114769F3D57FB23456; FeaturedImage fingerprint 07448DD99D2D9C768AED9E91CD0014C4FF880471015BC7925B568A88530BBF88
+    introduced_in: REV-2026-07-24-01
 
 resolved_findings:
   - id: SMELL-ARCH-001
