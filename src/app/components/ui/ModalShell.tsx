@@ -1,7 +1,7 @@
 import type { ReactNode, RefObject } from "react";
-import { X } from "lucide-react";
 import { useModalBehavior } from "../../hooks/useModalBehavior";
 import { focusRingClass } from "../../styles/shared";
+import { ModalCloseButton } from "./ModalControls";
 
 interface ModalShellProps {
   children: ReactNode;
@@ -40,18 +40,16 @@ export function ModalShell({
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
         tabIndex={-1}
-        className={`relative max-h-[calc(100svh-2rem)] w-full max-w-2xl overflow-y-auto rounded-3xl bg-site-canvas p-5 text-site-on-dark shadow-2xl shadow-site-overlay/60 sm:p-7 land-sm:max-h-[calc(100svh-1rem)] land-sm:p-4 ${focusRingClass}`}
+        className={`relative w-full max-w-2xl ${focusRingClass}`}
         onMouseDown={(event) => event.stopPropagation()}
       >
-        <button
-          type="button"
-          aria-label={closeLabel}
+        <ModalCloseButton
+          label={closeLabel}
           onClick={onClose}
-          className={`absolute right-3 top-3 flex size-11 items-center justify-center rounded-full bg-site-accent-strong text-site-on-dark transition-colors hover:bg-site-accent-hover ${focusRingClass}`}
-        >
-          <X className="size-5" aria-hidden="true" />
-        </button>
-        {children}
+        />
+        <div className="max-h-[calc(100svh-2rem)] overflow-y-auto rounded-3xl border border-site-action/70 bg-site-canvas p-5 text-site-on-dark shadow-2xl shadow-site-overlay/60 sm:p-7 land-sm:max-h-[calc(100svh-1rem)] land-sm:p-4">
+          {children}
+        </div>
       </div>
     </div>
   );

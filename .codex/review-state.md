@@ -2,7 +2,7 @@
 
 ```yaml
 schema_version: 2
-last_updated: 2026-07-24
+last_updated: 2026-07-25
 contract: .agents/review-contract.md
 
 state_rules:
@@ -13,6 +13,37 @@ state_rules:
   - Legacy claims without reproducible evidence are historical, not current coverage.
 
 latest_session:
+  id: REV-2026-07-25-01
+  requested_scope: Analyze visual consistency and positioning of the close and previous/next controls in the calendar event modal and gallery lightbox without implementing changes.
+  actual_scope:
+    targets:
+      - src/app/styles/shared.ts
+      - src/app/components/ui/ModalShell.tsx
+      - src/app/components/EventDetailModal.tsx
+      - src/app/components/Lightbox.tsx
+      - local routes /calendario/ and /galeria/
+    axes: [ARCH, TAILWIND, A11Y]
+    included:
+      - close-control size, icon size, surface styling, anchor, and inset
+      - previous/next control size, icon size, placement, and visual feedback
+      - desktop 1366x768 and mobile 390x844 rendered geometry
+      - minimum interactive-target size and semantic labels
+    excluded:
+      - implementation of the recommended control primitive
+      - exhaustive keyboard, swipe, and focus regression testing
+      - pixel-level comparison with Figma because no Figma artifact was supplied
+      - production deployment behavior
+  baseline:
+    commit: 391c061b
+    worktree: dirty
+    fingerprints:
+      shared.ts: C2F862790AB610ECAD073074C74FB57C7AF10445CC0F8C9FC49AFF97E37FDE77
+      ModalShell.tsx: 25D01221918EFEAFF99D5C40E1180D57E648142E625DCD376C821AC3D2637087
+      EventDetailModal.tsx: 6DAD8E82506467CEB4FD328E99178E99CD0E04D130BCFB772C05636454EA6F52
+      Lightbox.tsx: 04179A0B4E2970D7ACD3C074AEC7743328167C60874472F7C4097C28ECAFB09D
+  result: The controls meet the 44px minimum target and use consistent semantics, but their shared styling contract does not cover close anchoring or arrow icon geometry, allowing visible drift between the two dialogs.
+
+prior_redundancy_session:
   id: REV-2026-07-24-01
   requested_scope: Continue the prior redundancy review with component internals in scope and without implementing changes.
   actual_scope:
@@ -275,6 +306,83 @@ previous_resolution:
     - gallery frame computed flex was 0 0 auto at requested 1024x640 and 1 1 0% at requested 1024x641
 
 coverage:
+  - id: COV-2026-07-25-02
+    targets:
+      - finding SMELL-ARCH-003
+      - src/app/components/ui/ModalControls.tsx
+      - src/app/components/ui/ModalShell.tsx
+      - src/app/components/EventDetailModal.tsx
+      - src/app/components/Lightbox.tsx
+      - src/app/styles/shared.ts
+      - local routes /calendario/ and /galeria/
+    axes: [ARCH, TAILWIND, A11Y]
+    included:
+      - shared close and previous/next control primitives
+      - identical control and icon geometry across both dialogs
+      - calendar direction feedback for click, swipe, and keyboard paths
+      - mobile, tablet, and desktop placement at 390x844, 768x1024, and 1366x768
+      - previous/next navigation and Escape close in both dialogs
+      - TypeScript and production plus SSR build integrity
+    excluded:
+      - pixel-level Figma comparison
+      - production deployment behavior
+    depth: verified
+    evidence:
+      - corepack pnpm run typecheck passed
+      - corepack pnpm run build passed outside the sandbox
+      - git diff --check passed
+      - both close controls measured 44x44 with 20x20 icons and 12px dialog-relative top/right insets
+      - both navigation control pairs measured 44x44 with 20x20 icons at 390x844 and 48x48 with 24x24 icons at md and larger
+      - gallery navigation remained below the image at 390x844 and 768x1024, and centered vertically at the image sides at 1366x768
+      - calendar retained its bottom navigation row and both routes kept document clientHeight equal to scrollHeight at 1366x768
+      - scoped next navigation and Escape close passed in both dialogs
+    baseline:
+      commit: 391c061b
+      worktree: dirty
+      fingerprints:
+        ModalControls.tsx: 3A4F442801B81B0DD3BC8D87AF18A9695177CD3FA3C1FCDE79EBF0065996B8D5
+        ModalShell.tsx: 71A5CD3C53C1F369A5EF1A9532D301A225E027D75500661D08A99EF94EC7639E
+        EventDetailModal.tsx: 8030AE8D7DDA2C7C01AC0BD943A88BE795073A994651C027596B7A4DF978B3DE
+        Lightbox.tsx: A0CA135DA8D166B6BD7723AE430B6FDDBA9B24DA50E5B896F6BF195B3BC5D3BE
+        shared.ts: 422DAAB2BAB25E9F89799BF868C7A63B74EEB86CE2DC732E75C4BBD1D2E77D55
+    status: current
+    result: Calendar and gallery now share the same modal-control geometry and interaction states while retaining content-appropriate responsive placement.
+
+  - id: COV-2026-07-25-01
+    targets:
+      - src/app/styles/shared.ts
+      - src/app/components/ui/ModalShell.tsx
+      - src/app/components/EventDetailModal.tsx
+      - src/app/components/Lightbox.tsx
+      - local routes /calendario/ and /galeria/
+    axes: [ARCH, TAILWIND, A11Y]
+    included:
+      - modal close and previous/next control geometry, styling, placement, and labels
+      - rendered comparison at 1366x768 and 390x844
+    excluded:
+      - implementation
+      - exhaustive modal interaction regression
+      - Figma pixel comparison
+      - production behavior
+    depth: reviewed
+    evidence:
+      - source inspection and line-targeted search of shared modal classes and both dialog render trees
+      - browser-computed button and SVG rectangles at 1366x768 and 390x844
+      - calendar close measured 44x44 with a 20x20 icon and absolute dialog-relative positioning
+      - gallery close measured 44x44 with a 20x20 icon and fixed viewport-relative positioning
+      - desktop navigation controls measured 48x48 in both dialogs, with 20x20 calendar icons and 24x24 gallery icons
+    baseline:
+      commit: 391c061b
+      worktree: dirty
+      fingerprints:
+        shared.ts: C2F862790AB610ECAD073074C74FB57C7AF10445CC0F8C9FC49AFF97E37FDE77
+        ModalShell.tsx: 25D01221918EFEAFF99D5C40E1180D57E648142E625DCD376C821AC3D2637087
+        EventDetailModal.tsx: 6DAD8E82506467CEB4FD328E99178E99CD0E04D130BCFB772C05636454EA6F52
+        Lightbox.tsx: 04179A0B4E2970D7ACD3C074AEC7743328167C60874472F7C4097C28ECAFB09D
+    status: stale
+    stale_reason: All reviewed control targets changed during the implementation verified by COV-2026-07-25-02.
+    result: Visual drift is confirmed in close anchoring and arrow icon geometry; target size and accessible naming are consistent.
+
   - id: COV-2026-07-24-08
     targets:
       - finding POL-A11Y-001
@@ -959,6 +1067,14 @@ active_findings:
     introduced_in: REV-2026-07-21-01
 
 resolved_findings:
+  - id: SMELL-ARCH-003
+    status: resolved
+    resolved_at: 2026-07-25
+    summary: Calendar and gallery now render shared close and navigation primitives with identical geometry, styling, focus, hover, pressed, and transient direction states while retaining content-appropriate responsive placement.
+    resolution:
+      resolved_ref: 391c061b dirty worktree fingerprints recorded in COV-2026-07-25-02
+      checks: [typecheck, production and SSR build, git diff check, responsive browser geometry, scoped navigation and Escape flows]
+
   - id: POL-A11Y-001
     status: resolved
     resolved_at: 2026-07-24

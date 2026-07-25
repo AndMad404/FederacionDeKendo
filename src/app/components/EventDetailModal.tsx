@@ -1,27 +1,29 @@
 import {
   CalendarDays,
-  ChevronLeft,
-  ChevronRight,
+  Check,
   Clock,
   ExternalLink,
   MapPin,
+  Share2,
   UserRound,
 } from "lucide-react";
 import { useCallback, type RefObject } from "react";
 import type { CalendarEvent } from "../types";
 import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
+import { useTransientDirectionFeedback } from "../hooks/useTransientDirectionFeedback";
 import {
   formatEventTime,
   getEventDateLabel,
+  getEventLocationName,
   getLocationMapUrl,
 } from "../utils/calendarEventPresentation";
 import {
   actionControlSurfaceClass,
   focusRingClass,
-  modalNavigationButtonClass,
   panelSurfaceClass,
 } from "../styles/shared";
 import { ModalShell } from "./ui/ModalShell";
+import { ModalNavigationButton } from "./ui/ModalControls";
 
 interface EventDetailModalProps {
   event: CalendarEvent;
@@ -31,6 +33,8 @@ interface EventDetailModalProps {
   onClose: () => void;
   onPrevious: () => void;
   onNext: () => void;
+  onShare: () => void;
+  isShareCopied: boolean;
 }
 
 export function EventDetailModal({
@@ -41,6 +45,8 @@ export function EventDetailModal({
   onClose,
   onPrevious,
   onNext,
+  onShare,
+  isShareCopied,
 }: EventDetailModalProps) {
   const titleId = `event-detail-${event.id}-title`;
   const descriptionId = event.summary
@@ -49,21 +55,36 @@ export function EventDetailModal({
   const locationUrl = event.location
     ? getLocationMapUrl(event.location)
     : undefined;
+  const locationName = event.location
+    ? getEventLocationName(event.location)
+    : undefined;
+  const {
+    activeDirection: activeArrow,
+    showDirection: showArrowFeedback,
+  } = useTransientDirectionFeedback();
+  const handlePrevious = useCallback(() => {
+    showArrowFeedback("left");
+    onPrevious();
+  }, [onPrevious, showArrowFeedback]);
+  const handleNext = useCallback(() => {
+    showArrowFeedback("right");
+    onNext();
+  }, [onNext, showArrowFeedback]);
   const { swipeHandlers } = useSwipeNavigation({
-    onSwipeLeft: onNext,
-    onSwipeRight: onPrevious,
+    onSwipeLeft: handleNext,
+    onSwipeRight: handlePrevious,
   });
   const handleDialogKeyDown = useCallback(
     (keyboardEvent: KeyboardEvent) => {
       if (keyboardEvent.key === "ArrowLeft") {
         keyboardEvent.preventDefault();
-        onPrevious();
+        handlePrevious();
       } else if (keyboardEvent.key === "ArrowRight") {
         keyboardEvent.preventDefault();
-        onNext();
+        handleNext();
       }
     },
-    [onNext, onPrevious],
+    [handleNext, handlePrevious],
   );
 
   return (
@@ -75,17 +96,21 @@ export function EventDetailModal({
       onClose={onClose}
       onKeyDown={handleDialogKeyDown}
     >
-      <article className="touch-pan-y pr-10" {...swipeHandlers}>
-        {event.type ? (
-          <p className="mb-2 text-sm font-bold uppercase tracking-widest text-site-accent">
-            {event.type}
-          </p>
-        ) : null}
-        <h2 id={titleId} className="text-2xl font-bold leading-tight sm:text-3xl">
-          {event.title}
-        </h2>
+      <article className="touch-pan-y" {...swipeHandlers}>
+        <div className="pr-12">
+          {event.type ? (
+            <p className="mb-2 text-sm font-bold uppercase tracking-widest text-site-accent">
+              {event.type}
+            </p>
+          ) : null}
+          <h2 id={titleId} className="text-2xl font-bold leading-tight sm:text-3xl">
+            {event.title}
+          </h2>
+        </div>
 
-        <dl className={`mt-5 grid gap-3 rounded-2xl p-4 ${panelSurfaceClass}`}>
+        <dl
+          className={`relative mt-5 grid gap-3 rounded-2xl p-4 ${panelSurfaceClass}`}
+        >
           <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3">
             <CalendarDays
               className="mt-0.5 size-5 text-site-accent-soft"
@@ -112,30 +137,38 @@ export function EventDetailModal({
             </div>
           </div>
 
-          {event.location ? (
-            <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3">
-              <MapPin
-                className="mt-0.5 size-5 text-site-accent-soft"
-                aria-hidden="true"
-              />
-              <div>
-                <dt className="sr-only">Ubicación</dt>
-                <dd>
+          <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3">
+            <MapPin
+              className={`mt-0.5 size-5 ${
+                event.location
+                  ? "text-site-accent-soft"
+                  : "text-site-on-dark/40"
+              }`}
+              aria-hidden="true"
+            />
+            <div>
+              <dt className="sr-only">Ubicación</dt>
+              <dd>
+                {event.location ? (
                   <a
                     href={locationUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`inline-block underline decoration-site-action-soft underline-offset-4 hover:text-site-action-text ${focusRingClass}`}
                   >
-                    {event.location}
+                    {locationName}
                     <span className="sr-only">
                       . Abre Google Maps en una pestaña nueva.
                     </span>
                   </a>
-                </dd>
-              </div>
+                ) : (
+                  <span className="inline-flex items-center justify-center rounded-full border border-site-on-dark/20 bg-site-overlay/70 px-3 py-1 text-sm font-semibold text-site-on-dark/65">
+                    Pendiente de confirmar
+                  </span>
+                )}
+              </dd>
             </div>
-          ) : null}
+          </div>
 
           {event.organizer ? (
             <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3">
@@ -152,6 +185,24 @@ export function EventDetailModal({
               </div>
             </div>
           ) : null}
+
+          <button
+            type="button"
+            aria-label={
+              isShareCopied
+                ? `Enlace de ${event.title} copiado`
+                : `Compartir ${event.title}`
+            }
+            title={isShareCopied ? "Enlace copiado" : "Compartir evento"}
+            onClick={onShare}
+            className={`absolute right-3 top-3 flex size-11 items-center justify-center rounded-full transition-colors hover:bg-site-action-hover/90 hover:text-site-on-dark ${actionControlSurfaceClass} ${focusRingClass}`}
+          >
+            {isShareCopied ? (
+              <Check className="size-5" aria-hidden="true" />
+            ) : (
+              <Share2 className="size-5" aria-hidden="true" />
+            )}
+          </button>
         </dl>
 
         {event.summary ? (
@@ -181,25 +232,21 @@ export function EventDetailModal({
             aria-label="Navegación entre eventos"
             className="mt-6 flex min-h-11 items-center justify-center gap-4"
           >
-            <button
-              type="button"
-              aria-label="Ver evento anterior"
-              onClick={onPrevious}
-              className={`${modalNavigationButtonClass} ${focusRingClass}`}
-            >
-              <ChevronLeft className="size-5" aria-hidden="true" />
-            </button>
+            <ModalNavigationButton
+              direction="previous"
+              label="Ver evento anterior"
+              isActive={activeArrow === "left"}
+              onClick={handlePrevious}
+            />
             <p className="min-w-24 text-center text-sm font-semibold" aria-live="polite">
               Evento {index + 1} de {total}
             </p>
-            <button
-              type="button"
-              aria-label="Ver evento siguiente"
-              onClick={onNext}
-              className={`${modalNavigationButtonClass} ${focusRingClass}`}
-            >
-              <ChevronRight className="size-5" aria-hidden="true" />
-            </button>
+            <ModalNavigationButton
+              direction="next"
+              label="Ver evento siguiente"
+              isActive={activeArrow === "right"}
+              onClick={handleNext}
+            />
           </nav>
         ) : null}
       </article>

@@ -4,6 +4,7 @@ import { CALENDAR_EVENTS } from "../data/calendarEvents";
 import { getUpcomingEvents } from "../utils/calendarEvents";
 import {
   getEventDateRangeLabels,
+  getEventLocationName,
   getLocationMapUrl,
 } from "../utils/calendarEventPresentation";
 import { actionControlSurfaceClass, focusRingClass } from "../styles/shared";
@@ -56,6 +57,9 @@ export function UpcomingEventsSection() {
             ? `${startDateLabel} - ${endDateLabel}`
             : startDateLabel;
           const locationUrl = event.location ? getLocationMapUrl(event.location) : undefined;
+          const locationName = event.location
+            ? getEventLocationName(event.location)
+            : undefined;
           const locationDescriptionId = `${event.id}-location-description`;
 
           return (
@@ -95,7 +99,7 @@ export function UpcomingEventsSection() {
                   <MapPin className="mr-1.5 size-3.5 shrink-0 text-site-accent-soft" aria-hidden="true" />
                   <span>Cómo llegar</span>
                   <span id={locationDescriptionId} className="sr-only">
-                    Dirección: {event.location}. Abre Google Maps en una pestaña nueva.
+                    Lugar: {locationName}. Abre Google Maps en una pestaña nueva.
                   </span>
                 </a>
               ) : (

@@ -1,19 +1,16 @@
 import { useCallback, useRef, type RefObject } from "react";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import type { GalleryImage } from "../types";
 import { useModalBehavior } from "../hooks/useModalBehavior";
 import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
 import { useTransientDirectionFeedback } from "../hooks/useTransientDirectionFeedback";
 import { getGalleryDisplayText } from "./gallery/galleryText";
+import { panelSurfaceClass } from "../styles/shared";
 import {
-  focusRingClass,
-  modalNavigationButtonClass,
-  panelSurfaceClass,
-} from "../styles/shared";
+  ModalCloseButton,
+  ModalNavigationButton,
+} from "./ui/ModalControls";
 
 const LIGHTBOX_IMAGE_SIZES = "(max-width: 640px) 92vw, 75vw";
-const activeArrowClass = "border-site-accent bg-site-accent-strong text-site-on-dark";
-
 interface LightboxProps {
   image: GalleryImage;
   index: number;
@@ -91,15 +88,11 @@ export function Lightbox({
         onClick={(event) => event.stopPropagation()}
         {...swipeHandlers}
       >
-        <button
+        <ModalCloseButton
           ref={closeBtnRef}
-          type="button"
-          aria-label="Cerrar galería"
+          label="Cerrar galería"
           onClick={onClose}
-          className={`fixed right-4 top-4 z-[60] flex size-11 cursor-pointer items-center justify-center rounded-full bg-site-accent-strong text-site-on-dark transition-colors hover:bg-site-accent-hover land-sm:right-2 land-sm:top-2 ${focusRingClass}`}
-        >
-          <X size={20} aria-hidden="true" />
-        </button>
+        />
 
         <div className="flex h-[min(54svh,32rem)] min-h-0 w-full items-center justify-center overflow-hidden rounded-3xl bg-site-overlay/70 sm:h-[min(68svh,36rem)] land-sm:h-full land-sm:flex-none">
           <img
@@ -114,22 +107,19 @@ export function Lightbox({
           />
         </div>
 
-        <div className="grid w-full max-w-[22rem] grid-cols-[auto_auto] items-center justify-between gap-x-[min(75%,calc(100%_-_5.5rem))] gap-y-[clamp(1.5rem,5vw,2.25rem)] sm:max-w-[calc(100vw-4rem)] sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:justify-around sm:gap-x-4 sm:gap-y-3 land-sm:absolute land-sm:inset-0 land-sm:z-10 land-sm:block land-sm:max-w-none">
-          <button
-            type="button"
-            aria-label="Imagen anterior"
+        <div className="grid w-full max-w-[22rem] grid-cols-[auto_auto] items-center justify-between gap-x-[min(75%,calc(100%_-_5.5rem))] gap-y-[clamp(1.5rem,5vw,2.25rem)] sm:max-w-[calc(100vw-4rem)] sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:justify-around sm:gap-x-4 sm:gap-y-3 lg:absolute lg:inset-0 lg:z-10 lg:block lg:max-w-none land-sm:absolute land-sm:inset-0 land-sm:z-10 land-sm:block land-sm:max-w-none">
+          <ModalNavigationButton
+            direction="previous"
+            label="Imagen anterior"
+            isActive={activeArrow === "left"}
             onClick={(event) => {
               event.stopPropagation();
               handlePrev();
             }}
-            className={`${modalNavigationButtonClass} ${
-              activeArrow === "left" ? activeArrowClass : ""
-            } justify-self-end sm:justify-self-center land-sm:absolute land-sm:left-3 land-sm:top-1/2 land-sm:-translate-y-1/2 ${focusRingClass}`}
-          >
-            <ChevronLeft size={24} aria-hidden="true" />
-          </button>
+            className="justify-self-end sm:justify-self-center lg:absolute lg:left-3 lg:top-1/2 lg:-translate-y-1/2 land-sm:absolute land-sm:left-3 land-sm:top-1/2 land-sm:-translate-y-1/2"
+          />
 
-          <div className={`col-span-2 row-start-2 grid min-h-[9.5rem] w-full min-w-0 max-w-full grid-rows-[auto_auto_minmax(0,1fr)_auto] items-center rounded-2xl px-4 py-3 text-center shadow-xl shadow-site-overlay/40 backdrop-blur-sm sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:max-w-none sm:items-center sm:rounded-3xl sm:px-5 sm:py-4 land-sm:absolute land-sm:bottom-3 land-sm:left-1/2 land-sm:w-[min(28rem,calc(100%_-_6rem))] land-sm:-translate-x-1/2 land-sm:min-h-0 land-sm:grid-cols-[minmax(0,1fr)_auto] land-sm:grid-rows-[auto_auto] land-sm:gap-x-4 land-sm:gap-y-1 land-sm:rounded-2xl land-sm:px-3 land-sm:py-2 land-sm:text-left ${panelSurfaceClass}`}>
+          <div className={`col-span-2 row-start-2 grid min-h-[9.5rem] w-full min-w-0 max-w-full grid-rows-[auto_auto_minmax(0,1fr)_auto] items-center rounded-2xl px-4 py-3 text-center shadow-xl shadow-site-overlay/40 backdrop-blur-sm sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:max-w-none sm:items-center sm:rounded-3xl sm:px-5 sm:py-4 lg:absolute lg:bottom-3 lg:left-1/2 lg:w-[min(28rem,calc(100%_-_6rem))] lg:-translate-x-1/2 lg:min-h-0 lg:grid-cols-[minmax(0,1fr)_auto] lg:grid-rows-[auto_auto] lg:gap-x-4 lg:gap-y-1 lg:rounded-2xl lg:px-3 lg:py-2 lg:text-left land-sm:absolute land-sm:bottom-3 land-sm:left-1/2 land-sm:w-[min(28rem,calc(100%_-_6rem))] land-sm:-translate-x-1/2 land-sm:min-h-0 land-sm:grid-cols-[minmax(0,1fr)_auto] land-sm:grid-rows-[auto_auto] land-sm:gap-x-4 land-sm:gap-y-1 land-sm:rounded-2xl land-sm:px-3 land-sm:py-2 land-sm:text-left ${panelSurfaceClass}`}>
             <h2
               id="lightbox-title"
               className="line-clamp-2 text-xl font-bold leading-tight land-sm:col-start-1 land-sm:row-start-1 land-sm:text-base"
@@ -151,19 +141,16 @@ export function Lightbox({
             </p>
           </div>
 
-          <button
-            type="button"
-            aria-label="Imagen siguiente"
+          <ModalNavigationButton
+            direction="next"
+            label="Imagen siguiente"
+            isActive={activeArrow === "right"}
             onClick={(event) => {
               event.stopPropagation();
               handleNext();
             }}
-            className={`${modalNavigationButtonClass} ${
-              activeArrow === "right" ? activeArrowClass : ""
-            } justify-self-start sm:col-start-3 sm:justify-self-center land-sm:absolute land-sm:right-3 land-sm:top-1/2 land-sm:-translate-y-1/2 ${focusRingClass}`}
-          >
-            <ChevronRight size={24} aria-hidden="true" />
-          </button>
+            className="justify-self-start sm:col-start-3 sm:justify-self-center lg:absolute lg:right-3 lg:top-1/2 lg:-translate-y-1/2 land-sm:absolute land-sm:right-3 land-sm:top-1/2 land-sm:-translate-y-1/2"
+          />
         </div>
       </div>
     </div>

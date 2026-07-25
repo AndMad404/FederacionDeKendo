@@ -46,3 +46,7 @@ export function getLocationMapUrl(location: string) {
   const params = new URLSearchParams({ api: "1", query: location });
   return `https://www.google.com/maps/search/?${params.toString()}`;
 }
+
+export function getEventLocationName(location: string) {
+  return location.split(",", 1)[0].trim();
+}

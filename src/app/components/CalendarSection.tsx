@@ -18,6 +18,7 @@ import { getUpcomingEventGroups } from "../utils/calendarEvents";
 import {
   formatEventTime,
   getEventDateLabel,
+  getEventLocationName,
   getLocationMapUrl,
 } from "../utils/calendarEventPresentation";
 import {
@@ -97,9 +98,9 @@ function CalendarBanner() {
 }
 
 function formatMonth(monthKey: string) {
-  const label = monthFormatter.format(
-    new Date(`${monthKey}-01T00:00:00.000Z`),
-  );
+  const label = monthFormatter
+    .format(new Date(`${monthKey}-01T00:00:00.000Z`))
+    .replace(" de ", " ");
   return label.charAt(0).toUpperCase() + label.slice(1);
 }
 
@@ -410,6 +411,9 @@ export function CalendarSection() {
           const locationUrl = event.location
             ? getLocationMapUrl(event.location)
             : undefined;
+          const locationName = event.location
+            ? getEventLocationName(event.location)
+            : undefined;
           const locationDescriptionId = `${event.id}-calendar-location`;
 
           return (
@@ -463,7 +467,7 @@ export function CalendarSection() {
                     />
                     Ver ubicación
                     <span id={locationDescriptionId} className="sr-only">
-                      Dirección: {event.location}. Abre Google Maps en una
+                      Lugar: {locationName}. Abre Google Maps en una
                       pestaña nueva.
                     </span>
                   </a>
@@ -555,6 +559,8 @@ export function CalendarSection() {
           onClose={closeEvent}
           onPrevious={() => navigateSelectedEvent(-1)}
           onNext={() => navigateSelectedEvent(1)}
+          onShare={() => void shareEvent(selectedEvent)}
+          isShareCopied={copiedEventId === selectedEvent.id}
         />
       ) : null}
     </>
