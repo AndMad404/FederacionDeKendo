@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import {
   focusRingClass,
   modalCloseButtonClass,
-  modalNavigationButtonClass,
+  navigationArrowButtonClass,
 } from "../../styles/shared";
 
 interface ModalCloseButtonProps
@@ -28,27 +28,27 @@ export const ModalCloseButton = forwardRef<
   );
 });
 
-interface ModalNavigationButtonProps
+interface NavigationArrowButtonProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" | "type"> {
   direction: "previous" | "next";
   label: string;
   isActive?: boolean;
 }
 
-export function ModalNavigationButton({
+export function NavigationArrowButton({
   direction,
   label,
   isActive = false,
   className = "",
   ...props
-}: ModalNavigationButtonProps) {
+}: NavigationArrowButtonProps) {
   const Icon = direction === "previous" ? ChevronLeft : ChevronRight;
 
   return (
     <button
       type="button"
       aria-label={label}
-      className={`${modalNavigationButtonClass} ${
+      className={`${navigationArrowButtonClass} ${
         isActive
           ? "border-site-accent bg-site-accent-strong text-site-on-dark"
           : ""

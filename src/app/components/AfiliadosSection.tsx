@@ -56,7 +56,7 @@ function InfoCell({ item, side }: { item: InfoItem; side: "left" | "right" }) {
 
   return (
     <Fragment>
-      <span className={`${iconColumn} flex size-8 items-center justify-center rounded-full bg-site-action/20 text-site-accent [&>svg]:size-5 md:size-10 lg:size-12 lg:[&>svg]:size-6 land-compact:size-7 land-compact:[&>svg]:size-4`}>
+      <span className={`${iconColumn} flex size-8 items-center justify-center rounded-lg bg-site-media text-site-action [&>svg]:size-5 md:size-10 lg:size-12 lg:[&>svg]:size-6 land-compact:size-7 land-compact:[&>svg]:size-4`}>
         {ICON_MAP[item.icon]}
       </span>
       <div className={`${textColumn} min-w-0`}>
@@ -124,7 +124,7 @@ function DojoInfo({
   return (
     <section
       aria-labelledby={headingId}
-      className={`mb-6 flex flex-col justify-between gap-2 rounded-3xl px-3 py-4 text-site-on-dark sm:px-6 land-compact:mb-0 land-compact:gap-1 land-compact:rounded-2xl land-compact:px-3 land-compact:py-2 ${panelSurfaceClass}`}
+      className={`mb-2.5 flex flex-col justify-between gap-2 px-3 py-4 sm:px-6 xl:mb-0 land-compact:mb-0 land-compact:gap-1 land-compact:px-3 land-compact:py-2 ${panelSurfaceClass}`}
     >
       <h2
         id={headingId}
@@ -219,12 +219,12 @@ function AffiliatePagination({
         aria-controls="affiliate-dojo-list"
         disabled={page === 0}
         onClick={() => onPageChange(page - 1)}
-        className={`inline-flex size-11 items-center justify-center rounded-full transition-colors hover:bg-site-action-hover/90 disabled:cursor-not-allowed disabled:border-site-on-dark/20 disabled:text-site-on-dark/35 ${actionControlSurfaceClass} ${focusRingClass}`}
+        className={`inline-flex size-11 items-center justify-center rounded-full transition-colors hover:border-site-action hover:bg-site-media disabled:cursor-not-allowed disabled:opacity-35 ${actionControlSurfaceClass} ${focusRingClass}`}
       >
         <ChevronLeft className="size-5" aria-hidden="true" />
       </button>
 
-      <p className="min-w-20 text-center text-sm font-bold text-site-on-dark" aria-live="polite">
+      <p className="min-w-20 text-center text-sm font-bold text-site-text" aria-live="polite">
         {page + 1} de {totalPages}
       </p>
 
@@ -234,7 +234,7 @@ function AffiliatePagination({
         aria-controls="affiliate-dojo-list"
         disabled={page === totalPages - 1}
         onClick={() => onPageChange(page + 1)}
-        className={`inline-flex size-11 items-center justify-center rounded-full transition-colors hover:bg-site-action-hover/90 disabled:cursor-not-allowed disabled:border-site-on-dark/20 disabled:text-site-on-dark/35 ${actionControlSurfaceClass} ${focusRingClass}`}
+        className={`inline-flex size-11 items-center justify-center rounded-full transition-colors hover:border-site-action hover:bg-site-media disabled:cursor-not-allowed disabled:opacity-35 ${actionControlSurfaceClass} ${focusRingClass}`}
       >
         <ChevronRight className="size-5" aria-hidden="true" />
       </button>
@@ -251,16 +251,10 @@ export function AfiliadosSection() {
   return (
     <section
       aria-labelledby="affiliates-title"
-      className="relative rounded-3xl bg-site-canvas md:h-full md:overflow-y-auto xl:overflow-hidden land-compact:overflow-y-auto"
+      className="relative mt-2 flex flex-col overflow-hidden rounded-xl bg-site-canvas md:h-full md:overflow-y-auto xl:overflow-hidden tall-md:h-[calc(100%_-_0.5rem)] land-compact:overflow-y-auto"
     >
-      <PageTitle
-        id="affiliates-title"
-        placement="floating"
-      >
-        Dojos afiliados
-      </PageTitle>
-      <div className="relative flex min-h-[530px] items-center justify-center overflow-hidden rounded-3xl pt-6 xl:h-full xl:min-h-0 xl:pt-0 land-compact:min-h-[calc(100dvh-4rem-10px)] land-compact:items-start land-compact:overflow-y-auto land-compact:py-2">
-        <picture className="absolute inset-0 h-full w-full">
+      <header className="absolute inset-x-0 top-0 z-10 h-28 overflow-hidden land-compact:h-20">
+        <picture className="absolute inset-0 h-full w-full" aria-hidden="true">
           <source
             srcSet="/images/affiliates/kendo-affiliates-768.avif 768w, /images/affiliates/kendo-affiliates-1200.avif 1200w"
             sizes="(min-width: 1024px) 1200px, 100vw"
@@ -273,17 +267,27 @@ export function AfiliadosSection() {
           />
           <img
             src="/images/affiliates/kendo-affiliates.jpg"
-            alt="Practicantes de kendo reunidos durante un entrenamiento en un dojo"
+            alt=""
             width={1500}
             height={1001}
             loading="eager"
             decoding="async"
             fetchpriority="high"
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover object-[center_33%]"
           />
         </picture>
-        <div className="absolute inset-0 rounded-3xl bg-site-overlay/30" aria-hidden="true" />
-        <div className="relative z-10 w-full max-w-4xl px-4 pt-14 sm:px-6 md:max-w-5xl lg:max-w-6xl xl:flex xl:h-full xl:max-w-7xl xl:items-center xl:pt-10 land-compact:max-w-none land-compact:px-2 land-compact:pt-14">
+        <div className="absolute inset-0 bg-gradient-to-r from-site-navy/95 via-site-navy/80 to-site-navy/45" aria-hidden="true" />
+        <div className="relative z-10 flex h-full flex-col items-center justify-start px-4 pt-4 text-center text-site-on-dark">
+          <PageTitle id="affiliates-title" tone="media" className="!p-0">
+            Dojos afiliados
+          </PageTitle>
+          <p className="mt-1 text-sm text-site-subtle land-compact:hidden">
+            Encuentra una comunidad donde practicar kendo.
+          </p>
+        </div>
+      </header>
+      <div className="relative flex min-h-[530px] flex-1 items-start justify-center overflow-hidden pt-20 md:overflow-visible xl:overflow-hidden land-compact:min-h-[calc(100dvh-4rem-10px)] land-compact:items-start land-compact:overflow-y-auto land-compact:py-14">
+        <div className="relative z-20 w-full max-w-4xl px-4 sm:px-6 md:max-w-5xl lg:max-w-6xl xl:flex xl:h-full xl:items-start xl:px-0 land-compact:max-w-none land-compact:px-2">
           <AffiliatePagination
             page={page}
             totalPages={totalPages}

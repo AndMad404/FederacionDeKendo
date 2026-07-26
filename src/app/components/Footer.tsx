@@ -2,8 +2,8 @@ import { focusRingClass } from "../styles/shared";
 
 export function Footer() {
   return (
-    <footer className="bg-site-canvas text-site-on-dark">
-      <div className="mx-auto grid max-w-6xl grid-cols-1 justify-items-center gap-5 px-3 py-4 text-center md:grid-cols-2 md:gap-10 md:px-6 md:py-3 lg:px-0">
+    <footer className="bg-site-navy text-site-on-dark">
+      <div className="mx-auto grid max-w-6xl grid-cols-1 justify-items-center gap-5 p-2.5 text-center md:grid-cols-2 md:gap-10">
         <section
           aria-labelledby="footer-purpose-title"
           className="flex max-w-md flex-col items-center gap-3 md:gap-2"
@@ -40,7 +40,7 @@ export function Footer() {
             <ul className="flex flex-col gap-1 text-base">
               <li>
                 <a
-                  className={`hover:text-site-action-soft ${focusRingClass}`}
+                  className={`underline-offset-4 hover:text-site-accent-soft hover:underline ${focusRingClass}`}
                   href="mailto:secretaria.fedekendo@outlook.com"
                 >
                   secretaria.fedekendo@outlook.com

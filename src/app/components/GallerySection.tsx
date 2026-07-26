@@ -22,11 +22,13 @@ export function GallerySection() {
   return (
     <section
       aria-labelledby="gallery-title"
-      className="relative overflow-hidden bg-site-canvas tall-md:h-full tall-md:min-h-0"
+      className="relative my-2 overflow-hidden rounded-xl bg-site-canvas tall-md:h-[calc(100%_-_1rem)] tall-md:min-h-0"
     >
       <PageTitle
         id="gallery-title"
         placement="floating"
+        tone="media"
+        className="!p-0"
       >
         Galería de kendo
       </PageTitle>
