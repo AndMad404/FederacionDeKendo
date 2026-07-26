@@ -7,7 +7,7 @@ import { getGalleryDisplayText } from "./gallery/galleryText";
 import { panelSurfaceClass } from "../styles/shared";
 import {
   ModalCloseButton,
-  ModalNavigationButton,
+  NavigationArrowButton,
 } from "./ui/ModalControls";
 
 const LIGHTBOX_IMAGE_SIZES = "(max-width: 640px) 92vw, 75vw";
@@ -75,7 +75,7 @@ export function Lightbox({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-site-overlay/70 p-4 land-sm:p-2"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-site-navy/90 p-4 land-sm:p-2"
       onClick={onBackdropInteraction}
     >
       <div
@@ -94,7 +94,7 @@ export function Lightbox({
           onClick={onClose}
         />
 
-        <div className="flex h-[min(54svh,32rem)] min-h-0 w-full items-center justify-center overflow-hidden rounded-3xl bg-site-overlay/70 sm:h-[min(68svh,36rem)] land-sm:h-full land-sm:flex-none">
+        <div className="flex h-[min(54svh,32rem)] min-h-0 w-full items-center justify-center overflow-hidden rounded-xl bg-site-navy sm:h-[min(68svh,36rem)] land-sm:h-full land-sm:flex-none">
           <img
             src={image.src}
             srcSet={image.srcSet}
@@ -103,12 +103,12 @@ export function Lightbox({
             width={image.width}
             height={image.height}
             decoding="async"
-            className="block h-auto max-h-full w-auto max-w-full rounded-3xl object-contain land-sm:h-full land-sm:max-h-none land-sm:w-full land-sm:max-w-none"
+            className="block h-auto max-h-full w-auto max-w-full rounded-xl object-contain lg:h-full lg:w-full lg:max-w-none lg:object-cover land-sm:h-full land-sm:max-h-none land-sm:w-full land-sm:max-w-none land-sm:object-cover"
           />
         </div>
 
         <div className="grid w-full max-w-[22rem] grid-cols-[auto_auto] items-center justify-between gap-x-[min(75%,calc(100%_-_5.5rem))] gap-y-[clamp(1.5rem,5vw,2.25rem)] sm:max-w-[calc(100vw-4rem)] sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:justify-around sm:gap-x-4 sm:gap-y-3 lg:absolute lg:inset-0 lg:z-10 lg:block lg:max-w-none land-sm:absolute land-sm:inset-0 land-sm:z-10 land-sm:block land-sm:max-w-none">
-          <ModalNavigationButton
+          <NavigationArrowButton
             direction="previous"
             label="Imagen anterior"
             isActive={activeArrow === "left"}
@@ -119,7 +119,7 @@ export function Lightbox({
             className="justify-self-end sm:justify-self-center lg:absolute lg:left-3 lg:top-1/2 lg:-translate-y-1/2 land-sm:absolute land-sm:left-3 land-sm:top-1/2 land-sm:-translate-y-1/2"
           />
 
-          <div className={`col-span-2 row-start-2 grid min-h-[9.5rem] w-full min-w-0 max-w-full grid-rows-[auto_auto_minmax(0,1fr)_auto] items-center rounded-2xl px-4 py-3 text-center shadow-xl shadow-site-overlay/40 backdrop-blur-sm sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:max-w-none sm:items-center sm:rounded-3xl sm:px-5 sm:py-4 lg:absolute lg:bottom-3 lg:left-1/2 lg:w-[min(28rem,calc(100%_-_6rem))] lg:-translate-x-1/2 lg:min-h-0 lg:grid-cols-[minmax(0,1fr)_auto] lg:grid-rows-[auto_auto] lg:gap-x-4 lg:gap-y-1 lg:rounded-2xl lg:px-3 lg:py-2 lg:text-left land-sm:absolute land-sm:bottom-3 land-sm:left-1/2 land-sm:w-[min(28rem,calc(100%_-_6rem))] land-sm:-translate-x-1/2 land-sm:min-h-0 land-sm:grid-cols-[minmax(0,1fr)_auto] land-sm:grid-rows-[auto_auto] land-sm:gap-x-4 land-sm:gap-y-1 land-sm:rounded-2xl land-sm:px-3 land-sm:py-2 land-sm:text-left ${panelSurfaceClass}`}>
+          <div className={`col-span-2 row-start-2 grid h-[9.5rem] w-full min-w-0 max-w-full grid-rows-[auto_auto_minmax(0,1fr)_auto] items-center overflow-hidden px-4 py-3 text-center sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:max-w-none sm:items-center sm:px-5 sm:py-4 lg:absolute lg:bottom-3 lg:left-1/2 lg:h-24 lg:w-[min(30rem,calc(100%_-_6rem))] lg:-translate-x-1/2 lg:grid-cols-[minmax(0,1fr)_auto] lg:grid-rows-[auto_auto] lg:gap-x-4 lg:gap-y-1 lg:px-3 lg:py-2 lg:text-left land-sm:absolute land-sm:bottom-3 land-sm:left-1/2 land-sm:h-24 land-sm:w-[min(30rem,calc(100%_-_6rem))] land-sm:-translate-x-1/2 land-sm:grid-cols-[minmax(0,1fr)_auto] land-sm:grid-rows-[auto_auto] land-sm:gap-x-4 land-sm:gap-y-1 land-sm:px-3 land-sm:py-2 land-sm:text-left ${panelSurfaceClass}`}>
             <h2
               id="lightbox-title"
               className="line-clamp-2 text-xl font-bold leading-tight land-sm:col-start-1 land-sm:row-start-1 land-sm:text-base"
@@ -131,7 +131,7 @@ export function Lightbox({
             </p>
             {displayDescription && (
               <div id="lightbox-description" className="min-h-0 land-sm:col-start-1 land-sm:row-start-2">
-                <p className="text-sm leading-snug text-site-subtle land-sm:line-clamp-2 land-sm:text-[10px] land-sm:leading-tight">
+                <p className="line-clamp-3 text-sm leading-snug text-site-muted lg:line-clamp-2 land-sm:line-clamp-2 land-sm:text-[10px] land-sm:leading-tight">
                   {displayDescription}
                 </p>
               </div>
@@ -141,7 +141,7 @@ export function Lightbox({
             </p>
           </div>
 
-          <ModalNavigationButton
+          <NavigationArrowButton
             direction="next"
             label="Imagen siguiente"
             isActive={activeArrow === "right"}

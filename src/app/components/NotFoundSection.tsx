@@ -18,7 +18,7 @@ export function NotFoundSection() {
         Página no encontrada
       </PageTitle>
 
-      <p className="max-w-md text-base leading-relaxed text-site-on-dark">
+      <p className="max-w-md text-base leading-relaxed text-site-text">
         La página que buscas no existe o fue movida. Puedes continuar desde
         alguna de estas secciones.
       </p>
@@ -28,7 +28,7 @@ export function NotFoundSection() {
           <li key={link.to}>
             <Link
               to={link.to}
-              className={`rounded-lg px-4 py-2 text-site-on-dark transition-colors duration-200 hover:text-site-accent ${panelSurfaceClass} ${focusRingClass}`}
+              className={`rounded-lg px-4 py-2 text-site-action transition-colors duration-200 hover:border-site-action ${panelSurfaceClass} ${focusRingClass}`}
             >
               {link.label}
             </Link>

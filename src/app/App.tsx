@@ -75,12 +75,12 @@ function RouteMetadata() {
 
 export default function App() {
   return (
-    <div className="flex min-h-svh flex-col bg-site-canvas tall-md:h-dvh tall-md:overflow-hidden">
+    <div className="flex min-h-svh flex-col bg-site-canvas text-site-text tall-md:h-dvh tall-md:overflow-hidden">
       <ScrollToTop />
       <RouteMetadata />
       <a
         href="#main-content"
-        className="fixed left-4 top-4 z-[60] -translate-y-20 rounded bg-site-on-dark px-4 py-2 text-sm font-bold text-site-canvas shadow-lg transition focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-site-action"
+        className="fixed left-4 top-4 z-[60] -translate-y-20 rounded-lg bg-site-surface px-4 py-2 text-sm font-bold text-site-navy shadow-lg transition focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-site-focus"
       >
         Saltar al contenido principal
       </a>

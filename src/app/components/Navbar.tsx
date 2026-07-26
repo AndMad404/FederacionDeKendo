@@ -13,8 +13,8 @@ const NAV_LINKS = [
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   `text-lg tracking-wide transition-colors duration-200 land-sm:text-base ${focusRingClass} ${
     isActive
-      ? "border-b border-site-action/70 pb-0.5 text-site-action-soft"
-      : "text-site-on-dark hover:text-site-accent"
+      ? "border-b-2 border-site-accent pb-0.5 text-site-on-dark"
+      : "text-site-on-dark/85 hover:text-site-on-dark"
   }`;
 
 export function Navbar() {
@@ -36,7 +36,7 @@ export function Navbar() {
   }, [open]);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 bg-site-canvas backdrop-blur">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-site-on-dark/10 bg-site-navy">
       <nav aria-label="Navegación principal">
       <div className="mx-auto my-[5px] flex h-16 max-w-6xl items-center justify-between px-6 land-sm:my-[3px] land-sm:h-12 land-sm:px-5">
         <Link
@@ -78,7 +78,7 @@ export function Navbar() {
         <button
           ref={menuButtonRef}
           type="button"
-          className={`inline-flex size-11 shrink-0 items-center justify-center text-site-muted hover:text-site-on-dark md:hidden ${focusRingClass}`}
+          className={`inline-flex size-11 shrink-0 items-center justify-center rounded-lg border border-white/70 bg-white/10 text-white transition-colors hover:border-white hover:bg-white/20 hover:text-white md:hidden ${focusRingClass}`}
           aria-controls="mobile-menu"
           aria-expanded={open}
           aria-label={open ? "Cerrar menú" : "Abrir menú"}
@@ -95,7 +95,7 @@ export function Navbar() {
       {open && (
         <ul
           id="mobile-menu"
-          className="flex flex-col items-center gap-5 bg-site-canvas px-6 py-5 text-center md:hidden"
+          className="flex flex-col items-center gap-5 bg-site-navy px-6 py-5 text-center md:hidden"
         >
           {NAV_LINKS.map((link) => (
             <li key={link.to}>

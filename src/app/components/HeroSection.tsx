@@ -3,14 +3,15 @@ import { UpcomingEventsSection } from "./UpcomingEventsSection";
 import { PageTitle } from "./PageTitle";
 import {
   focusRingClass,
-  panelSurfaceClass,
+  primaryButtonClass,
+  secondaryButtonClass,
 } from "../styles/shared";
 
 const imageVersion = "v=20260704-0120";
 
 function HeroBanner() {
   return (
-    <header className="relative flex h-[clamp(520px,calc(100svh_-_4rem_-_10px),680px)] items-stretch overflow-hidden rounded-3xl land-sm:h-auto land-sm:min-h-[calc(100svh_-_3rem_-_6px)] tall-md:h-auto tall-md:min-h-[230px] tall-md:flex-1">
+    <header className="relative my-2 flex h-[clamp(520px,calc(100svh_-_4rem_-_10px),680px)] items-stretch overflow-hidden rounded-xl land-sm:h-auto land-sm:min-h-[calc(100svh_-_3rem_-_6px)] tall-md:h-auto tall-md:min-h-[230px] tall-md:flex-1">
       <picture className="absolute inset-0 h-full w-full">
         <source
           srcSet={`/images/hero/kendo-hero-formacion-480.webp?${imageVersion} 480w, /images/hero/kendo-hero-formacion-960.webp?${imageVersion} 960w, /images/hero/kendo-hero-formacion-1500.webp?${imageVersion} 1500w`}
@@ -22,35 +23,49 @@ function HeroBanner() {
           alt="Grupo de practicantes de kendo reunidos después de una actividad"
           width={1500}
           height={750}
-          className="absolute inset-0 h-full w-full object-cover object-center lg:object-[50%_42%]"
+          className="absolute inset-0 h-full w-full object-cover"
           loading="eager"
           fetchpriority="high"
         />
       </picture>
 
-      <div className="absolute inset-0 bg-site-overlay/30" aria-hidden="true" />
+      <div
+        className="absolute inset-0 bg-gradient-to-r from-site-navy/95 via-site-navy/65 to-site-navy/10 sm:via-site-navy/55"
+        aria-hidden="true"
+      />
 
-      <div className="relative z-10 flex w-full flex-col justify-between gap-3 p-4 text-center sm:px-6 land-sm:gap-2 land-sm:px-2 land-sm:py-2 tall-md:px-10 tall-md:py-4">
-        <div className="mx-auto max-w-3xl text-site-on-dark">
-          <PageTitle id="home-title" className="normal-case" allowWrap>
+      <div className="relative z-10 mx-auto flex w-full max-w-6xl items-center px-3 text-center land-sm:text-left land-tall:text-left">
+        <div className="mx-auto flex min-h-[28rem] max-w-xl flex-col justify-between text-site-on-dark md:min-h-[20rem] md:justify-around land-sm:mx-0 land-sm:block land-sm:min-h-0 land-tall:mx-0">
+          <PageTitle
+            id="home-title"
+            tone="media"
+            className="mx-auto !p-0 text-3xl normal-case after:hidden sm:text-4xl land-sm:mx-0 land-sm:text-left land-tall:mx-0 land-tall:text-left"
+            allowWrap
+          >
             Federación de Asociaciones
             <span className="block sm:inline"> de Kendo</span>
           </PageTitle>
-        </div>
-
-        <div className={`mx-auto flex max-w-2xl flex-col items-center rounded-2xl p-3 text-site-on-dark ${panelSurfaceClass}`}>
-          <h2 className="max-w-sm text-lg leading-snug sm:max-w-md tall-md:leading-relaxed">
-            Te invitamos a descubrir este arte marcial japonés.
-            <br />
-            Clases para todos los niveles y edades.
-            <br />
+          <p className="text-lg font-bold leading-snug sm:text-xl land-sm:mt-5">
+            Una comunidad que aprende, entrena y crece unida a través del
+            kendo en Costa Rica.
+          </p>
+          <p className="text-base leading-relaxed text-site-subtle land-sm:mt-3">
+            Encuentra un dojo afiliado o consulta nuestros próximos encuentros.
+          </p>
+          <div className="flex flex-col justify-center gap-3 sm:flex-row land-sm:mt-5 land-sm:justify-start land-tall:justify-start">
             <Link
               to="/afiliados/"
-              className={`inline-flex min-h-11 items-center justify-center font-semibold text-site-action-soft underline decoration-site-action/70 underline-offset-4 transition-colors hover:text-site-accent ${focusRingClass}`}
+              className={`${primaryButtonClass} ${focusRingClass}`}
             >
-              Conoce nuestros dojos afiliados
+              Encuentra un dojo
             </Link>
-          </h2>
+            <Link
+              to="/calendario/"
+              className={`${secondaryButtonClass} ${focusRingClass}`}
+            >
+              Ver próximos eventos
+            </Link>
+          </div>
         </div>
       </div>
     </header>

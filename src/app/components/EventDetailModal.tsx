@@ -23,7 +23,7 @@ import {
   panelSurfaceClass,
 } from "../styles/shared";
 import { ModalShell } from "./ui/ModalShell";
-import { ModalNavigationButton } from "./ui/ModalControls";
+import { NavigationArrowButton } from "./ui/ModalControls";
 
 interface EventDetailModalProps {
   event: CalendarEvent;
@@ -96,7 +96,7 @@ export function EventDetailModal({
       onClose={onClose}
       onKeyDown={handleDialogKeyDown}
     >
-      <article className="touch-pan-y" {...swipeHandlers}>
+      <article className="flex h-full touch-pan-y flex-col" {...swipeHandlers}>
         <div className="pr-12">
           {event.type ? (
             <p className="mb-2 text-sm font-bold uppercase tracking-widest text-site-accent">
@@ -109,7 +109,7 @@ export function EventDetailModal({
         </div>
 
         <dl
-          className={`relative mt-5 grid gap-3 rounded-2xl p-4 ${panelSurfaceClass}`}
+          className={`relative mt-5 grid gap-3 p-4 ${panelSurfaceClass}`}
         >
           <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3">
             <CalendarDays
@@ -142,7 +142,7 @@ export function EventDetailModal({
               className={`mt-0.5 size-5 ${
                 event.location
                   ? "text-site-accent-soft"
-                  : "text-site-on-dark/40"
+                  : "text-site-muted"
               }`}
               aria-hidden="true"
             />
@@ -162,7 +162,7 @@ export function EventDetailModal({
                     </span>
                   </a>
                 ) : (
-                  <span className="inline-flex items-center justify-center rounded-full border border-site-on-dark/20 bg-site-overlay/70 px-3 py-1 text-sm font-semibold text-site-on-dark/65">
+                  <span className="inline-flex items-center justify-center rounded-full bg-site-media px-3 py-1 text-sm font-semibold text-site-muted">
                     Pendiente de confirmar
                   </span>
                 )}
@@ -195,7 +195,7 @@ export function EventDetailModal({
             }
             title={isShareCopied ? "Enlace copiado" : "Compartir evento"}
             onClick={onShare}
-            className={`absolute right-3 top-3 flex size-11 items-center justify-center rounded-full transition-colors hover:bg-site-action-hover/90 hover:text-site-on-dark ${actionControlSurfaceClass} ${focusRingClass}`}
+            className={`absolute right-3 top-3 flex size-11 items-center justify-center rounded-full transition-colors hover:border-site-action hover:bg-site-media ${actionControlSurfaceClass} ${focusRingClass}`}
           >
             {isShareCopied ? (
               <Check className="size-5" aria-hidden="true" />
@@ -205,34 +205,36 @@ export function EventDetailModal({
           </button>
         </dl>
 
-        {event.summary ? (
-          <div id={descriptionId} className="mt-5">
-            <h3 className="text-lg font-bold">Descripción</h3>
-            <p className="mt-2 whitespace-pre-line text-site-subtle">
-              {event.summary}
-            </p>
-          </div>
-        ) : null}
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          {event.summary ? (
+            <div id={descriptionId} className="mt-5">
+              <h3 className="text-lg font-bold">Descripción</h3>
+              <p className="mt-2 whitespace-pre-line text-site-muted">
+                {event.summary}
+              </p>
+            </div>
+          ) : null}
 
-        {event.infoUrl ? (
-          <a
-            href={event.infoUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`mt-6 inline-flex min-h-11 items-center justify-center rounded-full px-5 py-2 font-bold transition-colors hover:bg-site-action-hover/90 hover:text-site-on-dark ${actionControlSurfaceClass} ${focusRingClass}`}
-          >
-            {event.ctaLabel ?? "Más información"}
-            <ExternalLink className="ml-2 size-4" aria-hidden="true" />
-            <span className="sr-only">. Abre en una pestaña nueva.</span>
-          </a>
-        ) : null}
+          {event.infoUrl ? (
+            <a
+              href={event.infoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`mt-6 inline-flex min-h-11 items-center justify-center rounded-lg px-5 py-2 font-bold transition-colors hover:border-site-action hover:bg-site-media ${actionControlSurfaceClass} ${focusRingClass}`}
+            >
+              {event.ctaLabel ?? "Más información"}
+              <ExternalLink className="ml-2 size-4" aria-hidden="true" />
+              <span className="sr-only">. Abre en una pestaña nueva.</span>
+            </a>
+          ) : null}
+        </div>
 
         {total > 1 ? (
           <nav
             aria-label="Navegación entre eventos"
-            className="mt-6 flex min-h-11 items-center justify-center gap-4"
+            className="mt-6 flex min-h-11 shrink-0 items-center justify-center gap-4"
           >
-            <ModalNavigationButton
+            <NavigationArrowButton
               direction="previous"
               label="Ver evento anterior"
               isActive={activeArrow === "left"}
@@ -241,7 +243,7 @@ export function EventDetailModal({
             <p className="min-w-24 text-center text-sm font-semibold" aria-live="polite">
               Evento {index + 1} de {total}
             </p>
-            <ModalNavigationButton
+            <NavigationArrowButton
               direction="next"
               label="Ver evento siguiente"
               isActive={activeArrow === "right"}
