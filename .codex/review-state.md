@@ -205,6 +205,22 @@ prior_session:
   result: One responsive correctness defect, two structural issues, one responsive smell, and five Tailwind polish findings were recorded; the required 1366x768 no-scroll invariant passed on all four routes.
 
 latest_resolution:
+  id: FIX-2026-07-27-02
+  source_session: legacy-v1
+  baseline:
+    commit: 32fa7f7d
+    worktree: dirty
+    fingerprints:
+      ci.yml: 918E2FD063B49021ABD1A8EA37FBF658874621E70C4674C0BBB1EB6301BF7091
+  resolved_findings:
+    - STR-ARCH-001
+  checks:
+    - corepack pnpm run typecheck passed
+    - corepack pnpm run build passed outside the sandbox
+    - git diff --check passed
+    - workflow source uses read-only contents permission, frozen-lockfile installation, Node 22, and push and pull-request triggers
+
+prior_resolution_2026_07_27_01:
   id: FIX-2026-07-27-01
   source_session: REV-2026-07-27-01
   baseline:
@@ -1179,17 +1195,6 @@ legacy_coverage:
       evidence: Detailed commands and baselines were not consistently recorded in v1.
 
 active_findings:
-  - id: STR-ARCH-001
-    level: STRUCTURAL
-    axis: ARCH
-    status: open
-    target: .github/workflows
-    problem: Ordinary repository changes are not protected by automated quality checks because the recorded workflow coverage is limited to calendar synchronization.
-    fix: Add a change-validation workflow that runs the repository's relevant typecheck and build commands.
-    cost_of_deferring: Routing, build, and type regressions can be merged without an automated gate.
-    evidence: migrated from v1 state; current workflow inventory not revalidated in this session
-    introduced_in: legacy-v1
-
   - id: STR-ARCH-003
     level: STRUCTURAL
     axis: ARCH
@@ -1228,6 +1233,15 @@ active_findings:
     introduced_in: REV-2026-07-21-01
 
 resolved_findings:
+  - id: STR-ARCH-001
+    status: resolved
+    resolved_at: 2026-07-27
+    summary: Ordinary pushes and pull requests now run frozen dependency installation, TypeScript validation, and the complete production build in GitHub Actions.
+    resolution:
+      resolved_ref: 32fa7f7d dirty worktree fingerprint recorded in FIX-2026-07-27-02
+      checks: [typecheck, build, workflow source inspection]
+    limitation: The first hosted GitHub Actions execution can only be confirmed after the workflow is pushed.
+
   - id: CRIT-A11Y-001
     status: resolved
     resolved_at: 2026-07-27
