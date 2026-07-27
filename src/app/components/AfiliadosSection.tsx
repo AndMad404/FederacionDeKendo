@@ -54,10 +54,10 @@ export function AfiliadosSection() {
   return (
     <section
       aria-labelledby="affiliates-title"
-      className="relative mt-2 flex flex-col overflow-hidden rounded-xl bg-site-canvas md:h-full md:overflow-y-auto xl:overflow-hidden tall-md:h-[calc(100%_-_0.5rem)] land-compact:overflow-y-auto"
+      className="relative mt-2 flex min-h-[calc(100svh_-_4rem_-_10px)] w-full flex-col overflow-hidden rounded-xl bg-site-canvas text-site-text land-sm:min-h-[calc(100svh_-_3rem_-_6px)] tall-md:h-[calc(100%_-_0.5rem)] tall-md:min-h-0"
     >
       <MediaPageBanner
-        className="absolute inset-x-0 top-0 z-10 h-28 overflow-hidden land-compact:h-20"
+        className="relative z-10 h-28 shrink-0 overflow-hidden land-compact:h-20"
         titleId="affiliates-title"
         title="Dojos afiliados"
         description="Encuentra una comunidad donde practicar kendo."
@@ -82,8 +82,8 @@ export function AfiliadosSection() {
           className: "object-[center_33%]",
         }}
       />
-      <div className="relative flex min-h-[530px] flex-1 items-start justify-center overflow-hidden pt-[calc(7rem+10px)] md:overflow-visible xl:overflow-hidden land-compact:min-h-[calc(100dvh-4rem-10px)] land-compact:items-start land-compact:overflow-y-auto land-compact:pb-14 land-compact:pt-[90px]">
-        <div className="relative z-20 w-full max-w-4xl px-4 sm:px-6 md:max-w-5xl lg:max-w-6xl xl:flex xl:h-full xl:items-start xl:px-0 land-compact:max-w-none land-compact:px-2">
+      <div className="relative z-20 -mt-11 flex min-h-0 flex-1 items-start justify-center p-3 sm:-mt-13 sm:p-4 xl:absolute xl:inset-0 xl:mt-0 xl:items-start xl:px-4 xl:pb-4 xl:pt-20 land-sm:p-2 land-compact:-mt-8">
+        <div className="relative w-full md:max-w-6xl xl:flex xl:h-full xl:items-start">
           <AffiliatePagination
             page={page}
             totalPages={totalPages}

@@ -128,7 +128,7 @@ export function DojoCard({
   return (
     <section
       aria-labelledby={headingId}
-      className={`mb-2.5 flex flex-col justify-between gap-2 px-3 py-4 sm:px-6 xl:mb-0 land-compact:mb-0 land-compact:gap-1 land-compact:px-3 land-compact:py-2 ${panelSurfaceClass}`}
+      className={`mb-2.5 flex flex-col justify-between gap-2 px-3 py-4 sm:px-6 xl:mb-0 xl:py-3 land-compact:mb-0 land-compact:gap-1 land-compact:px-3 land-compact:py-2 ${panelSurfaceClass}`}
     >
       <h2
         id={headingId}
