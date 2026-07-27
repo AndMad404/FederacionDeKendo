@@ -41,11 +41,17 @@ interface EventDetailRowProps {
   icon: ReactNode;
   label: string;
   children: ReactNode;
+  className?: string;
 }
 
-function EventDetailRow({ icon, label, children }: EventDetailRowProps) {
+function EventDetailRow({
+  icon,
+  label,
+  children,
+  className = "",
+}: EventDetailRowProps) {
   return (
-    <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3">
+    <div className={`grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 ${className}`}>
       {icon}
       <div>
         <dt className="sr-only">{label}</dt>
@@ -131,6 +137,7 @@ export function EventDetailModal({
         >
           <EventDetailRow
             label="Fecha"
+            className="pr-16"
             icon={
               <CalendarDays
               className="mt-0.5 size-5 text-site-accent-soft"

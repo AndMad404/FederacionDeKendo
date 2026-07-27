@@ -26,7 +26,7 @@ export function GallerySection() {
   return (
     <section
       aria-labelledby="gallery-title"
-      className="relative my-2 overflow-hidden rounded-xl bg-site-canvas tall-md:h-[calc(100%_-_1rem)] tall-md:min-h-0"
+      className="relative my-2 overflow-hidden rounded-xl bg-site-canvas tall-md:h-[calc(100%_-_1rem)] tall-md:min-h-0 land-sm:mt-[11px]"
     >
       <PageTitle
         id="gallery-title"

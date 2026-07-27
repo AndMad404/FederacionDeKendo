@@ -82,7 +82,7 @@ export function AfiliadosSection() {
           className: "object-[center_33%]",
         }}
       />
-      <div className="relative flex min-h-[530px] flex-1 items-start justify-center overflow-hidden pt-20 md:overflow-visible xl:overflow-hidden land-compact:min-h-[calc(100dvh-4rem-10px)] land-compact:items-start land-compact:overflow-y-auto land-compact:py-14">
+      <div className="relative flex min-h-[530px] flex-1 items-start justify-center overflow-hidden pt-[calc(7rem+10px)] md:overflow-visible xl:overflow-hidden land-compact:min-h-[calc(100dvh-4rem-10px)] land-compact:items-start land-compact:overflow-y-auto land-compact:pb-14 land-compact:pt-[90px]">
         <div className="relative z-20 w-full max-w-4xl px-4 sm:px-6 md:max-w-5xl lg:max-w-6xl xl:flex xl:h-full xl:items-start xl:px-0 land-compact:max-w-none land-compact:px-2">
           <AffiliatePagination
             page={page}

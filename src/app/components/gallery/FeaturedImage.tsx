@@ -86,7 +86,7 @@ export function FeaturedImage({
     : "";
 
   return (
-    <figure className="gallery-featured-frame group relative h-[clamp(420px,62svh,620px)] w-full flex-none cursor-pointer overflow-hidden rounded-xl bg-site-media tall-md:h-[calc(100%_-_5.5rem)] tall-md:min-h-0 tall-md:flex-none land-sm:h-[calc(100svh_-_3rem_-_6px)] land-sm:flex-none">
+    <figure className="gallery-featured-frame group relative h-[clamp(420px,62svh,620px)] w-full flex-none cursor-pointer overflow-hidden rounded-xl bg-site-media tall-md:h-[calc(100%_-_5.5rem)] tall-md:min-h-0 tall-md:flex-none land-sm:h-[calc(100svh_-_3rem_-_17px)] land-sm:flex-none">
       <img
         key={image.id}
         src={featuredSrc}
@@ -107,8 +107,8 @@ export function FeaturedImage({
       />
 
       <figcaption className="absolute inset-x-0 bottom-0">
-        <div className={`grid w-full items-center px-16 py-4 text-center sm:grid-cols-[minmax(0,1fr)_auto] sm:grid-rows-[auto_auto] sm:items-start sm:px-20 sm:text-left land-sm:gap-x-6 land-sm:px-20 land-sm:py-2 ${mediaCaptionSurfaceClass}`}>
-          <h2 className="text-xl font-bold leading-tight sm:text-2xl land-sm:text-base">
+        <div className={`grid w-full items-center px-16 py-4 text-center sm:grid-cols-[minmax(0,1fr)_auto] sm:grid-rows-[auto_auto] sm:items-start sm:px-20 sm:text-left land-sm:grid-rows-[auto_auto_auto] land-sm:gap-x-6 land-sm:gap-y-0.5 land-sm:px-20 land-sm:py-2 ${mediaCaptionSurfaceClass}`}>
+          <h2 className="text-xl font-bold leading-tight sm:text-2xl land-sm:row-span-3 land-sm:self-center land-sm:text-base">
             {displayTitle}
           </h2>
           <p className="truncate pt-1 text-base font-bold uppercase tracking-widest text-site-accent-soft sm:col-start-2 sm:row-start-1 sm:text-right land-sm:text-[10px]">
@@ -127,10 +127,10 @@ export function FeaturedImage({
               )}
             </p>
           )}
-          <p className="hidden font-bold text-site-on-dark underline underline-offset-2 transition-colors group-hover:text-site-accent-soft land-sm:col-start-2 land-sm:row-start-1 land-sm:block land-sm:self-end land-sm:text-sm">
+          <p className="hidden font-bold text-site-on-dark underline underline-offset-2 transition-colors group-hover:text-site-accent-soft land-sm:col-start-2 land-sm:row-start-2 land-sm:block land-sm:text-sm land-sm:leading-none">
             {SEE_MORE_LABEL}
           </p>
-          <p className="text-right text-xs land-sm:col-start-2 land-sm:row-start-2 land-sm:self-start land-sm:text-[10px]">
+          <p className="text-right text-xs land-sm:col-start-2 land-sm:row-start-3 land-sm:text-[10px] land-sm:leading-none">
             {positionLabel}
           </p>
         </div>

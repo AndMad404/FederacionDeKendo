@@ -98,7 +98,7 @@ export function Lightbox({
           onClick={onClose}
         />
 
-        <div className="flex h-[min(54svh,32rem)] min-h-0 w-full items-center justify-center overflow-hidden rounded-xl bg-site-navy sm:h-[min(68svh,36rem)] land-sm:h-full land-sm:flex-none">
+        <div className="flex h-[min(54svh,32rem)] min-h-0 w-full items-end justify-center overflow-hidden rounded-xl bg-site-navy sm:h-[min(68svh,36rem)] land-sm:h-full land-sm:flex-none">
           <img
             src={image.src}
             srcSet={image.srcSet}
