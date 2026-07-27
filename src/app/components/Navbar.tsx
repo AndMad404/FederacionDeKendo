@@ -41,6 +41,7 @@ export function Navbar() {
       <div className="mx-auto my-[5px] flex h-16 max-w-6xl items-center justify-between px-6 land-sm:my-[3px] land-sm:h-12 land-sm:px-5">
         <Link
           to="/"
+          aria-label="Ir al inicio"
           onClick={() => setOpen(false)}
           className={`flex min-w-0 items-center ${focusRingClass}`}
         >
