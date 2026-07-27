@@ -30,8 +30,8 @@ export function ModalShell({
 
   return (
     <div
-      className="fixed inset-0 z-[70] flex items-center justify-center bg-site-navy/85 p-4 land-sm:p-2"
-      onMouseDown={onBackdropInteraction}
+      className="fixed inset-0 z-[70] flex touch-manipulation items-center justify-center bg-site-navy/85 p-4 land-sm:p-2"
+      onPointerDown={onBackdropInteraction}
     >
       <div
         ref={dialogRef}
@@ -41,13 +41,13 @@ export function ModalShell({
         aria-describedby={descriptionId}
         tabIndex={-1}
         className={`relative w-full max-w-2xl ${focusRingClass}`}
-        onMouseDown={(event) => event.stopPropagation()}
+        onPointerDown={(event) => event.stopPropagation()}
       >
         <ModalCloseButton
           label={closeLabel}
           onClick={onClose}
         />
-        <div className="h-[min(25.5rem,calc(100svh-2rem))] overflow-y-auto rounded-xl border border-site-border bg-site-surface p-5 text-site-text shadow-2xl shadow-site-navy/40 sm:h-[min(27.5rem,calc(100svh-2rem))] sm:p-7 land-sm:h-auto land-sm:max-h-[calc(100svh-1rem)] land-sm:p-4">
+        <div className="h-[min(25.5rem,calc(100svh-2rem))] touch-pan-y overflow-y-auto overscroll-y-contain rounded-xl border border-site-border bg-site-surface p-5 text-site-text shadow-2xl shadow-site-navy/40 sm:h-[min(27.5rem,calc(100svh-2rem))] sm:p-7 land-sm:h-auto land-sm:max-h-[calc(100svh-1rem)] land-sm:p-4">
           {children}
         </div>
       </div>

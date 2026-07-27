@@ -75,8 +75,8 @@ export function Lightbox({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-site-navy/90 p-4 land-sm:p-2"
-      onClick={onBackdropInteraction}
+      className="fixed inset-0 z-50 flex touch-manipulation items-center justify-center bg-site-navy/90 p-4 land-sm:p-2"
+      onPointerDown={onBackdropInteraction}
     >
       <div
         ref={dialogRef}
@@ -85,8 +85,12 @@ export function Lightbox({
         aria-labelledby="lightbox-title"
         aria-describedby={displayDescription ? "lightbox-description" : undefined}
         className="relative flex max-h-[calc(100svh-2rem)] w-full max-w-5xl touch-pan-y flex-col items-center gap-3 text-site-on-dark land-sm:h-[calc(100svh-1rem)] land-sm:max-h-none land-sm:max-w-[calc(100vw-2rem)] land-sm:gap-0"
-        onClick={(event) => event.stopPropagation()}
-        {...swipeHandlers}
+        onPointerDown={(event) => {
+          event.stopPropagation();
+          swipeHandlers.onPointerDown(event);
+        }}
+        onPointerUp={swipeHandlers.onPointerUp}
+        onPointerCancel={swipeHandlers.onPointerCancel}
       >
         <ModalCloseButton
           ref={closeBtnRef}

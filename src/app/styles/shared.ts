@@ -22,7 +22,7 @@ export const actionControlSurfaceClass =
   "border border-site-border bg-site-surface text-site-action";
 
 export const navigationArrowButtonClass =
-  "flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-site-border bg-site-surface text-site-action shadow-sm transition-[color,background-color,border-color,transform] enabled:hover:border-site-accent enabled:hover:bg-site-accent-strong enabled:hover:text-site-on-dark active:scale-95 disabled:cursor-not-allowed disabled:opacity-35 md:size-12";
+  "flex size-11 shrink-0 touch-manipulation cursor-pointer items-center justify-center rounded-full border border-site-border bg-site-surface text-site-action shadow-sm transition-[color,background-color,border-color,transform] enabled:hover:border-site-accent enabled:hover:bg-site-accent-strong enabled:hover:text-site-on-dark active:scale-95 disabled:cursor-not-allowed disabled:opacity-35 md:size-12";
 
 export const modalCloseButtonClass =
-  "absolute right-3 top-3 z-20 flex size-11 cursor-pointer items-center justify-center rounded-full bg-site-accent-strong text-site-on-dark transition-[color,background-color,transform] hover:bg-site-accent-hover active:scale-95 active:bg-site-accent-hover";
+  "absolute right-3 top-3 z-20 flex size-11 touch-manipulation cursor-pointer items-center justify-center rounded-full bg-site-accent-strong text-site-on-dark transition-[color,background-color,transform] hover:bg-site-accent-hover active:scale-95 active:bg-site-accent-hover";

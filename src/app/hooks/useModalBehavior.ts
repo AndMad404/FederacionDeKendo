@@ -2,8 +2,8 @@ import {
   useCallback,
   useEffect,
   useRef,
+  type PointerEvent as ReactPointerEvent,
   type RefObject,
-  type SyntheticEvent,
 } from "react";
 
 const focusableSelector = [
@@ -103,8 +103,14 @@ export function useModalBehavior({
   }, [onClose, onKeyDown]);
 
   const onBackdropInteraction = useCallback(
-    (event: SyntheticEvent<HTMLElement>) => {
-      if (event.target === event.currentTarget) onClose();
+    (event: ReactPointerEvent<HTMLElement>) => {
+      if (
+        event.isPrimary &&
+        event.button === 0 &&
+        event.target === event.currentTarget
+      ) {
+        onClose();
+      }
     },
     [onClose],
   );

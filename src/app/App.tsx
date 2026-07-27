@@ -1,12 +1,12 @@
-import { useEffect, useRef, type ComponentType } from "react";
+import {
+  Suspense,
+  useEffect,
+  useRef,
+  type ComponentType,
+} from "react";
 import { Route, Routes, useLocation } from "react-router";
 import { Navbar } from "./components/Navbar";
-import { HeroSection } from "./components/HeroSection";
-import { GallerySection } from "./components/GallerySection";
-import { AfiliadosSection } from "./components/AfiliadosSection";
-import { CalendarSection } from "./components/CalendarSection";
 import { Footer } from "./components/Footer";
-import { NotFoundSection } from "./components/NotFoundSection";
 import {
   getRouteHeadDescriptors,
   getRouteManifest,
@@ -15,12 +15,10 @@ import {
   type RouteComponent,
 } from "./config/seo";
 
-const ROUTE_COMPONENTS: Record<RouteComponent, ComponentType> = {
-  home: HeroSection,
-  calendar: CalendarSection,
-  gallery: GallerySection,
-  affiliates: AfiliadosSection,
-};
+export interface RouteComponentRegistry {
+  routes: Record<RouteComponent, ComponentType>;
+  notFound: ComponentType;
+}
 
 function applyRouteHead(pathname: string) {
   const meta = getRouteMeta(pathname);
@@ -73,7 +71,13 @@ function RouteMetadata() {
   return null;
 }
 
-export default function App() {
+export default function App({
+  routeComponents,
+}: {
+  routeComponents: RouteComponentRegistry;
+}) {
+  const NotFoundComponent = routeComponents.notFound;
+
   return (
     <div className="flex min-h-svh flex-col bg-site-canvas text-site-text tall-md:h-dvh tall-md:overflow-hidden">
       <ScrollToTop />
@@ -92,16 +96,39 @@ export default function App() {
       >
         <Routes>
           {getRouteManifest().map((route) => {
-            const Component = ROUTE_COMPONENTS[route.component];
+            const Component = routeComponents.routes[route.component];
             return (
               <Route
                 key={route.path}
                 path={route.path}
-                element={<Component />}
+                element={
+                  <Suspense
+                    fallback={
+                      <p className="sr-only" role="status">
+                        Cargando contenido…
+                      </p>
+                    }
+                  >
+                    <Component />
+                  </Suspense>
+                }
               />
             );
           })}
-          <Route path="*" element={<NotFoundSection />} />
+          <Route
+            path="*"
+            element={
+              <Suspense
+                fallback={
+                  <p className="sr-only" role="status">
+                    Cargando contenido…
+                  </p>
+                }
+              >
+                <NotFoundComponent />
+              </Suspense>
+            }
+          />
         </Routes>
       </main>
 

@@ -1,10 +1,14 @@
+import { lazy, Suspense } from "react";
 import { FeaturedImage } from "./gallery/FeaturedImage";
 import { GalleryThumbnails } from "./gallery/GalleryThumbnails";
 import { GALLERY_IMAGES } from "../data/gallery";
 import { useCarousel } from "../hooks/useCarousel";
 import { useGalleryLightbox } from "../hooks/useGalleryLightbox";
-import { Lightbox } from "./Lightbox";
 import { PageTitle } from "./PageTitle";
+
+const Lightbox = lazy(() =>
+  import("./Lightbox").then((module) => ({ default: module.Lightbox })),
+);
 
 export function GallerySection() {
   const { index, prev, next, goTo } = useCarousel(GALLERY_IMAGES.length);
@@ -62,15 +66,17 @@ export function GallerySection() {
       </div>
 
       {lightboxImage && (
-        <Lightbox
-          image={lightboxImage}
-          index={lightboxIndex}
-          total={GALLERY_IMAGES.length}
-          triggerRef={triggerRef}
-          onClose={closeLightbox}
-          onPrev={showPrev}
-          onNext={showNext}
-        />
+        <Suspense fallback={null}>
+          <Lightbox
+            image={lightboxImage}
+            index={lightboxIndex}
+            total={GALLERY_IMAGES.length}
+            triggerRef={triggerRef}
+            onClose={closeLightbox}
+            onPrev={showPrev}
+            onNext={showNext}
+          />
+        </Suspense>
       )}
     </section>
   );

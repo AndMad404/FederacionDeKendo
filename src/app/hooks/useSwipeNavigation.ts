@@ -24,7 +24,7 @@ export function useSwipeNavigation({
   const didSwipeRef = useRef(false);
 
   const onPointerDown = useCallback((event: ReactPointerEvent<HTMLElement>) => {
-    if (event.pointerType !== "touch") return;
+    if (event.pointerType !== "touch" || !event.isPrimary) return;
     const target = event.target as HTMLElement;
 
     if (

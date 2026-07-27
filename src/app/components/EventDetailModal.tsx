@@ -7,7 +7,7 @@ import {
   Share2,
   UserRound,
 } from "lucide-react";
-import { useCallback, type RefObject } from "react";
+import { useCallback, type ReactNode, type RefObject } from "react";
 import type { CalendarEvent } from "../types";
 import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
 import { useTransientDirectionFeedback } from "../hooks/useTransientDirectionFeedback";
@@ -35,6 +35,24 @@ interface EventDetailModalProps {
   onNext: () => void;
   onShare: () => void;
   isShareCopied: boolean;
+}
+
+interface EventDetailRowProps {
+  icon: ReactNode;
+  label: string;
+  children: ReactNode;
+}
+
+function EventDetailRow({ icon, label, children }: EventDetailRowProps) {
+  return (
+    <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3">
+      {icon}
+      <div>
+        <dt className="sr-only">{label}</dt>
+        <dd>{children}</dd>
+      </div>
+    </div>
+  );
 }
 
 export function EventDetailModal({
@@ -111,79 +129,77 @@ export function EventDetailModal({
         <dl
           className={`relative mt-5 grid gap-3 p-4 ${panelSurfaceClass}`}
         >
-          <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3">
-            <CalendarDays
+          <EventDetailRow
+            label="Fecha"
+            icon={
+              <CalendarDays
               className="mt-0.5 size-5 text-site-accent-soft"
               aria-hidden="true"
-            />
-            <div>
-              <dt className="sr-only">Fecha</dt>
-              <dd>
-                <time dateTime={event.date} className="font-semibold">
-                  {getEventDateLabel(event)}
-                </time>
-              </dd>
-            </div>
-          </div>
+              />
+            }
+          >
+            <time dateTime={event.date} className="font-semibold">
+              {getEventDateLabel(event)}
+            </time>
+          </EventDetailRow>
 
-          <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3">
-            <Clock
-              className="mt-0.5 size-5 text-site-accent-soft"
-              aria-hidden="true"
-            />
-            <div>
-              <dt className="sr-only">Horario</dt>
-              <dd>{formatEventTime(event)}</dd>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3">
-            <MapPin
-              className={`mt-0.5 size-5 ${
-                event.location
-                  ? "text-site-accent-soft"
-                  : "text-site-muted"
-              }`}
-              aria-hidden="true"
-            />
-            <div>
-              <dt className="sr-only">Ubicación</dt>
-              <dd>
-                {event.location ? (
-                  <a
-                    href={locationUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`inline-block underline decoration-site-action-soft underline-offset-4 hover:text-site-action-text ${focusRingClass}`}
-                  >
-                    {locationName}
-                    <span className="sr-only">
-                      . Abre Google Maps en una pestaña nueva.
-                    </span>
-                  </a>
-                ) : (
-                  <span className="inline-flex items-center justify-center rounded-full bg-site-media px-3 py-1 text-sm font-semibold text-site-muted">
-                    Pendiente de confirmar
-                  </span>
-                )}
-              </dd>
-            </div>
-          </div>
-
-          {event.organizer ? (
-            <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3">
-              <UserRound
+          <EventDetailRow
+            label="Horario"
+            icon={
+              <Clock
                 className="mt-0.5 size-5 text-site-accent-soft"
                 aria-hidden="true"
               />
-              <div>
-                <dt className="sr-only">Organiza</dt>
-                <dd>
-                  <span className="font-semibold">Organiza: </span>
-                  {event.organizer}
-                </dd>
-              </div>
-            </div>
+            }
+          >
+            {formatEventTime(event)}
+          </EventDetailRow>
+
+          <EventDetailRow
+            label="Ubicación"
+            icon={
+              <MapPin
+                className={`mt-0.5 size-5 ${
+                  event.location
+                    ? "text-site-accent-soft"
+                    : "text-site-muted"
+                }`}
+                aria-hidden="true"
+              />
+            }
+          >
+            {event.location ? (
+              <a
+                href={locationUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`inline-block underline decoration-site-action-soft underline-offset-4 hover:text-site-action-text ${focusRingClass}`}
+              >
+                {locationName}
+                <span className="sr-only">
+                  . Abre Google Maps en una pestaña nueva.
+                </span>
+              </a>
+            ) : (
+              <span className="inline-flex items-center justify-center rounded-full bg-site-media px-3 py-1 text-sm font-semibold text-site-muted">
+                Pendiente de confirmar
+              </span>
+            )}
+          </EventDetailRow>
+
+          {event.organizer ? (
+            <EventDetailRow
+              label="Organiza"
+              icon={
+                <UserRound
+                  className="mt-0.5 size-5 text-site-accent-soft"
+                  aria-hidden="true"
+                />
+              }
+            >
+              <span className="font-semibold">Organiza: </span>
+              {event.organizer}
+            </EventDetailRow>
           ) : null}
 
           <button
