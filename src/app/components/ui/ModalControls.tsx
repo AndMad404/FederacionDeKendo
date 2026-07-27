@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import {
   focusRingClass,
   modalCloseButtonClass,
+  navigationArrowActiveClass,
   navigationArrowButtonClass,
 } from "../../styles/shared";
 
@@ -49,9 +50,7 @@ export function NavigationArrowButton({
       type="button"
       aria-label={label}
       className={`${navigationArrowButtonClass} ${
-        isActive
-          ? "border-site-accent bg-site-accent-strong text-site-on-dark"
-          : ""
+        isActive ? navigationArrowActiveClass : ""
       } ${focusRingClass} ${className}`}
       {...props}
     >
