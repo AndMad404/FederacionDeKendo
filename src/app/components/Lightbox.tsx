@@ -103,7 +103,7 @@ export function Lightbox({
             src={image.src}
             srcSet={image.srcSet}
             sizes={LIGHTBOX_IMAGE_SIZES}
-            alt={image.title}
+            alt={image.alt}
             width={image.width}
             height={image.height}
             decoding="async"

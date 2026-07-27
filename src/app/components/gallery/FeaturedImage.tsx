@@ -94,7 +94,7 @@ export function FeaturedImage({
         src={featuredSrc}
         srcSet={featuredSrcSet}
         sizes={image.sizes}
-        alt={image.title}
+        alt={image.alt}
         width={featuredWidth}
         height={featuredHeight}
         loading="eager"

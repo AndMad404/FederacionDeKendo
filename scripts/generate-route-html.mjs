@@ -5,6 +5,7 @@ import {
   getRouteManifest,
   getRouteMeta,
   getRouteSeoPayload,
+  getRouteSitemapImageUrls,
   render,
 } from "../dist-ssr/entry-server.js";
 
@@ -117,11 +118,20 @@ await writeNotFoundHtml();
 
 const sitemap = [
   '<?xml version="1.0" encoding="UTF-8"?>',
-  '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+  '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">',
   ...routes.flatMap((route) => {
     const canonicalUrl = getRouteSeoPayload(route).canonicalUrl;
     return canonicalUrl
-      ? ["  <url>", `    <loc>${escapeText(canonicalUrl)}</loc>`, "  </url>"]
+      ? [
+          "  <url>",
+          `    <loc>${escapeText(canonicalUrl)}</loc>`,
+          ...getRouteSitemapImageUrls(route).flatMap((imageUrl) => [
+            "    <image:image>",
+            `      <image:loc>${escapeText(imageUrl)}</image:loc>`,
+            "    </image:image>",
+          ]),
+          "  </url>",
+        ]
       : [];
   }),
   "</urlset>",

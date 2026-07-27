@@ -1,4 +1,5 @@
 import seoData from "./seo-data.json";
+import { GALLERY_IMAGES } from "../data/gallery";
 
 type SchemaType = "WebPage" | "CollectionPage";
 export type RouteComponent = "home" | "calendar" | "gallery" | "affiliates";
@@ -34,6 +35,10 @@ export interface RouteMeta {
   title: string;
   description: string;
   image: string;
+  imageAlt: string;
+  imageWidth: number;
+  imageHeight: number;
+  imageType: string;
   schemaType: SchemaType;
   preloadImage?: PreloadImage;
   /** true para rutas que no deben indexarse (ej. 404). No aparecen en ROUTE_META. */
@@ -49,7 +54,9 @@ type StructuredDataBuilder = (
 // Route-specific entities can be added here without expanding the base graph.
 const ROUTE_STRUCTURED_DATA_BUILDERS: Partial<
   Record<RouteComponent, StructuredDataBuilder>
-> = {};
+> = {
+  gallery: buildGalleryStructuredData,
+};
 
 export interface RouteSeoPayload {
   title: string;
@@ -63,6 +70,7 @@ export interface RouteSeoPayload {
     alt: string;
     width: number;
     height: number;
+    type: string;
   };
   structuredData: StructuredData | null;
   preloadImage?: PreloadImage;
@@ -99,6 +107,10 @@ function assertSeoData(value: unknown): asserts value is SeoData {
       !route.title ||
       !route.description ||
       !route.image ||
+      !route.imageAlt ||
+      !route.imageWidth ||
+      !route.imageHeight ||
+      !route.imageType ||
       !route.component ||
       !validComponents.has(route.component) ||
       !route.schemaType ||
@@ -134,12 +146,44 @@ function absoluteUrl(path: string) {
   return path === "/" ? `${SITE_URL}/` : `${SITE_URL}${path}`;
 }
 
+function buildGalleryStructuredData(
+  meta: RouteMeta,
+  canonicalUrl: string,
+): StructuredData[] {
+  return [
+    {
+      "@type": "ImageGallery",
+      "@id": `${canonicalUrl}#image-gallery`,
+      url: canonicalUrl,
+      name: meta.title,
+      description: meta.description,
+      inLanguage: SITE_LANGUAGE,
+      image: GALLERY_IMAGES.map((image) => ({
+        "@type": "ImageObject",
+        "@id": `${canonicalUrl}#image-${image.id}`,
+        contentUrl: absoluteUrl(image.src),
+        name: image.title,
+        caption: image.alt,
+        description: image.description,
+        width: image.width,
+        height: image.height,
+        encodingFormat: "image/webp",
+        representativeOfPage: image.id === 1,
+      })),
+    },
+  ];
+}
+
 const NOT_FOUND_META: RouteMeta = {
   path: "/404/",
   component: "home",
   title: `Página no encontrada | ${SITE_NAME}`,
   description: "La página que buscas no existe o fue movida.",
   image: DATA.defaultImage,
+  imageAlt: DATA.defaultImageAlt,
+  imageWidth: DATA.defaultImageWidth,
+  imageHeight: DATA.defaultImageHeight,
+  imageType: "image/png",
   schemaType: "WebPage",
   noindex: true,
 };
@@ -150,6 +194,14 @@ export function getRouteMeta(pathname: string) {
 
 export function getRouteManifest() {
   return Object.values(ROUTE_META);
+}
+
+export function getRouteSitemapImageUrls(meta: RouteMeta) {
+  if (meta.component === "gallery") {
+    return GALLERY_IMAGES.map((image) => absoluteUrl(image.src));
+  }
+
+  return [getRouteImageUrl(meta)];
 }
 
 function getCanonicalUrl(meta: RouteMeta) {
@@ -163,9 +215,10 @@ function getRouteImageUrl(meta: RouteMeta) {
 function getRouteImageMetadata(meta: RouteMeta) {
   return {
     url: getRouteImageUrl(meta),
-    alt: DEFAULT_SOCIAL_IMAGE_ALT,
-    width: DEFAULT_SOCIAL_IMAGE_WIDTH,
-    height: DEFAULT_SOCIAL_IMAGE_HEIGHT,
+    alt: meta.imageAlt || DEFAULT_SOCIAL_IMAGE_ALT,
+    width: meta.imageWidth || DEFAULT_SOCIAL_IMAGE_WIDTH,
+    height: meta.imageHeight || DEFAULT_SOCIAL_IMAGE_HEIGHT,
+    type: meta.imageType || "image/png",
   };
 }
 
@@ -192,6 +245,10 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
   const image = getRouteImageMetadata(meta);
   const routeEntities =
     ROUTE_STRUCTURED_DATA_BUILDERS[meta.component]?.(meta, canonicalUrl) ?? [];
+  const mainEntityReferences = routeEntities
+    .map((entity) => entity["@id"])
+    .filter((id): id is string => typeof id === "string")
+    .map((id) => ({ "@id": id }));
 
   return {
     "@context": "https://schema.org",
@@ -227,6 +284,9 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
           height: image.height,
           caption: image.alt,
         },
+        ...(mainEntityReferences.length > 0
+          ? { mainEntity: mainEntityReferences }
+          : {}),
       },
       ...routeEntities,
     ],
@@ -296,7 +356,7 @@ export function getRouteHeadDescriptors(meta: RouteMeta): HeadDescriptor[] {
       ["og:url", seo.canonicalUrl],
       ["og:image", seo.image.url],
       ["og:image:secure_url", seo.image.url],
-      ["og:image:type", "image/png"],
+      ["og:image:type", seo.image.type],
       ["og:image:width", String(seo.image.width)],
       ["og:image:height", String(seo.image.height)],
       ["og:image:alt", seo.image.alt],

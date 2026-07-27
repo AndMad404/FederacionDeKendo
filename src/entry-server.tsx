@@ -12,6 +12,7 @@ export {
   getRouteManifest,
   getRouteMeta,
   getRouteSeoPayload,
+  getRouteSitemapImageUrls,
 } from "./app/config/seo";
 
 const SERVER_ROUTE_COMPONENTS: RouteComponentRegistry = {
