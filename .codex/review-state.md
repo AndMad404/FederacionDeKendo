@@ -2,7 +2,7 @@
 
 ```yaml
 schema_version: 2
-last_updated: 2026-07-25
+last_updated: 2026-07-27
 contract: .agents/review-contract.md
 
 state_rules:
@@ -13,6 +13,61 @@ state_rules:
   - Legacy claims without reproducible evidence are historical, not current coverage.
 
 latest_session:
+  id: REV-2026-07-27-01
+  requested_scope: Validate external Kimi 3 and Claude feedback against the published site and current sources, consolidate confirmed findings, and record the result without implementing fixes.
+  actual_scope:
+    targets:
+      - src/app/components/Navbar.tsx
+      - src/app/components/CalendarSection.tsx
+      - src/app/components/UpcomingEventsSection.tsx
+      - src/app/components/events/UpcomingEventCard.tsx
+      - src/app/components/gallery/FeaturedImage.tsx
+      - src/app/components/gallery/GalleryThumbnails.tsx
+      - src/app/components/gallery/galleryText.ts
+      - src/app/components/ui/MediaPageBanner.tsx
+      - src/app/components/HeroSection.tsx
+      - src/app/data/gallery.ts
+      - src/app/utils/calendarEvents.ts
+      - scripts/sync-calendar-events.mjs
+      - scripts/generate-route-html.mjs
+      - public/robots.txt
+      - published routes /, /calendario/, /galeria/, /afiliados/, and a nonexistent route
+    axes: [A11Y, ARCH, REACT, PERF]
+    included:
+      - internal route consistency, active navigation, event hashes, and custom 404 behavior
+      - event filtering and date-range semantics
+      - external-link announcements and decorative-image semantics
+      - gallery controls, lightbox behavior, thumbnail naming, scrolling discoverability, overlay, copy, and responsive image loading
+      - live contrast measurement for calendar event times
+    excluded:
+      - SEO quality, metadata, canonical policy, and search-engine recommendations
+      - implementation of confirmed findings
+      - exhaustive screen-reader testing on physical assistive technology
+  baseline:
+    commit: b3744e7f
+    worktree: clean
+  confirmed_findings:
+    - CRIT-A11Y-001
+    - CRIT-A11Y-002
+    - SMELL-A11Y-001
+    - POL-ARCH-001
+  invalidated_reports:
+    - Internal navigation and the route manifest consistently use trailing slashes; slashless requests redirect permanently to the canonical slash route.
+    - NavLink exposes the active route visually and through aria-current.
+    - Breadcrumbs are optional for the current one-level route hierarchy and were not recorded as a defect.
+    - Homepage detail hashes resolve through CalendarSection and open the matching event modal.
+    - No /eventos/ or gallery child-page links are emitted by the inspected UI.
+    - Runtime and synchronization utilities both filter events by their end date.
+    - External map links include screen-reader text announcing the new tab.
+    - Calendar and affiliate banner images are decorative inside an aria-hidden picture.
+    - Gallery thumbnails are decorative images inside explicitly named buttons.
+    - Gallery controls, dialog semantics, keyboard navigation, focus containment, and dark overlays are present.
+    - Gallery assets use WebP or AVIF, responsive srcSet values, and lazy-loaded thumbnails.
+    - The published robots.txt returns HTTP 200 and nonexistent routes return a custom HTTP 404 page.
+    - The hero alt text is concise but valid; more specificity requires approved factual context.
+  result: Four findings were confirmed, the legacy calendar-route critical was revalidated as resolved, and the remaining external reports were rejected with source or published-site evidence.
+
+prior_modal_control_review_session:
   id: REV-2026-07-25-01
   requested_scope: Analyze visual consistency and positioning of the close and previous/next controls in the calendar event modal and gallery lightbox without implementing changes.
   actual_scope:
@@ -150,6 +205,35 @@ prior_session:
   result: One responsive correctness defect, two structural issues, one responsive smell, and five Tailwind polish findings were recorded; the required 1366x768 no-scroll invariant passed on all four routes.
 
 latest_resolution:
+  id: FIX-2026-07-27-01
+  source_session: REV-2026-07-27-01
+  baseline:
+    commit: b3744e7f
+    worktree: dirty
+    fingerprints:
+      calendarEventPresentation.ts: 5C3910E5F189E96B59675BE3CFE655F4E0A5C59B454DDA5A0C8329318BAE2031
+      UpcomingEventCard.tsx: 4AC7602AC656F2DF557A530BC8506561B477E70E65E3BC4E900435F4CC5AE6A1
+      CalendarEventCard.tsx: 3ADFAF54FD1EE1D24A5BA42CD7D7ABE8F2DFC84AE896DFB56CF63B529AFC3900
+      EventDetailModal.tsx: B77CF57BD1A216811D49B0B2D8FFE7452620C7563E2965216DFC109280C6C072
+      galleryText.ts: 09BFC20B22CE1CA29DF7DC33DE7F15E9D58E34B3DF92921AF990A496E73BF388
+      FeaturedImage.tsx: 77E68B3E5779F892B4F8DA41D5041353B868E8FD1F7444AEE85F1A8A6C2002D8
+      GalleryThumbnails.tsx: 408F8E4DD5ADB99A999032B035827EB26B80CD6EDC50AE78309350887A67DFFD
+  resolved_findings:
+    - CRIT-A11Y-001
+    - CRIT-A11Y-002
+    - SMELL-A11Y-001
+    - POL-ARCH-001
+  checks:
+    - corepack pnpm run typecheck passed
+    - corepack pnpm run build passed
+    - mobile accessibility tree exposed separate start and inclusive-end time elements with ISO dateTime values and the semantic separator al
+    - local calendar event-time contrast measured 6.13:1 at 14px normal weight
+    - gallery overflow cues switched from right-only to left-only after selecting the final thumbnail at 390x844
+    - the updated Abrir detalles control opened the gallery lightbox
+    - all four routes preserved the 1366x768 no-scroll invariant with visible footer and no horizontal overflow
+    - browser console warning and error log was empty
+
+prior_resolution_2026_07_24_06:
   id: FIX-2026-07-24-06
   source_session: REV-2026-07-24-01
   baseline:
@@ -306,6 +390,92 @@ previous_resolution:
     - gallery frame computed flex was 0 0 auto at requested 1024x640 and 1 1 0% at requested 1024x641
 
 coverage:
+  - id: COV-2026-07-27-02
+    targets:
+      - findings CRIT-A11Y-001, CRIT-A11Y-002, SMELL-A11Y-001, and POL-ARCH-001
+      - src/app/utils/calendarEventPresentation.ts
+      - src/app/components/events/UpcomingEventCard.tsx
+      - src/app/components/calendar/CalendarEventCard.tsx
+      - src/app/components/EventDetailModal.tsx
+      - src/app/components/gallery/galleryText.ts
+      - src/app/components/gallery/FeaturedImage.tsx
+      - src/app/components/gallery/GalleryThumbnails.tsx
+      - local routes /, /calendario/, /galeria/, and /afiliados/
+    axes: [A11Y, ARCH, REACT, TAILWIND]
+    included:
+      - separate machine-readable start and inclusive-end dates in every event presentation
+      - assistive semantic separator for multi-day ranges
+      - calendar event-time normal-text contrast
+      - position-aware gallery thumbnail overflow cues
+      - visible and accessible gallery detail wording
+      - required desktop route geometry and affected mobile behavior
+      - TypeScript, production build, SSR output, and browser console integrity
+    excluded:
+      - physical screen-reader announcement testing
+      - production deployment behavior
+      - unrelated open findings
+    depth: verified
+    evidence:
+      - corepack pnpm run typecheck passed
+      - corepack pnpm run build passed and regenerated route HTML
+      - local homepage at 390x844 exposed 2026-09-11 and 2026-09-12 as separate time elements with al in the accessibility tree
+      - local calendar at 390x844 exposed the same separate range semantics and measured rgb(49, 95, 140) on rgb(247, 245, 240) at 6.13:1
+      - local gallery at 390x844 measured 355px client width and 524px scroll width; the right cue was present at the start and the left cue was present after selecting image eight
+      - local gallery at 1366x768 measured 1152px client width and 1539px scroll width with the right overflow cue visible
+      - Abrir detalles was visible and the updated featured-image accessible control opened the lightbox
+      - /, /calendario/, /galeria/, and /afiliados/ each kept document clientHeight and scrollHeight at 768 with no horizontal overflow
+      - browser console warning and error log was empty
+    baseline:
+      commit: b3744e7f
+      worktree: dirty
+      fingerprints:
+        calendarEventPresentation.ts: 5C3910E5F189E96B59675BE3CFE655F4E0A5C59B454DDA5A0C8329318BAE2031
+        UpcomingEventCard.tsx: 4AC7602AC656F2DF557A530BC8506561B477E70E65E3BC4E900435F4CC5AE6A1
+        CalendarEventCard.tsx: 3ADFAF54FD1EE1D24A5BA42CD7D7ABE8F2DFC84AE896DFB56CF63B529AFC3900
+        EventDetailModal.tsx: B77CF57BD1A216811D49B0B2D8FFE7452620C7563E2965216DFC109280C6C072
+        galleryText.ts: 09BFC20B22CE1CA29DF7DC33DE7F15E9D58E34B3DF92921AF990A496E73BF388
+        FeaturedImage.tsx: 77E68B3E5779F892B4F8DA41D5041353B868E8FD1F7444AEE85F1A8A6C2002D8
+        GalleryThumbnails.tsx: 408F8E4DD5ADB99A999032B035827EB26B80CD6EDC50AE78309350887A67DFFD
+    status: current
+    result: All four findings from REV-2026-07-27-01 are implemented and verified locally.
+
+  - id: COV-2026-07-27-01
+    targets:
+      - findings CRIT-A11Y-001, CRIT-A11Y-002, SMELL-A11Y-001, and POL-ARCH-001
+      - finding CRIT-ARCH-001
+      - navigation, event, gallery, media-banner, calendar-filtering, route-generation, and robots targets recorded in REV-2026-07-27-01
+      - published routes /, /calendario/, /galeria/, /afiliados/, /calendario/#examen-2026-08-08, and /ruta-inexistente/
+    axes: [A11Y, ARCH, REACT, PERF]
+    included:
+      - adjudication of the supplied external feedback
+      - route and hash functionality, active navigation, custom 404, and slash redirect behavior
+      - date-range semantics, event-time contrast, and runtime plus synchronization filtering
+      - gallery accessible naming, controls, modal behavior, overlay, thumbnail discoverability, copy, and image loading
+      - decorative-image handling and external-link new-tab announcements
+    excluded:
+      - SEO assessment beyond checking robots.txt availability as a disputed production fact
+      - implementation or verification of fixes for the four confirmed findings
+      - physical assistive-technology testing
+    depth: reviewed
+    evidence:
+      - git status --short returned no changes and git rev-parse --short HEAD returned b3744e7f before the state update
+      - source inspection found canonical slash paths in Navbar and the route configuration
+      - the published slashless /afiliados request returned HTTP 308 to /afiliados/
+      - the published robots.txt returned HTTP 200
+      - the published nonexistent route returned HTTP 404 and rendered the custom Pagina no encontrada view
+      - the published /calendario/#examen-2026-08-08 route opened the Examen dialog after the lazy modal loaded
+      - published route DOM and screenshots were inspected at 1366x768 and 390x844
+      - browser accessibility snapshots exposed active navigation, labeled gallery controls, dialog semantics, and screen-reader new-tab descriptions
+      - source inspection found runtime and synchronization-time future-event filters
+      - source inspection found WebP and AVIF srcSet candidates plus lazy-loaded gallery thumbnails
+      - computed calendar event-time contrast measured approximately 4.37:1 against the card surface
+    baseline:
+      commit: b3744e7f
+      worktree: clean
+    status: stale
+    stale_reason: All four confirmed finding targets changed during the implementation verified by COV-2026-07-27-02.
+    result: Four findings were current at this baseline; they are now resolved by FIX-2026-07-27-01.
+
   - id: COV-2026-07-25-02
     targets:
       - finding SMELL-ARCH-003
@@ -345,7 +515,8 @@ coverage:
         EventDetailModal.tsx: 8030AE8D7DDA2C7C01AC0BD943A88BE795073A994651C027596B7A4DF978B3DE
         Lightbox.tsx: A0CA135DA8D166B6BD7723AE430B6FDDBA9B24DA50E5B896F6BF195B3BC5D3BE
         shared.ts: 422DAAB2BAB25E9F89799BF868C7A63B74EEB86CE2DC732E75C4BBD1D2E77D55
-    status: current
+    status: stale
+    stale_reason: EventDetailModal.tsx changed after this baseline; current date semantics and route geometry are verified by COV-2026-07-27-02, while the complete modal-control matrix was not rerun.
     result: Calendar and gallery now share the same modal-control geometry and interaction states while retaining content-appropriate responsive placement.
 
   - id: COV-2026-07-25-01
@@ -415,7 +586,8 @@ coverage:
         ModalShell.tsx: 4F26FAF166CE2EB3751E0A5100669C3A5EA3A31D96AA12623B4EA058855982F0
         Lightbox.tsx: 04179A0B4E2970D7ACD3C074AEC7743328167C60874472F7C4097C28ECAFB09D
         useModalBehavior.ts: 0D0317C215B7835D39434D77635FD8550E05C2913E06D9C60B7A47F65D35E507
-    status: current
+    status: stale
+    stale_reason: EventDetailModal.tsx changed after this baseline; the current gallery lightbox open flow passed, but the complete paired keyboard-navigation matrix was not rerun.
     result: Calendar and gallery dialogs now expose the same left/right keyboard navigation contract.
 
   - id: COV-2026-07-24-07
@@ -611,7 +783,8 @@ coverage:
       fingerprints:
         UpcomingEventsSection.tsx: 8A4524F13E2C5CC250AAA67252909303A420C473C7DF2B1A64FB18D91C3DE747
         calendarEventPresentation.ts: 8031A73A0EA5A13ED8A0AEFFF72C13429CFBE411156E5E5238B72E6B9A0A06E1
-    status: current
+    status: stale
+    stale_reason: calendarEventPresentation.ts changed after this baseline; current date-range output is verified by COV-2026-07-27-02.
     result: STR-ARCH-007 resolved by making calendarEventPresentation.ts the single source for date ranges and map URLs.
 
   - id: COV-2026-07-24-02
@@ -976,7 +1149,8 @@ coverage:
         EventDetailModal.tsx: ABC80D05C3C99B3FF4D93F7585B1DDE405074528F7F3BF9CA6C9A89005001A52
         PageTitle.tsx: E4A64A2BD0B309928141AB0A0C88CB6E6F4A5D4CE2FA5D0B9D3B3004A583F586
         Footer.tsx: D1203595874C6970FDA39C363CBCDBF9CDD6690DC44812CF94C896DC296F6C2E
-    status: current
+    status: stale
+    stale_reason: EventDetailModal.tsx changed after this baseline; current heading structure remained present but the original scoped coverage was not rerun in full.
     result: Semantic and visual heading order are sound after resolving POL-TW-006.
 
 legacy_coverage:
@@ -1005,19 +1179,6 @@ legacy_coverage:
       evidence: Detailed commands and baselines were not consistently recorded in v1.
 
 active_findings:
-  - id: CRIT-ARCH-001
-    level: CRITICAL
-    axis: ARCH
-    status: open_needs_revalidation
-    target: route manifest, component map, and navigation for /calendario
-    problem: The legacy review found that the required /calendario route rendered the 404 page and left events beyond the homepage preview unreachable.
-    fix: Add and verify the route manifest entry, route component, navigation path, prerendered output, and bounded access to the full event list.
-    cost_of_deferring: Users cannot reach the federation's complete calendar through the documented route.
-    evidence:
-      - migrated from v1 state
-      - current worktree contains unreviewed calendar-related changes
-    introduced_in: legacy-v1
-
   - id: STR-ARCH-001
     level: STRUCTURAL
     axis: ARCH
@@ -1067,6 +1228,47 @@ active_findings:
     introduced_in: REV-2026-07-21-01
 
 resolved_findings:
+  - id: CRIT-A11Y-001
+    status: resolved
+    resolved_at: 2026-07-27
+    summary: Multi-day events now expose separate start and inclusive-end time elements with independent ISO values and an assistive al separator across the homepage, calendar cards, and event modal.
+    resolution:
+      resolved_ref: b3744e7f dirty worktree fingerprints recorded in FIX-2026-07-27-01
+      checks: [typecheck, build, mobile accessibility tree, desktop route matrix]
+    limitation: Final announcement remains pending on a physical screen reader.
+
+  - id: CRIT-A11Y-002
+    status: resolved
+    resolved_at: 2026-07-27
+    summary: Calendar event times now use site-action-soft and measure 6.13:1 against the calendar card surface.
+    resolution:
+      resolved_ref: b3744e7f dirty worktree fingerprint 3ADFAF54FD1EE1D24A5BA42CD7D7ABE8F2DFC84AE896DFB56CF63B529AFC3900
+      checks: [typecheck, build, computed-color contrast measurement at 390x844]
+
+  - id: SMELL-A11Y-001
+    status: resolved
+    resolved_at: 2026-07-27
+    summary: The gallery thumbnail strip now shows position-aware edge fades only where additional off-screen thumbnails remain.
+    resolution:
+      resolved_ref: b3744e7f dirty worktree fingerprint 408F8E4DD5ADB99A999032B035827EB26B80CD6EDC50AE78309350887A67DFFD
+      checks: [typecheck, build, initial and final thumbnail positions at 390x844, desktop gallery screenshot]
+
+  - id: POL-ARCH-001
+    status: resolved
+    resolved_at: 2026-07-27
+    summary: Gallery preview copy and the featured-image accessible control now consistently use Abrir detalles.
+    resolution:
+      resolved_ref: b3744e7f dirty worktree fingerprints recorded in FIX-2026-07-27-01
+      checks: [typecheck, build, accessibility snapshot, visible desktop and mobile copy, lightbox open flow]
+
+  - id: CRIT-ARCH-001
+    status: resolved
+    resolved_at: 2026-07-27
+    summary: The calendar route, navigation entry, prerendered output, bounded month and event pagination, and hash-addressable event modal are present and reachable on the published site.
+    resolution:
+      resolved_ref: b3744e7f clean worktree and published-site checks recorded in COV-2026-07-27-01
+      checks: [source route inspection, published calendar route, active navigation, event pagination, direct event hash modal, custom 404 control]
+
   - id: SMELL-ARCH-003
     status: resolved
     resolved_at: 2026-07-25
@@ -1228,6 +1430,10 @@ resolved_findings:
     resolution: { resolved_ref: f35c9557 dirty worktree, checks: [typecheck, build, browser matrix] }
 
 pending_reviews:
+  - id: PEND-A11Y-001
+    target: implemented multi-day event range with a real screen reader
+    axes: [A11Y]
+    reason: Source and browser accessibility-tree verification now pass, but final announcement behavior still requires physical assistive-technology verification.
   - id: PEND-ARCH-002
     target: Post-calendar documentation reconciliation against one final main commit
     axes: [ARCH]

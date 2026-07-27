@@ -15,18 +15,22 @@ function formatEventDate(date: string) {
   return formatCalendarDate(new Date(`${date}T00:00:00.000Z`));
 }
 
-function getInclusiveEndDate(date: string) {
+function getInclusiveEndDateValue(date: string) {
   const endDate = new Date(`${date}T00:00:00.000Z`);
   endDate.setUTCDate(endDate.getUTCDate() - 1);
-  return formatCalendarDate(endDate);
+  return endDate.toISOString().slice(0, 10);
 }
 
 export function getEventDateRangeLabels({ date, endDate }: CalendarEvent) {
   const startDateLabel = formatEventDate(date);
+  const endDateValue = endDate
+    ? getInclusiveEndDateValue(endDate)
+    : undefined;
 
   return {
     startDateLabel,
-    endDateLabel: endDate ? getInclusiveEndDate(endDate) : undefined,
+    endDateLabel: endDateValue ? formatEventDate(endDateValue) : undefined,
+    endDateValue,
   };
 }
 

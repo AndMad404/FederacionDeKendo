@@ -2,7 +2,7 @@ import { Check, Info, MapPin, Share2 } from "lucide-react";
 import type { CalendarEvent } from "../../types";
 import {
   formatEventTime,
-  getEventDateLabel,
+  getEventDateRangeLabels,
   getEventLocationName,
   getLocationMapUrl,
 } from "../../utils/calendarEventPresentation";
@@ -24,7 +24,8 @@ export function CalendarEventCard({
   onOpen,
   onShare,
 }: CalendarEventCardProps) {
-  const eventDateLabel = getEventDateLabel(event);
+  const { startDateLabel, endDateLabel, endDateValue } =
+    getEventDateRangeLabels(event);
   const locationUrl = event.location
     ? getLocationMapUrl(event.location)
     : undefined;
@@ -44,14 +45,19 @@ export function CalendarEventCard({
         className={`absolute inset-0 cursor-pointer rounded-lg ${focusRingClass}`}
       />
       <h3 className="text-base font-bold leading-tight">{event.title}</h3>
-      <time
-        dateTime={event.date}
-        aria-label={eventDateLabel}
+      <span
         className="rounded-lg bg-site-media px-2.5 py-2 text-sm font-bold uppercase leading-tight text-site-action lg:px-2 lg:py-1.5"
       >
-        {eventDateLabel}
-      </time>
-      <p className="text-sm leading-tight text-site-muted">
+        <time dateTime={event.date}>{startDateLabel}</time>
+        {endDateLabel && endDateValue ? (
+          <>
+            <span aria-hidden="true">{" - "}</span>
+            <span className="sr-only"> al </span>
+            <time dateTime={endDateValue}>{endDateLabel}</time>
+          </>
+        ) : null}
+      </span>
+      <p className="text-sm leading-tight text-site-action-soft">
         {formatEventTime(event)}
       </p>
       <span

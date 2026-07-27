@@ -2,7 +2,7 @@ const GALLERY_TITLE_MAX_LENGTH = 32;
 const GALLERY_TAG_MAX_LENGTH = 20;
 const GALLERY_DESCRIPTION_MAX_LENGTH = 200;
 const MOBILE_DESCRIPTION_MAX_LENGTH = 70;
-export const SEE_MORE_LABEL = "Ver mas >>";
+export const OPEN_DETAILS_LABEL = "Abrir detalles";
 
 const ellipsis = "...";
 
@@ -62,10 +62,10 @@ export function getMobileDescriptionPreview(description: string) {
   }
 
   const textLimit =
-    MOBILE_DESCRIPTION_MAX_LENGTH - SEE_MORE_LABEL.length - ellipsis.length;
+    MOBILE_DESCRIPTION_MAX_LENGTH - OPEN_DETAILS_LABEL.length - ellipsis.length;
 
   return {
-    preview: `${truncateAtWord(text, textLimit)}${ellipsis}${SEE_MORE_LABEL}`,
+    preview: `${truncateAtWord(text, textLimit)}${ellipsis}${OPEN_DETAILS_LABEL}`,
     isTruncated: true,
   };
 }

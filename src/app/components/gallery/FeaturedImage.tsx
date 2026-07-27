@@ -9,7 +9,7 @@ import { useTransientDirectionFeedback } from "../../hooks/useTransientDirection
 import {
   getGalleryDisplayText,
   getMobileDescriptionPreview,
-  SEE_MORE_LABEL,
+  OPEN_DETAILS_LABEL,
 } from "./galleryText";
 import {
   focusRingClass,
@@ -51,7 +51,9 @@ export function FeaturedImage({
     : null;
   const previewText =
     descriptionPreview?.isTruncated
-      ? descriptionPreview.preview.slice(0, -SEE_MORE_LABEL.length).trimEnd()
+      ? descriptionPreview.preview
+          .slice(0, -OPEN_DETAILS_LABEL.length)
+          .trimEnd()
       : descriptionPreview?.preview;
   const handleSwipePrev = useCallback(() => {
     showArrowFeedback("left");
@@ -122,13 +124,13 @@ export function FeaturedImage({
                   aria-hidden="true"
                   className="block font-bold text-site-on-dark underline underline-offset-2 transition-colors group-hover:text-site-accent-soft"
                 >
-                  {SEE_MORE_LABEL}
+                  {OPEN_DETAILS_LABEL}
                 </span>
               )}
             </p>
           )}
           <p className="hidden font-bold text-site-on-dark underline underline-offset-2 transition-colors group-hover:text-site-accent-soft land-sm:col-start-2 land-sm:row-start-2 land-sm:block land-sm:text-sm land-sm:leading-none">
-            {SEE_MORE_LABEL}
+            {OPEN_DETAILS_LABEL}
           </p>
           <p className="text-right text-xs land-sm:col-start-2 land-sm:row-start-3 land-sm:text-[10px] land-sm:leading-none">
             {positionLabel}
@@ -138,7 +140,7 @@ export function FeaturedImage({
 
       <button
         type="button"
-        aria-label={`${displayTitle}. ${displayTag}. ${positionLabel}. Abrir imagen para ver mas detalles`}
+        aria-label={`${displayTitle}. ${displayTag}. ${positionLabel}. ${OPEN_DETAILS_LABEL} en la galería`}
         className={`absolute inset-0 z-10 block h-full w-full touch-pan-y cursor-pointer ${focusRingClass}`}
         onClick={(event) => {
           if (consumeSwipe()) {
@@ -150,7 +152,7 @@ export function FeaturedImage({
         }}
         {...swipeHandlers}
       >
-        <span className="sr-only">Abrir imagen</span>
+        <span className="sr-only">{OPEN_DETAILS_LABEL}</span>
       </button>
 
       <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-between px-3">

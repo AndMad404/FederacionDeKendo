@@ -13,7 +13,7 @@ import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
 import { useTransientDirectionFeedback } from "../hooks/useTransientDirectionFeedback";
 import {
   formatEventTime,
-  getEventDateLabel,
+  getEventDateRangeLabels,
   getEventLocationName,
   getLocationMapUrl,
 } from "../utils/calendarEventPresentation";
@@ -72,6 +72,8 @@ export function EventDetailModal({
   onShare,
   isShareCopied,
 }: EventDetailModalProps) {
+  const { startDateLabel, endDateLabel, endDateValue } =
+    getEventDateRangeLabels(event);
   const titleId = `event-detail-${event.id}-title`;
   const descriptionId = event.summary
     ? `event-detail-${event.id}-description`
@@ -155,9 +157,16 @@ export function EventDetailModal({
               />
             }
           >
-            <time dateTime={event.date} className="font-semibold">
-              {getEventDateLabel(event)}
-            </time>
+            <span className="font-semibold">
+              <time dateTime={event.date}>{startDateLabel}</time>
+              {endDateLabel && endDateValue ? (
+                <>
+                  <span aria-hidden="true">{" - "}</span>
+                  <span className="sr-only"> al </span>
+                  <time dateTime={endDateValue}>{endDateLabel}</time>
+                </>
+              ) : null}
+            </span>
           </EventDetailRow>
 
           <EventDetailRow

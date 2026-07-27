@@ -26,10 +26,8 @@ export function UpcomingEventCard({
   event,
   index,
 }: UpcomingEventCardProps) {
-  const { startDateLabel, endDateLabel } = getEventDateRangeLabels(event);
-  const eventDateLabel = endDateLabel
-    ? `${startDateLabel} - ${endDateLabel}`
-    : startDateLabel;
+  const { startDateLabel, endDateLabel, endDateValue } =
+    getEventDateRangeLabels(event);
   const locationUrl = event.location
     ? getLocationMapUrl(event.location)
     : undefined;
@@ -45,23 +43,27 @@ export function UpcomingEventCard({
       <h3 className="col-start-2 row-start-1 min-w-0 text-right text-base font-bold leading-tight land-tall:text-center lg:text-center">
         {event.title}
       </h3>
-      <time
-        dateTime={event.date}
-        aria-label={eventDateLabel}
+      <span
         className="col-start-1 row-start-1 max-w-[10rem] shrink-0 rounded-lg bg-site-media px-2.5 py-2 text-center text-sm font-bold uppercase leading-tight text-site-action land-tall:max-w-none lg:max-w-none lg:px-2 lg:py-1.5"
       >
-        <span className="whitespace-nowrap">{startDateLabel}</span>
-        {endDateLabel ? (
+        <time dateTime={event.date} className="whitespace-nowrap">
+          {startDateLabel}
+        </time>
+        {endDateLabel && endDateValue ? (
           <>
             <span className="hidden sm:inline" aria-hidden="true">
               {" - "}
             </span>
-            <span className="block whitespace-nowrap sm:inline">
+            <span className="sr-only"> al </span>
+            <time
+              dateTime={endDateValue}
+              className="block whitespace-nowrap sm:inline"
+            >
               {endDateLabel}
-            </span>
+            </time>
           </>
         ) : null}
-      </time>
+      </span>
 
       {locationUrl ? (
         <a
