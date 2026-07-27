@@ -84,7 +84,7 @@ export function Lightbox({
         aria-modal="true"
         aria-labelledby="lightbox-title"
         aria-describedby={displayDescription ? "lightbox-description" : undefined}
-        className="relative flex max-h-[calc(100svh-2rem)] w-full max-w-5xl touch-pan-y flex-col items-center gap-3 text-site-on-dark land-sm:h-[calc(100svh-1rem)] land-sm:max-h-none land-sm:max-w-[calc(100vw-2rem)] land-sm:gap-0"
+        className="relative flex max-h-[calc(100svh-2rem)] w-full max-w-5xl touch-pan-y flex-col items-center gap-[10px] text-site-on-dark sm:gap-3 land-sm:h-[calc(100svh-1rem)] land-sm:max-h-none land-sm:max-w-[calc(100vw-2rem)] land-sm:gap-0"
         onPointerDown={(event) => {
           event.stopPropagation();
           swipeHandlers.onPointerDown(event);
@@ -111,7 +111,7 @@ export function Lightbox({
           />
         </div>
 
-        <div className="grid w-full max-w-[22rem] grid-cols-[auto_auto] items-center justify-between gap-x-[min(75%,calc(100%_-_5.5rem))] gap-y-[clamp(1.5rem,5vw,2.25rem)] sm:max-w-[calc(100vw-4rem)] sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:justify-around sm:gap-x-4 sm:gap-y-3 lg:absolute lg:inset-0 lg:z-10 lg:block lg:max-w-none land-sm:absolute land-sm:inset-0 land-sm:z-10 land-sm:block land-sm:max-w-none">
+        <div className="grid w-full max-w-[22rem] grid-cols-[auto_auto] items-center justify-between gap-x-[min(75%,calc(100%_-_5.5rem))] gap-y-[10px] sm:max-w-[calc(100vw-4rem)] sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:justify-around sm:gap-x-4 sm:gap-y-3 lg:absolute lg:inset-0 lg:z-10 lg:block lg:max-w-none land-sm:absolute land-sm:inset-0 land-sm:z-10 land-sm:block land-sm:max-w-none">
           <NavigationArrowButton
             direction="previous"
             label="Imagen anterior"

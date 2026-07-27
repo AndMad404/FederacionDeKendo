@@ -40,14 +40,14 @@ export function ModalShell({
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
         tabIndex={-1}
-        className={`relative w-full max-w-2xl ${focusRingClass}`}
+        className={`relative h-[calc(100svh-2rem)] w-full max-w-2xl md:h-auto land-sm:h-[calc(100svh-1rem)] ${focusRingClass}`}
         onPointerDown={(event) => event.stopPropagation()}
       >
         <ModalCloseButton
           label={closeLabel}
           onClick={onClose}
         />
-        <div className="h-[min(25.5rem,calc(100svh-2rem))] touch-pan-y overflow-y-auto overscroll-y-contain rounded-xl border border-site-border bg-site-surface p-5 text-site-text shadow-2xl shadow-site-navy/40 sm:h-[min(27.5rem,calc(100svh-2rem))] sm:p-7 land-sm:h-auto land-sm:max-h-[calc(100svh-1rem)] land-sm:p-4">
+        <div className="h-full touch-pan-y overflow-hidden rounded-xl border border-site-border bg-site-surface p-4 text-site-text shadow-2xl shadow-site-navy/40 md:h-[min(27.5rem,calc(100svh-2rem))] md:p-7 land-sm:h-full land-sm:max-h-none land-sm:p-3">
           {children}
         </div>
       </div>

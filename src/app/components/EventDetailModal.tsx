@@ -94,9 +94,10 @@ export function EventDetailModal({
     showArrowFeedback("right");
     onNext();
   }, [onNext, showArrowFeedback]);
-  const { swipeHandlers } = useSwipeNavigation({
+  const { consumeSwipe, swipeHandlers } = useSwipeNavigation({
     onSwipeLeft: handleNext,
     onSwipeRight: handlePrevious,
+    allowInteractiveStart: true,
   });
   const handleDialogKeyDown = useCallback(
     (keyboardEvent: KeyboardEvent) => {
@@ -120,20 +121,29 @@ export function EventDetailModal({
       onClose={onClose}
       onKeyDown={handleDialogKeyDown}
     >
-      <article className="flex h-full touch-pan-y flex-col" {...swipeHandlers}>
+      <article
+        className="flex h-full touch-pan-y flex-col overflow-hidden"
+        onClickCapture={(event) => {
+          if (!consumeSwipe()) return;
+
+          event.preventDefault();
+          event.stopPropagation();
+        }}
+        {...swipeHandlers}
+      >
         <div className="pr-12">
           {event.type ? (
-            <p className="mb-2 text-sm font-bold uppercase tracking-widest text-site-accent">
+            <p className="mb-1 text-sm font-bold uppercase tracking-widest text-site-accent md:mb-2 land-sm:text-xs">
               {event.type}
             </p>
           ) : null}
-          <h2 id={titleId} className="text-2xl font-bold leading-tight sm:text-3xl">
+          <h2 id={titleId} className="text-2xl font-bold leading-tight md:text-3xl land-sm:text-xl">
             {event.title}
           </h2>
         </div>
 
         <dl
-          className={`relative mt-5 grid gap-3 p-4 ${panelSurfaceClass}`}
+          className={`relative mt-4 grid shrink-0 gap-2 p-3 md:mt-5 md:gap-3 md:p-4 land-sm:mt-2 land-sm:gap-1.5 land-sm:p-2 ${panelSurfaceClass}`}
         >
           <EventDetailRow
             label="Fecha"
@@ -228,11 +238,11 @@ export function EventDetailModal({
           </button>
         </dl>
 
-        <div className="min-h-0 flex-1 overflow-y-auto">
+        <div className="min-h-0 flex-1 overflow-hidden">
           {event.summary ? (
-            <div id={descriptionId} className="mt-5">
-              <h3 className="text-lg font-bold">Descripción</h3>
-              <p className="mt-2 whitespace-pre-line text-site-muted">
+            <div id={descriptionId} className="mt-4 md:mt-5 land-sm:mt-2">
+              <h3 className="text-lg font-bold land-sm:text-base">Descripción</h3>
+              <p className="mt-1 whitespace-pre-line text-site-muted md:mt-2 land-sm:text-sm">
                 {event.summary}
               </p>
             </div>
@@ -243,7 +253,7 @@ export function EventDetailModal({
               href={event.infoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className={`mt-6 inline-flex min-h-11 items-center justify-center rounded-lg px-5 py-2 font-bold transition-colors hover:border-site-action hover:bg-site-media ${actionControlSurfaceClass} ${focusRingClass}`}
+              className={`mt-4 inline-flex min-h-11 items-center justify-center rounded-lg px-5 py-2 font-bold transition-colors hover:border-site-action hover:bg-site-media md:mt-6 land-sm:mt-2 land-sm:min-h-10 land-sm:px-4 land-sm:py-1 ${actionControlSurfaceClass} ${focusRingClass}`}
             >
               {event.ctaLabel ?? "Más información"}
               <ExternalLink className="ml-2 size-4" aria-hidden="true" />
@@ -255,7 +265,7 @@ export function EventDetailModal({
         {total > 1 ? (
           <nav
             aria-label="Navegación entre eventos"
-            className="mt-6 flex min-h-11 shrink-0 items-center justify-center gap-4"
+            className="mt-4 flex min-h-11 shrink-0 items-center justify-center gap-4 md:mt-6 land-sm:mt-2"
           >
             <NavigationArrowButton
               direction="previous"
