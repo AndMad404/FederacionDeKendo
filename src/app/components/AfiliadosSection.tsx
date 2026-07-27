@@ -60,7 +60,7 @@ export function AfiliadosSection() {
         className="relative z-10 h-28 shrink-0 overflow-hidden land-compact:h-20"
         titleId="affiliates-title"
         title="Dojos afiliados"
-        description="Encuentra una comunidad donde practicar kendo."
+        description="Dojos afiliados donde practicar kendo."
         image={{
           src: "/images/affiliates/kendo-affiliates.jpg",
           sources: [
