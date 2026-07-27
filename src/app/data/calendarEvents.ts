@@ -58,7 +58,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
     aliases: ["panama-torneo-por-equipos-2026-11-21"],
     title: "PANAMA Torneo por Equipos",
     date: "2026-11-21",
-    summary: "Torneo por Equipos en Panamá. Invitación de Shinsei Panamá.",
+    summary: "Torneo por Equipos en Panamá. Invitación de Shinsei Panamá.",
     timeZone: "America/Costa_Rica"
   },
   {
