@@ -30,7 +30,7 @@ function HeroBanner() {
       </picture>
 
       <div
-        className="absolute inset-0 bg-gradient-to-r from-site-navy/95 via-site-navy/65 to-site-navy/10 sm:via-site-navy/55"
+        className="absolute inset-0 bg-gradient-to-r from-site-navy/85 via-site-navy/60 to-site-navy/30"
         aria-hidden="true"
       />
 

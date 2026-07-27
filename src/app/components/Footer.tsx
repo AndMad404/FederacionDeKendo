@@ -15,7 +15,7 @@ export function Footer() {
                 className="flex items-baseline gap-1 text-lg font-extrabold tracking-widest text-site-on-dark"
               >
                 Propósito del{" "}
-                <span className="text-lg font-bold text-site-accent">
+                <span className="text-lg font-bold text-site-accent-on-dark">
                   KENDO
                 </span>
               </h2>

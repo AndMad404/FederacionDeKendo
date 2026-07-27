@@ -53,7 +53,7 @@ export function MediaPageBanner({
         />
       </picture>
       <div
-        className="absolute inset-0 bg-gradient-to-r from-site-navy/95 via-site-navy/80 to-site-navy/45"
+        className="absolute inset-0 bg-gradient-to-r from-site-navy/85 via-site-navy/70 to-site-navy/50"
         aria-hidden="true"
       />
       <div className="relative z-10 flex h-full flex-col items-center justify-start px-4 pt-4 text-center text-site-on-dark">
