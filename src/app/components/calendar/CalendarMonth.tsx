@@ -11,7 +11,6 @@ interface CalendarMonthProps {
   pageIndex: number;
   copiedEventId: string | null;
   onPageChange: (page: number) => void;
-  onOpenEvent: (event: CalendarEvent, trigger: HTMLElement) => void;
   onShareEvent: (event: CalendarEvent) => void;
 }
 
@@ -21,7 +20,6 @@ export function CalendarMonth({
   pageIndex,
   copiedEventId,
   onPageChange,
-  onOpenEvent,
   onShareEvent,
 }: CalendarMonthProps) {
   const pageCount = Math.ceil(
@@ -45,7 +43,6 @@ export function CalendarMonth({
             key={event.id}
             event={event}
             isShareCopied={copiedEventId === event.id}
-            onOpen={onOpenEvent}
             onShare={onShareEvent}
           />
         ))}

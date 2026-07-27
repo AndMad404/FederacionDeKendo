@@ -7,6 +7,7 @@ import {
   getEventLocationName,
   getLocationMapUrl,
 } from "../../utils/calendarEventPresentation";
+import { getEventPath } from "../../utils/eventRoutes";
 
 const actionClass =
   `inline-flex min-h-11 min-w-0 items-center justify-center rounded-lg px-3 py-1.5 text-center text-sm font-semibold leading-tight transition-colors hover:border-site-action hover:bg-site-media lg:min-h-8 lg:px-2.5 lg:py-1 ${actionControlSurfaceClass}`;
@@ -92,7 +93,7 @@ export function UpcomingEventCard({
       )}
 
       <Link
-        to={`/calendario/#${encodeURIComponent(event.id)}`}
+        to={getEventPath(event)}
         aria-label={`Consultar detalles del evento ${event.title}`}
         className={`col-start-2 row-start-2 justify-self-end ${actionClass} ${focusRingClass}`}
       >

@@ -31,6 +31,7 @@ type CalendarEventType =
 
 export interface CalendarEvent {
   id: string;
+  aliases?: string[];
   title: string;
   date: string;
   endDate?: string;

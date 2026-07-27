@@ -1,6 +1,4 @@
 import {
-  lazy,
-  Suspense,
   useEffect,
   useRef,
   useState,
@@ -11,9 +9,9 @@ import { CALENDAR_EVENTS } from "../data/calendarEvents";
 import type { CalendarEvent } from "../types";
 import { getUpcomingEventGroups } from "../utils/calendarEvents";
 import { panelSurfaceClass } from "../styles/shared";
+import { getEventPath } from "../utils/eventRoutes";
 import {
   CalendarMonth,
-  CALENDAR_EVENTS_PER_PAGE,
 } from "./calendar/CalendarMonth";
 import { CalendarNavigation } from "./calendar/CalendarNavigation";
 import { MediaPageBanner } from "./ui/MediaPageBanner";
@@ -31,14 +29,11 @@ const monthNameFormatter = new Intl.DateTimeFormat("es-CR", {
 const legacyEventHashPattern = /-[a-f0-9]{8}$/i;
 const EVENT_GROUPS = getUpcomingEventGroups(CALENDAR_EVENTS);
 const ALL_EVENTS = EVENT_GROUPS.flatMap((group) => group.events);
-const EventDetailModal = lazy(() =>
-  import("./EventDetailModal").then((module) => ({
-    default: module.EventDetailModal,
-  })),
-);
 
 function findEventByUrlId(events: CalendarEvent[], urlId: string) {
-  const exactMatch = events.find((event) => event.id === urlId);
+  const exactMatch = events.find(
+    (event) => event.id === urlId || event.aliases?.includes(urlId),
+  );
 
   if (exactMatch) return exactMatch;
   if (!legacyEventHashPattern.test(urlId)) return undefined;
@@ -121,18 +116,12 @@ function usesTwoMonthLayout() {
   return window.matchMedia("(min-width: 768px)").matches;
 }
 
-function getVisibleGroupStart(groupIndex: number) {
-  return usesTwoMonthLayout() ? groupIndex - (groupIndex % 2) : groupIndex;
-}
-
 export function CalendarSection() {
   const location = useLocation();
   const navigate = useNavigate();
   const [groupIndex, setGroupIndex] = useState(0);
   const [pageIndexes, setPageIndexes] = useState<Record<string, number>>({});
-  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [copiedEventId, setCopiedEventId] = useState<string | null>(null);
-  const triggerRef = useRef<HTMLElement | null>(null);
   const shareFeedbackTimeoutRef = useRef<number | null>(null);
   const swipeStartRef = useRef<{
     pointerId: number;
@@ -152,36 +141,8 @@ export function CalendarSection() {
 
     const matchingEvent = findEventByUrlId(ALL_EVENTS, eventId);
 
-    if (!matchingEvent) {
-      setSelectedEvent(null);
-      return;
-    }
-
-    const matchingGroupIndex = EVENT_GROUPS.findIndex((group) =>
-      group.events.some((event) => event.id === matchingEvent.id),
-    );
-    const matchingGroup = EVENT_GROUPS[matchingGroupIndex];
-    const matchingEventIndex = matchingGroup.events.findIndex(
-      (event) => event.id === matchingEvent.id,
-    );
-    setGroupIndex(getVisibleGroupStart(matchingGroupIndex));
-    setPageIndexes((currentPageIndexes) => ({
-      ...currentPageIndexes,
-      [matchingGroup.monthKey]: Math.floor(
-        matchingEventIndex / CALENDAR_EVENTS_PER_PAGE,
-      ),
-    }));
-    setSelectedEvent(matchingEvent);
-
-    if (matchingEvent.id !== eventId) {
-      void navigate(
-        {
-          pathname: location.pathname,
-          search: location.search,
-          hash: `#${encodeURIComponent(matchingEvent.id)}`,
-        },
-        { replace: true },
-      );
+    if (matchingEvent) {
+      void navigate(getEventPath(matchingEvent), { replace: true });
     }
   }, [
     location.hash,
@@ -214,86 +175,8 @@ export function CalendarSection() {
     };
   }, []);
 
-  function openEvent(event: CalendarEvent, trigger: HTMLElement) {
-    triggerRef.current = trigger;
-    selectEvent(event);
-    void navigate(
-      {
-        pathname: location.pathname,
-        search: location.search,
-        hash: `#${encodeURIComponent(event.id)}`,
-      },
-      { replace: false },
-    );
-  }
-
-  function closeEvent() {
-    if (selectedEvent) {
-      triggerRef.current = document.querySelector<HTMLElement>(
-        `[data-calendar-event-id="${selectedEvent.id}"]`,
-      );
-    }
-
-    setSelectedEvent(null);
-    void navigate(
-      {
-        pathname: location.pathname,
-        search: location.search,
-        hash: "",
-      },
-      { replace: true },
-    );
-  }
-
-  function selectEvent(event: CalendarEvent) {
-    const nextGroupIndex = EVENT_GROUPS.findIndex((group) =>
-      group.events.some((groupEvent) => groupEvent.id === event.id),
-    );
-    const nextEventIndex = EVENT_GROUPS[nextGroupIndex]?.events.findIndex(
-      (groupEvent) => groupEvent.id === event.id,
-    );
-
-    if (nextGroupIndex !== -1 && nextEventIndex !== undefined) {
-      const nextGroup = EVENT_GROUPS[nextGroupIndex];
-      setGroupIndex(getVisibleGroupStart(nextGroupIndex));
-      setPageIndexes((currentPageIndexes) => ({
-        ...currentPageIndexes,
-        [nextGroup.monthKey]: Math.floor(
-          nextEventIndex / CALENDAR_EVENTS_PER_PAGE,
-        ),
-      }));
-    }
-
-    setSelectedEvent(event);
-  }
-
-  function navigateSelectedEvent(direction: -1 | 1) {
-    if (!selectedEvent || ALL_EVENTS.length < 2) return;
-
-    const currentIndex = ALL_EVENTS.findIndex(
-      (event) => event.id === selectedEvent.id,
-    );
-    const nextIndex =
-      (currentIndex + direction + ALL_EVENTS.length) % ALL_EVENTS.length;
-    const nextEvent = ALL_EVENTS[nextIndex];
-
-    selectEvent(nextEvent);
-    void navigate(
-      {
-        pathname: location.pathname,
-        search: location.search,
-        hash: `#${encodeURIComponent(nextEvent.id)}`,
-      },
-      { replace: true },
-    );
-  }
-
   async function shareEvent(event: CalendarEvent) {
-    const eventUrl = new URL(
-      `${location.pathname}${location.search}`,
-      window.location.origin,
-    );
-    eventUrl.hash = event.id;
+    const eventUrl = new URL(getEventPath(event), window.location.origin);
 
     if (navigator.share) {
       try {
@@ -390,7 +273,6 @@ export function CalendarSection() {
   }
 
   return (
-    <>
       <section
         aria-labelledby="calendar-title"
         className="relative mt-2 flex min-h-[calc(100svh_-_4rem_-_10px)] w-full flex-col overflow-hidden rounded-xl bg-site-canvas text-site-text land-sm:min-h-[calc(100svh_-_3rem_-_6px)] tall-md:h-[calc(100%_-_0.5rem)] tall-md:min-h-0"
@@ -441,7 +323,6 @@ export function CalendarSection() {
                   onPageChange={(nextPage) =>
                     changeMonthPage(currentGroup.monthKey, nextPage)
                   }
-                  onOpenEvent={openEvent}
                   onShareEvent={(event) => void shareEvent(event)}
                 />
 
@@ -455,7 +336,6 @@ export function CalendarSection() {
                       onPageChange={(nextPage) =>
                         changeMonthPage(nextGroup.monthKey, nextPage)
                       }
-                      onOpenEvent={openEvent}
                       onShareEvent={(event) => void shareEvent(event)}
                     />
                   </div>
@@ -479,23 +359,5 @@ export function CalendarSection() {
           </div>
         )}
       </section>
-      {selectedEvent ? (
-        <Suspense fallback={null}>
-          <EventDetailModal
-            event={selectedEvent}
-            index={ALL_EVENTS.findIndex(
-              (event) => event.id === selectedEvent.id,
-            )}
-            total={ALL_EVENTS.length}
-            triggerRef={triggerRef}
-            onClose={closeEvent}
-            onPrevious={() => navigateSelectedEvent(-1)}
-            onNext={() => navigateSelectedEvent(1)}
-            onShare={() => void shareEvent(selectedEvent)}
-            isShareCopied={copiedEventId === selectedEvent.id}
-          />
-        </Suspense>
-      ) : null}
-    </>
   );
 }

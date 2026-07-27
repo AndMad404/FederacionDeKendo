@@ -1,8 +1,25 @@
 import seoData from "./seo-data.json";
 import { GALLERY_IMAGES } from "../data/gallery";
+import { CALENDAR_EVENTS } from "../data/calendarEvents";
+import {
+  EVENT_INDEXING_ENABLED,
+  PAST_EVENTS_PAGE_SIZE,
+} from "./events";
+import {
+  findEventByPathname,
+  getArchivePagePath,
+  getPastEvents,
+  getEventPath,
+} from "../utils/eventRoutes";
 
 type SchemaType = "WebPage" | "CollectionPage";
-export type RouteComponent = "home" | "calendar" | "gallery" | "affiliates";
+export type RouteComponent =
+  | "home"
+  | "calendar"
+  | "gallery"
+  | "affiliates"
+  | "event"
+  | "pastEvents";
 
 export interface PreloadImage {
   href: string;
@@ -41,6 +58,10 @@ export interface RouteMeta {
   imageType: string;
   schemaType: SchemaType;
   preloadImage?: PreloadImage;
+  eventId?: string;
+  archivePage?: number;
+  canonicalWhileNoindex?: boolean;
+  suppressStructuredData?: boolean;
   /** true para rutas que no deben indexarse (ej. 404). No aparecen en ROUTE_META. */
   noindex?: boolean;
 }
@@ -97,6 +118,8 @@ function assertSeoData(value: unknown): asserts value is SeoData {
     "calendar",
     "gallery",
     "affiliates",
+    "event",
+    "pastEvents",
   ]);
   const validSchemaTypes = new Set<SchemaType>(["WebPage", "CollectionPage"]);
 
@@ -133,6 +156,7 @@ const DEFAULT_SOCIAL_IMAGE_ALT = DATA.defaultImageAlt;
 const DEFAULT_SOCIAL_IMAGE_WIDTH = DATA.defaultImageWidth;
 const DEFAULT_SOCIAL_IMAGE_HEIGHT = DATA.defaultImageHeight;
 const ROUTE_META = DATA.routes;
+const CALENDAR_META = ROUTE_META["/calendario/"];
 
 function normalizeRoutePath(pathname: string) {
   if (pathname === "/") return pathname;
@@ -186,14 +210,85 @@ const NOT_FOUND_META: RouteMeta = {
   imageType: "image/png",
   schemaType: "WebPage",
   noindex: true,
+  suppressStructuredData: true,
 };
 
 export function getRouteMeta(pathname: string) {
-  return ROUTE_META[normalizeRoutePath(pathname)] ?? NOT_FOUND_META;
+  const normalizedPath = normalizeRoutePath(pathname);
+  const configuredRoute = ROUTE_META[normalizedPath];
+  if (configuredRoute) return configuredRoute;
+
+  const event = findEventByPathname(normalizedPath);
+  if (event) return createEventRouteMeta(event);
+
+  return getRouteManifest().find((route) => route.path === normalizedPath) ?? NOT_FOUND_META;
 }
 
 export function getRouteManifest() {
-  return Object.values(ROUTE_META);
+  const pastPageCount = Math.max(
+    1,
+    Math.ceil(getPastEvents().length / PAST_EVENTS_PAGE_SIZE),
+  );
+  const archiveRoutes = Array.from({ length: pastPageCount }, (_, index) =>
+    createArchiveRouteMeta(index + 1),
+  );
+
+  return [
+    ...Object.values(ROUTE_META),
+    ...CALENDAR_EVENTS.map(createEventRouteMeta),
+    ...archiveRoutes,
+  ];
+}
+
+export function getEventRedirects() {
+  return CALENDAR_EVENTS.flatMap((event) =>
+    (event.aliases ?? [])
+      .filter((alias) => alias !== event.id)
+      .map((alias) => ({
+        from: `/eventos/${alias}/`,
+        to: getEventPath(event),
+      })),
+  );
+}
+
+function createEventRouteMeta(event: (typeof CALENDAR_EVENTS)[number]): RouteMeta {
+  const description =
+    event.summary ||
+    `Consulta fecha, horario y detalles de ${event.title}.`;
+  return {
+    path: getEventPath(event),
+    component: "event",
+    eventId: event.id,
+    title: `${event.title} | ${SITE_NAME}`,
+    description: description.slice(0, 160),
+    image: CALENDAR_META.image,
+    imageAlt: CALENDAR_META.imageAlt,
+    imageWidth: CALENDAR_META.imageWidth,
+    imageHeight: CALENDAR_META.imageHeight,
+    imageType: CALENDAR_META.imageType,
+    schemaType: "WebPage",
+    noindex: !EVENT_INDEXING_ENABLED,
+    canonicalWhileNoindex: true,
+  };
+}
+
+function createArchiveRouteMeta(page: number): RouteMeta {
+  return {
+    path: getArchivePagePath(page),
+    component: "pastEvents",
+    archivePage: page,
+    title: `Eventos pasados${page > 1 ? ` — página ${page}` : ""} | ${SITE_NAME}`,
+    description:
+      "Archivo histórico de torneos, exámenes, seminarios y actividades de kendo.",
+    image: CALENDAR_META.image,
+    imageAlt: CALENDAR_META.imageAlt,
+    imageWidth: CALENDAR_META.imageWidth,
+    imageHeight: CALENDAR_META.imageHeight,
+    imageType: CALENDAR_META.imageType,
+    schemaType: "CollectionPage",
+    noindex: !EVENT_INDEXING_ENABLED,
+    canonicalWhileNoindex: true,
+  };
 }
 
 export function getRouteSitemapImageUrls(meta: RouteMeta) {
@@ -223,7 +318,7 @@ function getRouteImageMetadata(meta: RouteMeta) {
 }
 
 function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
-  if (meta.noindex) return null;
+  if (meta.suppressStructuredData) return null;
 
   const canonicalUrl = getCanonicalUrl(meta);
   const organizationId = `${SITE_URL}/#organization`;
@@ -245,6 +340,42 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
   const image = getRouteImageMetadata(meta);
   const routeEntities =
     ROUTE_STRUCTURED_DATA_BUILDERS[meta.component]?.(meta, canonicalUrl) ?? [];
+  if (meta.component === "event" && meta.eventId) {
+    const event = CALENDAR_EVENTS.find((candidate) => candidate.id === meta.eventId);
+    if (event?.location) {
+      const startDate = event.startTime
+        ? `${event.date}T${event.startTime}:00-06:00`
+        : event.date;
+      const endDate = event.endDate
+        ? event.endTime
+          ? `${event.endDate}T${event.endTime}:00-06:00`
+          : event.endDate
+        : event.endTime
+          ? `${event.date}T${event.endTime}:00-06:00`
+          : undefined;
+      routeEntities.push({
+        "@type": "Event",
+        "@id": `${canonicalUrl}#event`,
+        name: event.title,
+        description: event.summary || meta.description,
+        startDate,
+        ...(endDate ? { endDate } : {}),
+        eventStatus: "https://schema.org/EventScheduled",
+        eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+        location: {
+          "@type": "Place",
+          name: event.location.split(",", 1)[0].trim(),
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: event.location,
+            addressCountry: "CR",
+          },
+        },
+        image: [image.url],
+        url: canonicalUrl,
+      });
+    }
+  }
   const mainEntityReferences = routeEntities
     .map((entity) => entity["@id"])
     .filter((id): id is string => typeof id === "string")
@@ -300,7 +431,8 @@ export function getRouteSeoPayload(meta: RouteMeta): RouteSeoPayload {
     title: meta.title,
     description: meta.description || DEFAULT_SITE_DESCRIPTION,
     robots: noindex ? "noindex, nofollow" : "index, follow",
-    canonicalUrl: noindex ? null : getCanonicalUrl(meta),
+    canonicalUrl:
+      noindex && !meta.canonicalWhileNoindex ? null : getCanonicalUrl(meta),
     siteName: SITE_NAME,
     locale: SITE_LOCALE,
     image: getRouteImageMetadata(meta),

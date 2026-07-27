@@ -7,6 +7,10 @@
     "build": "vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr",
     "postbuild": "node scripts/generate-route-html.mjs",
     "dev": "vite",
+    "preview": "vite preview",
+    "test:e2e": "playwright test",
+    "test:generated": "node --test tests/generated-output.test.mjs",
+    "test:unit": "node --test tests/calendar-sync.test.mjs",
     "typecheck": "tsc --noEmit",
     "sync:calendar": "node scripts/sync-calendar-events.mjs",
     "images:responsive": "node scripts/generate-responsive-images.mjs"
@@ -18,6 +22,7 @@
     "react-router": "^7.18.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.0",
     "@tailwindcss/vite": "4.1.12",
     "@types/react": "^18",
     "@types/react-dom": "^18",

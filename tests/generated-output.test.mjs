@@ -1,0 +1,43 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import test from "node:test";
+
+async function readDist(relativePath) {
+  return readFile(new URL(`../dist/${relativePath}`, import.meta.url), "utf8");
+}
+
+test("generates event HTML with canonical, noindex and valid conditional Event JSON-LD", async () => {
+  const complete = await readDist("eventos/2026-08-08-examen/index.html");
+  const incomplete = await readDist(
+    "eventos/2026-10-10-clak-1er-panamericano-brasil/index.html",
+  );
+
+  assert.match(complete, /<h1[^>]*>Examen<\/h1>/);
+  assert.match(complete, /name="robots" content="noindex, nofollow"/);
+  assert.match(
+    complete,
+    /rel="canonical" href="https:\/\/fak-kendo\.pages\.dev\/eventos\/2026-08-08-examen\/"/,
+  );
+  assert.match(complete, /"@type":"Event"/);
+  assert.doesNotMatch(incomplete, /"@type":"Event"/);
+});
+
+test("excludes event routes from sitemap while indexing is disabled", async () => {
+  const sitemap = await readDist("sitemap.xml");
+  assert.doesNotMatch(sitemap, /\/eventos\//);
+  assert.match(sitemap, /\/calendario\//);
+});
+
+test("writes permanent redirects for previous event slugs", async () => {
+  const redirects = await readDist("_redirects");
+  assert.match(
+    redirects,
+    /\/eventos\/examen-2026-08-08\/ \/eventos\/2026-08-08-examen\/ 301/,
+  );
+});
+
+test("generates the archive route", async () => {
+  const archive = await readDist("eventos/pasados/index.html");
+  assert.match(archive, /Eventos pasados/);
+  assert.match(archive, /Página (?:<!-- -->)?1(?:<!-- -->)? de (?:<!-- -->)?1/);
+});

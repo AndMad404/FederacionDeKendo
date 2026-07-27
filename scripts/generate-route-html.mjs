@@ -2,6 +2,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import {
   getRouteHeadDescriptors,
+  getEventRedirects,
   getRouteManifest,
   getRouteMeta,
   getRouteSeoPayload,
@@ -120,11 +121,11 @@ const sitemap = [
   '<?xml version="1.0" encoding="UTF-8"?>',
   '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">',
   ...routes.flatMap((route) => {
-    const canonicalUrl = getRouteSeoPayload(route).canonicalUrl;
-    return canonicalUrl
+    const seo = getRouteSeoPayload(route);
+    return seo.canonicalUrl && seo.robots === "index, follow"
       ? [
           "  <url>",
-          `    <loc>${escapeText(canonicalUrl)}</loc>`,
+          `    <loc>${escapeText(seo.canonicalUrl)}</loc>`,
           ...getRouteSitemapImageUrls(route).flatMap((imageUrl) => [
             "    <image:image>",
             `      <image:loc>${escapeText(imageUrl)}</image:loc>`,
@@ -140,3 +141,12 @@ const sitemap = [
 
 await writeFile(path.join(DIST_DIR, "sitemap.xml"), sitemap, "utf8");
 console.log("generated dist\\sitemap.xml");
+
+const redirects = [
+  ...getEventRedirects().map(
+    ({ from, to }) => `${from} ${to} 301`,
+  ),
+  "",
+].join("\n");
+await writeFile(path.join(DIST_DIR, "_redirects"), redirects, "utf8");
+console.log("generated dist\\_redirects");

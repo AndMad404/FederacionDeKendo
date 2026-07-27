@@ -1,55 +1,26 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { appendFile, mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "..");
-
-const calendarSource = process.env.CALENDAR_ICS_URL ?? process.argv[2];
-const outputPath =
-  process.env.CALENDAR_OUTPUT_PATH ??
-  path.join(repoRoot, "src", "app", "data", "calendarEvents.ts");
-const lookaheadMonths = parsePositiveInteger(
-  process.env.CALENDAR_LOOKAHEAD_MONTHS,
-  6,
+const defaultOutputPath = path.join(
+  repoRoot,
+  "src",
+  "app",
+  "data",
+  "calendarEvents.ts",
 );
-const minimumFutureEvents = parsePositiveInteger(
-  process.env.CALENDAR_MIN_FUTURE_EVENTS,
-  12,
+const defaultRegistryPath = path.join(
+  repoRoot,
+  "src",
+  "app",
+  "data",
+  "calendarEventRegistry.json",
 );
 const defaultTimeZone = process.env.CALENDAR_TIME_ZONE ?? "America/Costa_Rica";
-
-function parsePositiveInteger(value, fallback) {
-  if (!value) {
-    return fallback;
-  }
-
-  const parsed = Number.parseInt(value, 10);
-
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
-}
-
-function requireCalendarSource() {
-  if (!calendarSource) {
-    throw new Error(
-      "Missing CALENDAR_ICS_URL. Add it as a GitHub Actions secret or pass an ICS URL/file path as the first argument.",
-    );
-  }
-}
-
-async function readCalendarSource(source) {
-  if (/^https?:\/\//i.test(source)) {
-    const response = await fetch(source);
-
-    if (!response.ok) {
-      throw new Error(`Calendar request failed: ${response.status} ${response.statusText}`);
-    }
-
-    return response.text();
-  }
-
-  return readFile(path.resolve(repoRoot, source), "utf8");
-}
+const draftPrefix = "[BORRADOR]";
 
 function unfoldIcsLines(icsText) {
   return icsText
@@ -78,10 +49,7 @@ function decodeIcsText(value) {
 
 function parseIcsProperty(line) {
   const colonIndex = line.indexOf(":");
-
-  if (colonIndex === -1) {
-    return undefined;
-  }
+  if (colonIndex === -1) return undefined;
 
   const rawName = line.slice(0, colonIndex);
   const rawValue = line.slice(colonIndex + 1);
@@ -89,15 +57,12 @@ function parseIcsProperty(line) {
   const params = Object.fromEntries(
     rawParams.map((param) => {
       const equalsIndex = param.indexOf("=");
-
-      if (equalsIndex === -1) {
-        return [param.toUpperCase(), ""];
-      }
-
-      return [
-        param.slice(0, equalsIndex).toUpperCase(),
-        param.slice(equalsIndex + 1).replace(/^"|"$/g, ""),
-      ];
+      return equalsIndex === -1
+        ? [param.toUpperCase(), ""]
+        : [
+            param.slice(0, equalsIndex).toUpperCase(),
+            param.slice(equalsIndex + 1).replace(/^"|"$/g, ""),
+          ];
     }),
   );
 
@@ -109,42 +74,46 @@ function parseIcsProperty(line) {
   };
 }
 
-function parseVEvents(icsText) {
+export function parseVEvents(icsText) {
+  if (!/BEGIN:VCALENDAR/.test(icsText) || !/END:VCALENDAR/.test(icsText)) {
+    throw new Error("Invalid iCalendar feed: VCALENDAR boundaries are missing.");
+  }
+
   const events = [];
   let currentEventLines;
 
   for (const line of unfoldIcsLines(icsText)) {
     if (line === "BEGIN:VEVENT") {
+      if (currentEventLines) {
+        throw new Error("Invalid iCalendar feed: nested VEVENT.");
+      }
       currentEventLines = [];
-      continue;
-    }
-
-    if (line === "END:VEVENT" && currentEventLines) {
+    } else if (line === "END:VEVENT" && currentEventLines) {
       events.push(currentEventLines);
       currentEventLines = undefined;
-      continue;
-    }
-
-    if (currentEventLines) {
+    } else if (currentEventLines) {
       currentEventLines.push(line);
     }
   }
 
+  if (currentEventLines) {
+    throw new Error("Invalid iCalendar feed: an event is not closed.");
+  }
+
   return events.map((eventLines) => {
     const properties = new Map();
-
     for (const line of eventLines) {
       const property = parseIcsProperty(line);
-
-      if (!property || properties.has(property.name)) {
-        continue;
+      if (property && !properties.has(property.name)) {
+        properties.set(property.name, property);
       }
-
-      properties.set(property.name, property);
     }
-
     return properties;
   });
+}
+
+function pad(value) {
+  return String(value).padStart(2, "0");
 }
 
 function parseBasicDate(value) {
@@ -163,16 +132,8 @@ function parseBasicDateTime(value) {
   };
 }
 
-function pad(value) {
-  return String(value).padStart(2, "0");
-}
-
 function formatDate({ year, month, day }) {
   return `${year}-${pad(month)}-${pad(day)}`;
-}
-
-function formatTime({ hours, minutes }) {
-  return `${pad(hours)}:${pad(minutes)}`;
 }
 
 function formatDateTimeInZone(date, timeZone) {
@@ -186,7 +147,6 @@ function formatDateTimeInZone(date, timeZone) {
     hourCycle: "h23",
   }).formatToParts(date);
   const value = Object.fromEntries(parts.map((part) => [part.type, part.value]));
-
   return {
     date: `${value.year}-${value.month}-${value.day}`,
     time: `${value.hour}:${value.minute}`,
@@ -194,10 +154,7 @@ function formatDateTimeInZone(date, timeZone) {
 }
 
 function parseIcsDate(property) {
-  if (!property) {
-    return undefined;
-  }
-
+  if (!property) return undefined;
   const isDateOnly =
     property.params.VALUE === "DATE" || /^\d{8}$/.test(property.rawValue);
 
@@ -209,79 +166,57 @@ function parseIcsDate(property) {
     };
   }
 
+  if (!/^\d{8}T\d{4,6}Z?$/i.test(property.rawValue)) {
+    return undefined;
+  }
+
+  const parts = parseBasicDateTime(property.rawValue);
   if (/Z$/i.test(property.rawValue)) {
-    const parts = parseBasicDateTime(property.rawValue);
     const utcDate = new Date(
       Date.UTC(parts.year, parts.month - 1, parts.day, parts.hours, parts.minutes),
     );
-    const localDateTime = formatDateTimeInZone(utcDate, defaultTimeZone);
-
     return {
-      date: localDateTime.date,
-      time: localDateTime.time,
+      ...formatDateTimeInZone(utcDate, defaultTimeZone),
       isDateOnly: false,
       timeZone: defaultTimeZone,
     };
   }
 
-  const parts = parseBasicDateTime(property.rawValue);
-
   return {
     date: formatDate(parts),
-    time: formatTime(parts),
+    time: `${pad(parts.hours)}:${pad(parts.minutes)}`,
     isDateOnly: false,
     timeZone: property.params.TZID ?? defaultTimeZone,
   };
 }
 
-function createDateAtStartOfDay(date) {
-  const [year, month, day] = date.split("-").map(Number);
-
-  return new Date(year, month - 1, day);
-}
-
-function createDateTime(date, time = "00:00") {
+function createLocalDate(date, time = "00:00") {
   const [year, month, day] = date.split("-").map(Number);
   const [hours, minutes] = time.split(":").map(Number);
-
   return new Date(year, month - 1, day, hours, minutes);
 }
 
 function addDays(date, days) {
-  const nextDate = new Date(date);
-  nextDate.setDate(nextDate.getDate() + days);
-
-  return nextDate;
-}
-
-function addMonths(date, months) {
-  const nextDate = new Date(date);
-  nextDate.setMonth(nextDate.getMonth() + months);
-
-  return nextDate;
+  const result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
 }
 
 function toIsoDate(date) {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
-function getEventEndDateTime(event) {
+export function getEventEndDateTime(event) {
   if (event.endDate) {
-    return createDateAtStartOfDay(event.endDate);
+    return createLocalDate(event.endDate, event.endTime);
   }
-
-  if (event.endTime) {
-    return createDateTime(event.date, event.endTime);
-  }
-
+  if (event.endTime) return createLocalDate(event.date, event.endTime);
   if (event.startTime) {
-    const startDate = createDateTime(event.date, event.startTime);
-    startDate.setHours(startDate.getHours() + 1);
-
-    return startDate;
+    const result = createLocalDate(event.date, event.startTime);
+    result.setHours(result.getHours() + 1);
+    return result;
   }
-
-  return addDays(createDateAtStartOfDay(event.date), 1);
+  return addDays(createLocalDate(event.date), 1);
 }
 
 function slugify(value) {
@@ -294,167 +229,166 @@ function slugify(value) {
     .slice(0, 72);
 }
 
-function createEventId(title, date, usedIds) {
-  const base = slugify(`${title}-${date}`) || "calendar-event";
-  let id = base;
-  let suffix = 2;
+function hash(value, length = 24) {
+  return createHash("sha256").update(value).digest("hex").slice(0, length);
+}
 
-  while (usedIds.has(id)) {
-    id = `${base}-${suffix}`;
-    suffix += 1;
-  }
+export function createCanonicalSlug(title, date) {
+  return `${date}-${slugify(title) || "actividad"}`;
+}
 
-  usedIds.add(id);
-
-  return id;
+function createLegacySlug(title, date) {
+  return `${slugify(title) || "actividad"}-${date}`;
 }
 
 function getEventType(property) {
-  if (!property) {
-    return undefined;
-  }
-
-  const supportedTypes = new Map(
+  if (!property) return undefined;
+  const supported = new Map(
     [
       "Examen",
       "Torneo",
       "Seminario",
       "Entrenamiento especial",
       "Actividad federativa",
-    ].map((type) => [
-      type
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase(),
-      type,
-    ]),
+    ].map((type) => [slugify(type), type]),
   );
 
   for (const category of property.value.split(",")) {
-    const normalizedCategory = category
-      .trim()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase();
-    const matchingType = supportedTypes.get(normalizedCategory);
-
-    if (matchingType) {
-      return matchingType;
-    }
+    const match = supported.get(slugify(category.trim()));
+    if (match) return match;
   }
-
   return undefined;
 }
 
 function getOrganizer(property) {
-  if (!property) {
-    return undefined;
-  }
-
-  const commonName = property.params.CN
+  if (!property) return undefined;
+  return property.params.CN
     ? decodeIcsText(property.params.CN)
-    : undefined;
-
-  return commonName || property.value.replace(/^mailto:/i, "");
+    : property.value.replace(/^mailto:/i, "");
 }
 
-function parseCalendarEvent(properties, usedIds) {
-  const status = properties.get("STATUS")?.value;
-
-  if (status === "CANCELLED") {
+export function parseCalendarEvent(properties, warnings = []) {
+  const rawTitle = properties.get("SUMMARY")?.value;
+  if (rawTitle?.toUpperCase().startsWith(draftPrefix)) {
+    warnings.push(`Draft omitted: ${rawTitle.slice(draftPrefix.length).trim() || "(untitled)"}`);
+    return undefined;
+  }
+  if (properties.has("RRULE")) {
+    warnings.push(`Recurring event omitted: ${rawTitle || "(untitled)"}. Create individual events instead.`);
+    return undefined;
+  }
+  if (properties.get("STATUS")?.value === "CANCELLED") {
+    warnings.push(`Cancelled event omitted: ${rawTitle || "(untitled)"}`);
     return undefined;
   }
 
-  const title = properties.get("SUMMARY")?.value;
+  const uid = properties.get("UID")?.value;
   const start = parseIcsDate(properties.get("DTSTART"));
-  const end = parseIcsDate(properties.get("DTEND"));
-
-  if (!title || !start) {
+  if (!uid || !start) {
+    warnings.push(`Event omitted because UID or DTSTART is missing: ${rawTitle || "(untitled)"}`);
     return undefined;
   }
 
+  const title = rawTitle || "Actividad sin título";
+  const end = parseIcsDate(properties.get("DTEND"));
   const event = {
-    id: createEventId(title, start.date, usedIds),
+    sourceId: hash(uid),
+    slug: createCanonicalSlug(title, start.date),
+    aliases: [createLegacySlug(title, start.date)],
     title,
     date: start.date,
+    timeZone: start.timeZone ?? defaultTimeZone,
   };
 
-  if (!start.isDateOnly && start.time) {
-    event.startTime = start.time;
-  }
-
+  if (!rawTitle) warnings.push(`Published with placeholder title on ${start.date}.`);
+  if (!start.isDateOnly && start.time) event.startTime = start.time;
   if (end) {
     if (start.isDateOnly && end.isDateOnly) {
-      const singleDayExclusiveEndDate = toIsoDate(addDays(createDateAtStartOfDay(start.date), 1));
-
-      if (end.date !== singleDayExclusiveEndDate) {
-        event.endDate = end.date;
-      }
-    } else if (end.date === start.date && end.time) {
-      event.endTime = end.time;
+      const defaultEnd = toIsoDate(addDays(createLocalDate(start.date), 1));
+      if (end.date !== defaultEnd) event.endDate = end.date;
+    } else {
+      if (end.date !== start.date) event.endDate = end.date;
+      if (end.time) event.endTime = end.time;
     }
   }
 
-  const location = properties.get("LOCATION")?.value;
-  const summary = properties.get("DESCRIPTION")?.value;
-  const type = getEventType(properties.get("CATEGORIES"));
-  const organizer = getOrganizer(properties.get("ORGANIZER"));
-  const infoUrl = properties.get("URL")?.value;
+  const optionalProperties = {
+    location: properties.get("LOCATION")?.value,
+    summary: properties.get("DESCRIPTION")?.value,
+    type: getEventType(properties.get("CATEGORIES")),
+    organizer: getOrganizer(properties.get("ORGANIZER")),
+    infoUrl: properties.get("URL")?.value,
+  };
+  Object.assign(
+    event,
+    Object.fromEntries(
+      Object.entries(optionalProperties).filter(([, value]) => Boolean(value)),
+    ),
+  );
 
-  if (location) {
-    event.location = location;
+  const missing = [
+    !event.location && "ubicación",
+    !event.summary && "descripción",
+  ].filter(Boolean);
+  if (missing.length) {
+    warnings.push(`${title} (${start.date}) published without ${missing.join(" y ")}.`);
   }
-
-  if (summary) {
-    event.summary = summary;
-  }
-
-  if (type) {
-    event.type = type;
-  }
-
-  if (organizer) {
-    event.organizer = organizer;
-  }
-
-  if (infoUrl) {
-    event.infoUrl = infoUrl;
-  }
-
-  event.timeZone = start.timeZone ?? defaultTimeZone;
-
   return event;
 }
 
-function selectFutureEvents(events) {
-  const now = new Date();
-  const lookaheadEnd = addMonths(now, lookaheadMonths);
-  const futureEvents = events
-    .filter((event) => getEventEndDateTime(event) >= now)
-    .sort(
-      (a, b) =>
-        createDateTime(a.date, a.startTime).getTime() -
-        createDateTime(b.date, b.startTime).getTime(),
-    );
-
-  const eventsInsideWindow = futureEvents.filter(
-    (event) => createDateTime(event.date, event.startTime).getTime() <= lookaheadEnd.getTime(),
-  );
-
-  if (eventsInsideWindow.length >= minimumFutureEvents) {
-    return eventsInsideWindow;
-  }
-
-  return futureEvents.slice(0, minimumFutureEvents);
+function resolveSlugCollisions(events, warnings) {
+  const bySlug = new Map();
+  return events.map((event) => {
+    const previous = bySlug.get(event.slug);
+    if (!previous) {
+      bySlug.set(event.slug, event.sourceId);
+      return event;
+    }
+    const slug = `${event.slug}-${event.sourceId.slice(0, 8)}`;
+    warnings.push(`Slug collision resolved: ${event.slug} -> ${slug}.`);
+    return { ...event, slug };
+  });
 }
 
-function serializeProperty(name, value, isLast = false) {
+export function mergeRegistry(previousRegistry, currentEvents, now = new Date()) {
+  const previousBySource = new Map(
+    (previousRegistry.events ?? []).map((event) => [event.sourceId, event]),
+  );
+  const currentSourceIds = new Set(currentEvents.map((event) => event.sourceId));
+  const merged = currentEvents.map((event) => {
+    const previous = previousBySource.get(event.sourceId);
+    if (!previous) return event;
+    const aliases = new Set(previous.aliases ?? []);
+    if (previous.slug !== event.slug) aliases.add(previous.slug);
+    aliases.delete(event.slug);
+    return { ...event, aliases: [...aliases].sort() };
+  });
+
+  for (const previous of previousRegistry.events ?? []) {
+    if (
+      !currentSourceIds.has(previous.sourceId) &&
+      getEventEndDateTime(previous).getTime() < now.getTime()
+    ) {
+      merged.push(previous);
+    }
+  }
+
+  merged.sort(
+    (a, b) =>
+      createLocalDate(a.date, a.startTime).getTime() -
+      createLocalDate(b.date, b.startTime).getTime(),
+  );
+  return { version: 1, events: merged };
+}
+
+function serializeProperty(name, value, isLast) {
   return `    ${name}: ${JSON.stringify(value)}${isLast ? "" : ","}`;
 }
 
-function serializeEvent(event) {
+function serializeCalendarEvent(event) {
   const entries = [
-    ["id", event.id],
+    ["id", event.slug],
+    ["aliases", event.aliases],
     ["title", event.title],
     ["date", event.date],
     ["endDate", event.endDate],
@@ -465,10 +399,8 @@ function serializeEvent(event) {
     ["type", event.type],
     ["organizer", event.organizer],
     ["infoUrl", event.infoUrl],
-    ["ctaLabel", event.ctaLabel],
     ["timeZone", event.timeZone],
-  ].filter(([, value]) => value);
-
+  ].filter(([, value]) => value !== undefined && (!Array.isArray(value) || value.length));
   return [
     "  {",
     ...entries.map(([name, value], index) =>
@@ -478,36 +410,126 @@ function serializeEvent(event) {
   ].join("\n");
 }
 
-function serializeCalendarEvents(events) {
-  const serializedEvents = events.map(serializeEvent).join(",\n");
-
+export function serializeCalendarEvents(events) {
   return `import type { CalendarEvent } from "../types";
 
 // Auto-generated from Google Calendar. Do not edit manually.
 export const CALENDAR_EVENTS: CalendarEvent[] = [
-${serializedEvents}
+${events.map(serializeCalendarEvent).join(",\n")}
 ];
 `;
 }
 
-async function main() {
-  requireCalendarSource();
-
-  const icsText = await readCalendarSource(calendarSource);
-  const usedIds = new Set();
-  const events = selectFutureEvents(
-    parseVEvents(icsText)
-      .map((properties) => parseCalendarEvent(properties, usedIds))
-      .filter(Boolean),
-  );
-
-  await mkdir(path.dirname(outputPath), { recursive: true });
-  await writeFile(outputPath, serializeCalendarEvents(events), "utf8");
-
-  console.log(`Synced ${events.length} calendar event(s) to ${path.relative(repoRoot, outputPath)}.`);
+async function readCalendarSource(source) {
+  if (/^https?:\/\//i.test(source)) {
+    const response = await fetch(source);
+    if (!response.ok) {
+      throw new Error(`Calendar request failed: ${response.status} ${response.statusText}`);
+    }
+    return response.text();
+  }
+  return readFile(path.resolve(repoRoot, source), "utf8");
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+async function readRegistry(registryPath) {
+  try {
+    const registry = JSON.parse(await readFile(registryPath, "utf8"));
+    if (registry.version !== 1 || !Array.isArray(registry.events)) {
+      throw new Error("Unsupported calendar event registry.");
+    }
+    return registry;
+  } catch (error) {
+    if (error?.code === "ENOENT") return { version: 1, events: [] };
+    throw error;
+  }
+}
+
+async function writeAtomically(files) {
+  const temporaryFiles = [];
+  try {
+    for (const [filePath, contents] of files) {
+      await mkdir(path.dirname(filePath), { recursive: true });
+      const temporaryPath = `${filePath}.${process.pid}.tmp`;
+      await writeFile(temporaryPath, contents, "utf8");
+      temporaryFiles.push([temporaryPath, filePath]);
+    }
+    for (const [temporaryPath, filePath] of temporaryFiles) {
+      await rename(temporaryPath, filePath);
+    }
+  } catch (error) {
+    await Promise.allSettled(
+      temporaryFiles.map(([temporaryPath]) =>
+        import("node:fs/promises").then(({ unlink }) => unlink(temporaryPath)),
+      ),
+    );
+    throw error;
+  }
+}
+
+async function writeActionSummary(warnings, eventCount) {
+  const summaryPath = process.env.GITHUB_STEP_SUMMARY;
+  if (!summaryPath) return;
+  const lines = [
+    "## Calendar synchronization",
+    "",
+    `Published events: ${eventCount}`,
+    `Warnings: ${warnings.length}`,
+    "",
+    ...warnings.map((warning) => `- ⚠️ ${warning}`),
+    "",
+  ];
+  await appendFile(summaryPath, lines.join("\n"), "utf8");
+}
+
+export async function synchronizeCalendar({
+  source,
+  outputPath = defaultOutputPath,
+  registryPath = defaultRegistryPath,
+  now = new Date(),
+} = {}) {
+  if (!source) {
+    throw new Error(
+      "Missing CALENDAR_ICS_URL. Add it as a GitHub Actions secret or pass an ICS URL/file path as the first argument.",
+    );
+  }
+
+  const icsText = await readCalendarSource(source);
+  const warnings = [];
+  const parsed = parseVEvents(icsText)
+    .map((properties) => parseCalendarEvent(properties, warnings))
+    .filter(Boolean);
+  const currentEvents = resolveSlugCollisions(parsed, warnings);
+  const previousRegistry = await readRegistry(registryPath);
+  const registry = mergeRegistry(previousRegistry, currentEvents, now);
+
+  await writeAtomically([
+    [registryPath, `${JSON.stringify(registry, null, 2)}\n`],
+    [outputPath, serializeCalendarEvents(registry.events)],
+  ]);
+  await writeActionSummary(warnings, registry.events.length);
+
+  return { registry, warnings };
+}
+
+async function main() {
+  const source = process.env.CALENDAR_ICS_URL ?? process.argv[2];
+  const result = await synchronizeCalendar({
+    source,
+    outputPath: process.env.CALENDAR_OUTPUT_PATH ?? defaultOutputPath,
+    registryPath: process.env.CALENDAR_REGISTRY_PATH ?? defaultRegistryPath,
+  });
+  console.log(
+    `Synced ${result.registry.events.length} event(s) with ${result.warnings.length} warning(s).`,
+  );
+}
+
+const isDirectExecution =
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
+
+if (isDirectExecution) {
+  main().catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  });
+}

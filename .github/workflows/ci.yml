@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   verify:
-    name: Typecheck and build
+    name: Unit, typecheck, build and browser tests
     runs-on: ubuntu-latest
 
     steps:
@@ -34,5 +34,17 @@ jobs:
       - name: Typecheck
         run: pnpm run typecheck
 
+      - name: Unit tests
+        run: pnpm run test:unit
+
       - name: Build
         run: pnpm run build
+
+      - name: Generated output tests
+        run: pnpm run test:generated
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Browser tests
+        run: pnpm run test:e2e

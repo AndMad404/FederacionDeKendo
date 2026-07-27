@@ -6,9 +6,12 @@ import { CalendarSection } from "./app/components/CalendarSection";
 import { GallerySection } from "./app/components/GallerySection";
 import { HeroSection } from "./app/components/HeroSection";
 import { NotFoundSection } from "./app/components/NotFoundSection";
+import { EventPage } from "./app/components/EventPage";
+import { PastEventsSection } from "./app/components/PastEventsSection";
 
 export {
   getRouteHeadDescriptors,
+  getEventRedirects,
   getRouteManifest,
   getRouteMeta,
   getRouteSeoPayload,
@@ -21,6 +24,8 @@ const SERVER_ROUTE_COMPONENTS: RouteComponentRegistry = {
     calendar: CalendarSection,
     gallery: GallerySection,
     affiliates: AfiliadosSection,
+    event: EventPage,
+    pastEvents: PastEventsSection,
   },
   notFound: NotFoundSection,
 };

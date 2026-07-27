@@ -42,7 +42,7 @@ function getEventStartDate(event: CalendarEvent) {
   return createLocalDate(event.date, event.startTime);
 }
 
-function getEventEndDate(event: CalendarEvent) {
+export function getEventEndDate(event: CalendarEvent) {
   if (event.endDate) {
     return createLocalDate(event.endDate, event.endTime);
   }

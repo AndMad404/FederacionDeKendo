@@ -1,4 +1,5 @@
 import { Check, Info, MapPin, Share2 } from "lucide-react";
+import { Link } from "react-router";
 import type { CalendarEvent } from "../../types";
 import {
   formatEventTime,
@@ -10,18 +11,17 @@ import {
   actionControlSurfaceClass,
   focusRingClass,
 } from "../../styles/shared";
+import { getEventPath } from "../../utils/eventRoutes";
 
 interface CalendarEventCardProps {
   event: CalendarEvent;
   isShareCopied: boolean;
-  onOpen: (event: CalendarEvent, trigger: HTMLElement) => void;
   onShare: (event: CalendarEvent) => void;
 }
 
 export function CalendarEventCard({
   event,
   isShareCopied,
-  onOpen,
   onShare,
 }: CalendarEventCardProps) {
   const { startDateLabel, endDateLabel, endDateValue } =
@@ -36,14 +36,6 @@ export function CalendarEventCard({
 
   return (
     <li className="relative flex min-h-40 flex-col items-center justify-around gap-2 rounded-xl border border-site-border bg-site-canvas p-3 text-center transition-colors hover:border-site-action lg:min-h-36 lg:gap-1 lg:px-2 lg:py-1">
-      <button
-        type="button"
-        data-calendar-event-id={event.id}
-        aria-haspopup="dialog"
-        aria-label={`Abrir más información sobre ${event.title}`}
-        onClick={(clickEvent) => onOpen(event, clickEvent.currentTarget)}
-        className={`absolute inset-0 cursor-pointer rounded-lg ${focusRingClass}`}
-      />
       <h3 className="text-base font-bold leading-tight">{event.title}</h3>
       <span
         className="rounded-lg bg-site-media px-2.5 py-2 text-sm font-bold uppercase leading-tight text-site-action lg:px-2 lg:py-1.5"
@@ -60,13 +52,14 @@ export function CalendarEventCard({
       <p className="text-sm leading-tight text-site-action-soft">
         {formatEventTime(event)}
       </p>
-      <span
-        aria-hidden="true"
-        className={`pointer-events-none relative z-10 inline-flex min-h-8 items-center justify-center rounded-full px-3 py-1 text-sm font-semibold ${actionControlSurfaceClass}`}
+      <Link
+        to={getEventPath(event)}
+        aria-label={`Ver detalles del evento ${event.title}`}
+        className={`relative z-10 inline-flex min-h-11 cursor-pointer items-center justify-center rounded-full px-3 py-1 text-sm font-semibold transition hover:border-site-action hover:bg-site-media lg:min-h-8 ${actionControlSurfaceClass} ${focusRingClass}`}
       >
         <Info className="mr-1.5 size-4" />
-        Más información
-      </span>
+        Detalles del evento
+      </Link>
       <div className="pointer-events-none relative z-10 flex items-center justify-center gap-2">
         {locationUrl ? (
           <a

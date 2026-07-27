@@ -2,7 +2,7 @@ name: Sync calendar events
 
 on:
   schedule:
-    - cron: "0 9 * * 1"
+    - cron: "0 9 * * *"
   workflow_dispatch:
 
 permissions:
@@ -18,8 +18,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CALENDAR_ICS_URL: ${{ secrets.CALENDAR_ICS_URL }}
-      CALENDAR_LOOKAHEAD_MONTHS: "6"
-      CALENDAR_MIN_FUTURE_EVENTS: "12"
       CALENDAR_TIME_ZONE: America/Costa_Rica
 
     steps:
@@ -43,18 +41,30 @@ jobs:
       - name: Typecheck
         run: pnpm run typecheck
 
+      - name: Unit tests
+        run: pnpm run test:unit
+
       - name: Build
         run: pnpm run build
 
+      - name: Generated output tests
+        run: pnpm run test:generated
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Browser tests
+        run: pnpm run test:e2e
+
       - name: Commit calendar changes
         run: |
-          if [[ -z "$(git status --porcelain src/app/data/calendarEvents.ts)" ]]; then
+          if [[ -z "$(git status --porcelain src/app/data/calendarEvents.ts src/app/data/calendarEventRegistry.json)" ]]; then
             echo "No calendar changes to commit."
             exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/app/data/calendarEvents.ts
+          git add src/app/data/calendarEvents.ts src/app/data/calendarEventRegistry.json
           git commit -m "chore: sync calendar events"
           git push

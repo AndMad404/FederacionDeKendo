@@ -23,6 +23,16 @@ export const CLIENT_ROUTE_COMPONENTS: RouteComponentRegistry = {
         default: module.AfiliadosSection,
       })),
     ),
+    event: lazy(() =>
+      import("./components/EventPage").then((module) => ({
+        default: module.EventPage,
+      })),
+    ),
+    pastEvents: lazy(() =>
+      import("./components/PastEventsSection").then((module) => ({
+        default: module.PastEventsSection,
+      })),
+    ),
   },
   notFound: lazy(() =>
     import("./components/NotFoundSection").then((module) => ({

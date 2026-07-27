@@ -13,6 +13,72 @@ state_rules:
   - Legacy claims without reproducible evidence are historical, not current coverage.
 
 latest_session:
+  id: REV-2026-07-27-02
+  requested_scope: Compare the promised Google Calendar ownership and indexable event-content model with the current project, identify unrealistic metrics, and recommend a proportionate direction.
+  actual_scope:
+    targets:
+      - .github/workflows/sync-calendar.yml
+      - scripts/sync-calendar-events.mjs
+      - src/app/types.ts
+      - src/app/data/calendarEvents.ts
+      - src/app/components/CalendarSection.tsx
+      - src/app/config/seo.ts
+      - src/app/config/seo-data.json
+      - scripts/generate-route-html.mjs
+      - generated dist/calendario/index.html and dist/sitemap.xml
+      - external ADR 002, calendar operation guide, roadmap, decision log, and technical backlog
+    axes: [ARCH, SEO]
+    included:
+      - editorial ownership and publication latency
+      - ICS-to-generated-TypeScript boundaries and content completeness
+      - event fragment URLs versus independently indexable event pages
+      - stable event identity, historical retention, prerendering, metadata, structured data, and sitemap inclusion
+      - provisional organization identity and canonical-domain timing
+      - realistic operational, indexing, rich-result, and business metrics
+    excluded:
+      - implementation or visual design of a dedicated event page
+      - legal interpretation of the pending Gaceta publication
+      - Search Console property data, analytics data, and production rich-result validation
+      - exhaustive RFC 5545 compatibility testing
+  baseline:
+    commit: 0729f5fc
+    worktree: clean
+    fingerprints:
+      sync-calendar-events.mjs: 0A83814461E06ED2F6CE78F64D0B25DF8F8AD7C9EAE073106F58B6CFFAF8E248
+      types.ts: 6D7D63147AF36705440B1CD85FB8A5D8B865DB8F3EF685AD50084C859FD6A853
+      calendarEvents.ts: D26F25C055212D70B311D380A6E9FBA8FA5632814E158D9AAA07139751EAAC05
+      CalendarSection.tsx: 2272F4F24FF792B3AFBFACC0499A56002B40E2A3413F1DEA2696BE18AC478641
+      seo.ts: B495061FD1288F74D6C9F643690F0D9BC28FF9494314E48371BBDA5297683237
+      seo-data.json: 149C2AC6E5FB17DB8E2400677C3BA0DD52F793A0AC50ACA62D5E9CCE2DE3EE5D
+      generate-route-html.mjs: 25A7A3B7DA414FF569078592C7D12EEAC2959F79BBB0135435763669678EBF62
+      sync-calendar.yml: E657ACD7F0278314B2582527AB5D06115892D5EE84F9CA89955669F8F2554AF4
+  confirmed_findings:
+    - STR-SEO-001
+    - STR-SEO-002
+    - STR-ARCH-008
+    - STR-ARCH-009
+    - SMELL-ARCH-004
+  result: Google Calendar as the editorial source and a generated static artifact fit the product, but the current implementation provides shareable fragment state rather than independently indexable event pages and needs stable identity, history, content governance, and an explicit publication SLA before the SEO promise is complete.
+
+latest_implementation:
+  id: FIX-2026-07-27-03
+  requested_scope: Implement generated static event pages backed by Google Calendar while keeping event routes noindex until Gaceta approval.
+  baseline:
+    commit: 0729f5fc
+    worktree: dirty with the prior review-state update plus this implementation
+  implemented:
+    - daily 09:00 UTC synchronization with a manual trigger
+    - hashed UID registry, canonical slugs, aliases, historical preservation, future deletion, draft and recurrence policies, warnings, and guarded atomic output
+    - prerendered event pages, temporary noindex canonicals, conditional Event JSON-LD, archive pagination, sitemap policy, and 301 redirect rules
+    - canonical event-page navigation from Home and Calendar plus old-hash redirects
+    - unit, generated-output, Playwright, CI, and synchronization verification coverage
+  deferred:
+    - official identity, canonical production domain, event indexing, Search Console, and post-launch metrics
+    - registration CTA
+    - expanded event editorial content for responsible parties, regulations, documents, results, and galleries
+  result: Event pages are statically generated and shareable now, but remain excluded from indexing and the sitemap through the central event flag.
+
+prior_external_feedback_session:
   id: REV-2026-07-27-01
   requested_scope: Validate external Kimi 3 and Claude feedback against the published site and current sources, consolidate confirmed findings, and record the result without implementing fixes.
   actual_scope:
@@ -406,6 +472,72 @@ previous_resolution:
     - gallery frame computed flex was 0 0 auto at requested 1024x640 and 1 1 0% at requested 1024x641
 
 coverage:
+  - id: COV-2026-07-27-04
+    date: 2026-07-27
+    baseline: 0729f5fc dirty worktree from FIX-2026-07-27-03
+    targets:
+      - scripts/sync-calendar-events.mjs
+      - src/app/data/calendarEventRegistry.json
+      - src/app/data/calendarEvents.ts
+      - src/app/config/events.ts
+      - src/app/config/seo.ts
+      - src/app/components/EventPage.tsx
+      - src/app/components/PastEventsSection.tsx
+      - src/app/components/CalendarSection.tsx
+      - scripts/generate-route-html.mjs
+      - .github/workflows/ci.yml
+      - .github/workflows/sync-calendar.yml
+      - tests/calendar-sync.test.mjs
+      - tests/generated-output.test.mjs
+      - tests/e2e/events.spec.ts
+    axes: [ARCH, SEO, REACT, A11Y, PERF]
+    depth: implemented_and_verified
+    evidence:
+      - seven calendar synchronization unit tests pass
+      - TypeScript strict check passes
+      - production and SSR builds generate twelve event documents, the archive, sitemap, 404, and redirect rules
+      - four generated-output assertions cover canonical/noindex, conditional Event JSON-LD, sitemap exclusion, archive, and 301 aliases
+      - ten Playwright tests cover direct navigation, old-hash redirects, event-page links from Home and Calendar, sharing, full descriptions, archive, 404, and six routes at 360x800, 390x844, 768x1024, and 1366x768
+      - all six routes keep navbar, main content, and footer visible without document scroll at 1366x768
+    limitations:
+      - production deployment and a real scheduled synchronization are not verified locally
+      - no historical event exists in the current generated dataset, so multi-page archive generation is unit- and source-covered rather than exercised by current production content
+
+  - id: COV-2026-07-27-03
+    targets:
+      - calendar generation, route generation, SEO configuration, and workflow files recorded in REV-2026-07-27-02
+      - generated dist/calendario/index.html and dist/sitemap.xml
+      - external ADR 002 and calendar operation documentation
+    axes: [ARCH, SEO]
+    included:
+      - source-to-build ownership boundary
+      - publication triggers and latency
+      - event field contract and current generated-data completeness
+      - event identity and future-only selection
+      - fragment URL, canonical metadata, prerendered route, sitemap, and Event structured-data readiness
+      - provisional identity and domain decision gate
+      - realistic measurement categories
+    excluded:
+      - event-page implementation and design
+      - legal advice
+      - production Search Console, analytics, and rich-result results
+      - exhaustive recurrence and timezone interoperability
+    depth: reviewed
+    evidence:
+      - source inspection found event shares and direct opens using /calendario/ hash fragments
+      - generated calendar HTML has one /calendario/ canonical, CollectionPage JSON-LD, and no event-specific head
+      - generated sitemap contains four static route URLs and no event URLs
+      - sync source derives ids from mutable title and date, ignores UID, and emits only selected future events
+      - current generated data contains 12 events; location is present on 10, summary on 11, and type, organizer, and infoUrl on 0
+      - workflow source runs weekly or manually and requires repository access for manual dispatch
+      - official Google Event documentation requires one unique leaf URL focused on each event and does not guarantee rich-result appearance
+    baseline:
+      commit: 0729f5fc
+      worktree: clean
+      fingerprint: per-file SHA-256 values recorded in REV-2026-07-27-02
+    status: current
+    result: The static generated-content architecture is proportionate, while five gaps separate the current calendar experience from the promised owner-operated, indexable event-content system.
+
   - id: COV-2026-07-27-02
     targets:
       - findings CRIT-A11Y-001, CRIT-A11Y-002, SMELL-A11Y-001, and POL-ARCH-001
@@ -1195,16 +1327,20 @@ legacy_coverage:
       evidence: Detailed commands and baselines were not consistently recorded in v1.
 
 active_findings:
-  - id: STR-ARCH-003
+  - id: STR-SEO-002
     level: STRUCTURAL
-    axis: ARCH
+    axis: SEO
     status: open
-    target: automated browser-test harness
-    problem: Critical routing, navigation, hydration, 404, and gallery behavior relies on manual regression checks.
-    fix: Add a minimal browser-test harness covering the highest-risk route and interaction paths.
-    cost_of_deferring: Regressions remain expensive to detect and easy to miss during solo development.
-    evidence: migrated from v1 state; package scripts were not revalidated in this session
-    introduced_in: legacy-v1
+    target: src/app/config/seo-data.json and canonical domain policy
+    problem: The public indexable configuration declares a SportsOrganization with an official federation name and "Sitio oficial" copy while the owner reports that Gaceta publication and authorization to use official names are still pending.
+    fix: Obtain an explicit client-approved interim publication policy—approved provisional identity or staging noindex—and perform one controlled canonical-name and domain cutover with redirects after officialization.
+    cost_of_deferring: Search engines can associate authority with a provisional entity and pages.dev URLs, creating reputational ambiguity and avoidable migration work.
+    evidence:
+      - user-provided business constraint in REV-2026-07-27-02
+      - seo-data.json:2-4 publishes pages.dev, the federation name, and Sitio oficial
+      - generated calendar JSON-LD identifies the entity as SportsOrganization
+      - robots.txt allows crawling and references the public sitemap
+    introduced_in: REV-2026-07-27-02
 
   - id: STR-ARCH-004
     level: STRUCTURAL
@@ -1233,6 +1369,48 @@ active_findings:
     introduced_in: REV-2026-07-21-01
 
 resolved_findings:
+  - id: STR-SEO-001
+    status: resolved
+    resolved_at: 2026-07-27
+    summary: Every generated event has a dedicated prerendered canonical page with conditional Event JSON-LD, and Home and Calendar link to it directly; legacy calendar hashes redirect to the canonical page.
+    resolution:
+      resolved_ref: 0729f5fc dirty worktree recorded in FIX-2026-07-27-03
+      checks: [unit tests, typecheck, build, generated-output tests, Playwright direct route and hash tests]
+    limitation: Event routes remain intentionally noindex and excluded from the sitemap until official approval.
+
+  - id: STR-ARCH-008
+    status: resolved
+    resolved_at: 2026-07-27
+    summary: Synchronization uses a non-reversible UID hash for identity, preserves canonical and previous slugs, deletes missing future events, and retains completed events indefinitely.
+    resolution:
+      resolved_ref: 0729f5fc dirty worktree recorded in FIX-2026-07-27-03
+      checks: [UID unit test, alias unit test, future-deletion unit test, historical-preservation unit test, generated 301 test]
+
+  - id: STR-ARCH-009
+    status: resolved
+    resolved_at: 2026-07-27
+    summary: Calendar authoring now has explicit draft, recurrence, incomplete-content, timed cross-date, deletion, placeholder, and structured-data eligibility policies.
+    resolution:
+      resolved_ref: 0729f5fc dirty worktree recorded in FIX-2026-07-27-03
+      checks: [fixture-based unit tests, Action summary implementation, conditional Event JSON-LD test]
+    limitation: Registration CTA and expanded editorial fields remain research items.
+
+  - id: STR-ARCH-003
+    status: resolved
+    resolved_at: 2026-07-27
+    summary: Playwright now covers critical direct routing, hash/modal behavior, event links, sharing, dialogs, archive, 404, and the responsive route matrix.
+    resolution:
+      resolved_ref: 0729f5fc dirty worktree recorded in FIX-2026-07-27-03
+      checks: [nine local Playwright tests]
+
+  - id: SMELL-ARCH-004
+    status: resolved
+    resolved_at: 2026-07-27
+    summary: Calendar synchronization now runs daily at 09:00 UTC with an accepted publication latency of up to 24 hours and retains manual workflow dispatch.
+    resolution:
+      resolved_ref: 0729f5fc dirty worktree recorded in FIX-2026-07-27-03
+      checks: [workflow source inspection]
+
   - id: STR-ARCH-001
     status: resolved
     resolved_at: 2026-07-27
@@ -1240,7 +1418,7 @@ resolved_findings:
     resolution:
       resolved_ref: 32fa7f7d dirty worktree fingerprint recorded in FIX-2026-07-27-02
       checks: [typecheck, build, workflow source inspection]
-    limitation: The first hosted GitHub Actions execution can only be confirmed after the workflow is pushed.
+    hosted_verification: CI run 1 passed on main for commit 0729f5f in 24 seconds, as shown in the owner-provided GitHub Actions evidence.
 
   - id: CRIT-A11Y-001
     status: resolved
@@ -1444,6 +1622,22 @@ resolved_findings:
     resolution: { resolved_ref: f35c9557 dirty worktree, checks: [typecheck, build, browser matrix] }
 
 pending_reviews:
+  - id: PEND-SEO-003
+    target: client-approved provisional name, official-name cutover, canonical domain, and redirect policy
+    axes: [SEO, ARCH]
+    reason: The owner confirmed that Gaceta publication is pending, but the exact legally approved interim public identity and final domain are not yet available.
+  - id: PEND-SEO-004
+    target: production event-page indexing, Event rich results, impressions, clicks, and conversion baselines
+    axes: [SEO, PERF]
+    reason: Dedicated event pages now exist behind temporary noindex, but Gaceta approval, production indexing, Search Console, and analytics data remain unavailable.
+  - id: PEND-ARCH-003
+    target: event registration CTA and participation workflow
+    axes: [ARCH]
+    reason: The first event-page version intentionally excludes registration; requirements, destination, ownership, and eligibility rules need client research.
+  - id: PEND-ARCH-004
+    target: expanded event editorial page
+    axes: [ARCH]
+    reason: Responsible parties, regulations, documents, results, and per-event galleries were explicitly deferred from the first generated-page version.
   - id: PEND-A11Y-001
     target: implemented multi-day event range with a real screen reader
     axes: [A11Y]
