@@ -31,7 +31,7 @@ export function PastEventsSection() {
       className="relative mt-2 flex min-h-[calc(100svh_-_4rem_-_10px)] w-full flex-col overflow-hidden rounded-xl bg-site-canvas text-site-text land-sm:min-h-[calc(100svh_-_3rem_-_6px)] tall-md:h-[calc(100%_-_0.5rem)] tall-md:min-h-0"
     >
       <MediaPageBanner
-        className="relative h-24 shrink-0 overflow-hidden land-compact:h-16"
+        className="relative z-10 h-28 shrink-0 overflow-hidden land-compact:h-20"
         titleId="past-events-title"
         title="Eventos pasados"
         description="Archivo histórico de actividades publicadas."
