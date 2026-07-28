@@ -3,6 +3,28 @@ import type { CalendarEvent } from "../types";
 // Auto-generated from Google Calendar. Do not edit manually.
 export const CALENDAR_EVENTS: CalendarEvent[] = [
   {
+    id: "2026-05-02-federacion-examen",
+    aliases: ["federacion-examen-2026-05-02"],
+    title: "FEDERACIÓN  : Examen",
+    date: "2026-05-02",
+    timeZone: "America/Costa_Rica"
+  },
+  {
+    id: "2026-05-29-clak-seminario-instructores-chile",
+    aliases: ["clak-seminario-instructores-chile-2026-05-29"],
+    title: "CLAK Seminario Instructores CHILE",
+    date: "2026-05-29",
+    endDate: "2026-06-01",
+    timeZone: "America/Costa_Rica"
+  },
+  {
+    id: "2026-05-30-federacion-seminario-y-reunion",
+    aliases: ["federacion-seminario-y-reunion-2026-05-30"],
+    title: "FEDERACIÓN : Seminario y Reunión",
+    date: "2026-05-30",
+    timeZone: "America/Costa_Rica"
+  },
+  {
     id: "2026-08-08-examen",
     aliases: ["examen-2026-08-08"],
     title: "Examen",
@@ -121,6 +143,28 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
     aliases: ["6to-torneo-2027-08-14"],
     title: "6to Torneo",
     date: "2027-08-14",
+    startTime: "13:00",
+    endTime: "17:00",
+    location: "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
+    summary: "Categoría con Bogu y sin Bogu",
+    timeZone: "America/Costa_Rica"
+  },
+  {
+    id: "2027-10-30-examen",
+    aliases: ["examen-2027-10-30"],
+    title: "Examen",
+    date: "2027-10-30",
+    startTime: "13:00",
+    endTime: "15:00",
+    location: "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
+    summary: "Exámenes de 8vo a 2do kyu",
+    timeZone: "America/Costa_Rica"
+  },
+  {
+    id: "2027-12-11-7mo-torneo",
+    aliases: ["7mo-torneo-2027-12-11"],
+    title: "7mo Torneo",
+    date: "2027-12-11",
     startTime: "13:00",
     endTime: "17:00",
     location: "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
