@@ -2,7 +2,7 @@
 
 ```yaml
 schema_version: 2
-last_updated: 2026-07-27
+last_updated: 2026-07-30
 contract: .agents/review-contract.md
 
 state_rules:
@@ -77,6 +77,95 @@ latest_implementation:
     - registration CTA
     - expanded event editorial content for responsible parties, regulations, documents, results, and galleries
   result: Event pages are statically generated and shareable now, but remain excluded from indexing and the sitemap through the central event flag.
+
+latest_style_review_session:
+  id: REV-2026-07-27-03
+  requested_scope: Evaluate whether the generated event-page styles agree with the rest of the site.
+  actual_scope:
+    targets:
+      - src/app/components/EventPage.tsx
+      - src/app/components/PastEventsSection.tsx
+      - src/app/components/CalendarSection.tsx
+      - src/app/components/AfiliadosSection.tsx
+      - src/app/components/HeroSection.tsx
+      - src/app/components/calendar/CalendarEventCard.tsx
+      - src/app/components/affiliates/DojoCard.tsx
+      - src/app/components/ui/MediaPageBanner.tsx
+      - src/app/styles/shared.ts
+      - owner-provided event-page screenshot
+    axes: [ARCH, TAILWIND, RESPONSIVE]
+    included:
+      - banner geometry and treatment
+      - semantic color tokens, surfaces, radii, shadows, buttons, typography, spacing, and central-content composition
+      - comparison with Calendar and Affiliates as the closest internal-page references
+    excluded:
+      - Figma pixel fidelity because no current Figma node was supplied
+      - SEO, copy quality, React behavior, and production deployment
+      - exhaustive visual inspection of every site route
+  baseline:
+    commit: 711945b7
+    worktree: clean
+    fingerprints:
+      EventPage.tsx: 0808380A58D6F38E04DC215087716E3179BEDE2F46FC6E3E981FE5A15F7D7803
+      PastEventsSection.tsx: 181C1397B09EA8AD8E6B86E7C31D5B446AE1145FEEAD4734F6A20F8CDF820283
+      CalendarSection.tsx: 368C23442C335EFF520A5FEBF1A2A7361E7B35C41A544214E9CF9809F235E72B
+      AfiliadosSection.tsx: 6C9DA0D00B44CACC744CF12BA16977A541B606971B63C9F02A4565CAAFB932E7
+      MediaPageBanner.tsx: 17514E30E5F9B558B9D7DC135AC37E3616ED108686AC99BDB6EF5BA1AAF2BE04
+      shared.ts: 0EA18BC10AAF6F7C86D574CB3B3B384A2793D84ACB5D2315A630D5D336A98809
+  confirmed_findings: [POL-ARCH-002]
+  result: Event routes use the same visual system and shared primitives as the inspected site references; the remaining difference is a narrower, non-overlapping central-content composition.
+
+latest_knip_review_session:
+  id: REV-2026-07-30-01
+  requested_scope: Validate the user-provided Knip 6.29.0 report.
+  actual_scope:
+    targets:
+      - src/app/components/ui/ModalShell.tsx
+      - src/entry-server.tsx
+      - src/app/components/calendar/CalendarMonth.tsx
+      - src/app/config/seo.ts
+      - src/app/styles/shared.ts
+      - src/app/utils/eventRoutes.ts
+      - package.json build script
+      - scripts/generate-route-html.mjs
+    axes: [ARCH, TS, TAILWIND]
+    included:
+      - static reference tracing for every reported file, export, and exported type
+      - build-entry and generated SSR consumer boundaries
+      - distinction between dead declarations, excessive module visibility, and Knip false positives
+    excluded:
+      - implementation or deletion of reported declarations
+      - runtime, visual, accessibility, performance, and SEO behavior
+      - a fresh Knip execution
+  baseline:
+    commit: 711945b7
+    worktree: dirty because .codex/review-state.md already contained the prior style-review update
+  confirmed_findings: [SMELL-ARCH-005, POL-TW-007, POL-TS-001]
+  invalidated_reports:
+    - src/entry-server.tsx is the explicit Vite SSR entry in package.json.
+    - getEventRedirects and getRouteSitemapImageUrls cross the generated dist-ssr boundary and are consumed by scripts/generate-route-html.mjs.
+  result: Two declarations are dead, three declarations only expose unnecessary module API, and the SSR entry plus its two SEO exports are false positives caused by the generated build boundary.
+
+latest_knip_cleanup:
+  id: FIX-2026-07-30-01
+  source_session: REV-2026-07-30-01
+  baseline:
+    commit: 711945b7
+    worktree: dirty with the prior review-state update
+  implemented:
+    - removed the orphaned ModalShell component and unused badgeClass declaration
+    - made CALENDAR_EVENTS_PER_PAGE, PreloadImage, and findEventBySlug module-private
+    - configured src/entry-server.tsx as an explicit Knip entry while preserving getEventRedirects and getRouteSitemapImageUrls
+    - kept Knip outside package.json and pnpm-lock.yaml; local use is through the globally installed Knip 6.29.0
+    - preserved the pending-Gaceta identity, indexing, metadata, and canonical-domain policy unchanged
+  resolved_findings: [SMELL-ARCH-005, POL-TW-007, POL-TS-001]
+  checks:
+    - corepack pnpm run typecheck passed
+    - corepack pnpm run build passed, including the SSR bundle and generated route HTML
+    - npx.cmd --yes knip@6.29.0 passed with no findings or configuration hints
+    - the globally installed knip command reports 6.29.0 and passes with no findings
+    - git diff --check passed
+  result: The confirmed dead code and excessive exports are removed, the SSR build boundary is modeled for Knip, and the preserved SSR exports remain operational.
 
 prior_external_feedback_session:
   id: REV-2026-07-27-01
@@ -472,6 +561,23 @@ previous_resolution:
     - gallery frame computed flex was 0 0 auto at requested 1024x640 and 1 1 0% at requested 1024x641
 
 coverage:
+  - id: COV-2026-07-30-01
+    date: 2026-07-30
+    baseline: 711945b7 dirty worktree
+    targets:
+      - the eight Knip 6.29.0 reports supplied by the user
+      - package.json:7
+      - scripts/generate-route-html.mjs:5-11,129,146
+    axes: [ARCH, TS, TAILWIND]
+    included: [static references, module visibility, build-entry boundaries]
+    excluded: [implementation, runtime behavior, visual behavior, fresh Knip execution]
+    depth: reviewed
+    evidence:
+      - rg reference search across tracked source, scripts, tests, package metadata, and documentation
+      - direct inspection of all reported source declarations
+      - package.json identifies src/entry-server.tsx as the Vite SSR entry
+      - generate-route-html.mjs imports the two SEO helpers from generated dist-ssr/entry-server.js
+
   - id: COV-2026-07-27-04
     date: 2026-07-27
     baseline: 0729f5fc dirty worktree from FIX-2026-07-27-03
@@ -1368,7 +1474,47 @@ active_findings:
       - current main at 71875972 does not yet contain the calendar route in seo-data.json or App.tsx
     introduced_in: REV-2026-07-21-01
 
+  - id: POL-ARCH-002
+    level: POLISH
+    axis: ARCH
+    status: open
+    target: src/app/components/EventPage.tsx and src/app/components/PastEventsSection.tsx
+    problem: Event routes use a max-w-5xl panel in normal flow, with the detail page vertically centered, while Calendar and Affiliates use max-w-6xl content that overlaps the media banner.
+    fix: If strict visual parity is desired, reuse the internal-page overlap wrapper and max-w-6xl width while retaining the event-specific two-column content.
+    cost_of_deferring: The pages remain usable and on-brand, but retain visibly more whitespace and feel slightly separate from the established internal-page family.
+    evidence:
+      - EventPage.tsx:93-95 uses tall-md:items-center and max-w-5xl
+      - PastEventsSection.tsx:54-55 uses normal flow and max-w-5xl
+      - CalendarSection.tsx:282-284 uses negative overlap and md:max-w-6xl
+      - AfiliadosSection.tsx:85-86 uses the same overlap pattern and md:max-w-6xl
+      - owner-provided desktop screenshot shows the narrower centered event panel
+    introduced_in: REV-2026-07-27-03
+
 resolved_findings:
+  - id: SMELL-ARCH-005
+    status: resolved
+    resolved_at: 2026-07-30
+    summary: The orphaned ModalShell component was deleted while the Lightbox consumers of useModalBehavior and ModalControls were preserved.
+    resolution:
+      resolved_ref: 711945b7 dirty worktree from FIX-2026-07-30-01
+      checks: [typecheck, production and SSR build, Knip 6.29.0, git diff check]
+
+  - id: POL-TW-007
+    status: resolved
+    resolved_at: 2026-07-30
+    summary: The unused badgeClass Tailwind class group was removed from shared styles.
+    resolution:
+      resolved_ref: 711945b7 dirty worktree from FIX-2026-07-30-01
+      checks: [typecheck, production build, Knip 6.29.0]
+
+  - id: POL-TS-001
+    status: resolved
+    resolved_at: 2026-07-30
+    summary: CALENDAR_EVENTS_PER_PAGE, PreloadImage, and findEventBySlug are now module-private.
+    resolution:
+      resolved_ref: 711945b7 dirty worktree from FIX-2026-07-30-01
+      checks: [typecheck, production and SSR build, Knip 6.29.0]
+
   - id: STR-SEO-001
     status: resolved
     resolved_at: 2026-07-27

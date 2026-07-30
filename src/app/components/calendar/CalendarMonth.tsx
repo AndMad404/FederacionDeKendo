@@ -3,7 +3,7 @@ import type { UpcomingEventGroup } from "../../utils/calendarEvents";
 import { NavigationArrowButton } from "../ui/ModalControls";
 import { CalendarEventCard } from "./CalendarEventCard";
 
-export const CALENDAR_EVENTS_PER_PAGE = 2;
+const CALENDAR_EVENTS_PER_PAGE = 2;
 
 interface CalendarMonthProps {
   group: UpcomingEventGroup;

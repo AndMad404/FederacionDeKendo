@@ -6,7 +6,7 @@ export function getEventPath(event: CalendarEvent) {
   return `/eventos/${event.id}/`;
 }
 
-export function findEventBySlug(slug: string) {
+function findEventBySlug(slug: string) {
   return CALENDAR_EVENTS.find(
     (event) => event.id === slug || event.aliases?.includes(slug),
   );

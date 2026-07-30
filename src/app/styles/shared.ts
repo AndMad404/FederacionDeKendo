@@ -15,9 +15,6 @@ export const primaryButtonClass =
 export const secondaryButtonClass =
   "inline-flex min-h-11 items-center justify-center rounded-lg border border-site-action bg-site-surface px-5 py-2 font-bold text-site-action transition-colors hover:bg-site-media";
 
-export const badgeClass =
-  "inline-flex items-center rounded-full bg-site-accent-soft px-3 py-1 text-sm font-bold text-site-accent-strong";
-
 export const actionControlSurfaceClass =
   "border border-site-border bg-site-surface text-site-action";
 

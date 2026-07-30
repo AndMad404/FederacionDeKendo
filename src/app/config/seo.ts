@@ -21,7 +21,7 @@ export type RouteComponent =
   | "event"
   | "pastEvents";
 
-export interface PreloadImage {
+interface PreloadImage {
   href: string;
   type?: string;
   srcSet?: string;

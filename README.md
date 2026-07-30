@@ -24,6 +24,24 @@ Genera el build de produccion:
 pnpm run build
 ```
 
+### Diagnostico opcional con Knip
+
+Knip 6.29.0 se usa como herramienta global de diagnostico del entorno local; no
+es una dependencia del proyecto ni participa en desarrollo, CI, build o
+postbuild. La configuracion `knip.json` permanece en la raiz del repositorio
+porque describe su entrada SSR especifica.
+
+En una maquina nueva, instala la herramienta y ejecuta el analisis:
+
+```bash
+npm install --global knip@6.29.0
+knip
+```
+
+No muevas `knip.json` al directorio global de npm: sus rutas pertenecen a este
+repositorio y una actualizacion global podria reemplazar archivos en esa
+ubicacion.
+
 ## Prerender e hidratacion
 
 El build genera HTML inicial para Inicio, Galeria, Afiliados y la pagina 404:
