@@ -13,6 +13,80 @@ state_rules:
   - Legacy claims without reproducible evidence are historical, not current coverage.
 
 latest_session:
+  id: REV-2026-07-31-05
+  requested_scope: Audit the AI-generated tests as untrusted code for hallucinated claims, false positives, weak assertions, and independence from the implementation.
+  actual_scope:
+    targets:
+      - tests/e2e/events.spec.ts
+      - tests/calendar-sync.test.mjs
+      - tests/generated-output.test.mjs
+      - tests/fixtures/calendar-events.ics
+      - relevant calendar synchronization, route generation, SEO, event sharing, archive, and not-found implementations
+    axes: [ARCH, SEO, RESPONSIVE]
+    included:
+      - correspondence between each test name, arrangement, action, assertion, and claimed behavior
+      - deterministic test data, assertion specificity, negative cases, route identity, generated-output freshness, and local HTTP semantics
+      - distinction between current behavior being correct and the test being able to detect a future defect
+    excluded:
+      - editing tests or application code
+      - exhaustive mutation testing
+      - production HTTP behavior and stakeholder approval of business requirements
+      - accessibility, performance, security, and visual fidelity except where an existing test name claims them
+  baseline:
+    commit: 23907229
+    worktree: dirty only from the prior review-state update
+    test_fingerprints: unchanged from REV-2026-07-31-04
+  confirmed_findings:
+    - STR-ARCH-011
+    - SMELL-ARCH-008
+    - SMELL-ARCH-009
+    - SMELL-SEO-005
+    - STR-RESP-002
+  result: No fabricated test execution was found, but several tests overstate what their assertions prove; passing status must remain provisional until the owner approves the acceptance criteria and the highest-risk tests are strengthened or mutation-checked.
+
+previous_test_strategy_review:
+  id: REV-2026-07-31-04
+  requested_scope: Analyze how Playwright and the wider test strategy are used in the project, identify performed and missing manual and automated tests, and align the result with QA interview preparation and spec-driven development.
+  actual_scope:
+    targets:
+      - playwright.config.ts
+      - tests/e2e/events.spec.ts
+      - tests/calendar-sync.test.mjs
+      - tests/generated-output.test.mjs
+      - .github/workflows/ci.yml
+      - package.json test scripts
+      - .agents/review-contract.md
+      - .agents/implementation-contract.md
+      - .agents/verification.md
+      - external technical-backlog.md
+    axes: [ARCH, A11Y, RESPONSIVE]
+    included:
+      - automated test inventory and classification
+      - Playwright configuration, locators, assertions, isolation, retries, reporters, browser coverage, CI execution, and diagnostic artifacts
+      - functional, responsive, accessibility, visual, production-smoke, and manual-test gaps
+      - requirements-to-tests traceability and specification drift
+    excluded:
+      - implementation of new tests or configuration changes
+      - exhaustive application-code review outside interactions needed to identify test gaps
+      - production deployment, live assistive-technology execution, performance benchmarking, security testing, and real-device testing
+  baseline:
+    commit: 23907229
+    worktree: clean before this review-state update
+    fingerprints:
+      playwright.config.ts: C274ECCD512A807686F5387CC0DBFC462842FD2A2E8FDF15B76B59827B6BD9BA
+      events.spec.ts: EE3A6429F533224F77E4142FAE9B31C7A7318F5F768044658C7991F7EE6494BC
+      calendar-sync.test.mjs: 58481D7F87A01D82AE228B0310F29FD42208C9A29FCEB3A160EE5ED362F1536C
+      generated-output.test.mjs: 50486325C12F6FC6EFCE538BC13FB0BC93412A8032ACB4478FB9F793FE1AA1A8
+      ci.yml: C34EE415008A76BD55F9C3163A083852F0E405917F84BE9ABEF3E40D4A15DD1C
+  confirmed_findings:
+    - STR-RESP-002
+    - STR-ARCH-010
+    - SMELL-ARCH-006
+    - SMELL-A11Y-002
+    - SMELL-ARCH-007
+  result: The project has a fast, passing automated baseline with unit, generated-artifact, browser-functional, SEO, and responsive-smoke coverage, but its browser suite remains Chromium-only and shallow for interaction, accessibility, visual fidelity, CI diagnostics, and formal requirement traceability.
+
+previous_architecture_review:
   id: REV-2026-07-27-02
   requested_scope: Compare the promised Google Calendar ownership and indexable event-content model with the current project, identify unrealistic metrics, and recommend a proportionate direction.
   actual_scope:
@@ -649,6 +723,61 @@ previous_resolution:
     - gallery frame computed flex was 0 0 auto at requested 1024x640 and 1 1 0% at requested 1024x641
 
 coverage:
+  - id: COV-2026-07-31-05
+    date: 2026-07-31
+    baseline: 23907229 dirty only from review-state documentation
+    targets:
+      - tests/e2e/events.spec.ts
+      - tests/calendar-sync.test.mjs
+      - tests/generated-output.test.mjs
+      - tests/fixtures/calendar-events.ics
+      - directly corresponding implementation paths
+    axes: [ARCH, SEO, RESPONSIVE]
+    included:
+      - false-positive risk, assertion strength, test-name accuracy, oracle independence, data determinism, and local response semantics
+    excluded:
+      - implementation, exhaustive mutation testing, production responses, stakeholder acceptance, accessibility, performance, security, and visual fidelity
+    depth: reviewed
+    status: current
+    evidence:
+      - line-by-line inspection of all 21 automated cases and their fixture
+      - direct comparison with synchronization, SEO generation, routing, sharing, archive, and not-found source
+      - current event JSON-LD independently parsed successfully from dist
+      - local preview returned 200 for both the event route and unknown event route
+      - prior execution remained 7 of 7 unit, 4 of 4 generated, and 10 of 10 Playwright cases
+
+  - id: COV-2026-07-31-04
+    date: 2026-07-31
+    baseline: 23907229 clean worktree before this review-state update
+    targets:
+      - playwright.config.ts
+      - tests/e2e/events.spec.ts
+      - tests/calendar-sync.test.mjs
+      - tests/generated-output.test.mjs
+      - .github/workflows/ci.yml
+      - package.json test scripts
+      - .agents review, implementation, and verification contracts
+      - external technical-backlog.md
+    axes: [ARCH, A11Y, RESPONSIVE]
+    included:
+      - test taxonomy, automated coverage, CI execution, browser and device projects, retries, reporters, traces, and requirement traceability
+      - current user-interaction inventory used only to identify missing browser scenarios
+    excluded:
+      - implementation changes
+      - full source-code review of the interaction components
+      - production, real-device, screen-reader, performance, load, and security execution
+    depth: reviewed_and_locally_verified
+    status: current
+    evidence:
+      - Playwright 1.62.0 read from installed package metadata
+      - corepack pnpm run typecheck passed
+      - corepack pnpm run test:unit passed 7 of 7
+      - corepack pnpm run build passed
+      - corepack pnpm run test:generated passed 4 of 4
+      - corepack pnpm run test:e2e passed 10 of 10
+      - direct inspection of configuration, workflow, all three test files, project contracts, and technical backlog
+      - official Playwright documentation for best practices, projects, visual comparisons, accessibility, and CI
+
   - id: COV-2026-07-31-02
     date: 2026-07-31
     baseline: 39386711 dirty worktree from FIX-2026-07-31-02
@@ -1587,6 +1716,133 @@ legacy_coverage:
       evidence: Detailed commands and baselines were not consistently recorded in v1.
 
 active_findings:
+  - id: STR-ARCH-011
+    level: STRUCTURAL
+    axis: ARCH
+    status: open
+    target: AI-generated automated test suite and feature acceptance criteria
+    problem: The same agent produced much of the implementation and its tests without an independently owner-approved acceptance oracle, so internally consistent mistakes can pass together.
+    fix: Translate every high-risk test into owner-readable Given/When/Then criteria, obtain explicit approval, and then mutation-check that breaking the required behavior makes the test fail.
+    cost_of_deferring: Passing CI can be mistaken for product approval even when both code and assertions encode the same incorrect assumption.
+    evidence:
+      - owner states the generated tests have not been reviewed
+      - tests contain no stable requirement IDs linked to an owner-approved specification
+      - multiple test names make claims stronger than their assertions
+    introduced_in: REV-2026-07-31-05
+
+  - id: SMELL-ARCH-008
+    level: SMELL
+    axis: ARCH
+    status: open
+    target: tests/calendar-sync.test.mjs, tests/generated-output.test.mjs, and tests/e2e/events.spec.ts
+    problem: Several names overclaim their assertions, including stable hash without repeated evaluation, valid JSON-LD without JSON parsing, prerendering with JavaScript enabled, complete description from one excerpt, and historical archive from heading and page count only.
+    fix: Rename tests to their actual scope or strengthen assertions to prove the named behavior with exact outputs, parsed structures, disabled-JavaScript or raw-response checks, and representative archive entries.
+    cost_of_deferring: Reports will communicate coverage that the suite cannot actually guarantee.
+    evidence:
+      - calendar-sync.test.mjs:17-29 evaluates the hash once
+      - generated-output.test.mjs:9-23 only regex-matches Event JSON-LD
+      - events.spec.ts:5-20 loads the browser normally
+      - events.spec.ts:54-77 checks one description excerpt and absence of a button
+      - events.spec.ts:80-91 checks archive heading/page count and not-found copy
+      - current dist JSON-LD parses successfully, but that parse is absent from the automated test
+    introduced_in: REV-2026-07-31-05
+
+  - id: SMELL-ARCH-009
+    level: SMELL
+    axis: ARCH
+    status: open
+    target: package.json test:generated and tests/generated-output.test.mjs
+    problem: The generated-output command reads the existing dist directory without building it, so it can pass against stale artifacts when run directly outside the ordered CI workflow.
+    fix: Encode freshness in the command, for example with a dedicated pretest build/generation step, or test the generator in an isolated temporary output directory.
+    cost_of_deferring: Local green results may describe an older build rather than the current source tree.
+    evidence:
+      - package.json test:generated invokes only node --test
+      - generated-output.test.mjs reads ../dist directly
+      - ci.yml avoids the issue only because build precedes test:generated
+    introduced_in: REV-2026-07-31-05
+
+  - id: SMELL-SEO-005
+    level: SMELL
+    axis: SEO
+    status: open
+    target: tests/e2e/events.spec.ts custom not-found scenario
+    problem: The test proves that custom not-found copy is visible but not that an unknown URL receives the intended HTTP status, and local Vite preview currently returns 200.
+    fix: Keep the UI assertion and add a deployment-level response-status check against the actual hosting behavior after deployment.
+    cost_of_deferring: A visually correct 404 page can still be treated as a soft 404 by crawlers or monitoring.
+    evidence:
+      - events.spec.ts:89-90 asserts only visible text
+      - http://127.0.0.1:4173/eventos/ruta-inexistente/ returned HTTP 200 during this review
+      - scripts/generate-route-html.mjs generates 404.html but local preview does not prove host response semantics
+    introduced_in: REV-2026-07-31-05
+
+  - id: STR-RESP-002
+    level: STRUCTURAL
+    axis: RESPONSIVE
+    status: open
+    target: tests/e2e/events.spec.ts responsive route matrix
+    problem: The route matrix proves that navigation, main, and footer nodes exist and checks document overflow at desktop, but does not fully encode the required primary-section no-scroll invariant or horizontal-overflow and mobile reachability contracts.
+    fix: Add reusable viewport-contract assertions for document and primary-section geometry, horizontal overflow, and the intended footer visibility or reachability rule at each supported viewport.
+    cost_of_deferring: Layout regressions can pass CI while violating the project's defining desktop and responsive acceptance criteria.
+    evidence:
+      - tests/e2e/events.spec.ts route matrix
+      - .agents/verification.md responsive matrix and 1366x768 invariant
+      - current 10 of 10 Playwright cases pass
+    introduced_in: REV-2026-07-31-04
+
+  - id: STR-ARCH-010
+    level: STRUCTURAL
+    axis: ARCH
+    status: open
+    target: feature specifications, automated suites, and external technical-backlog.md
+    problem: Requirements do not have stable IDs mapped to acceptance scenarios and automated evidence, while the external backlog still states that Playwright and CI are absent.
+    fix: Maintain a lightweight requirement-to-test matrix and reconcile each feature spec, task, test ID, and current CI evidence when behavior changes.
+    cost_of_deferring: Code, tests, and planning documents can disagree without a reliable way to prove which product requirement is actually complete.
+    evidence:
+      - no per-feature requirement IDs or test mapping found in the inspected contracts and tests
+      - external technical-backlog.md dated 2026-07-13 describes the missing harness and CI
+      - playwright.config.ts and .github/workflows/ci.yml show both now exist
+    introduced_in: REV-2026-07-31-04
+
+  - id: SMELL-ARCH-006
+    level: SMELL
+    axis: ARCH
+    status: open
+    target: tests/e2e/events.spec.ts event-route scenarios
+    problem: Browser scenarios depend on a mutable generated event slug and title and sometimes select the first matching link, coupling behavior verification to current calendar content.
+    fix: Use a deterministic calendar fixture or stable seeded test event and scope locators to the intended card and acceptance condition.
+    cost_of_deferring: Legitimate editorial calendar changes can produce false failures or let ambiguous UI matches hide regressions.
+    evidence:
+      - hard-coded Examen event route and heading in tests/e2e/events.spec.ts
+      - first() used for duplicate event-detail link matches
+    introduced_in: REV-2026-07-31-04
+
+  - id: SMELL-A11Y-002
+    level: SMELL
+    axis: A11Y
+    status: open
+    target: tests/e2e/events.spec.ts and interactive route behavior
+    problem: Role-based locators provide useful semantic evidence, but the suite does not exercise keyboard focus workflows, modal focus containment, or automated accessibility scans.
+    fix: Add focused keyboard tests for navbar and gallery modal behavior plus a small axe scan on stable route states, retaining manual screen-reader testing for final verification.
+    cost_of_deferring: Keyboard and detectable accessibility regressions remain invisible to CI until a manual review finds them.
+    evidence:
+      - current Playwright suite has no keyboard or axe assertions
+      - PEND-A11Y-001 retains real screen-reader verification
+    introduced_in: REV-2026-07-31-04
+
+  - id: SMELL-ARCH-007
+    level: SMELL
+    axis: ARCH
+    status: open
+    target: playwright.config.ts and .github/workflows/ci.yml
+    problem: CI runs only Chromium with the GitHub reporter and does not upload a Playwright HTML report or trace artifacts, limiting portability evidence and failure diagnosis.
+    fix: Keep the full suite economical, add a Firefox/WebKit smoke project where justified, use one CI worker for stability, and upload HTML and test-results artifacts on failure.
+    cost_of_deferring: Browser-specific defects and intermittent CI failures will be slower to reproduce and diagnose.
+    evidence:
+      - playwright.config.ts defines no projects or CI worker limit and uses trace on first retry
+      - ci.yml installs only Chromium and has no artifact-upload step
+      - official Playwright projects and CI guidance
+    introduced_in: REV-2026-07-31-04
+
   - id: STR-SEO-002
     level: STRUCTURAL
     axis: SEO
