@@ -35,9 +35,9 @@ const ICON_MAP: Record<IconKey, ReactNode> = {
 };
 
 const INFO_GRID =
-  "grid w-full grid-cols-[2rem_minmax(0,1fr)] items-center gap-x-2 gap-y-2 sm:gap-x-4 md:grid-cols-[2.5rem_minmax(11rem,1.1fr)_1.5rem_2.5rem_minmax(0,1fr)] md:gap-y-4 lg:grid-cols-[3rem_minmax(13rem,1.1fr)_2rem_3rem_minmax(0,1fr)] land-compact:grid-cols-[1.75rem_minmax(0,1fr)] land-compact:gap-x-2 land-compact:gap-y-1";
+  "grid w-full grid-cols-[2rem_minmax(0,1fr)] items-center gap-x-2 gap-y-2 sm:gap-x-4 md:grid-cols-[2.5rem_minmax(11rem,1.1fr)_2.5rem_minmax(0,1fr)] md:gap-y-4 lg:grid-cols-[3rem_minmax(13rem,1.1fr)_3rem_minmax(0,1fr)] land-compact:grid-cols-[1.75rem_minmax(0,1fr)] land-compact:gap-x-2 land-compact:gap-y-1";
 const SCHEDULE_GRID =
-  "grid w-full grid-cols-1 items-center gap-y-1 text-center md:grid-cols-[2.5rem_minmax(0,1fr)_2rem_2.5rem_minmax(0,1fr)] md:gap-x-4 md:gap-y-4 lg:grid-cols-[3rem_minmax(0,1fr)_2.5rem_3rem_minmax(0,1fr)] land-compact:grid-cols-[minmax(0,1fr)_max-content] land-compact:items-baseline land-compact:gap-x-2 land-compact:text-left";
+  "grid w-full grid-cols-1 items-center gap-y-1 text-center md:grid-cols-[2.5rem_minmax(11rem,1.1fr)_2.5rem_minmax(0,1fr)] md:gap-x-4 md:gap-y-4 lg:grid-cols-[3rem_minmax(13rem,1.1fr)_3rem_minmax(0,1fr)] land-compact:grid-cols-[minmax(0,1fr)_max-content] land-compact:items-baseline land-compact:gap-x-2 land-compact:text-left";
 
 function getInfoRows(info: InfoItem[]) {
   return info.reduce<InfoItem[][]>((rows, item, index) => {
@@ -53,9 +53,9 @@ function getInfoRows(info: InfoItem[]) {
 
 function InfoCell({ item, side }: { item: InfoItem; side: "left" | "right" }) {
   const iconColumn =
-    side === "left" ? "col-start-1" : "md:col-start-4 land-compact:col-start-1";
+    side === "left" ? "col-start-1" : "md:col-start-3 land-compact:col-start-1";
   const textColumn =
-    side === "left" ? "col-start-2" : "md:col-start-5 land-compact:col-start-2";
+    side === "left" ? "col-start-2" : "md:col-start-4 land-compact:col-start-2";
 
   return (
     <Fragment>
@@ -87,7 +87,7 @@ function ScheduleRow({ days, hours }: Pick<ScheduleSlot, "days" | "hours">) {
       <dt className="text-center text-base [overflow-wrap:anywhere] md:col-start-2 md:text-left land-compact:col-start-auto land-compact:leading-tight">
         {days}
       </dt>
-      <dd className="text-center [overflow-wrap:anywhere] md:col-start-5 md:text-left land-compact:col-start-auto land-compact:leading-tight">
+      <dd className="text-center [overflow-wrap:anywhere] md:col-start-4 md:text-left land-compact:col-start-auto land-compact:leading-tight">
         {hours}
       </dd>
     </div>
