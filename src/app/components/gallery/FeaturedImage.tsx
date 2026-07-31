@@ -109,30 +109,30 @@ export function FeaturedImage({
       />
 
       <figcaption className="absolute inset-x-0 bottom-0">
-        <div className={`grid w-full items-center px-16 py-4 text-center sm:grid-cols-[minmax(0,1fr)_auto] sm:grid-rows-[auto_auto] sm:items-start sm:px-20 sm:text-left land-sm:grid-rows-[auto_auto_auto] land-sm:gap-x-6 land-sm:gap-y-0.5 land-sm:px-20 land-sm:py-2 ${mediaCaptionSurfaceClass}`}>
-          <h2 className="text-xl font-bold leading-tight sm:text-2xl land-sm:row-span-3 land-sm:self-center land-sm:text-base">
+        <div className={`grid w-full items-center p-2.5 text-center sm:grid-cols-[minmax(0,1fr)_auto] sm:grid-rows-[auto_auto_auto] sm:items-start sm:px-20 sm:text-left land-sm:grid-rows-[auto_auto] land-sm:gap-x-6 land-sm:gap-y-0.5 land-sm:px-20 land-sm:py-2 ${mediaCaptionSurfaceClass}`}>
+          <h2 className="text-xl font-bold leading-tight sm:col-start-1 sm:row-start-1 sm:self-baseline sm:text-2xl land-sm:text-base">
             {displayTitle}
           </h2>
-          <p className="truncate pt-1 text-base font-bold uppercase tracking-widest text-site-accent-soft sm:col-start-2 sm:row-start-1 sm:text-right land-sm:text-[10px]">
+          <p className="truncate text-xl font-bold uppercase leading-tight tracking-widest text-site-accent-soft sm:col-start-2 sm:row-start-1 sm:self-baseline sm:text-right sm:text-2xl land-sm:text-base">
             {displayTag}
           </p>
           {previewText && (
             <p className="text-sm leading-snug text-site-subtle sm:col-start-1 sm:row-start-2 land-sm:hidden">
               {previewText}
-              {descriptionPreview?.isTruncated && (
-                <span
-                  aria-hidden="true"
-                  className="block font-bold text-site-on-dark underline underline-offset-2 transition-colors group-hover:text-site-accent-soft"
-                >
-                  {OPEN_DETAILS_LABEL}
-                </span>
-              )}
             </p>
           )}
-          <p className="hidden font-bold text-site-on-dark underline underline-offset-2 transition-colors group-hover:text-site-accent-soft land-sm:col-start-2 land-sm:row-start-2 land-sm:block land-sm:text-sm land-sm:leading-none">
-            {OPEN_DETAILS_LABEL}
+          <p
+            aria-hidden="true"
+            className={`${descriptionPreview?.isTruncated ? "relative block" : "hidden"} font-bold text-site-on-dark underline underline-offset-2 transition-colors group-hover:text-site-accent-soft sm:col-start-1 sm:row-start-3 sm:mt-2.5 sm:self-baseline land-sm:row-start-2 land-sm:mt-0 land-sm:block land-sm:text-sm land-sm:leading-none`}
+          >
+            <span>{OPEN_DETAILS_LABEL}</span>
+            {descriptionPreview?.isTruncated && (
+              <span className="absolute right-0 top-1/2 -translate-y-1/2 text-xs font-normal text-site-on-dark no-underline sm:hidden">
+                {positionLabel}
+              </span>
+            )}
           </p>
-          <p className="text-right text-xs land-sm:col-start-2 land-sm:row-start-3 land-sm:text-[10px] land-sm:leading-none">
+          <p className={`${descriptionPreview?.isTruncated ? "hidden sm:block" : ""} text-right text-xs sm:col-start-2 sm:row-start-3 sm:mt-2.5 sm:self-baseline land-sm:row-start-2 land-sm:mt-0 land-sm:text-[10px] land-sm:leading-none`}>
             {positionLabel}
           </p>
         </div>

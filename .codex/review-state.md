@@ -2,7 +2,7 @@
 
 ```yaml
 schema_version: 2
-last_updated: 2026-07-30
+last_updated: 2026-07-31
 contract: .agents/review-contract.md
 
 state_rules:
@@ -166,6 +166,31 @@ latest_knip_cleanup:
     - the globally installed knip command reports 6.29.0 and passes with no findings
     - git diff --check passed
   result: The confirmed dead code and excessive exports are removed, the SSR build boundary is modeled for Knip, and the preserved SSR exports remain operational.
+
+latest_affiliates_layout_fix:
+  id: FIX-2026-07-31-01
+  requested_scope: Remove one redundant spacing block and align the contact and schedule text columns in the affiliate dojo cards.
+  baseline:
+    commit: c45ee08f
+    worktree: clean
+  resolved_ref: c20a8bcd
+  implemented:
+    - removed the explicit empty desktop spacer column from the contact and schedule grids
+    - moved the right-side contact and schedule content into the resulting four-column grid
+    - matched the schedule column proportions to the contact grid so both text columns share the same horizontal starts
+    - preserved the compact-landscape two-column overrides and public dojo copy
+  verification:
+    source_fingerprint_sha256: 4FCABCC1A3B3013C603AF50D9A352596EBF4EE8F0620F8F4FAD60BC1A35297BF
+    checks:
+      - corepack pnpm run typecheck passed
+      - corepack pnpm run build passed, including the SSR bundle and generated route HTML
+      - local /afiliados at 1366x768 kept document clientHeight and scrollHeight at 768 with no horizontal overflow
+      - the first dojo card kept client and scroll dimensions equal at 558x440
+      - contact and schedule grid columns both computed to 47.9972px 207.997px 47.9972px 158.224px
+      - left text starts matched at 196.0795px and right text starts matched at 484.0625px
+      - git diff --check passed
+  limitation: Production deployment was not inspected; the evidence applies to the local implementation.
+  result: Affiliate contact and schedule text columns are aligned without the redundant spacer or desktop overflow.
 
 prior_external_feedback_session:
   id: REV-2026-07-27-01

@@ -114,4 +114,25 @@ Las rutas LCP usan variantes responsive:
 - `public/images/affiliates/kendo-affiliates-768.webp`
 - `public/images/affiliates/kendo-affiliates-1200.webp`
 
+### Contrato responsive del pie de galeria
+
+`src/app/components/gallery/FeaturedImage.tsx` mantiene un pie superpuesto con
+reglas explicitas por viewport:
+
+- Movil, antes de `sm`: composicion centrada en una columna, padding de 10 px
+  (`p-2.5`), titulo y tag de 20 px, descripcion visible, accion centrada y
+  contador a 10 px del borde derecho.
+- Tablet y escritorio, desde `sm`: dos columnas y tres filas. Titulo y tag
+  comparten tamano de 24 px y linea base en la primera fila; la descripcion
+  ocupa la segunda; accion y contador comparten linea base en la tercera. La
+  fila inferior conserva 10 px de separacion sobre la descripcion.
+- Landscape compacto (`orientation: landscape` y `max-height: 640px`):
+  cuadricula de dos columnas y dos filas. La descripcion se oculta; titulo y
+  tag comparten tamano de 16 px y linea base arriba, y accion y contador se
+  alinean abajo.
+
+Al modificar este pie, verifica al menos `386x669`, `669x386`, `768x1024` y
+`1366x768`. El documento y el carrusel no deben tener overflow horizontal, y
+el modo landscape debe conservar sus dos filas dentro del viewport.
+
 Si Windows reporta una imagen como ocupada, cierra el navegador, vistas previas o el servidor local que la este usando y vuelve a correr el comando.
