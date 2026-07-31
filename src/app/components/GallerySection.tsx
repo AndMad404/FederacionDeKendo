@@ -32,11 +32,11 @@ export function GallerySection() {
         id="gallery-title"
         placement="floating"
         tone="media"
-        className="!p-0"
+        density="flush"
       >
         Galería de kendo
       </PageTitle>
-      <div className="mx-auto flex min-h-0 flex-col tall-md:h-full">
+      <div className="flex min-h-0 flex-col tall-md:h-full">
         <div className="flex min-h-0 flex-1 flex-col">
           <div className="flex min-h-0 flex-1 flex-col gap-2 land-sm:gap-1">
             <FeaturedImage

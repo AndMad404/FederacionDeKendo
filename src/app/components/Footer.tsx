@@ -8,20 +8,16 @@ export function Footer() {
           aria-labelledby="footer-purpose-title"
           className="flex max-w-md flex-col items-center gap-3 md:gap-2"
         >
-          <div className="flex items-center justify-center">
-            <div className="flex items-baseline">
-              <h2
-                id="footer-purpose-title"
-                className="flex items-baseline gap-1 text-lg font-extrabold tracking-widest text-site-on-dark"
-              >
-                Propósito del{" "}
-                <span className="text-lg font-bold text-site-accent-on-dark">
-                  KENDO
-                </span>
-              </h2>
-            </div>
-          </div>
-          <p className="text-base leading-relaxed">
+          <h2
+            id="footer-purpose-title"
+            className="flex items-baseline gap-1 text-lg font-extrabold tracking-widest"
+          >
+            Propósito del{" "}
+            <span className="text-lg font-bold text-site-accent-on-dark">
+              KENDO
+            </span>
+          </h2>
+          <p className="leading-relaxed">
             El concepto del Kendo es disciplinar el carácter humano a través de la aplicación de los principios de la Katana.
           </p>
         </section>
@@ -36,18 +32,16 @@ export function Footer() {
           >
             Contactos de la Federación
           </h2>
-          <div className="flex flex-col items-center justify-center md:flex-row">
-            <ul className="flex flex-col gap-1 text-base">
-              <li>
-                <a
-                  className={`underline-offset-4 hover:text-site-accent-soft hover:underline ${focusRingClass}`}
-                  href="mailto:secretaria.fedekendo@outlook.com"
-                >
-                  secretaria.fedekendo@outlook.com
-                </a>
-              </li>
-            </ul>
-          </div>
+          <ul className="flex flex-col gap-1 text-base">
+            <li>
+              <a
+                className={`underline-offset-4 hover:text-site-accent-soft hover:underline ${focusRingClass}`}
+                href="mailto:secretaria.fedekendo@outlook.com"
+              >
+                secretaria.fedekendo@outlook.com
+              </a>
+            </li>
+          </ul>
         </section>
       </div>
       <div className="px-4 pb-4 md:pb-3">

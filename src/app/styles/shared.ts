@@ -3,8 +3,11 @@
 export const focusRingClass =
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-site-focus";
 
+export const surfaceClass =
+  "border border-site-border bg-site-surface shadow-sm";
+
 export const panelSurfaceClass =
-  "rounded-xl border border-site-border bg-site-surface text-site-text shadow-sm";
+  `rounded-xl text-site-text ${surfaceClass}`;
 
 export const mediaCaptionSurfaceClass =
   "bg-gradient-to-r from-site-navy via-site-navy/95 to-site-navy/75 text-site-on-dark";

@@ -141,7 +141,7 @@ export function FeaturedImage({
       <button
         type="button"
         aria-label={`${displayTitle}. ${displayTag}. ${positionLabel}. ${OPEN_DETAILS_LABEL} en la galería`}
-        className={`absolute inset-0 z-10 block h-full w-full touch-pan-y cursor-pointer ${focusRingClass}`}
+        className={`absolute inset-0 z-10 touch-pan-y cursor-pointer ${focusRingClass}`}
         onClick={(event) => {
           if (consumeSwipe()) {
             event.preventDefault();

@@ -8,7 +8,7 @@ import { useLocation, useNavigate } from "react-router";
 import { CALENDAR_EVENTS } from "../data/calendarEvents";
 import type { CalendarEvent } from "../types";
 import { getUpcomingEventGroups } from "../utils/calendarEvents";
-import { panelSurfaceClass } from "../styles/shared";
+import { panelSurfaceClass, surfaceClass } from "../styles/shared";
 import { getEventPath } from "../utils/eventRoutes";
 import {
   CalendarMonth,
@@ -275,7 +275,7 @@ export function CalendarSection() {
   return (
       <section
         aria-labelledby="calendar-title"
-        className="relative mt-2 flex min-h-[calc(100svh_-_4rem_-_10px)] w-full flex-col overflow-hidden rounded-xl bg-site-canvas text-site-text land-sm:min-h-[calc(100svh_-_3rem_-_6px)] tall-md:h-[calc(100%_-_0.5rem)] tall-md:min-h-0"
+        className="relative mt-2 flex min-h-[calc(100svh_-_4rem_-_10px)] w-full flex-col overflow-hidden rounded-xl bg-site-canvas land-sm:min-h-[calc(100svh_-_3rem_-_6px)] tall-md:h-[calc(100%_-_0.5rem)] tall-md:min-h-0"
       >
         <CalendarBanner />
         {currentGroup ? (
@@ -352,7 +352,7 @@ export function CalendarSection() {
         ) : (
           <div className="relative z-10 flex flex-1 items-center justify-center px-4">
             <p
-              className={`rounded-lg px-6 py-5 text-center text-lg ${panelSurfaceClass}`}
+              className={`rounded-lg px-6 py-5 text-center text-lg ${surfaceClass}`}
             >
               No hay próximos eventos publicados.
             </p>

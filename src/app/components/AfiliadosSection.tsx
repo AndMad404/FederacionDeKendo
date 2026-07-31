@@ -30,7 +30,7 @@ function AffiliatePagination({
         onClick={() => onPageChange(page - 1)}
       />
 
-      <p className="min-w-20 text-center text-sm font-bold text-site-text" aria-live="polite">
+      <p className="min-w-20 text-center text-sm font-bold" aria-live="polite">
         {page + 1} de {totalPages}
       </p>
 
@@ -54,7 +54,7 @@ export function AfiliadosSection() {
   return (
     <section
       aria-labelledby="affiliates-title"
-      className="relative mt-2 flex min-h-[calc(100svh_-_4rem_-_10px)] w-full flex-col overflow-hidden rounded-xl bg-site-canvas text-site-text land-sm:min-h-[calc(100svh_-_3rem_-_6px)] tall-md:h-[calc(100%_-_0.5rem)] tall-md:min-h-0"
+      className="relative mt-2 flex min-h-[calc(100svh_-_4rem_-_10px)] w-full flex-col overflow-hidden rounded-xl bg-site-canvas land-sm:min-h-[calc(100svh_-_3rem_-_6px)] tall-md:h-[calc(100%_-_0.5rem)] tall-md:min-h-0"
     >
       <MediaPageBanner
         className="relative z-10 h-28 shrink-0 overflow-hidden land-compact:h-20"

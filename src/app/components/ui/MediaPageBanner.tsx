@@ -32,7 +32,7 @@ export function MediaPageBanner({
 }: MediaPageBannerProps) {
   return (
     <header className={className}>
-      <picture className="absolute inset-0 h-full w-full" aria-hidden="true">
+      <picture className="absolute inset-0" aria-hidden="true">
         {image.sources.map((source) => (
           <source
             key={`${source.type}-${source.srcSet}`}
@@ -57,7 +57,7 @@ export function MediaPageBanner({
         aria-hidden="true"
       />
       <div className="relative z-10 flex h-full flex-col items-center justify-start px-4 pt-4 text-center text-site-on-dark">
-        <PageTitle id={titleId} tone="media" className="!p-0">
+        <PageTitle id={titleId} tone="media" density="flush">
           {title}
         </PageTitle>
         <p className="mt-1 text-sm text-site-subtle land-compact:hidden">

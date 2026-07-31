@@ -16,7 +16,7 @@ export function UpcomingEventsSection() {
   return (
     <section
       aria-labelledby="upcoming-events-title"
-      className="mx-auto w-full max-w-6xl pb-2 text-site-text"
+      className="mx-auto w-full max-w-6xl pb-2"
     >
       <div className="mb-2.5 flex items-center justify-center text-center text-site-navy lg:mb-2">
         <h2

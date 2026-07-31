@@ -12,7 +12,7 @@ const imageVersion = "v=20260704-0120";
 function HeroBanner() {
   return (
     <header className="relative my-2 flex h-[clamp(520px,calc(100svh_-_4rem_-_10px),680px)] items-stretch overflow-hidden rounded-xl land-sm:h-auto land-sm:min-h-[calc(100svh_-_3rem_-_6px)] tall-md:h-auto tall-md:min-h-[230px] tall-md:flex-1">
-      <picture className="absolute inset-0 h-full w-full">
+      <picture className="absolute inset-0">
         <source
           srcSet={`/images/hero/kendo-hero-formacion-480.webp?${imageVersion} 480w, /images/hero/kendo-hero-formacion-960.webp?${imageVersion} 960w, /images/hero/kendo-hero-formacion-1500.webp?${imageVersion} 1500w`}
           sizes="100vw"
@@ -39,7 +39,10 @@ function HeroBanner() {
           <PageTitle
             id="home-title"
             tone="media"
-            className="mx-auto !p-0 text-3xl normal-case after:hidden sm:text-4xl land-sm:mx-0 land-sm:text-left land-tall:mx-0 land-tall:text-left"
+            density="flush"
+            decoration="none"
+            casing="normal"
+            className="mx-auto text-3xl sm:text-4xl land-sm:mx-0 land-sm:text-left land-tall:mx-0 land-tall:text-left"
             allowWrap
           >
             Federación de Asociaciones
@@ -49,7 +52,7 @@ function HeroBanner() {
             Una comunidad que aprende, entrena y crece unida a través del
             kendo en Costa Rica.
           </p>
-          <p className="text-base leading-relaxed text-site-subtle land-sm:mt-3">
+          <p className="leading-relaxed text-site-subtle land-sm:mt-3">
             Encuentra un dojo afiliado o consulta nuestros próximos encuentros.
           </p>
           <div className="flex flex-col justify-center gap-3 sm:flex-row land-sm:mt-5 land-sm:justify-start land-tall:justify-start">

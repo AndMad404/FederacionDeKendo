@@ -192,6 +192,69 @@ latest_affiliates_layout_fix:
   limitation: Production deployment was not inspected; the evidence applies to the local implementation.
   result: Affiliate contact and schedule text columns are aligned without the redundant spacer or desktop overflow.
 
+latest_design_metrics_review:
+  id: REV-2026-07-31-02
+  requested_scope: Re-review design metrics using the previous utility-cleanup criteria, including unnecessary classes, redundancies, and declarations duplicated from parent containers.
+  actual_scope:
+    targets:
+      - src/app/App.tsx
+      - src/app/components/**/*.tsx
+      - src/app/styles/shared.ts
+      - src/styles/globals.css
+      - src/styles/index.css
+      - generated dist/assets/index-DCiBSByF.css
+    axes: [TAILWIND, ARCH]
+    included:
+      - spacing, sizing, alignment, radius, surface, and typography utility composition
+      - same-element class conflicts and generated CSS precedence
+      - inherited text declarations repeated by descendants
+      - no-effect absolute sizing, aspect-ratio, centering, and base-typography utilities
+      - repeated important overrides and legacy Figma theme scaffolding
+    excluded:
+      - Figma pixel fidelity because no current Figma node was supplied
+      - responsive browser geometry, copy, SEO, accessibility, React behavior, and production deployment
+  baseline:
+    commit: 39386711
+    worktree: clean
+    target_inventory_fingerprint_sha256: FF1CF4BCEBFF578222ED4FC1E67CD98BA40B71539060326211CD4AB0C56E14D7
+  confirmed_findings: [STR-TW-002, SMELL-TW-001, SMELL-TW-002, POL-TW-008, POL-ARCH-003]
+  checks:
+    - className inventory across src/app/**/*.tsx
+    - shared-style consumer search across src/app
+    - legacy token and custom-variant reference search across source
+    - corepack pnpm run build passed, including SSR and generated route HTML
+    - generated CSS places rounded-xl after rounded-lg and text-site-text after text-site-action
+    - generated CSS still contains the legacy chart variables and dark theme block
+  result: The current site has no critical design-metric regression in the reviewed scope, but one shared surface abstraction silently overrides caller radius and text intent, PageTitle is routinely countermanded with important utilities, legacy theme scaffolding remains, and a small set of no-effect utilities and wrappers survived the prior cleanup.
+
+latest_design_metrics_cleanup:
+  id: FIX-2026-07-31-02
+  source_session: REV-2026-07-31-02
+  baseline:
+    commit: 39386711
+    worktree: dirty only with the review-state update before implementation
+  implemented:
+    - split neutral surface metrics from panel radius and text tone, then used the neutral primitive for the Calendar empty state and NotFound actions
+    - replaced PageTitle important overrides with explicit density, decoration, and casing variants
+    - removed unused generic Figma/shadcn theme families, the dark-mode block, the dark custom variant, and generated chart/sidebar tokens while preserving consumed base tokens
+    - removed the reviewed no-effect absolute sizing, thumbnail aspect ratio, centering, inherited text, and base paragraph-size utilities
+    - removed the redundant Footer heading and contact wrappers
+  resolved_findings: [STR-TW-002, SMELL-TW-001, SMELL-TW-002, POL-TW-008, POL-ARCH-003]
+  verification:
+    target_inventory_fingerprint_sha256: 29FC55201050DD80870189BC353FC27C7CF085B5B9EEBFDCA7AA9ABF5764715C
+    checks:
+      - corepack pnpm run typecheck passed
+      - corepack pnpm run build passed, including SSR and generated route HTML
+      - all ten Playwright tests passed across six routes and 360x800, 390x844, 768x1024, and 1366x768
+      - generated CSS dropped from 49.67 kB to 47.49 kB and contains neither the dark block nor chart tokens
+      - source searches found no important PageTitle padding overrides, legacy theme scaffold, thumbnail aspect residue, or panel radius/text conflicts
+      - at 1366x768 the Calendar panel computed to 14px radius with the intended site text color, its banner picture matched the banner bounds, and both document and primary section had no vertical overflow
+      - at 1366x768 the NotFound actions computed to 10px radius and rgb(22, 58, 99), with no document scroll
+      - at the requested 390x844 override the Gallery title kept zero padding and its thumbnail, featured frame, and full overlay retained nonzero matching geometry without section overflow; the browser reported the documented 845px inner-height limitation
+      - the Home hero picture matched its banner bounds and the Footer sections now directly contain [H2, P] and [H2, UL]
+      - git diff --check passed
+  result: All five findings from REV-2026-07-31-02 are implemented and verified locally without changing public copy, route behavior, or the established responsive metrics.
+
 prior_external_feedback_session:
   id: REV-2026-07-27-01
   requested_scope: Validate external Kimi 3 and Claude feedback against the published site and current sources, consolidate confirmed findings, and record the result without implementing fixes.
@@ -586,6 +649,72 @@ previous_resolution:
     - gallery frame computed flex was 0 0 auto at requested 1024x640 and 1 1 0% at requested 1024x641
 
 coverage:
+  - id: COV-2026-07-31-02
+    date: 2026-07-31
+    baseline: 39386711 dirty worktree from FIX-2026-07-31-02
+    targets:
+      - src/app/components/AfiliadosSection.tsx
+      - src/app/components/CalendarSection.tsx
+      - src/app/components/EventPage.tsx
+      - src/app/components/Footer.tsx
+      - src/app/components/GallerySection.tsx
+      - src/app/components/HeroSection.tsx
+      - src/app/components/NotFoundSection.tsx
+      - src/app/components/PageTitle.tsx
+      - src/app/components/PastEventsSection.tsx
+      - src/app/components/UpcomingEventsSection.tsx
+      - src/app/components/gallery/FeaturedImage.tsx
+      - src/app/components/gallery/GalleryThumbnails.tsx
+      - src/app/components/ui/MediaPageBanner.tsx
+      - src/app/styles/shared.ts
+      - src/styles/globals.css
+      - generated dist/assets/index-BvSSVbGA.css
+    axes: [TAILWIND, ARCH, RESPONSIVE]
+    included:
+      - resolution of STR-TW-002, SMELL-TW-001, SMELL-TW-002, POL-TW-008, and POL-ARCH-003
+      - generated CSS output and responsive geometry of affected consumers
+      - desktop no-scroll invariant across all six routes
+    excluded: [exact Figma fidelity, production deployment]
+    depth: implemented_and_verified
+    status: current
+    fingerprint: 29FC55201050DD80870189BC353FC27C7CF085B5B9EEBFDCA7AA9ABF5764715C
+    evidence:
+      - typecheck and production/SSR build
+      - ten Playwright tests and targeted computed-style browser checks
+      - source residue searches and generated CSS inspection
+      - git diff check
+
+  - id: COV-2026-07-31-01
+    date: 2026-07-31
+    baseline: 39386711 clean worktree
+    targets:
+      - src/app/App.tsx
+      - src/app/components/**/*.tsx
+      - src/app/styles/shared.ts
+      - src/styles/globals.css
+      - src/styles/index.css
+      - generated dist/assets/index-DCiBSByF.css
+    axes: [TAILWIND, ARCH]
+    included:
+      - spacing, sizing, alignment, radius, surface, and typography utility composition
+      - parent-to-child text inheritance
+      - same-element conflicts and generated CSS precedence
+      - no-effect utilities, repeated important overrides, and excess presentational nesting
+      - legacy theme and dark-mode scaffolding
+    excluded:
+      - exact Figma fidelity
+      - responsive browser geometry and runtime interaction
+      - color contrast, semantics, SEO, React hook behavior, and performance
+    depth: reviewed
+    status: stale
+    stale_reason: The reviewed targets changed in FIX-2026-07-31-02; COV-2026-07-31-02 records the implemented and verified replacement coverage.
+    fingerprint: FF1CF4BCEBFF578222ED4FC1E67CD98BA40B71539060326211CD4AB0C56E14D7
+    evidence:
+      - rg className inventory and targeted utility searches over all matched source targets
+      - direct inspection of every matched component and shared/global style source
+      - production and SSR build passed
+      - generated CSS precedence indices recorded for radius and text-color collisions
+
   - id: COV-2026-07-30-01
     date: 2026-07-30
     baseline: 711945b7 dirty worktree
@@ -1516,6 +1645,46 @@ active_findings:
     introduced_in: REV-2026-07-27-03
 
 resolved_findings:
+  - id: STR-TW-002
+    status: resolved
+    resolved_at: 2026-07-31
+    summary: Neutral surface metrics are separated from panel radius and tone, and Calendar empty-state and NotFound action consumers no longer emit conflicting radius or text classes.
+    resolution:
+      resolved_ref: 39386711 dirty worktree from FIX-2026-07-31-02
+      checks: [typecheck, production and SSR build, generated CSS inspection, NotFound and Calendar computed styles]
+
+  - id: SMELL-TW-001
+    status: resolved
+    resolved_at: 2026-07-31
+    summary: PageTitle exposes density, decoration, and casing variants; all three important padding overrides and the hero underline/casing overrides were removed.
+    resolution:
+      resolved_ref: 39386711 dirty worktree from FIX-2026-07-31-02
+      checks: [typecheck, build, source search, Home, Gallery, Calendar, and NotFound computed styles]
+
+  - id: SMELL-TW-002
+    status: resolved
+    resolved_at: 2026-07-31
+    summary: Unused generic theme families, dark-mode scaffolding, and chart/sidebar tokens were removed while consumed base and site tokens were preserved.
+    resolution:
+      resolved_ref: 39386711 dirty worktree from FIX-2026-07-31-02
+      checks: [build, source search, generated CSS inspection, responsive Playwright suite]
+
+  - id: POL-TW-008
+    status: resolved
+    resolved_at: 2026-07-31
+    summary: The reviewed no-effect absolute sizing, thumbnail aspect ratio, centering, inherited color, and paragraph-size utilities were removed with geometry preserved.
+    resolution:
+      resolved_ref: 39386711 dirty worktree from FIX-2026-07-31-02
+      checks: [source search, build, responsive Playwright suite, targeted banner, overlay, thumbnail, and overflow measurements]
+
+  - id: POL-ARCH-003
+    status: resolved
+    resolved_at: 2026-07-31
+    summary: Footer purpose and contact content now render directly under their sections without the three presentational wrapper divs.
+    resolution:
+      resolved_ref: 39386711 dirty worktree from FIX-2026-07-31-02
+      checks: [typecheck, build, responsive Playwright suite, computed Footer child structure]
+
   - id: SMELL-ARCH-005
     status: resolved
     resolved_at: 2026-07-30
