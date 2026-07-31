@@ -191,7 +191,7 @@ export function Lightbox({
             >
               {displayTitle}
             </h2>
-            <p className="truncate pt-1 text-sm font-bold uppercase tracking-widest text-site-accent land-sm:col-start-2 land-sm:row-start-1 land-sm:justify-self-end land-sm:pt-0 land-sm:text-right land-sm:text-[10px]">
+            <p className="truncate pt-1 text-sm font-bold uppercase text-site-accent land-sm:col-start-2 land-sm:row-start-1 land-sm:justify-self-end land-sm:pt-0 land-sm:text-right land-sm:text-[10px]">
               {displayTag}
             </p>
             {displayDescription && (
@@ -204,7 +204,7 @@ export function Lightbox({
                 </p>
               </div>
             )}
-            <p className="text-xs land-sm:col-start-2 land-sm:row-start-2 land-sm:justify-self-end land-sm:self-end land-sm:text-right land-sm:text-[10px]">
+            <p className="text-end text-xs land-sm:col-start-2 land-sm:row-start-2 land-sm:justify-self-end land-sm:self-end land-sm:text-[10px]">
               {positionLabel}
             </p>
           </div>

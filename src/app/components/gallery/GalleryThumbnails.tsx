@@ -19,8 +19,8 @@ function Thumbnail({ image, isActive, buttonRef, onClick }: ThumbnailProps) {
       aria-label={`Ver imagen: ${image.title}`}
       aria-current={isActive ? "true" : undefined}
       onClick={onClick}
-      className={`group relative aspect-[4/3] h-full w-full cursor-pointer overflow-hidden rounded-lg border-2 bg-site-media transition-colors duration-300 hover:border-site-accent ${
-        isActive ? "border-site-accent" : "border-transparent"
+      className={`group relative aspect-[4/3] h-full w-full cursor-pointer overflow-hidden rounded-lg border-2 border-transparent bg-site-media transition-colors duration-300 ${
+        isActive ? "border-b-4 border-b-site-accent" : ""
       } ${focusRingClass}`}
     >
       <img

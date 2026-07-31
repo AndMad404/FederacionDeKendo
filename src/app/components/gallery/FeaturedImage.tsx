@@ -113,7 +113,7 @@ export function FeaturedImage({
           <h2 className="text-xl font-bold leading-tight sm:col-start-1 sm:row-start-1 sm:self-baseline sm:text-2xl land-sm:text-base">
             {displayTitle}
           </h2>
-          <p className="truncate text-xl font-bold uppercase leading-tight tracking-widest text-site-accent-soft sm:col-start-2 sm:row-start-1 sm:self-baseline sm:text-right sm:text-2xl land-sm:text-base">
+          <p className="truncate text-xl font-bold uppercase leading-tight text-site-accent-soft sm:col-start-2 sm:row-start-1 sm:self-baseline sm:text-right sm:text-2xl land-sm:text-base">
             {displayTag}
           </p>
           {previewText && (
