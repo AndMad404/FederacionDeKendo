@@ -90,7 +90,7 @@ export function EventPage() {
           }}
         />
 
-        <div className="flex min-h-0 flex-1 items-start justify-center p-3 sm:p-4 tall-md:items-center">
+        <div className="flex min-h-0 flex-1 items-start justify-center px-3 pb-0 pt-3 sm:px-4 sm:pb-0 sm:pt-4 tall-md:items-center tall-md:p-4 land-sm:px-3 land-sm:pb-0 land-sm:pt-3">
           <article
             className={`grid w-full max-w-5xl gap-4 p-4 md:grid-cols-[minmax(0,1fr)_minmax(16rem,0.8fr)] md:p-5 land-sm:gap-2 land-sm:p-3 ${panelSurfaceClass}`}
           >
