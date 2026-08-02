@@ -109,7 +109,7 @@ export function FeaturedImage({
       />
 
       <figcaption className="absolute inset-x-0 bottom-0">
-        <div className={`grid w-full items-center p-2.5 text-center sm:grid-cols-[minmax(0,1fr)_auto] sm:grid-rows-[auto_auto_auto] sm:items-start sm:px-20 sm:text-left land-sm:grid-rows-[auto_auto] land-sm:gap-x-6 land-sm:gap-y-0.5 land-sm:px-20 land-sm:py-2 ${mediaCaptionSurfaceClass}`}>
+        <div className={`grid w-full items-center p-2.5 text-center sm:grid-cols-[minmax(0,1fr)_auto] sm:grid-rows-[auto_auto_auto] sm:items-start sm:px-20 sm:text-left land-sm:grid-rows-[auto_auto] land-sm:gap-x-6 land-sm:gap-y-0.5 land-sm:px-2.5 land-sm:py-2.5 ${mediaCaptionSurfaceClass}`}>
           <h2 className="text-xl font-bold leading-tight sm:col-start-1 sm:row-start-1 sm:self-baseline sm:text-2xl land-sm:text-base">
             {displayTitle}
           </h2>

@@ -2,7 +2,7 @@
 
 ```yaml
 schema_version: 2
-last_updated: 2026-07-31
+last_updated: 2026-08-01
 contract: .agents/review-contract.md
 
 state_rules:
@@ -13,6 +13,54 @@ state_rules:
   - Legacy claims without reproducible evidence are historical, not current coverage.
 
 latest_session:
+  id: REV-2026-08-01-02
+  requested_scope: Review the gallery landscape padding.
+  actual_scope:
+    targets:
+      - src/app/components/gallery/FeaturedImage.tsx
+      - /galeria at compact landscape viewports
+    axes: [TAILWIND, RESPONSIVE]
+    included:
+      - computed outer and internal padding, responsive variant precedence, and alignment offsets
+      - requested 669x386 and nearby 844x390 landscape presentations
+    excluded:
+      - application-code edits, typography, colors, radii, other routes, Figma comparison, and production behavior
+  baseline:
+    commit: ece88800
+    worktree: dirty only from the prior review-state documentation update
+    fingerprint:
+      FeaturedImage.tsx: 12DABEEB6374B38D4320E959D8162A365E52B42556EA36380A46008AD7F93DA9
+  confirmed_findings:
+    - POL-TW-009
+  result: The outer gallery inset remains 10px, but the landscape caption overrides its 10px base padding with 80px horizontally and 8px vertically.
+
+previous_landscape_review:
+  id: REV-2026-08-01-01
+  requested_scope: Review the current gallery landscape layout.
+  actual_scope:
+    targets:
+      - src/app/components/GallerySection.tsx
+      - src/app/components/gallery/FeaturedImage.tsx
+      - src/app/components/gallery/GalleryThumbnails.tsx
+      - /galeria at compact landscape viewports
+    axes: [RESPONSIVE, A11Y]
+    included:
+      - geometry, horizontal alignment, overflow, responsive visibility, and visible touch-target sizing
+      - requested 669x386 and nearby 844x390 landscape presentations
+    excluded:
+      - application-code edits
+      - Figma comparison, other routes, keyboard interaction, screen-reader execution, performance, SEO, and production behavior
+  baseline:
+    commit: ece88800
+    worktree: clean before this review-state update
+    fingerprints:
+      GallerySection.tsx: E625488992DF39923E53C288155EA4EED305F867ACDCFF7963A6D0A9CFF0B724
+      FeaturedImage.tsx: 12DABEEB6374B38D4320E959D8162A365E52B42556EA36380A46008AD7F93DA9
+      GalleryThumbnails.tsx: 659DC05D119679677366D92062929B7F8D5711FA12632E50910F676BAFF4850D
+  confirmed_findings: []
+  result: No in-scope landscape defect was confirmed; the two caption rows remain horizontally organized, no horizontal overflow occurs, and visible navigation controls meet a 44px minimum target.
+
+previous_ai_test_review:
   id: REV-2026-07-31-05
   requested_scope: Audit the AI-generated tests as untrusted code for hallucinated claims, false positives, weak assertions, and independence from the implementation.
   actual_scope:
@@ -723,6 +771,26 @@ previous_resolution:
     - gallery frame computed flex was 0 0 auto at requested 1024x640 and 1 1 0% at requested 1024x641
 
 coverage:
+  - id: COV-2026-08-01-02
+    date: 2026-08-01
+    baseline: ece88800 dirty only from prior review-state documentation
+    targets:
+      - src/app/components/gallery/FeaturedImage.tsx
+      - /galeria at requested 669x386 and nearby 844x390 landscape viewports
+    axes: [TAILWIND, RESPONSIVE]
+    included:
+      - computed padding, responsive variant precedence, and caption content offsets
+    excluded:
+      - implementation, typography, color, radius, other routes, Figma fidelity, and production behavior
+    depth: reviewed_and_locally_verified
+    status: stale
+    stale_reason: FeaturedImage.tsx changed when POL-TW-009 was resolved; the resolution checks below supersede only the padding finding, not the full original review scope.
+    evidence:
+      - FeaturedImage.tsx:112 combines p-2.5 with land-sm:px-20 and land-sm:py-2
+      - computed caption padding was 8px 80px at both landscape viewports
+      - title left inset and tag right inset were both 80px from the featured frame
+      - outer gallery inset remained 10px and the arrow layer used 12px horizontal padding
+
   - id: COV-2026-07-31-05
     date: 2026-07-31
     baseline: 23907229 dirty only from review-state documentation
@@ -1902,6 +1970,19 @@ active_findings:
     introduced_in: REV-2026-07-27-03
 
 resolved_findings:
+  - id: POL-TW-009
+    status: resolved
+    resolved_at: 2026-08-01
+    summary: The compact-landscape caption now retains the site's 10px spacing rhythm on every side.
+    resolution:
+      resolved_ref: worktree C514CD983B6A56248FE8F6C8B029EE9D32DCB2E07BAB0598BD09DB67773D9088
+      checks:
+        - corepack pnpm run typecheck passed
+        - corepack pnpm run build passed
+        - computed caption padding was 10px at 669x386 and 844x390
+        - title and tag measured 10px from the respective featured-frame edges at both viewports
+        - neither caption row overlapped and no horizontal document overflow was present
+
   - id: STR-TW-002
     status: resolved
     resolved_at: 2026-07-31
