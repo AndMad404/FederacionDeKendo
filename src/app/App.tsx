@@ -92,7 +92,7 @@ export default function App({
 
       <main
         id="main-content"
-        className="min-h-[calc(100svh_-_4rem_-_10px)] flex-1 px-2.5 pt-[calc(4rem_+_10px)] land-sm:min-h-[calc(100svh_-_3rem_-_6px)] land-sm:pt-[calc(3rem_+_6px)] tall-md:min-h-0 tall-md:overflow-hidden"
+        className="px-2.5 pt-[calc(4rem_+_10px)] land-sm:pt-[calc(3rem_+_6px)] tall-md:min-h-0 tall-md:flex-1 tall-md:overflow-hidden"
       >
         <Routes>
           {getRouteManifest().map((route) => {

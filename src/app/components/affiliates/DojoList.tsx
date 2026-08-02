@@ -15,7 +15,7 @@ export function DojoList({ dojos, startIndex }: DojoListProps) {
   return (
     <div
       id="affiliate-dojo-list"
-      className={`grid w-full grid-cols-1 land-compact:grid-cols-2 land-compact:gap-3 ${desktopGridClass}`}
+      className={`grid w-full grid-cols-1 gap-2.5 land-compact:grid-cols-2 land-compact:gap-3 xl:gap-8 ${desktopGridClass}`}
     >
       {dojos.map((dojo, index) => (
         <DojoCard

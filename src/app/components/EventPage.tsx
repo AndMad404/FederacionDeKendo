@@ -67,7 +67,7 @@ export function EventPage() {
   return (
     <section
         aria-labelledby="event-page-title"
-        className="relative my-2 flex min-h-[calc(100svh_-_4rem_-_10px)] w-full flex-col overflow-hidden rounded-xl bg-site-canvas land-sm:min-h-[calc(100svh_-_3rem_-_6px)] tall-md:h-[calc(100%_-_1rem)] tall-md:min-h-0"
+        className="relative my-2 flex w-full flex-col overflow-hidden rounded-xl bg-site-canvas tall-md:h-[calc(100%_-_1rem)] tall-md:min-h-0"
       >
         <MediaPageBanner
           className="relative z-10 h-28 shrink-0 overflow-hidden land-compact:h-20"
