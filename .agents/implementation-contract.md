@@ -41,6 +41,8 @@ Use this file when the user asks to apply, fix, build, implement, or change code
 
 ### Visual Change Baseline
 
+Project status as of 2026-08-01: the original Figma design is obsolete. Until a recreated Figma file is explicitly approved by the owner, use the current application and owner-approved measurements, screenshots, and rendered results as the visual baseline. Do not use the original Figma to undo current decisions or claim visual fidelity.
+
 Before editing a visual or layout concern, record the smallest baseline that
 can determine the intended result:
 

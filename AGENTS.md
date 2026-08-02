@@ -7,10 +7,11 @@ Stack:
 - TypeScript
 - Tailwind CSS 4
 - Vite
-- Figma-originated UI
+- UI originated in Figma Make; the original design is obsolete and is not a current source of truth
 
 ## Core Rules
 
+- Until a recreated Figma file is explicitly approved, use the current application plus owner-approved measurements, screenshots, and rendered results as the temporary visual baseline. Do not claim fidelity to or drift from the obsolete original Figma.
 - Read the relevant files before making claims or edits.
 - Keep work scoped to the user's requested file, route, concern, or task.
 - Prefer existing project patterns over new abstractions.

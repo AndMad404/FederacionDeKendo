@@ -12,6 +12,16 @@ state_rules:
   - Changed targets make prior coverage stale until re-reviewed.
   - Legacy claims without reproducible evidence are historical, not current coverage.
 
+design_source_status:
+  status: obsolete_pending_recreation
+  obsolete_source: the original Figma Make design and export
+  temporary_visual_authority:
+    - current application behavior and geometry
+    - owner-approved measurements, screenshots, and rendered results
+  rule: Do not claim fidelity to or drift from the original Figma. A recreated Figma becomes authoritative only after explicit owner approval.
+  planned_work: Recreate Figma from the approved current product, including supported routes, responsive viewports, components, tokens, and interactive states.
+  recorded_at: 2026-08-01
+
 latest_session:
   id: REV-2026-08-01-02
   requested_scope: Review the gallery landscape padding.
@@ -32,7 +42,7 @@ latest_session:
       FeaturedImage.tsx: 12DABEEB6374B38D4320E959D8162A365E52B42556EA36380A46008AD7F93DA9
   confirmed_findings:
     - POL-TW-009
-  result: The outer gallery inset remains 10px, but the landscape caption overrides its 10px base padding with 80px horizontally and 8px vertically.
+  result: The landscape caption padding finding was corrected to 10px on every side, verified locally, and approved by the owner on 2026-08-01.
 
 previous_landscape_review:
   id: REV-2026-08-01-01
@@ -771,6 +781,27 @@ previous_resolution:
     - gallery frame computed flex was 0 0 auto at requested 1024x640 and 1 1 0% at requested 1024x641
 
 coverage:
+  - id: COV-2026-08-01-03
+    date: 2026-08-01
+    baseline: 424a6218 with only review-state documentation dirty
+    targets:
+      - src/app/components/gallery/FeaturedImage.tsx:112
+      - /galeria at requested 669x386 and nearby 844x390 landscape viewports
+    axes: [TAILWIND, RESPONSIVE]
+    included:
+      - computed caption padding, content edge offsets, caption-row overlap, and horizontal document overflow
+    excluded:
+      - unrelated gallery behavior, other routes, Figma fidelity, deployed production output, and regenerated documentation screenshots
+    depth: reviewed_and_locally_verified
+    status: current
+    evidence:
+      - FeaturedImage.tsx fingerprint C514CD983B6A56248FE8F6C8B029EE9D32DCB2E07BAB0598BD09DB67773D9088
+      - corepack pnpm run typecheck passed
+      - corepack pnpm run build passed
+      - computed caption padding and both content edge offsets were 10px at 669x386 and 844x390
+      - neither caption row overlapped and no horizontal document overflow was present
+      - owner confirmed the resulting layout is correct on 2026-08-01
+
   - id: COV-2026-08-01-02
     date: 2026-08-01
     baseline: ece88800 dirty only from prior review-state documentation
@@ -1975,13 +2006,14 @@ resolved_findings:
     resolved_at: 2026-08-01
     summary: The compact-landscape caption now retains the site's 10px spacing rhythm on every side.
     resolution:
-      resolved_ref: worktree C514CD983B6A56248FE8F6C8B029EE9D32DCB2E07BAB0598BD09DB67773D9088
+      resolved_ref: commit 424a6218, FeaturedImage.tsx C514CD983B6A56248FE8F6C8B029EE9D32DCB2E07BAB0598BD09DB67773D9088
       checks:
         - corepack pnpm run typecheck passed
         - corepack pnpm run build passed
         - computed caption padding was 10px at 669x386 and 844x390
         - title and tag measured 10px from the respective featured-frame edges at both viewports
         - neither caption row overlapped and no horizontal document overflow was present
+        - owner approved the visual result on 2026-08-01
 
   - id: STR-TW-002
     status: resolved
@@ -2300,6 +2332,10 @@ resolved_findings:
     resolution: { resolved_ref: f35c9557 dirty worktree, checks: [typecheck, build, browser matrix] }
 
 pending_reviews:
+  - id: PEND-ARCH-005
+    target: recreate Figma from the approved current product
+    axes: [ARCH, RESPONSIVE]
+    reason: The original Figma Make design is obsolete. A new file must cover current routes, reference viewports, tokens, components, and interactive states, then receive explicit owner approval before it can establish fidelity or drift.
   - id: PEND-SEO-003
     target: client-approved provisional name, official-name cutover, canonical domain, and redirect policy
     axes: [SEO, ARCH]
