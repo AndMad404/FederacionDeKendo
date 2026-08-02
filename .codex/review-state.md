@@ -1766,13 +1766,14 @@ active_findings:
     axis: SEO
     status: open
     target: tests/e2e/events.spec.ts custom not-found scenario
-    problem: The test proves that custom not-found copy is visible but not that an unknown URL receives the intended HTTP status, and local Vite preview currently returns 200.
-    fix: Keep the UI assertion and add a deployment-level response-status check against the actual hosting behavior after deployment.
-    cost_of_deferring: A visually correct 404 page can still be treated as a soft 404 by crawlers or monitoring.
+    problem: The test proves that custom not-found copy is visible but does not verify hosting response semantics; local Vite preview returns 200 while the currently deployed Pages route correctly returns 404.
+    fix: Keep the UI assertion and add a separate deployment-level response-status smoke check after deployment rather than expecting Vite Preview to emulate host 404 behavior.
+    cost_of_deferring: The current deployment is correct, but a future hosting or redirect configuration regression would not be detected by the local Playwright suite.
     evidence:
       - events.spec.ts:89-90 asserts only visible text
       - http://127.0.0.1:4173/eventos/ruta-inexistente/ returned HTTP 200 during this review
       - scripts/generate-route-html.mjs generates 404.html but local preview does not prove host response semantics
+      - https://fak-kendo.pages.dev/eventos/ruta-inexistente/ returned HTTP 404 on 2026-07-31
     introduced_in: REV-2026-07-31-05
 
   - id: STR-RESP-002
