@@ -14,17 +14,84 @@ import {
 
 const fixturePath = new URL("./fixtures/calendar-events.ics", import.meta.url);
 
-test("parses UID as a non-reversible stable hash and handles all-day ranges", async () => {
+function createIcs(events) {
+  return [
+    "BEGIN:VCALENDAR",
+    ...events.flatMap(({ uid, date = "20260808", title = "Examen" }) => [
+      "BEGIN:VEVENT",
+      `UID:${uid}`,
+      `DTSTART;VALUE=DATE:${date}`,
+      `SUMMARY:${title}`,
+      "END:VEVENT",
+    ]),
+    "END:VCALENDAR",
+  ].join("\n");
+}
+
+function assertAliasInvariants(events) {
+  const canonicalOwners = new Map(
+    events.map((event) => [event.slug, event.sourceId]),
+  );
+  const aliasOwners = new Map();
+
+  for (const event of events) {
+    for (const alias of event.aliases ?? []) {
+      assert.equal(
+        canonicalOwners.has(alias),
+        false,
+        `Alias ${alias} collides with a canonical slug`,
+      );
+      const owners = aliasOwners.get(alias) ?? [];
+      owners.push(event.sourceId);
+      aliasOwners.set(alias, owners);
+    }
+  }
+
+  for (const [alias, owners] of aliasOwners) {
+    assert.equal(
+      owners.length,
+      1,
+      `Alias ${alias} belongs to more than one event`,
+    );
+  }
+}
+
+async function runSynchronization({
+  tempDirectory,
+  name,
+  events,
+  registryPath = path.join(tempDirectory, `${name}-registry.json`),
+}) {
+  const sourcePath = path.join(tempDirectory, `${name}.ics`);
+  const outputPath = path.join(tempDirectory, `${name}-calendarEvents.ts`);
+  await writeFile(sourcePath, createIcs(events));
+  const result = await synchronizeCalendar({
+    source: sourcePath,
+    outputPath,
+    registryPath,
+    now: new Date("2026-07-01"),
+  });
+  return { ...result, outputPath, registryPath };
+}
+
+test("creates the same opaque 24-character sourceId for the same UID", async () => {
+  const [properties] = parseVEvents(await readFile(fixturePath, "utf8"));
+  const first = parseCalendarEvent(properties);
+  const second = parseCalendarEvent(properties);
+
+  assert.equal(first.sourceId, second.sourceId);
+  assert.equal(first.sourceId, "aac691754e9f35832d4dfec4");
+  assert.match(first.sourceId, /^[a-f0-9]{24}$/);
+  assert.equal(first.sourceId.includes("exam-1@example.test"), false);
+});
+
+test("stores the exclusive DTEND for all-day ranges", async () => {
   const properties = parseVEvents(await readFile(fixturePath, "utf8"));
-  const warnings = [];
   const events = properties
-    .map((event) => parseCalendarEvent(event, warnings))
+    .map((event) => parseCalendarEvent(event))
     .filter(Boolean);
 
-  assert.equal(events.length, 3);
-  assert.match(events[0].sourceId, /^[a-f0-9]{24}$/);
-  assert.notEqual(events[0].sourceId, "exam-1@example.test");
-  assert.equal(events[0].slug, "2026-08-08-examen-nacional");
+  assert.equal(events[1].date, "2026-09-11");
   assert.equal(events[1].endDate, "2026-09-13");
 });
 
@@ -42,7 +109,7 @@ test("omits drafts and recurring events and warns about incomplete content", asy
   assert.equal(warnings.some((warning) => warning.includes("ubicación")), true);
 });
 
-test("preserves aliases when a title or date changes", () => {
+test("preserves the canonical slug when only the title changes", () => {
   const previous = {
     version: 1,
     events: [
@@ -58,17 +125,51 @@ test("preserves aliases when a title or date changes", () => {
   const current = [
     {
       sourceId: "same-source",
-      slug: "2026-08-15-examen-nacional",
-      aliases: [],
+      slug: "2026-08-08-examen-nacional",
+      aliases: ["examen-nacional-2026-08-08"],
       title: "Examen nacional",
+      date: "2026-08-08",
+    },
+  ];
+
+  const [event] = mergeRegistry(previous, current, new Date("2026-07-01")).events;
+  assert.equal(event.slug, "2026-08-08-examen");
+  assert.deepEqual(event.aliases, [
+    "2026-08-08-examen-nacional",
+    "examen-2026-08-08",
+    "examen-nacional-2026-08-08",
+  ]);
+});
+
+test("preserves the canonical slug when only the date changes", () => {
+  const previous = {
+    version: 1,
+    events: [
+      {
+        sourceId: "same-source",
+        slug: "2026-08-08-examen",
+        aliases: ["examen-2026-08-08"],
+        title: "Examen",
+        date: "2026-08-08",
+      },
+    ],
+  };
+  const current = [
+    {
+      sourceId: "same-source",
+      slug: "2026-08-15-examen",
+      aliases: ["examen-2026-08-15"],
+      title: "Examen",
       date: "2026-08-15",
     },
   ];
 
-  const merged = mergeRegistry(previous, current, new Date("2026-07-01"));
-  assert.deepEqual(merged.events[0].aliases, [
-    "2026-08-08-examen",
+  const [event] = mergeRegistry(previous, current, new Date("2026-07-01")).events;
+  assert.equal(event.slug, "2026-08-08-examen");
+  assert.deepEqual(event.aliases, [
+    "2026-08-15-examen",
     "examen-2026-08-08",
+    "examen-2026-08-15",
   ]);
 });
 
@@ -104,39 +205,124 @@ test("canonical slug starts with the date and normalizes accents", () => {
   );
 });
 
-test("resolves equal date/title slugs without losing either event", async () => {
+test("keeps sourceId in the registry and out of the public event URL", async () => {
+  const tempDirectory = await mkdtemp(path.join(os.tmpdir(), "fak-calendar-"));
+
+  try {
+    const result = await runSynchronization({
+      tempDirectory,
+      name: "internal-identity",
+      events: [{ uid: "first@example.test", title: "Examen de kyu" }],
+    });
+    const [event] = result.registry.events;
+    const generatedOutput = await readFile(result.outputPath, "utf8");
+
+    assert.equal(event.sourceId, "3f2eb91b31105691fbf84f65");
+    assert.equal(event.slug, "2026-08-08-examen-de-kyu");
+    assert.equal(event.slug.includes(event.sourceId.slice(0, 8)), false);
+    assert.equal(generatedOutput.includes(event.sourceId), false);
+    assert.match(generatedOutput, /id: "2026-08-08-examen-de-kyu"/);
+  } finally {
+    await rm(tempDirectory, { recursive: true, force: true });
+  }
+});
+
+test("a duplicate date and title aborts before either destination is published", async () => {
   const tempDirectory = await mkdtemp(path.join(os.tmpdir(), "fak-calendar-"));
   const sourcePath = path.join(tempDirectory, "collision.ics");
   const outputPath = path.join(tempDirectory, "calendarEvents.ts");
   const registryPath = path.join(tempDirectory, "registry.json");
+  const previousRegistry = '{"version":1,"events":[]}';
   await writeFile(
     sourcePath,
-    `BEGIN:VCALENDAR
-BEGIN:VEVENT
-UID:first@example.test
-DTSTART;VALUE=DATE:20260808
-SUMMARY:Examen
-END:VEVENT
-BEGIN:VEVENT
-UID:second@example.test
-DTSTART;VALUE=DATE:20260808
-SUMMARY:Examen
-END:VEVENT
-END:VCALENDAR`,
+    createIcs([
+      { uid: "first@example.test" },
+      { uid: "second@example.test" },
+    ]),
   );
+  await writeFile(outputPath, "previous output");
+  await writeFile(registryPath, previousRegistry);
 
   try {
-    const result = await synchronizeCalendar({
-      source: sourcePath,
-      outputPath,
-      registryPath,
-      now: new Date("2026-07-01"),
-    });
-    assert.equal(new Set(result.registry.events.map((event) => event.slug)).size, 2);
-    assert.equal(result.warnings.some((warning) => warning.includes("collision")), true);
+    await assert.rejects(
+      synchronizeCalendar({
+        source: sourcePath,
+        outputPath,
+        registryPath,
+        now: new Date("2026-07-01"),
+      }),
+      /Duplicate calendar canonical slug: 2026-08-08-examen/,
+    );
+    assert.equal(await readFile(outputPath, "utf8"), "previous output");
+    assert.equal(await readFile(registryPath, "utf8"), previousRegistry);
   } finally {
     await rm(tempDirectory, { recursive: true, force: true });
   }
+});
+
+test("removes aliases that collide with another event canonical", () => {
+  const previous = {
+    version: 1,
+    events: [
+      {
+        sourceId: "first",
+        slug: "2026-08-08-first",
+        aliases: ["2026-08-08-second"],
+        title: "First",
+        date: "2026-08-08",
+      },
+      {
+        sourceId: "second",
+        slug: "2026-08-08-second",
+        aliases: [],
+        title: "Second",
+        date: "2026-08-08",
+      },
+    ],
+  };
+
+  const merged = mergeRegistry(previous, previous.events, new Date("2026-07-01"));
+  assertAliasInvariants(merged.events);
+  assert.deepEqual(merged.events.find((event) => event.sourceId === "first").aliases, []);
+});
+
+test("removes a legacy alias claimed by more than one event", () => {
+  const previous = {
+    version: 1,
+    events: [
+      {
+        sourceId: "first",
+        slug: "2026-08-08-first",
+        aliases: ["legacy-examen"],
+        title: "First",
+        date: "2026-08-08",
+      },
+      {
+        sourceId: "second",
+        slug: "2026-08-08-second",
+        aliases: ["legacy-examen"],
+        title: "Second",
+        date: "2026-08-08",
+      },
+    ],
+  };
+
+  const merged = mergeRegistry(previous, previous.events, new Date("2026-07-01"));
+  assertAliasInvariants(merged.events);
+  assert.equal(
+    merged.events.flatMap((event) => event.aliases).includes("legacy-examen"),
+    false,
+  );
+
+  const redirects = merged.events.flatMap((event) =>
+    event.aliases.map((alias) => [alias, event.slug]),
+  );
+  const legacyDestinations = new Set(
+    redirects
+      .filter(([alias]) => alias === "legacy-examen")
+      .map(([, destination]) => destination),
+  );
+  assert.equal(legacyDestinations.size, 0);
 });
 
 test("an invalid feed leaves the last published files untouched", async () => {

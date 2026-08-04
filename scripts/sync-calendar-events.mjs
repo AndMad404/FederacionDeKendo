@@ -336,49 +336,116 @@ export function parseCalendarEvent(properties, warnings = []) {
   return event;
 }
 
-function resolveSlugCollisions(events, warnings) {
-  const bySlug = new Map();
-  return events.map((event) => {
-    const previous = bySlug.get(event.slug);
-    if (!previous) {
-      bySlug.set(event.slug, event.sourceId);
-      return event;
+function assertUniqueCurrentSlugs(events) {
+  const ownerBySlug = new Map();
+  for (const event of events) {
+    const previousOwner = ownerBySlug.get(event.slug);
+    if (previousOwner) {
+      throw new Error(
+        `Duplicate calendar canonical slug: ${event.slug} (${previousOwner} and ${event.sourceId}).`,
+      );
     }
-    const slug = `${event.slug}-${event.sourceId.slice(0, 8)}`;
-    warnings.push(`Slug collision resolved: ${event.slug} -> ${slug}.`);
-    return { ...event, slug };
-  });
+    ownerBySlug.set(event.slug, event.sourceId);
+  }
 }
 
-export function mergeRegistry(previousRegistry, currentEvents, now = new Date()) {
+function assignCanonicalSlugs(records) {
+  const canonicalBySource = new Map();
+  const ownerBySlug = new Map();
+
+  for (const record of records) {
+    const canonicalSlug = record.previous?.slug ?? record.event.slug;
+    const previousOwner = ownerBySlug.get(canonicalSlug);
+    if (previousOwner && previousOwner !== record.event.sourceId) {
+      throw new Error(
+        `Duplicate calendar canonical slug: ${canonicalSlug} (${previousOwner} and ${record.event.sourceId}).`,
+      );
+    }
+    ownerBySlug.set(canonicalSlug, record.event.sourceId);
+    canonicalBySource.set(record.event.sourceId, canonicalSlug);
+  }
+
+  return canonicalBySource;
+}
+
+function removeAmbiguousAliases(events, warnings) {
+  const canonicalSlugs = new Set(events.map((event) => event.slug));
+  const aliasOwners = new Map();
+
+  for (const event of events) {
+    for (const alias of event.aliases ?? []) {
+      const owners = aliasOwners.get(alias) ?? new Set();
+      owners.add(event.sourceId);
+      aliasOwners.set(alias, owners);
+    }
+  }
+
+  const invalidAliases = new Set();
+  for (const [alias, owners] of aliasOwners) {
+    if (canonicalSlugs.has(alias) || owners.size > 1) {
+      invalidAliases.add(alias);
+      warnings.push(`Ambiguous calendar alias omitted: ${alias}.`);
+    }
+  }
+
+  return events.map((event) => ({
+    ...event,
+    aliases: (event.aliases ?? []).filter(
+      (alias) => alias !== event.slug && !invalidAliases.has(alias),
+    ),
+  }));
+}
+
+export function mergeRegistry(
+  previousRegistry,
+  currentEvents,
+  now = new Date(),
+  warnings = [],
+) {
+  assertUniqueCurrentSlugs(currentEvents);
   const previousBySource = new Map(
     (previousRegistry.events ?? []).map((event) => [event.sourceId, event]),
   );
   const currentSourceIds = new Set(currentEvents.map((event) => event.sourceId));
-  const merged = currentEvents.map((event) => {
-    const previous = previousBySource.get(event.sourceId);
-    if (!previous) return event;
-    const aliases = new Set(previous.aliases ?? []);
-    if (previous.slug !== event.slug) aliases.add(previous.slug);
-    aliases.delete(event.slug);
-    return { ...event, aliases: [...aliases].sort() };
+  const retainedHistoricalEvents = (previousRegistry.events ?? []).filter(
+    (event) =>
+      !currentSourceIds.has(event.sourceId) &&
+      getEventEndDateTime(event).getTime() < now.getTime(),
+  );
+  const records = [
+    ...currentEvents.map((event) => ({
+      event,
+      previous: previousBySource.get(event.sourceId),
+    })),
+    ...retainedHistoricalEvents.map((event) => ({ event, previous: event })),
+  ];
+  const canonicalBySource = assignCanonicalSlugs(records);
+  const merged = records.map(({ event, previous }) => {
+    const canonicalSlug = canonicalBySource.get(event.sourceId);
+    const aliases = new Set([
+      ...(previous?.aliases ?? []),
+      ...(event.aliases ?? []),
+    ]);
+    if (event.slug !== canonicalSlug) aliases.add(event.slug);
+    if (previous?.slug && previous.slug !== canonicalSlug) {
+      aliases.add(previous.slug);
+    }
+    aliases.delete(canonicalSlug);
+    return {
+      ...event,
+      slug: canonicalSlug,
+      aliases: [...aliases].sort(),
+    };
   });
 
-  for (const previous of previousRegistry.events ?? []) {
-    if (
-      !currentSourceIds.has(previous.sourceId) &&
-      getEventEndDateTime(previous).getTime() < now.getTime()
-    ) {
-      merged.push(previous);
-    }
-  }
+  const sanitized = removeAmbiguousAliases(merged, warnings);
 
-  merged.sort(
+  sanitized.sort(
     (a, b) =>
       createLocalDate(a.date, a.startTime).getTime() -
       createLocalDate(b.date, b.startTime).getTime(),
   );
-  return { version: 1, events: merged };
+  return { version: 1, events: sanitized };
 }
 
 function serializeProperty(name, value, isLast) {
@@ -498,9 +565,8 @@ export async function synchronizeCalendar({
   const parsed = parseVEvents(icsText)
     .map((properties) => parseCalendarEvent(properties, warnings))
     .filter(Boolean);
-  const currentEvents = resolveSlugCollisions(parsed, warnings);
   const previousRegistry = await readRegistry(registryPath);
-  const registry = mergeRegistry(previousRegistry, currentEvents, now);
+  const registry = mergeRegistry(previousRegistry, parsed, now, warnings);
 
   await writeAtomically([
     [registryPath, `${JSON.stringify(registry, null, 2)}\n`],

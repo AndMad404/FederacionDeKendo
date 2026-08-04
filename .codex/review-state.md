@@ -2,7 +2,7 @@
 
 ```yaml
 schema_version: 2
-last_updated: 2026-08-01
+last_updated: 2026-08-04
 contract: .agents/review-contract.md
 
 state_rules:
@@ -191,6 +191,42 @@ previous_architecture_review:
     - STR-ARCH-009
     - SMELL-ARCH-004
   result: Google Calendar as the editorial source and a generated static artifact fit the product, but the current implementation provides shareable fragment state rather than independently indexable event pages and needs stable identity, history, content governance, and an explicit publication SLA before the SEO promise is complete.
+
+latest_calendar_identity_implementation:
+  id: FIX-2026-08-04-01
+  requested_scope: Keep calendar source identity internal, keep technical identity fragments out of public event URLs, reject duplicate date-and-title canonicals safely, preserve existing canonicals, and retain global alias validation without changing UI, SEO policy, cron, Playwright, or generated-output tests.
+  approved_criteria:
+    - A UID maps consistently to an opaque 24-character hexadecimal sourceId, with exam-1@example.test mapping to aac691754e9f35832d4dfec4.
+    - The sourceId remains in calendarEventRegistry.json as synchronization metadata and is not serialized into the public event model or URL.
+    - Public event slugs use the event date and the slugified Google Calendar title; the synchronization code does not append inferred editorial context or a sourceId fragment.
+    - The Google Calendar title remains under the federation president's editorial ownership; technical uniqueness is enforced by the synchronization layer without rewriting the title.
+    - Two current events with the same date-derived canonical slug are treated as invalid input and abort synchronization before either destination is published.
+    - Existing unique canonicals remain authoritative for known sourceIds; any canonical namespace conflict with retained history also aborts instead of generating a technical suffix.
+    - An alias is removed from every event when it collides with any canonical or is claimed by more than one sourceId; no redirect is emitted for that ambiguous source.
+    - A title-only or date-only update preserves the prior canonical and retains only globally unambiguous legacy aliases.
+    - All-day DTEND remains stored as the exclusive ICS boundary.
+    - Invalid feed parsing continues to fail before publication and leaves both destinations unchanged.
+  baseline:
+    commit: 7446a94a
+    worktree: clean
+  fingerprints:
+    sync-calendar-events.mjs: 78DBB6B3B53F7CF15287F06EA7440BF2662144C3B8F01E744EA97469DBF35CF7
+    calendar-sync.test.mjs: 562C2AF82362E5BCBC8401D138A425A7D9F542D25687DFC5A4D09B1450B10F3C
+  pre_fix_evidence:
+    - Initial identity correction: corepack pnpm run test:unit produced 6 passes and 7 failures covering canonical churn, feed-order collision ownership, and ambiguous aliases.
+    - Revised no-technical-ID-in-URL policy: corepack pnpm run test:unit produced 11 passes and 1 failure because duplicate date and title still generated a suffixed URL instead of aborting.
+  verification:
+    - corepack pnpm run test:unit: 12 passed
+    - corepack pnpm run typecheck: passed
+    - corepack pnpm run build: passed, including SSR and generated routes
+    - corepack pnpm run test:generated: 4 passed
+    - generated URL audit: 18 event directories, zero sourceId-prefix leaks, 17 redirect rules, and zero conflicting redirect sources
+    - git diff --check: passed
+  excluded:
+    - SEO implementation changes, visible calendar behavior, UI, cron, Playwright, fixture expansion, generated-output test changes, and production behavior
+    - cross-file transactional write refactor
+    - test-strategy findings outside calendar synchronization identity, collisions, ranges, invalid feeds, and aliases
+  result: Calendar source identity remains stable and internal, public URLs contain no technical identity fragments, duplicate date-and-title canonicals fail without publication, unique prior canonicals are retained, and ambiguous aliases are omitted before generated redirects consume the synchronized data.
 
 latest_implementation:
   id: FIX-2026-07-27-03
@@ -1827,23 +1863,40 @@ active_findings:
       - owner states the generated tests have not been reviewed
       - tests contain no stable requirement IDs linked to an owner-approved specification
       - multiple test names make claims stronger than their assertions
+    partial_resolution: The owner approved the revised calendar identity boundary on 2026-08-04: Google Calendar titles remain editorial input, sourceId remains internal metadata, public URLs use date and title, and duplicate canonicals abort publication. Relevant regression tests failed before each implementation stage and passed afterward. Acceptance criteria and independent checks for the rest of the generated test strategy remain open.
     introduced_in: REV-2026-07-31-05
+
+  - id: STR-ARCH-012
+    level: STRUCTURAL
+    axis: ARCH
+    status: open
+    target: scripts/sync-calendar-events.mjs writeAtomically
+    problem: The registry and generated TypeScript file are committed by two sequential renames, so failure of the second rename after the first succeeds can publish mismatched versions.
+    fix: Design a separate two-file transaction that stages both outputs, preserves recoverable backups, rolls back the first replacement if either commit rename fails, and cleans up only after both replacements succeed; account for Windows file-lock and replacement behavior as well as POSIX rename semantics.
+    cost_of_deferring: A filesystem error, file lock, or interrupted process during the commit phase can leave calendar identity data inconsistent with the generated application data until the next successful synchronization.
+    evidence:
+      - writeAtomically writes all temporary files before publication but then renames each temporary path to its destination sequentially
+      - the catch block deletes remaining temporary files but does not restore a destination already replaced by an earlier successful rename
+      - Windows can reject a rename when the destination is locked, while POSIX atomic rename of one path does not make two destination replacements transactional
+    reproducible_test: Inject or wrap rename so the second destination replacement fails after the first succeeds, seed both destinations with distinct prior contents, and assert that rollback restores both originals and removes temporary and backup files on Windows and Linux.
+    scope_note: No transactional refactor was included in FIX-2026-08-04-01 because pre-publication canonical validation and alias resolution do not require it.
+    introduced_in: FIX-2026-08-03-01
 
   - id: SMELL-ARCH-008
     level: SMELL
     axis: ARCH
     status: open
-    target: tests/calendar-sync.test.mjs, tests/generated-output.test.mjs, and tests/e2e/events.spec.ts
-    problem: Several names overclaim their assertions, including stable hash without repeated evaluation, valid JSON-LD without JSON parsing, prerendering with JavaScript enabled, complete description from one excerpt, and historical archive from heading and page count only.
+    target: tests/generated-output.test.mjs and tests/e2e/events.spec.ts
+    problem: Several remaining names overclaim their assertions, including valid JSON-LD without JSON parsing, prerendering with JavaScript enabled, complete description from one excerpt, and historical archive from heading and page count only.
     fix: Rename tests to their actual scope or strengthen assertions to prove the named behavior with exact outputs, parsed structures, disabled-JavaScript or raw-response checks, and representative archive entries.
     cost_of_deferring: Reports will communicate coverage that the suite cannot actually guarantee.
     evidence:
-      - calendar-sync.test.mjs:17-29 evaluates the hash once
       - generated-output.test.mjs:9-23 only regex-matches Event JSON-LD
       - events.spec.ts:5-20 loads the browser normally
       - events.spec.ts:54-77 checks one description excerpt and absence of a button
       - events.spec.ts:80-91 checks archive heading/page count and not-found copy
       - current dist JSON-LD parses successfully, but that parse is absent from the automated test
+    partial_resolution: calendar-sync.test.mjs now evaluates the same UID twice, asserts the exact expected sourceId, proves it is absent from the public event model and URL, and uses narrowly named tests for canonical preservation, collision rejection, aliases, all-day ranges, and invalid feeds.
     introduced_in: REV-2026-07-31-05
 
   - id: SMELL-ARCH-009
@@ -2091,7 +2144,7 @@ resolved_findings:
   - id: STR-ARCH-008
     status: resolved
     resolved_at: 2026-07-27
-    summary: Synchronization uses a non-reversible UID hash for identity, preserves canonical and previous slugs, deletes missing future events, and retains completed events indefinitely.
+    summary: Synchronization uses an opaque truncated SHA-256 UID digest for identity, preserves canonical and previous slugs, deletes missing future events, and retains completed events indefinitely.
     resolution:
       resolved_ref: 0729f5fc dirty worktree recorded in FIX-2026-07-27-03
       checks: [UID unit test, alias unit test, future-deletion unit test, historical-preservation unit test, generated 301 test]
