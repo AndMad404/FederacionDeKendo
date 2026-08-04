@@ -22,6 +22,57 @@ design_source_status:
   planned_work: Recreate Figma from the approved current product, including supported routes, responsive viewports, components, tokens, and interactive states.
   recorded_at: 2026-08-01
 
+latest_responsive_overlap_fix:
+  id: FIX-2026-08-04-02
+  requested_scope: Explain and fix the desktop banner overlap on Affiliates, check the duplicated Calendar layout pattern, and document the regression.
+  baseline:
+    commit: d1df5cd3
+    worktree: dirty with the owner's in-progress bilingual-route changes
+    visual_authority:
+      - owner-provided local and deployed Affiliates screenshots showing the banner heading obscured by the dojo cards
+      - the established 1366x768 no-scroll desktop requirement
+  root_cause:
+    introduced_by: 424a6218
+    explanation: The custom tall-md variant is emitted after the built-in xl variant. Adding tall-md:p-4 therefore reset xl:pt-20 from 80px to 16px when both variants matched, while the z-20 absolute content layer rendered above the banner.
+    affected_pattern:
+      - src/app/components/AfiliadosSection.tsx
+      - src/app/components/CalendarSection.tsx
+  implemented:
+    - added tall-md:xl:pt-20 at the exact variant intersection in Affiliates and Calendar
+    - preserved the existing tall-md tablet padding, compact-landscape overrides, bilingual content work, and 1366x768 no-scroll composition
+  verification:
+    - corepack pnpm run typecheck passed
+    - corepack pnpm run build passed outside the filesystem sandbox, including SSR and generated route HTML
+    - git diff --check passed before the documentation update
+    - local /afiliados at 1366x768 measured heading bottom 122.98px and dojo-list top 161.99px with no overlap
+    - local /calendario at 1366x768 measured heading bottom 122.98px and content-panel top 161.99px with no overlap
+    - both routes measured document clientHeight and scrollHeight at 768px and primary-section clientHeight and scrollHeight at 542px
+  result: The desktop content layers begin below the visible banner headings again without introducing document or primary-section scrolling.
+
+latest_visual_regression_gate:
+  id: FIX-2026-08-04-03
+  requested_scope: Treat the approved design as a site-wide CI contract so any generated page that breaks raises an error, rather than adding an Affiliates-only regression test.
+  baseline:
+    commit: d1df5cd3
+    worktree: dirty with FIX-2026-08-04-02 and this test implementation
+    authority: The owner explicitly confirmed that the current rendered design is approved for every page.
+  implemented:
+    - added tests/e2e/visual-regression.spec.ts with automatic discovery of every generated dist route plus the custom not-found route
+    - checks every generated page at 360x800, 390x844, 768x1024, and 1366x768
+    - enforces horizontal overflow, heading viewport bounds, declared heading-to-content boundaries, and the desktop document, footer, and primary-section no-scroll contract
+    - added data-page-content-boundary to the Affiliates dojo list and Calendar panel so the regression introduced by 424a6218 fails geometrically
+    - added 28 approved screenshots covering home, calendar, gallery, affiliates, event, pastEvents, and notFound across all four viewports
+    - configured platform-neutral screenshot paths and a 1% maximum pixel-difference ratio for useful Windows/Linux comparison
+    - documented that baselines require explicit owner approval before regeneration
+  verification:
+    - corepack pnpm run typecheck passed
+    - corepack pnpm run build passed, including SSR and generated route HTML
+    - structural gate: 92 passed across 23 generated/not-found pages and four viewports
+    - visual gate: 28 passed across seven page designs and four viewports
+    - complete Playwright suite: 130 passed
+    - all seven desktop baselines were visually inspected after generation
+  result: CI now rejects structural regressions on every generated page and material screenshot drift on every approved page design instead of relying on route presence and document height alone.
+
 latest_session:
   id: REV-2026-08-01-02
   requested_scope: Review the gallery landscape padding.

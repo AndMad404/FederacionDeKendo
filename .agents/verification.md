@@ -72,6 +72,35 @@ nearby regression checks. A change to a shared primitive or responsive rule
 must also inspect its affected consumers. A successful typecheck or build does
 not prove visual correctness.
 
+### Automated visual regression gate
+
+`tests/e2e/visual-regression.spec.ts` is the executable baseline for the
+approved application design:
+
+- It discovers every generated `dist/**/index.html` route automatically and
+  includes the custom not-found page.
+- Every generated page is checked at 360x800, 390x844, 768x1024, and
+  1366x768 for horizontal overflow, visible heading bounds, declared
+  heading-to-content boundaries, and the desktop no-scroll contract.
+- One representative of every page design (`home`, `calendar`, `gallery`,
+  `affiliates`, `event`, `pastEvents`, and `notFound`) is compared with an
+  approved screenshot at each viewport.
+- Screenshot comparisons allow at most a 1% pixel difference to absorb minor
+  cross-platform rendering variation while still rejecting material layout
+  changes.
+
+Run the complete gate with:
+
+```powershell
+pnpm run build
+pnpm run test:e2e
+```
+
+Never update screenshot baselines merely to make a failing test pass. After
+the owner explicitly approves an intentional visual change, regenerate them
+with `pnpm test:e2e --update-snapshots`, inspect the changed images, and commit
+the reviewed baselines with the implementation.
+
 ## Responsive Checks
 
 Use real route checks for:
@@ -96,6 +125,8 @@ At 1366x768, verify for every route that:
   overflow (`scrollHeight` equals `clientHeight`).
 - Variable-length content remains reachable through an explicit bounded
   interaction rather than desktop vertical scrolling.
+- Any primary surface marked with `data-page-content-boundary` begins at or
+  below the bottom edge of the route `h1`.
 
 For landscape-specific issues, do not treat scaled portrait behavior as proof.
 
