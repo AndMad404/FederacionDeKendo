@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { DOJOS } from "../data/dojos";
+import { getDojos } from "../data/dojos";
+import { useLanguage } from "../config/i18n";
 import { DojoList } from "./affiliates/DojoList";
 import { MediaPageBanner } from "./ui/MediaPageBanner";
 import { NavigationArrowButton } from "./ui/ModalControls";
@@ -10,33 +11,35 @@ function AffiliatePagination({
   page,
   totalPages,
   onPageChange,
+  language,
 }: {
   page: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  language: "es" | "en";
 }) {
   if (totalPages <= 1) return null;
 
   return (
     <nav
-      aria-label="Paginación de dojos afiliados"
+      aria-label={language === "en" ? "Affiliated dojo pagination" : "Paginación de dojos afiliados"}
       className="mb-4 flex min-h-11 items-center justify-center gap-2 xl:absolute xl:right-6 xl:top-2 xl:z-20 xl:mb-0"
     >
       <NavigationArrowButton
         direction="previous"
-        label="Página anterior de dojos"
+        label={language === "en" ? "Previous dojo page" : "Página anterior de dojos"}
         aria-controls="affiliate-dojo-list"
         disabled={page === 0}
         onClick={() => onPageChange(page - 1)}
       />
 
       <p className="min-w-20 text-center text-sm font-bold" aria-live="polite">
-        {page + 1} de {totalPages}
+        {page + 1} {language === "en" ? "of" : "de"} {totalPages}
       </p>
 
       <NavigationArrowButton
         direction="next"
-        label="Página siguiente de dojos"
+        label={language === "en" ? "Next dojo page" : "Página siguiente de dojos"}
         aria-controls="affiliate-dojo-list"
         disabled={page === totalPages - 1}
         onClick={() => onPageChange(page + 1)}
@@ -46,10 +49,12 @@ function AffiliatePagination({
 }
 
 export function AfiliadosSection() {
+  const { language } = useLanguage();
+  const dojos = getDojos(language);
   const [page, setPage] = useState(0);
-  const totalPages = Math.max(1, Math.ceil(DOJOS.length / DOJOS_PER_PAGE));
+  const totalPages = Math.max(1, Math.ceil(dojos.length / DOJOS_PER_PAGE));
   const startIndex = page * DOJOS_PER_PAGE;
-  const visibleDojos = DOJOS.slice(startIndex, startIndex + DOJOS_PER_PAGE);
+  const visibleDojos = dojos.slice(startIndex, startIndex + DOJOS_PER_PAGE);
 
   return (
     <section
@@ -59,8 +64,8 @@ export function AfiliadosSection() {
       <MediaPageBanner
         className="relative z-10 h-28 shrink-0 overflow-hidden land-compact:h-20"
         titleId="affiliates-title"
-        title="Dojos afiliados"
-        description="Dojos afiliados donde practicar kendo."
+        title={language === "en" ? "Affiliated dojos" : "Dojos afiliados"}
+        description={language === "en" ? "Affiliated dojos where you can practice kendo." : "Dojos afiliados donde practicar kendo."}
         image={{
           src: "/images/affiliates/kendo-affiliates.jpg",
           sources: [
@@ -88,8 +93,9 @@ export function AfiliadosSection() {
             page={page}
             totalPages={totalPages}
             onPageChange={setPage}
+            language={language}
           />
-          <DojoList dojos={visibleDojos} startIndex={startIndex} />
+          <DojoList dojos={visibleDojos} startIndex={startIndex} language={language} />
         </div>
       </div>
     </section>

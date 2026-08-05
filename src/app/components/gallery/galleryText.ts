@@ -51,7 +51,10 @@ export function getGalleryDisplayText({
   };
 }
 
-export function getMobileDescriptionPreview(description: string) {
+export function getMobileDescriptionPreview(
+  description: string,
+  openDetailsLabel = OPEN_DETAILS_LABEL,
+) {
   const text = truncateText(description, GALLERY_DESCRIPTION_MAX_LENGTH);
 
   if (text.length <= MOBILE_DESCRIPTION_MAX_LENGTH) {
@@ -62,10 +65,10 @@ export function getMobileDescriptionPreview(description: string) {
   }
 
   const textLimit =
-    MOBILE_DESCRIPTION_MAX_LENGTH - OPEN_DETAILS_LABEL.length - ellipsis.length;
+    MOBILE_DESCRIPTION_MAX_LENGTH - openDetailsLabel.length - ellipsis.length;
 
   return {
-    preview: `${truncateAtWord(text, textLimit)}${ellipsis}${OPEN_DETAILS_LABEL}`,
+    preview: `${truncateAtWord(text, textLimit)}${ellipsis}${openDetailsLabel}`,
     isTruncated: true,
   };
 }

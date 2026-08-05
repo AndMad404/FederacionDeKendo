@@ -1,4 +1,5 @@
 import { NavigationArrowButton } from "../ui/ModalControls";
+import { useLanguage } from "../../config/i18n";
 
 interface CalendarNavigationProps {
   currentMonthLabel: string;
@@ -25,15 +26,17 @@ export function CalendarNavigation({
   onPreviousPair,
   onNextPair,
 }: CalendarNavigationProps) {
+  const { language } = useLanguage();
+  const english = language === "en";
   return (
     <nav
-      aria-label="Navegación del calendario"
+      aria-label={english ? "Calendar navigation" : "Navegación del calendario"}
       className="flex items-center justify-center gap-4"
     >
       <span className="md:hidden">
         <NavigationArrowButton
           direction="previous"
-          label="Ver mes anterior"
+          label={english ? "View previous month" : "Ver mes anterior"}
           disabled={!canPreviousMonth}
           onClick={onPreviousMonth}
         />
@@ -41,7 +44,7 @@ export function CalendarNavigation({
       <span className="hidden md:block">
         <NavigationArrowButton
           direction="previous"
-          label="Ver los dos meses anteriores"
+          label={english ? "View previous two months" : "Ver los dos meses anteriores"}
           disabled={!canPreviousPair}
           onClick={onPreviousPair}
         />
@@ -58,7 +61,7 @@ export function CalendarNavigation({
       <span className="md:hidden">
         <NavigationArrowButton
           direction="next"
-          label="Ver mes siguiente"
+          label={english ? "View next month" : "Ver mes siguiente"}
           disabled={!canNextMonth}
           onClick={onNextMonth}
         />
@@ -66,7 +69,7 @@ export function CalendarNavigation({
       <span className="hidden md:block">
         <NavigationArrowButton
           direction="next"
-          label="Ver los dos meses siguientes"
+          label={english ? "View next two months" : "Ver los dos meses siguientes"}
           disabled={!canNextPair}
           onClick={onNextPair}
         />

@@ -58,14 +58,17 @@ For semantic or interactive UI changes, inspect:
 
 For layout, spacing, component, or style changes:
 
-1. Restate the approved baseline and identify its source.
-2. Inspect the affected route at every target viewport named in the task.
-3. Compare the relevant outer margins, internal padding, gaps, dimensions,
+1. Record the owner's explicit approval for the exact intended visual change.
+2. Restate the approved baseline and identify its source.
+3. Inspect the affected route at every target viewport named in the task.
+4. Compare the relevant outer margins, internal padding, gaps, dimensions,
    alignment, component composition, tokens, and interactive states.
-4. Check document and component overflow, including content at its expected
+5. Check document and component overflow, including content at its expected
    maximum or variable length.
-5. Capture or record reproducible visual evidence when practical and list any
+6. Capture or record reproducible visual evidence when practical and list any
    intentional deviation from the baseline.
+7. Inspect the screenshot diff itself, not only the changed-pixel count. Map
+   every material changed region to an explicitly authorized requirement.
 
 An exact, narrowly scoped correction needs only the affected viewport and
 nearby regression checks. A change to a shared primitive or responsive rule
@@ -100,6 +103,18 @@ Never update screenshot baselines merely to make a failing test pass. After
 the owner explicitly approves an intentional visual change, regenerate them
 with `pnpm test:e2e --update-snapshots`, inspect the changed images, and commit
 the reviewed baselines with the implementation.
+
+Visual comparisons fail closed:
+
+- One expected difference does not waive unexpected differences elsewhere in
+  the same screenshot.
+- If the worktree contains unrelated visual changes, the result cannot verify
+  a narrow change until that patch is isolated or the combined scope is
+  explicitly approved.
+- A reviewer must inspect expected, actual, and diff images before describing a
+  failure as intentional.
+- Structural assertions passing do not override a screenshot failure.
+- Do not regenerate baselines from a mixed or partially approved worktree.
 
 ## Responsive Checks
 

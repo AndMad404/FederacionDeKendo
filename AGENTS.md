@@ -16,6 +16,14 @@ Stack:
 - Keep work scoped to the user's requested file, route, concern, or task.
 - Prefer existing project patterns over new abstractions.
 - Do not refactor unrelated code while implementing a narrow change.
+- Do not validate a narrow visual change on top of unrelated visual worktree
+  changes. First isolate the authorized patch or stop and ask how the existing
+  changes should be preserved.
+- Do not implement any visual change without explicit owner approval. This
+  includes spacing, dimensions, alignment, typography, colors, filters,
+  visibility, responsive presentation, and shared visual tokens.
+- Treat every unexpected visual-regression difference as blocking. An intended
+  difference in one region does not authorize or explain differences elsewhere.
 - Separate verified repo facts from suggestions or future ideas.
 - Treat legal, SEO metadata, and public copy constraints from the user as hard requirements.
 - When creating a commit, follow the message convention in `CONTRIBUTING.md`.

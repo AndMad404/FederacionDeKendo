@@ -1,12 +1,15 @@
 import { CALENDAR_EVENTS } from "../data/calendarEvents";
 import { getUpcomingEvents } from "../utils/calendarEvents";
 import { UpcomingEventCard } from "./events/UpcomingEventCard";
+import { useLanguage } from "../config/i18n";
+import { getLocalizedEvents } from "../utils/localizedEvents";
 
 const maxHomepageEvents = 4;
 
 export function UpcomingEventsSection() {
+  const { copy, language } = useLanguage();
   const homepageEvents = getUpcomingEvents(
-    CALENDAR_EVENTS,
+    getLocalizedEvents(CALENDAR_EVENTS, language),
     undefined,
     maxHomepageEvents,
   );
@@ -23,7 +26,7 @@ export function UpcomingEventsSection() {
           id="upcoming-events-title"
           className="text-lg font-bold leading-tight sm:text-xl tall-md:text-2xl"
         >
-          Próximos encuentros
+          {copy.home.upcoming}
         </h2>
       </div>
 

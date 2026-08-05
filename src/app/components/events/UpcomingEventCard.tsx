@@ -8,6 +8,7 @@ import {
   getLocationMapUrl,
 } from "../../utils/calendarEventPresentation";
 import { getEventPath } from "../../utils/eventRoutes";
+import { useLanguage } from "../../config/i18n";
 
 const actionClass =
   `inline-flex min-h-11 min-w-0 items-center justify-center rounded-lg px-3 py-1.5 text-center text-sm font-semibold leading-tight transition-colors hover:border-site-action hover:bg-site-media lg:min-h-8 lg:px-2.5 lg:py-1 ${actionControlSurfaceClass}`;
@@ -27,8 +28,10 @@ export function UpcomingEventCard({
   event,
   index,
 }: UpcomingEventCardProps) {
+  const { language } = useLanguage();
+  const english = language === "en";
   const { startDateLabel, endDateLabel, endDateValue } =
-    getEventDateRangeLabels(event);
+    getEventDateRangeLabels(event, language);
   const locationUrl = event.location
     ? getLocationMapUrl(event.location)
     : undefined;
@@ -55,7 +58,7 @@ export function UpcomingEventCard({
             <span className="hidden sm:inline" aria-hidden="true">
               {" - "}
             </span>
-            <span className="sr-only"> al </span>
+            <span className="sr-only"> {english ? "to" : "al"} </span>
             <time
               dateTime={endDateValue}
               className="block whitespace-nowrap sm:inline"
@@ -71,7 +74,7 @@ export function UpcomingEventCard({
           href={locationUrl}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label={`Abrir ubicación de ${event.title} en Google Maps`}
+          aria-label={english ? `Open the location of ${event.title} in Google Maps` : `Abrir ubicación de ${event.title} en Google Maps`}
           aria-describedby={locationDescriptionId}
           className={`col-start-1 row-start-2 justify-self-center ${actionClass} ${focusRingClass}`}
         >
@@ -79,25 +82,25 @@ export function UpcomingEventCard({
             className="mr-1.5 size-3.5 shrink-0 text-site-accent"
             aria-hidden="true"
           />
-          <span>Cómo llegar</span>
+          <span>{english ? "Directions" : "Cómo llegar"}</span>
           <span id={locationDescriptionId} className="sr-only">
-            Lugar: {locationName}. Abre Google Maps en una pestaña nueva.
+            {english ? "Place" : "Lugar"}: {locationName}. {english ? "Opens Google Maps in a new tab." : "Abre Google Maps en una pestaña nueva."}
           </span>
         </a>
       ) : (
         <span
           className={`col-start-1 row-start-2 justify-self-center text-site-muted ${actionClass}`}
         >
-          Pendiente de confirmar
+          {english ? "To be confirmed" : "Pendiente de confirmar"}
         </span>
       )}
 
       <Link
-        to={getEventPath(event)}
-        aria-label={`Consultar detalles del evento ${event.title}`}
+        to={getEventPath(event, language)}
+        aria-label={english ? `View details for ${event.title}` : `Consultar detalles del evento ${event.title}`}
         className={`col-start-2 row-start-2 justify-self-end ${actionClass} ${focusRingClass}`}
       >
-        Detalles del evento
+        {english ? "Event details" : "Detalles del evento"}
       </Link>
     </li>
   );

@@ -22,6 +22,34 @@ design_source_status:
   planned_work: Recreate Figma from the approved current product, including supported routes, responsive viewports, components, tokens, and interactive states.
   recorded_at: 2026-08-01
 
+latest_process_incident:
+  id: INC-2026-08-04-01
+  requested_scope: Reduce the homepage hero overlay so a person at the right edge is more recognizable without weakening text contrast.
+  baseline:
+    commit: b59c5813
+    worktree: dirty with unrelated in-progress bilingual route and component changes across 31 files
+    approved_visual_oracle: committed Playwright screenshots for the current official design
+  observed:
+    - The desktop homepage screenshot comparison failed with 74504 changed pixels, an 8 percent ratio.
+    - The diff contained the intended overlay change plus unrelated navbar, hero geometry, and event-title differences.
+    - UpcomingEventCard.tsx had unrelated flex and min-height title changes that differed from the approved official presentation.
+    - The overlay change did not improve recognition enough to satisfy the owner's visual objective.
+  failure:
+    - The mixed dirty worktree was used to evaluate a narrow visual change.
+    - The screenshot failure was described as expected without first attributing every material changed region.
+    - Passing structural checks were allowed to overshadow the blocking visual comparison.
+  corrective_rules:
+    - Require explicit owner approval before every visual edit, including spacing, alignment, typography, color, filters, visibility, and responsive presentation.
+    - Feature approval does not authorize incidental design changes.
+    - Isolate narrow visual work from unrelated dirty visual changes before validation.
+    - Treat visual comparisons as fail-closed and inspect expected, actual, and diff images.
+    - Never approve or regenerate a baseline until every material difference is authorized by the owner.
+    - Preserve owner work and request explicit direction before any destructive reset, checkout, stash, or relocation.
+  corrective_action:
+    - removed the unapproved min-height and flex alignment added to homepage event titles
+    - reverted the rejected responsive hero-overlay change
+  status: documented; rejected visual changes removed and the remaining mixed implementation must not become a visual baseline without review
+
 latest_responsive_overlap_fix:
   id: FIX-2026-08-04-02
   requested_scope: Explain and fix the desktop banner overlap on Affiliates, check the duplicated Calendar layout pattern, and document the regression.

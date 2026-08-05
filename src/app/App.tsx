@@ -14,6 +14,12 @@ import {
   getRouteSeoPayload,
   type RouteComponent,
 } from "./config/seo";
+import {
+  getLanguageFromPathname,
+  isLanguageSwitch,
+  LanguageProvider,
+  useLanguage,
+} from "./config/i18n";
 
 export interface RouteComponentRegistry {
   routes: Record<RouteComponent, ComponentType>;
@@ -24,6 +30,7 @@ function applyRouteHead(pathname: string) {
   const meta = getRouteMeta(pathname);
   const seo = getRouteSeoPayload(meta);
   document.title = seo.title;
+  document.documentElement.lang = meta.language;
 
   document
     .querySelectorAll(
@@ -44,15 +51,74 @@ function applyRouteHead(pathname: string) {
   }
 }
 
+function AppShell({
+  routeComponents,
+}: {
+  routeComponents: RouteComponentRegistry;
+}) {
+  const { copy } = useLanguage();
+  const NotFoundComponent = routeComponents.notFound;
+
+  return (
+    <div className="flex min-h-svh flex-col bg-site-canvas text-site-text tall-md:h-dvh tall-md:overflow-hidden">
+      <ScrollToTop />
+      <RouteMetadata />
+      <a
+        href="#main-content"
+        className="fixed left-4 top-4 z-[60] -translate-y-20 rounded-lg bg-site-surface px-4 py-2 text-sm font-bold text-site-navy shadow-lg transition focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-site-focus"
+      >
+        {copy.shell.skip}
+      </a>
+      <Navbar />
+
+      <main
+        id="main-content"
+        className="px-2.5 pt-[calc(4rem_+_10px)] land-sm:pt-[calc(3rem_+_6px)] tall-md:min-h-0 tall-md:flex-1 tall-md:overflow-hidden"
+      >
+        <Routes>
+          {getRouteManifest().map((route) => {
+            const Component = routeComponents.routes[route.component];
+            return (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={
+                  <Suspense fallback={<p className="sr-only" role="status">{copy.shell.loading}</p>}>
+                    <Component />
+                  </Suspense>
+                }
+              />
+            );
+          })}
+          <Route
+            path="*"
+            element={
+              <Suspense fallback={<p className="sr-only" role="status">{copy.shell.loading}</p>}>
+                <NotFoundComponent />
+              </Suspense>
+            }
+          />
+        </Routes>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
+
 function ScrollToTop() {
   const { pathname } = useLocation();
   const previousPathname = useRef(pathname);
 
   useEffect(() => {
     const isInitialLoad = previousPathname.current === pathname;
+    const isEquivalentLanguageRoute = isLanguageSwitch(
+      previousPathname.current,
+      pathname,
+    );
     previousPathname.current = pathname;
 
-    if (isInitialLoad || window.location.hash) return;
+    if (isInitialLoad || isEquivalentLanguageRoute || window.location.hash) return;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
@@ -76,63 +142,10 @@ export default function App({
 }: {
   routeComponents: RouteComponentRegistry;
 }) {
-  const NotFoundComponent = routeComponents.notFound;
-
+  const { pathname } = useLocation();
   return (
-    <div className="flex min-h-svh flex-col bg-site-canvas text-site-text tall-md:h-dvh tall-md:overflow-hidden">
-      <ScrollToTop />
-      <RouteMetadata />
-      <a
-        href="#main-content"
-        className="fixed left-4 top-4 z-[60] -translate-y-20 rounded-lg bg-site-surface px-4 py-2 text-sm font-bold text-site-navy shadow-lg transition focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-site-focus"
-      >
-        Saltar al contenido principal
-      </a>
-      <Navbar />
-
-      <main
-        id="main-content"
-        className="px-2.5 pt-[calc(4rem_+_10px)] land-sm:pt-[calc(3rem_+_6px)] tall-md:min-h-0 tall-md:flex-1 tall-md:overflow-hidden"
-      >
-        <Routes>
-          {getRouteManifest().map((route) => {
-            const Component = routeComponents.routes[route.component];
-            return (
-              <Route
-                key={route.path}
-                path={route.path}
-                element={
-                  <Suspense
-                    fallback={
-                      <p className="sr-only" role="status">
-                        Cargando contenido…
-                      </p>
-                    }
-                  >
-                    <Component />
-                  </Suspense>
-                }
-              />
-            );
-          })}
-          <Route
-            path="*"
-            element={
-              <Suspense
-                fallback={
-                  <p className="sr-only" role="status">
-                    Cargando contenido…
-                  </p>
-                }
-              >
-                <NotFoundComponent />
-              </Suspense>
-            }
-          />
-        </Routes>
-      </main>
-
-      <Footer />
-    </div>
+    <LanguageProvider language={getLanguageFromPathname(pathname)}>
+      <AppShell routeComponents={routeComponents} />
+    </LanguageProvider>
   );
 }
