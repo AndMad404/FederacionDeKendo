@@ -19,16 +19,6 @@ test("opens a prerendered event route with temporary noindex metadata", async ({
   );
 });
 
-test("redirects an old calendar hash to the canonical event page", async ({
-  page,
-}) => {
-  await page.goto("/calendario/#examen-2026-08-08");
-
-  await expect(page).toHaveURL(new RegExp(`${canonicalEventPath}$`));
-  await expect(page.getByRole("heading", { name: "Examen", level: 1 })).toBeVisible();
-  await expect(page.getByRole("dialog")).toHaveCount(0);
-});
-
 test("calendar cards link to the canonical event page", async ({ page }) => {
   await page.goto("/calendario/");
 
@@ -38,6 +28,17 @@ test("calendar cards link to the canonical event page", async ({ page }) => {
   await expect(eventLink).toHaveAttribute("href", canonicalEventPath);
   await eventLink.click();
   await expect(page).toHaveURL(new RegExp(`${canonicalEventPath}$`));
+});
+
+test("accepts only current canonical event routes", async ({ page }) => {
+  await page.goto("/eventos/examen-2026-08-08/");
+  await expect(page.getByText(/página que buscas no existe/i)).toBeVisible();
+
+  await page.goto("/calendario/#examen-2026-08-08");
+  await expect(page).toHaveURL(/\/calendario\/#examen-2026-08-08$/);
+  await expect(
+    page.getByRole("heading", { name: "Calendario de eventos", level: 1 }),
+  ).toBeVisible();
 });
 
 test("homepage event details link to the canonical event page", async ({ page }) => {

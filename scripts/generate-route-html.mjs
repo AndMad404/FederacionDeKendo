@@ -2,7 +2,6 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import {
   getRouteHeadDescriptors,
-  getEventRedirects,
   getRouteManifest,
   getRouteMeta,
   getRouteSeoPayload,
@@ -143,12 +142,3 @@ const sitemap = [
 
 await writeFile(path.join(DIST_DIR, "sitemap.xml"), sitemap, "utf8");
 console.log("generated dist\\sitemap.xml");
-
-const redirects = [
-  ...getEventRedirects().map(
-    ({ from, to }) => `${from} ${to} 301`,
-  ),
-  "",
-].join("\n");
-await writeFile(path.join(DIST_DIR, "_redirects"), redirects, "utf8");
-console.log("generated dist\\_redirects");

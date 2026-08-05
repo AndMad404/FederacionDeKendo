@@ -266,23 +266,6 @@ export function getRouteManifest() {
   ];
 }
 
-export function getEventRedirects() {
-  return CALENDAR_EVENTS.flatMap((event) =>
-    (event.aliases ?? [])
-      .filter((alias) => alias !== event.id)
-      .flatMap((alias) => [
-        {
-          from: `/eventos/${alias}/`,
-          to: getEventPath(event, "es"),
-        },
-        {
-          from: `/en/events/${alias}/`,
-          to: getEventPath(event, "en"),
-        },
-      ]),
-  );
-}
-
 function createEventRouteMeta(
   event: (typeof CALENDAR_EVENTS)[number],
   language: Language,

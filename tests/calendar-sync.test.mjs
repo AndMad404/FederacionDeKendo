@@ -28,34 +28,6 @@ function createIcs(events) {
   ].join("\n");
 }
 
-function assertAliasInvariants(events) {
-  const canonicalOwners = new Map(
-    events.map((event) => [event.slug, event.sourceId]),
-  );
-  const aliasOwners = new Map();
-
-  for (const event of events) {
-    for (const alias of event.aliases ?? []) {
-      assert.equal(
-        canonicalOwners.has(alias),
-        false,
-        `Alias ${alias} collides with a canonical slug`,
-      );
-      const owners = aliasOwners.get(alias) ?? [];
-      owners.push(event.sourceId);
-      aliasOwners.set(alias, owners);
-    }
-  }
-
-  for (const [alias, owners] of aliasOwners) {
-    assert.equal(
-      owners.length,
-      1,
-      `Alias ${alias} belongs to more than one event`,
-    );
-  }
-}
-
 async function runSynchronization({
   tempDirectory,
   name,
@@ -109,14 +81,13 @@ test("omits drafts and recurring events and warns about incomplete content", asy
   assert.equal(warnings.some((warning) => warning.includes("ubicación")), true);
 });
 
-test("preserves the canonical slug when only the title changes", () => {
+test("uses the current canonical slug when the title changes", () => {
   const previous = {
-    version: 1,
+    version: 2,
     events: [
       {
         sourceId: "same-source",
         slug: "2026-08-08-examen",
-        aliases: ["examen-2026-08-08"],
         title: "Examen",
         date: "2026-08-08",
       },
@@ -126,29 +97,22 @@ test("preserves the canonical slug when only the title changes", () => {
     {
       sourceId: "same-source",
       slug: "2026-08-08-examen-nacional",
-      aliases: ["examen-nacional-2026-08-08"],
       title: "Examen nacional",
       date: "2026-08-08",
     },
   ];
 
   const [event] = mergeRegistry(previous, current, new Date("2026-07-01")).events;
-  assert.equal(event.slug, "2026-08-08-examen");
-  assert.deepEqual(event.aliases, [
-    "2026-08-08-examen-nacional",
-    "examen-2026-08-08",
-    "examen-nacional-2026-08-08",
-  ]);
+  assert.equal(event.slug, "2026-08-08-examen-nacional");
 });
 
-test("preserves the canonical slug when only the date changes", () => {
+test("uses the current canonical slug when the date changes", () => {
   const previous = {
-    version: 1,
+    version: 2,
     events: [
       {
         sourceId: "same-source",
         slug: "2026-08-08-examen",
-        aliases: ["examen-2026-08-08"],
         title: "Examen",
         date: "2026-08-08",
       },
@@ -158,36 +122,28 @@ test("preserves the canonical slug when only the date changes", () => {
     {
       sourceId: "same-source",
       slug: "2026-08-15-examen",
-      aliases: ["examen-2026-08-15"],
       title: "Examen",
       date: "2026-08-15",
     },
   ];
 
   const [event] = mergeRegistry(previous, current, new Date("2026-07-01")).events;
-  assert.equal(event.slug, "2026-08-08-examen");
-  assert.deepEqual(event.aliases, [
-    "2026-08-15-examen",
-    "examen-2026-08-08",
-    "examen-2026-08-15",
-  ]);
+  assert.equal(event.slug, "2026-08-15-examen");
 });
 
 test("removes missing future events and preserves missing historical events", () => {
   const previous = {
-    version: 1,
+    version: 2,
     events: [
       {
         sourceId: "past",
         slug: "2025-01-01-past",
-        aliases: [],
         title: "Past",
         date: "2025-01-01",
       },
       {
         sourceId: "future",
         slug: "2027-01-01-future",
-        aliases: [],
         title: "Future",
         date: "2027-01-01",
       },
@@ -232,7 +188,7 @@ test("a duplicate date and title aborts before either destination is published",
   const sourcePath = path.join(tempDirectory, "collision.ics");
   const outputPath = path.join(tempDirectory, "calendarEvents.ts");
   const registryPath = path.join(tempDirectory, "registry.json");
-  const previousRegistry = '{"version":1,"events":[]}';
+  const previousRegistry = '{"version":2,"events":[]}';
   await writeFile(
     sourcePath,
     createIcs([
@@ -260,71 +216,6 @@ test("a duplicate date and title aborts before either destination is published",
   }
 });
 
-test("removes aliases that collide with another event canonical", () => {
-  const previous = {
-    version: 1,
-    events: [
-      {
-        sourceId: "first",
-        slug: "2026-08-08-first",
-        aliases: ["2026-08-08-second"],
-        title: "First",
-        date: "2026-08-08",
-      },
-      {
-        sourceId: "second",
-        slug: "2026-08-08-second",
-        aliases: [],
-        title: "Second",
-        date: "2026-08-08",
-      },
-    ],
-  };
-
-  const merged = mergeRegistry(previous, previous.events, new Date("2026-07-01"));
-  assertAliasInvariants(merged.events);
-  assert.deepEqual(merged.events.find((event) => event.sourceId === "first").aliases, []);
-});
-
-test("removes a legacy alias claimed by more than one event", () => {
-  const previous = {
-    version: 1,
-    events: [
-      {
-        sourceId: "first",
-        slug: "2026-08-08-first",
-        aliases: ["legacy-examen"],
-        title: "First",
-        date: "2026-08-08",
-      },
-      {
-        sourceId: "second",
-        slug: "2026-08-08-second",
-        aliases: ["legacy-examen"],
-        title: "Second",
-        date: "2026-08-08",
-      },
-    ],
-  };
-
-  const merged = mergeRegistry(previous, previous.events, new Date("2026-07-01"));
-  assertAliasInvariants(merged.events);
-  assert.equal(
-    merged.events.flatMap((event) => event.aliases).includes("legacy-examen"),
-    false,
-  );
-
-  const redirects = merged.events.flatMap((event) =>
-    event.aliases.map((alias) => [alias, event.slug]),
-  );
-  const legacyDestinations = new Set(
-    redirects
-      .filter(([alias]) => alias === "legacy-examen")
-      .map(([, destination]) => destination),
-  );
-  assert.equal(legacyDestinations.size, 0);
-});
-
 test("an invalid feed leaves the last published files untouched", async () => {
   const tempDirectory = await mkdtemp(path.join(os.tmpdir(), "fak-calendar-"));
   const sourcePath = path.join(tempDirectory, "invalid.ics");
@@ -332,7 +223,7 @@ test("an invalid feed leaves the last published files untouched", async () => {
   const registryPath = path.join(tempDirectory, "registry.json");
   await writeFile(sourcePath, "not a calendar");
   await writeFile(outputPath, "previous output");
-  await writeFile(registryPath, '{"version":1,"events":[]}');
+  await writeFile(registryPath, '{"version":2,"events":[]}');
 
   try {
     await assert.rejects(
@@ -342,7 +233,7 @@ test("an invalid feed leaves the last published files untouched", async () => {
     assert.equal(await readFile(outputPath, "utf8"), "previous output");
     assert.equal(
       await readFile(registryPath, "utf8"),
-      '{"version":1,"events":[]}',
+      '{"version":2,"events":[]}',
     );
   } finally {
     await rm(tempDirectory, { recursive: true, force: true });

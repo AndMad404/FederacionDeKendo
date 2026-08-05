@@ -4,14 +4,12 @@ import type { CalendarEvent } from "../types";
 export const CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: "2026-05-02-federacion-examen",
-    aliases: ["federacion-examen-2026-05-02"],
     title: "FEDERACIÓN  : Examen",
     date: "2026-05-02",
     timeZone: "America/Costa_Rica"
   },
   {
     id: "2026-05-29-clak-seminario-instructores-chile",
-    aliases: ["clak-seminario-instructores-chile-2026-05-29"],
     title: "CLAK Seminario Instructores CHILE",
     date: "2026-05-29",
     endDate: "2026-06-01",
@@ -19,14 +17,12 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2026-05-30-federacion-seminario-y-reunion",
-    aliases: ["federacion-seminario-y-reunion-2026-05-30"],
     title: "FEDERACIÓN : Seminario y Reunión",
     date: "2026-05-30",
     timeZone: "America/Costa_Rica"
   },
   {
     id: "2026-08-08-examen",
-    aliases: ["examen-2026-08-08"],
     title: "Examen",
     date: "2026-08-08",
     startTime: "13:00",
@@ -37,7 +33,6 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2026-08-22-3er-torneo",
-    aliases: ["3er-torneo-2026-08-22"],
     title: "3er Torneo",
     date: "2026-08-22",
     startTime: "13:00",
@@ -48,7 +43,6 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2026-09-11-gasshuku-monteverde",
-    aliases: ["gasshuku-monteverde-2026-09-11"],
     title: "Gasshuku Monteverde",
     date: "2026-09-11",
     endDate: "2026-09-13",
@@ -58,7 +52,6 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2026-10-10-clak-1er-panamericano-brasil",
-    aliases: ["clak-1er-panamericano-brasil-2026-10-10"],
     title: "CLAK 1er Panamericano BRASIL",
     date: "2026-10-10",
     endDate: "2026-10-12",
@@ -66,7 +59,6 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2026-10-31-examen",
-    aliases: ["examen-2026-10-31"],
     title: "Examen",
     date: "2026-10-31",
     startTime: "13:00",
@@ -77,7 +69,6 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2026-11-21-panama-torneo-por-equipos",
-    aliases: ["panama-torneo-por-equipos-2026-11-21"],
     title: "PANAMA Torneo por Equipos",
     date: "2026-11-21",
     summary: "Torneo por Equipos en Panamá. Invitación de Shinsei Panamá.",
@@ -85,7 +76,6 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2026-12-12-4to-torneo",
-    aliases: ["4to-torneo-2026-12-12"],
     title: "4to Torneo",
     date: "2026-12-12",
     startTime: "13:00",
@@ -96,7 +86,6 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2027-01-30-examen",
-    aliases: ["examen-2027-01-30"],
     title: "Examen",
     date: "2027-01-30",
     startTime: "13:00",
@@ -107,7 +96,6 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2027-04-03-5to-torneo",
-    aliases: ["5to-torneo-2027-04-03"],
     title: "5to Torneo",
     date: "2027-04-03",
     startTime: "13:00",
@@ -118,7 +106,6 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2027-05-01-examen",
-    aliases: ["examen-2027-05-01"],
     title: "Examen",
     date: "2027-05-01",
     startTime: "13:00",
@@ -129,7 +116,6 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2027-07-31-examen",
-    aliases: ["examen-2027-07-31"],
     title: "Examen",
     date: "2027-07-31",
     startTime: "13:00",
@@ -140,7 +126,6 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2027-08-14-6to-torneo",
-    aliases: ["6to-torneo-2027-08-14"],
     title: "6to Torneo",
     date: "2027-08-14",
     startTime: "13:00",
@@ -151,7 +136,6 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2027-10-30-examen",
-    aliases: ["examen-2027-10-30"],
     title: "Examen",
     date: "2027-10-30",
     startTime: "13:00",
@@ -162,7 +146,6 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2027-12-11-7mo-torneo",
-    aliases: ["7mo-torneo-2027-12-11"],
     title: "7mo Torneo",
     date: "2027-12-11",
     startTime: "13:00",

@@ -23,7 +23,7 @@ export function CalendarMonth({
   onPageChange,
   onShareEvent,
 }: CalendarMonthProps) {
-  const { language } = useLanguage();
+  const { copy } = useLanguage();
   const pageCount = Math.ceil(
     group.events.length / CALENDAR_EVENTS_PER_PAGE,
   );
@@ -32,9 +32,7 @@ export function CalendarMonth({
     (pageIndex + 1) * CALENDAR_EVENTS_PER_PAGE,
   );
   const headingId = `calendar-month-${group.monthKey}`;
-  const pageLabel = language === "en"
-    ? `Page ${pageIndex + 1} of ${pageCount}`
-    : `Página ${pageIndex + 1} de ${pageCount}`;
+  const pageLabel = `${copy.calendar.page} ${pageIndex + 1} ${copy.calendar.of} ${pageCount}`;
 
   return (
     <section aria-labelledby={headingId} className="flex flex-col gap-2">
@@ -55,12 +53,12 @@ export function CalendarMonth({
 
       {pageCount > 1 ? (
         <nav
-          aria-label={language === "en" ? `Event pagination for ${monthLabel}` : `Paginación de eventos de ${monthLabel}`}
+          aria-label={`${copy.calendar.eventPagination} ${monthLabel}`}
           className="flex min-h-11 items-center justify-center gap-4"
         >
           <NavigationArrowButton
             direction="previous"
-            label={language === "en" ? "View previous events this month" : "Ver eventos anteriores del mes"}
+            label={copy.calendar.previousEvents}
             disabled={pageIndex === 0}
             onClick={() => onPageChange(pageIndex - 1)}
           />
@@ -72,7 +70,7 @@ export function CalendarMonth({
           </p>
           <NavigationArrowButton
             direction="next"
-            label={language === "en" ? "View more events this month" : "Ver más eventos del mes"}
+            label={copy.calendar.nextEvents}
             disabled={pageIndex === pageCount - 1}
             onClick={() => onPageChange(pageIndex + 1)}
           />

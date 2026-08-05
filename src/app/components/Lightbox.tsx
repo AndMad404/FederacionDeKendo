@@ -32,7 +32,7 @@ export function Lightbox({
   onPrev,
   onNext,
 }: LightboxProps) {
-  const { language } = useLanguage();
+  const { copy } = useLanguage();
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
   const {
@@ -150,7 +150,7 @@ export function Lightbox({
       >
         <ModalCloseButton
           ref={closeBtnRef}
-          label={language === "en" ? "Close gallery" : "Cerrar galería"}
+          label={copy.gallery.close}
           onClick={onClose}
         />
 
@@ -177,7 +177,7 @@ export function Lightbox({
         <div className="grid w-full max-w-[22rem] grid-cols-[auto_auto] items-center justify-between gap-x-[min(75%,calc(100%_-_5.5rem))] gap-y-[10px] sm:max-w-[calc(100vw-4rem)] sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:justify-around sm:gap-x-4 sm:gap-y-3 lg:absolute lg:inset-0 lg:z-10 lg:block lg:max-w-none land-sm:absolute land-sm:inset-0 land-sm:z-10 land-sm:block land-sm:max-w-none">
           <NavigationArrowButton
             direction="previous"
-            label={language === "en" ? "Previous image" : "Imagen anterior"}
+            label={copy.gallery.previousImage}
             isActive={activeArrow === "left"}
             onClick={(event) => {
               event.stopPropagation();
@@ -213,7 +213,7 @@ export function Lightbox({
 
           <NavigationArrowButton
             direction="next"
-            label={language === "en" ? "Next image" : "Imagen siguiente"}
+            label={copy.gallery.nextImage}
             isActive={activeArrow === "right"}
             onClick={(event) => {
               event.stopPropagation();

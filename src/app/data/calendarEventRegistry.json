@@ -1,12 +1,9 @@
 {
-  "version": 1,
+  "version": 2,
   "events": [
     {
       "sourceId": "7bd8989c63db48fab752ce0f",
       "slug": "2026-05-02-federacion-examen",
-      "aliases": [
-        "federacion-examen-2026-05-02"
-      ],
       "title": "FEDERACIÓN  : Examen",
       "date": "2026-05-02",
       "timeZone": "America/Costa_Rica"
@@ -14,9 +11,6 @@
     {
       "sourceId": "462f5f7da99a1d17474471bd",
       "slug": "2026-05-29-clak-seminario-instructores-chile",
-      "aliases": [
-        "clak-seminario-instructores-chile-2026-05-29"
-      ],
       "title": "CLAK Seminario Instructores CHILE",
       "date": "2026-05-29",
       "timeZone": "America/Costa_Rica",
@@ -25,9 +19,6 @@
     {
       "sourceId": "9c63151cacb01bef733c39cb",
       "slug": "2026-05-30-federacion-seminario-y-reunion",
-      "aliases": [
-        "federacion-seminario-y-reunion-2026-05-30"
-      ],
       "title": "FEDERACIÓN : Seminario y Reunión",
       "date": "2026-05-30",
       "timeZone": "America/Costa_Rica"
@@ -35,9 +26,6 @@
     {
       "sourceId": "89d31aa2d6937a78b1866283",
       "slug": "2026-08-08-examen",
-      "aliases": [
-        "examen-2026-08-08"
-      ],
       "title": "Examen",
       "date": "2026-08-08",
       "timeZone": "America/Costa_Rica",
@@ -49,9 +37,6 @@
     {
       "sourceId": "72f0b1f2f02e0f5d73ae28ec",
       "slug": "2026-08-22-3er-torneo",
-      "aliases": [
-        "3er-torneo-2026-08-22"
-      ],
       "title": "3er Torneo",
       "date": "2026-08-22",
       "timeZone": "America/Costa_Rica",
@@ -63,9 +48,6 @@
     {
       "sourceId": "45c4376b5e5e0fcf347835d0",
       "slug": "2026-09-11-gasshuku-monteverde",
-      "aliases": [
-        "gasshuku-monteverde-2026-09-11"
-      ],
       "title": "Gasshuku Monteverde",
       "date": "2026-09-11",
       "timeZone": "America/Costa_Rica",
@@ -76,9 +58,6 @@
     {
       "sourceId": "e25ca7168de483e195f1aaf1",
       "slug": "2026-10-10-clak-1er-panamericano-brasil",
-      "aliases": [
-        "clak-1er-panamericano-brasil-2026-10-10"
-      ],
       "title": "CLAK 1er Panamericano BRASIL",
       "date": "2026-10-10",
       "timeZone": "America/Costa_Rica",
@@ -87,9 +66,6 @@
     {
       "sourceId": "56f8899c9ee30db7265945af",
       "slug": "2026-10-31-examen",
-      "aliases": [
-        "examen-2026-10-31"
-      ],
       "title": "Examen",
       "date": "2026-10-31",
       "timeZone": "America/Costa_Rica",
@@ -101,9 +77,6 @@
     {
       "sourceId": "2d5bad84832b0a2be6193e52",
       "slug": "2026-11-21-panama-torneo-por-equipos",
-      "aliases": [
-        "panama-torneo-por-equipos-2026-11-21"
-      ],
       "title": "PANAMA Torneo por Equipos",
       "date": "2026-11-21",
       "timeZone": "America/Costa_Rica",
@@ -112,9 +85,6 @@
     {
       "sourceId": "d5e995f4e75da854e455e4a5",
       "slug": "2026-12-12-4to-torneo",
-      "aliases": [
-        "4to-torneo-2026-12-12"
-      ],
       "title": "4to Torneo",
       "date": "2026-12-12",
       "timeZone": "America/Costa_Rica",
@@ -126,9 +96,6 @@
     {
       "sourceId": "8f7f631510e2e2523d7345c1",
       "slug": "2027-01-30-examen",
-      "aliases": [
-        "examen-2027-01-30"
-      ],
       "title": "Examen",
       "date": "2027-01-30",
       "timeZone": "America/Costa_Rica",
@@ -140,9 +107,6 @@
     {
       "sourceId": "325fa23572d746c098463cfc",
       "slug": "2027-04-03-5to-torneo",
-      "aliases": [
-        "5to-torneo-2027-04-03"
-      ],
       "title": "5to Torneo",
       "date": "2027-04-03",
       "timeZone": "America/Costa_Rica",
@@ -154,9 +118,6 @@
     {
       "sourceId": "2c34e1accb679991a55100bb",
       "slug": "2027-05-01-examen",
-      "aliases": [
-        "examen-2027-05-01"
-      ],
       "title": "Examen",
       "date": "2027-05-01",
       "timeZone": "America/Costa_Rica",
@@ -168,9 +129,6 @@
     {
       "sourceId": "1361a31e6ed86361f014c7c1",
       "slug": "2027-07-31-examen",
-      "aliases": [
-        "examen-2027-07-31"
-      ],
       "title": "Examen",
       "date": "2027-07-31",
       "timeZone": "America/Costa_Rica",
@@ -182,9 +140,6 @@
     {
       "sourceId": "af94c6be4ebe10e334a37951",
       "slug": "2027-08-14-6to-torneo",
-      "aliases": [
-        "6to-torneo-2027-08-14"
-      ],
       "title": "6to Torneo",
       "date": "2027-08-14",
       "timeZone": "America/Costa_Rica",
@@ -196,9 +151,6 @@
     {
       "sourceId": "2d0ecad0919db5dc75e39dd5",
       "slug": "2027-10-30-examen",
-      "aliases": [
-        "examen-2027-10-30"
-      ],
       "title": "Examen",
       "date": "2027-10-30",
       "timeZone": "America/Costa_Rica",
@@ -210,9 +162,6 @@
     {
       "sourceId": "26e2ecffe893577fa8a242ec",
       "slug": "2027-12-11-7mo-torneo",
-      "aliases": [
-        "7mo-torneo-2027-12-11"
-      ],
       "title": "7mo Torneo",
       "date": "2027-12-11",
       "timeZone": "America/Costa_Rica",

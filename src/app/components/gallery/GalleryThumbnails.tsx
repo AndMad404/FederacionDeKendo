@@ -13,12 +13,12 @@ interface ThumbnailProps {
 }
 
 function Thumbnail({ image, isActive, buttonRef, onClick }: ThumbnailProps) {
-  const { language } = useLanguage();
+  const { copy } = useLanguage();
   return (
     <button
       ref={buttonRef}
       type="button"
-      aria-label={language === "en" ? `View image: ${image.title}` : `Ver imagen: ${image.title}`}
+      aria-label={`${copy.gallery.viewImage} ${image.title}`}
       aria-current={isActive ? "true" : undefined}
       onClick={onClick}
       className={`group relative h-full w-full cursor-pointer overflow-hidden rounded-lg border-2 border-transparent bg-site-media transition-colors duration-300 ${
@@ -52,7 +52,7 @@ export function GalleryThumbnails({
   activeIndex,
   onSelect,
 }: GalleryThumbnailsProps) {
-  const { language } = useLanguage();
+  const { copy } = useLanguage();
   const stripRef = useRef<HTMLDivElement | null>(null);
   const buttonRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const previousActiveIndexRef = useRef(activeIndex);
@@ -122,7 +122,7 @@ export function GalleryThumbnails({
       <div
         ref={stripRef}
         role="group"
-        aria-label={language === "en" ? "Gallery thumbnails" : "Miniaturas de galería"}
+        aria-label={copy.gallery.thumbnails}
         className="grid h-14 w-full touch-manipulation scroll-smooth grid-flow-col auto-cols-[17%] gap-1.5 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden motion-reduce:scroll-auto sm:h-16 sm:auto-cols-[calc((100%_-_2.5rem)_/_6)] sm:gap-2 md:h-20"
       >
         {images.map((image, index) => (

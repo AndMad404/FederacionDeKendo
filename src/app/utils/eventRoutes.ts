@@ -10,9 +10,7 @@ export function getEventPath(event: CalendarEvent, language: Language = "es") {
 }
 
 function findEventBySlug(slug: string) {
-  return CALENDAR_EVENTS.find(
-    (event) => event.id === slug || event.aliases?.includes(slug),
-  );
+  return CALENDAR_EVENTS.find((event) => event.id === slug);
 }
 
 export function findEventByPathname(pathname: string) {

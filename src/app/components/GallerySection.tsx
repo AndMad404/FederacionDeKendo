@@ -12,7 +12,7 @@ const Lightbox = lazy(() =>
 );
 
 export function GallerySection() {
-  const { language } = useLanguage();
+  const { language, copy } = useLanguage();
   const images = useMemo(() => getGalleryImages(language), [language]);
   const { index, prev, next, goTo } = useCarousel(images.length);
   const {
@@ -37,7 +37,7 @@ export function GallerySection() {
         tone="media"
         density="flush"
       >
-        {language === "en" ? "Kendo gallery" : "Galería de kendo"}
+        {copy.gallery.title}
       </PageTitle>
       <div className="flex min-h-0 flex-col tall-md:h-full">
         <div className="flex min-h-0 flex-1 flex-col">

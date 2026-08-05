@@ -2490,6 +2490,118 @@ resolved_findings:
     summary: The primary Hero container now uses rounded-3xl at the base viewport.
     resolution: { resolved_ref: f35c9557 dirty worktree, checks: [typecheck, build, browser matrix] }
 
+current_review:
+  id: REV-2026-08-04-01
+  requested_scope: Critique the current project while respecting its documented constraints.
+  actual_scope:
+    targets:
+      - src/app/App.tsx
+      - src/app/routeRegistry.client.tsx
+      - src/app/config/i18n.tsx
+      - src/app/config/seo.ts
+      - src/app/components/CalendarSection.tsx
+      - src/app/components/GallerySection.tsx
+      - src/app/components/AfiliadosSection.tsx
+      - src/styles/globals.css
+      - tests/e2e/design-contract.ts
+      - tests/e2e/geometry-contract.spec.ts
+    axes: [ARCH, REACT, TS, TAILWIND, A11Y, PERF, RESPONSIVE, SEO]
+    included:
+      - route-shell boundaries, localization ownership, component responsibility, duplicated responsive composition, strict TypeScript configuration, route lazy loading, and documented geometry-test strategy
+    excluded:
+      - exhaustive repository-wide coverage, visual fidelity, production behavior, live assistive technology, field performance, external SEO services, and application-code changes
+  baseline:
+    commit: 5faf69f7
+    worktree: clean before this review-state update
+  confirmed_findings: [STR-ARCH-008, STR-REACT-002, SMELL-ARCH-003]
+  verification:
+    - corepack pnpm run typecheck passed
+    - corepack pnpm run test:unit passed with 12 tests
+    - corepack pnpm run test:generated passed with 5 tests
+  result: No reproducible CRITICAL was found in the inspected sample; three maintainability risks were confirmed without using the obsolete Figma as evidence.
+
+latest_calendar_refactor:
+  id: FIX-2026-08-04-05
+  status: approved_by_owner
+  requested_scope: Refactor CalendarSection without changing public behavior, remove all legacy URL behavior, centralize stable bilingual interface copy, and document the resulting system.
+  implemented:
+    - CalendarSection now composes useCalendarNavigation and useCalendarEventSharing.
+    - Mobile navigation moves one month, desktop navigation moves two, swipe uses the same actions, and changing month resets internal pagination.
+    - Calendar sharing preserves Web Share, clipboard, WhatsApp fallback, 2.2-second copied feedback, and timer cleanup.
+    - Event routing now accepts only the current canonical slug; aliases, previous-slug retention, old hash redirects, and generated redirect output were removed.
+    - Stable UI copy is centralized in the typed COPY contract; localized event, dojo, and gallery records remain in their existing data sources.
+    - External architecture, calendar operation, and technical backlog documentation was reconciled with the implementation.
+  verification:
+    - corepack pnpm run typecheck passed
+    - corepack pnpm run build passed, including SSR and generated routes
+    - calendar synchronization tests passed with 10 tests
+    - generated-output tests passed with 4 tests
+    - complete Playwright suite passed with 93 tests
+    - approved Windows visual suite passed with 28 comparisons and no baseline regeneration
+    - git diff --check passed
+  owner_decisions:
+    - The owner approved the calendar intervention on 2026-08-04.
+    - The owner accepted the current accessibility behavior; no execution with NVDA, JAWS, or VoiceOver is claimed.
+    - The Calendar and Affiliates SPA composition is an accepted reuse decision and is not queued for another abstraction.
+    - No commit is created until the owner requests the project-level commit.
+
+open_findings:
+  - id: STR-ARCH-008
+    level: STRUCTURAL
+    axis: ARCH
+    status: resolved
+    target: src/app/components and src/app/config/i18n.tsx
+    problem: Localized public copy is split between the central COPY object and repeated component-level language conditionals.
+    fix: Move stable interface and public copy behind typed translation keys while leaving event and dojo records in their existing localized data sources.
+    cost_of_deferring: Every copy revision or additional locale will require coordinated edits across presentation components and increases inconsistency risk.
+    evidence: [src/app/config/i18n.tsx:44, src/app/components/CalendarSection.tsx:43, src/app/components/AfiliadosSection.tsx:25, src/app/components/EventPage.tsx:110]
+    introduced_in: REV-2026-08-04-01
+    resolution:
+      resolved_at: 2026-08-04
+      resolved_ref: uncommitted worktree based on 5faf69f7
+      summary: Stable Spanish and English interface copy now lives in the typed COPY contract by domain; components consume translation keys while routes, formatting logic, and localized event, dojo, and gallery records remain in their existing sources.
+      checks: [typecheck, production and SSR build, calendar synchronization tests, generated-output tests, complete Playwright suite with 93 tests, approved visual suite with 28 comparisons, git diff check]
+  - id: STR-REACT-002
+    level: STRUCTURAL
+    axis: REACT
+    status: resolved
+    target: src/app/components/CalendarSection.tsx
+    problem: CalendarSection owns legacy URL migration, responsive grouping, clipboard and share fallbacks, swipe recognition, pagination state, formatting, and page composition in one component.
+    fix: Extract behavior-focused hooks for calendar navigation and event sharing while keeping CalendarSection as the route composition boundary.
+    cost_of_deferring: Changes to navigation, sharing, or breakpoints remain coupled and require reasoning through a 376-line stateful component.
+    evidence: [src/app/components/CalendarSection.tsx:25, src/app/components/CalendarSection.tsx:62, src/app/components/CalendarSection.tsx:93, src/app/components/CalendarSection.tsx:119, src/app/components/CalendarSection.tsx:142, src/app/components/CalendarSection.tsx:188, src/app/components/CalendarSection.tsx:242]
+    introduced_in: REV-2026-08-04-01
+    resolution:
+      resolved_at: 2026-08-04
+      resolved_ref: uncommitted worktree based on 5faf69f7
+      summary: CalendarSection composes typed hooks for navigation, swipe, and event sharing; the owner subsequently removed all alias, old-hash redirect, prior-slug preservation, and generated event-redirect behavior in favor of current canonical routes only.
+      checks: [typecheck, production and SSR build, calendar synchronization tests, generated-output tests, directed calendar behavior tests, complete Playwright suite, approved visual comparisons]
+  - id: SMELL-ARCH-003
+    level: SMELL
+    axis: ARCH
+    status: accepted_by_owner
+    target: src/app/components/CalendarSection.tsx and src/app/components/AfiliadosSection.tsx
+    problem: Calendar and Affiliates duplicate the same long banner-overlap and responsive-positioning utility chain.
+    fix: Reuse one non-visual layout primitive or exported class for the approved media-page content layer, preserving the exact current classes and geometry.
+    cost_of_deferring: A future breakpoint fix can update one route but miss the other, repeating the variant-precedence regression already recorded in project history.
+    evidence: [src/app/components/CalendarSection.tsx:293, src/app/components/AfiliadosSection.tsx:90, FIX-2026-08-04-02]
+    introduced_in: REV-2026-08-04-01
+    resolution:
+      resolved_at: 2026-08-04
+      resolved_ref: owner architecture decision; no code change
+      summary: The owner confirmed that the current Calendar and Affiliates composition follows the intended SPA component-reuse logic. It remains unchanged unless a reproducible regression or additional consumer justifies revisiting it.
+
+coverage:
+  - id: COV-2026-08-04-01
+    target: the ten files listed in REV-2026-08-04-01 actual_scope.targets
+    axes: [ARCH, REACT, TS, TAILWIND, A11Y, PERF, RESPONSIVE, SEO]
+    included: [the bounded concerns listed in the session]
+    excluded: [exhaustive per-file axis coverage and all excluded session concerns]
+    depth: reviewed
+    evidence: [source inspection, rg inventories, typecheck, unit tests, generated-output tests]
+    baseline: { commit: 5faf69f7, worktree: clean before state update }
+    status: current
+
 pending_reviews:
   - id: PEND-ARCH-005
     target: recreate Figma from the approved current product
@@ -2511,14 +2623,6 @@ pending_reviews:
     target: expanded event editorial page
     axes: [ARCH]
     reason: Responsible parties, regulations, documents, results, and per-event galleries were explicitly deferred from the first generated-page version.
-  - id: PEND-A11Y-001
-    target: implemented multi-day event range with a real screen reader
-    axes: [A11Y]
-    reason: Source and browser accessibility-tree verification now pass, but final announcement behavior still requires physical assistive-technology verification.
-  - id: PEND-ARCH-002
-    target: Post-calendar documentation reconciliation against one final main commit
-    axes: [ARCH]
-    reason: The calendar implementation has not reached current main; reconciling now would create another knowingly temporary architecture baseline.
   - id: PEND-RESP-001
     target: exact 390x844 and 768x1024 inner-viewport geometry
     axes: [RESPONSIVE]

@@ -5,6 +5,7 @@ interface SwipeNavigationOptions {
   onSwipeRight: () => void;
   threshold?: number;
   allowInteractiveStart?: boolean;
+  preventDefaultOnSwipe?: boolean;
 }
 
 interface SwipeStart {
@@ -21,6 +22,7 @@ export function useSwipeNavigation({
   onSwipeRight,
   threshold = defaultThreshold,
   allowInteractiveStart = false,
+  preventDefaultOnSwipe = false,
 }: SwipeNavigationOptions) {
   const startRef = useRef<SwipeStart | null>(null);
   const didSwipeRef = useRef(false);
@@ -57,6 +59,7 @@ export function useSwipeNavigation({
         Math.abs(deltaX) >= threshold && Math.abs(deltaX) > Math.abs(deltaY) * 1.25;
 
       if (isHorizontalSwipe) {
+        if (preventDefaultOnSwipe) event.preventDefault();
         didSwipeRef.current = true;
         if (deltaX < 0) {
           onSwipeLeft();
@@ -70,7 +73,12 @@ export function useSwipeNavigation({
         event.currentTarget.releasePointerCapture(event.pointerId);
       }
     },
-    [onSwipeLeft, onSwipeRight, threshold],
+    [
+      onSwipeLeft,
+      onSwipeRight,
+      preventDefaultOnSwipe,
+      threshold,
+    ],
   );
 
   const onPointerCancel = useCallback((event: ReactPointerEvent<HTMLElement>) => {

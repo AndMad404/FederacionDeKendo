@@ -17,16 +17,13 @@ import { useLanguage } from "../config/i18n";
 import { getLocalizedEvents } from "../utils/localizedEvents";
 
 export function PastEventsSection() {
-  const { language } = useLanguage();
-  const english = language === "en";
+  const { language, copy } = useLanguage();
   const { pathname } = useLocation();
   const requestedPage = getArchivePageFromPathname(pathname) ?? 1;
   const events = getLocalizedEvents(getPastEvents(), language);
   const pageCount = Math.max(1, Math.ceil(events.length / PAST_EVENTS_PAGE_SIZE));
   const page = Math.min(requestedPage, pageCount);
-  const pageLabel = english
-    ? `Page ${page} of ${pageCount}`
-    : `Página ${page} de ${pageCount}`;
+  const pageLabel = `${copy.archive.page} ${page} ${copy.archive.of} ${pageCount}`;
   const pageEvents = events.slice(
     (page - 1) * PAST_EVENTS_PAGE_SIZE,
     page * PAST_EVENTS_PAGE_SIZE,
@@ -40,8 +37,8 @@ export function PastEventsSection() {
       <MediaPageBanner
         className="relative z-10 h-28 shrink-0 overflow-hidden land-compact:h-20"
         titleId="past-events-title"
-        title={english ? "Past events" : "Eventos pasados"}
-        description={english ? "Historical archive of published activities." : "Archivo histórico de actividades publicadas."}
+        title={copy.archive.title}
+        description={copy.archive.description}
         image={{
           src: "/images/calendar/kendo-calendar-1600.webp",
           sources: [
@@ -73,26 +70,26 @@ export function PastEventsSection() {
                     </p>
                     <h2 className="mt-1 font-bold">{event.title}</h2>
                     <p className="mt-1 line-clamp-2 text-sm text-site-muted">
-                      {event.summary ?? (english ? "Information to be confirmed." : "Información pendiente de confirmar.")}
+                      {event.summary ?? copy.common.informationPending}
                     </p>
                   </div>
                   <Link
                     to={getEventPath(event, language)}
                     className={`text-sm ${secondaryButtonClass} ${focusRingClass}`}
                   >
-                    {english ? "View event page" : "Ver página del evento"}
+                    {copy.archive.viewEvent}
                   </Link>
                 </li>
               ))}
             </ul>
           ) : (
             <p className="py-8 text-center text-site-muted">
-              {english ? "There are no events in the archive yet." : "Todavía no hay eventos en el archivo."}
+              {copy.archive.empty}
             </p>
           )}
 
           <nav
-            aria-label={english ? "Archive pagination" : "Paginación del archivo"}
+            aria-label={copy.archive.pagination}
             className="mt-auto flex items-center justify-center gap-3"
           >
             {page > 1 ? (
@@ -100,7 +97,7 @@ export function PastEventsSection() {
                 to={getArchivePagePath(page - 1, language)}
                 className={`${secondaryButtonClass} ${focusRingClass}`}
               >
-                {english ? "Previous" : "Anterior"}
+                {copy.archive.previous}
               </Link>
             ) : null}
             <span className="text-sm font-semibold">
@@ -111,7 +108,7 @@ export function PastEventsSection() {
                 to={getArchivePagePath(page + 1, language)}
                 className={`${secondaryButtonClass} ${focusRingClass}`}
               >
-                {english ? "Next" : "Siguiente"}
+                {copy.archive.next}
               </Link>
             ) : null}
           </nav>

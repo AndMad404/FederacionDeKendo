@@ -237,10 +237,6 @@ export function createCanonicalSlug(title, date) {
   return `${date}-${slugify(title) || "actividad"}`;
 }
 
-function createLegacySlug(title, date) {
-  return `${slugify(title) || "actividad"}-${date}`;
-}
-
 function getEventType(property) {
   if (!property) return undefined;
   const supported = new Map(
@@ -294,7 +290,6 @@ export function parseCalendarEvent(properties, warnings = []) {
   const event = {
     sourceId: hash(uid),
     slug: createCanonicalSlug(title, start.date),
-    aliases: [createLegacySlug(title, start.date)],
     title,
     date: start.date,
     timeZone: start.timeZone ?? defaultTimeZone,
@@ -349,103 +344,26 @@ function assertUniqueCurrentSlugs(events) {
   }
 }
 
-function assignCanonicalSlugs(records) {
-  const canonicalBySource = new Map();
-  const ownerBySlug = new Map();
-
-  for (const record of records) {
-    const canonicalSlug = record.previous?.slug ?? record.event.slug;
-    const previousOwner = ownerBySlug.get(canonicalSlug);
-    if (previousOwner && previousOwner !== record.event.sourceId) {
-      throw new Error(
-        `Duplicate calendar canonical slug: ${canonicalSlug} (${previousOwner} and ${record.event.sourceId}).`,
-      );
-    }
-    ownerBySlug.set(canonicalSlug, record.event.sourceId);
-    canonicalBySource.set(record.event.sourceId, canonicalSlug);
-  }
-
-  return canonicalBySource;
-}
-
-function removeAmbiguousAliases(events, warnings) {
-  const canonicalSlugs = new Set(events.map((event) => event.slug));
-  const aliasOwners = new Map();
-
-  for (const event of events) {
-    for (const alias of event.aliases ?? []) {
-      const owners = aliasOwners.get(alias) ?? new Set();
-      owners.add(event.sourceId);
-      aliasOwners.set(alias, owners);
-    }
-  }
-
-  const invalidAliases = new Set();
-  for (const [alias, owners] of aliasOwners) {
-    if (canonicalSlugs.has(alias) || owners.size > 1) {
-      invalidAliases.add(alias);
-      warnings.push(`Ambiguous calendar alias omitted: ${alias}.`);
-    }
-  }
-
-  return events.map((event) => ({
-    ...event,
-    aliases: (event.aliases ?? []).filter(
-      (alias) => alias !== event.slug && !invalidAliases.has(alias),
-    ),
-  }));
-}
-
 export function mergeRegistry(
   previousRegistry,
   currentEvents,
   now = new Date(),
-  warnings = [],
 ) {
   assertUniqueCurrentSlugs(currentEvents);
-  const previousBySource = new Map(
-    (previousRegistry.events ?? []).map((event) => [event.sourceId, event]),
-  );
   const currentSourceIds = new Set(currentEvents.map((event) => event.sourceId));
   const retainedHistoricalEvents = (previousRegistry.events ?? []).filter(
     (event) =>
       !currentSourceIds.has(event.sourceId) &&
       getEventEndDateTime(event).getTime() < now.getTime(),
   );
-  const records = [
-    ...currentEvents.map((event) => ({
-      event,
-      previous: previousBySource.get(event.sourceId),
-    })),
-    ...retainedHistoricalEvents.map((event) => ({ event, previous: event })),
-  ];
-  const canonicalBySource = assignCanonicalSlugs(records);
-  const merged = records.map(({ event, previous }) => {
-    const canonicalSlug = canonicalBySource.get(event.sourceId);
-    const aliases = new Set([
-      ...(previous?.aliases ?? []),
-      ...(event.aliases ?? []),
-    ]);
-    if (event.slug !== canonicalSlug) aliases.add(event.slug);
-    if (previous?.slug && previous.slug !== canonicalSlug) {
-      aliases.add(previous.slug);
-    }
-    aliases.delete(canonicalSlug);
-    return {
-      ...event,
-      slug: canonicalSlug,
-      aliases: [...aliases].sort(),
-    };
-  });
-
-  const sanitized = removeAmbiguousAliases(merged, warnings);
-
-  sanitized.sort(
+  const merged = [...currentEvents, ...retainedHistoricalEvents];
+  assertUniqueCurrentSlugs(merged);
+  merged.sort(
     (a, b) =>
       createLocalDate(a.date, a.startTime).getTime() -
       createLocalDate(b.date, b.startTime).getTime(),
   );
-  return { version: 1, events: sanitized };
+  return { version: 2, events: merged };
 }
 
 function serializeProperty(name, value, isLast) {
@@ -455,7 +373,6 @@ function serializeProperty(name, value, isLast) {
 function serializeCalendarEvent(event) {
   const entries = [
     ["id", event.slug],
-    ["aliases", event.aliases],
     ["title", event.title],
     ["date", event.date],
     ["endDate", event.endDate],
@@ -501,12 +418,12 @@ async function readCalendarSource(source) {
 async function readRegistry(registryPath) {
   try {
     const registry = JSON.parse(await readFile(registryPath, "utf8"));
-    if (registry.version !== 1 || !Array.isArray(registry.events)) {
+    if (registry.version !== 2 || !Array.isArray(registry.events)) {
       throw new Error("Unsupported calendar event registry.");
     }
     return registry;
   } catch (error) {
-    if (error?.code === "ENOENT") return { version: 1, events: [] };
+    if (error?.code === "ENOENT") return { version: 2, events: [] };
     throw error;
   }
 }
@@ -566,7 +483,7 @@ export async function synchronizeCalendar({
     .map((properties) => parseCalendarEvent(properties, warnings))
     .filter(Boolean);
   const previousRegistry = await readRegistry(registryPath);
-  const registry = mergeRegistry(previousRegistry, parsed, now, warnings);
+  const registry = mergeRegistry(previousRegistry, parsed, now);
 
   await writeAtomically([
     [registryPath, `${JSON.stringify(registry, null, 2)}\n`],

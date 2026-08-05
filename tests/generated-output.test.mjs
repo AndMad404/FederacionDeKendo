@@ -28,14 +28,6 @@ test("excludes event routes from sitemap while indexing is disabled", async () =
   assert.match(sitemap, /\/calendario\//);
 });
 
-test("writes permanent redirects for previous event slugs", async () => {
-  const redirects = await readDist("_redirects");
-  assert.match(
-    redirects,
-    /\/eventos\/examen-2026-08-08\/ \/eventos\/2026-08-08-examen\/ 301/,
-  );
-});
-
 test("generates the archive route", async () => {
   const archive = await readDist("eventos/pasados/index.html");
   assert.match(archive, /Eventos pasados/);

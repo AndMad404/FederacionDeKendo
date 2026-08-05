@@ -26,17 +26,16 @@ export function CalendarNavigation({
   onPreviousPair,
   onNextPair,
 }: CalendarNavigationProps) {
-  const { language } = useLanguage();
-  const english = language === "en";
+  const { copy } = useLanguage();
   return (
     <nav
-      aria-label={english ? "Calendar navigation" : "Navegación del calendario"}
+      aria-label={copy.calendar.navigation}
       className="flex items-center justify-center gap-4"
     >
       <span className="md:hidden">
         <NavigationArrowButton
           direction="previous"
-          label={english ? "View previous month" : "Ver mes anterior"}
+          label={copy.calendar.previousMonth}
           disabled={!canPreviousMonth}
           onClick={onPreviousMonth}
         />
@@ -44,7 +43,7 @@ export function CalendarNavigation({
       <span className="hidden md:block">
         <NavigationArrowButton
           direction="previous"
-          label={english ? "View previous two months" : "Ver los dos meses anteriores"}
+          label={copy.calendar.previousPair}
           disabled={!canPreviousPair}
           onClick={onPreviousPair}
         />
@@ -61,7 +60,7 @@ export function CalendarNavigation({
       <span className="md:hidden">
         <NavigationArrowButton
           direction="next"
-          label={english ? "View next month" : "Ver mes siguiente"}
+          label={copy.calendar.nextMonth}
           disabled={!canNextMonth}
           onClick={onNextMonth}
         />
@@ -69,7 +68,7 @@ export function CalendarNavigation({
       <span className="hidden md:block">
         <NavigationArrowButton
           direction="next"
-          label={english ? "View next two months" : "Ver los dos meses siguientes"}
+          label={copy.calendar.nextPair}
           disabled={!canNextPair}
           onClick={onNextPair}
         />

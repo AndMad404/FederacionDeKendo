@@ -28,8 +28,7 @@ export function UpcomingEventCard({
   event,
   index,
 }: UpcomingEventCardProps) {
-  const { language } = useLanguage();
-  const english = language === "en";
+  const { language, copy } = useLanguage();
   const { startDateLabel, endDateLabel, endDateValue } =
     getEventDateRangeLabels(event, language);
   const locationUrl = event.location
@@ -58,7 +57,7 @@ export function UpcomingEventCard({
             <span className="hidden sm:inline" aria-hidden="true">
               {" - "}
             </span>
-            <span className="sr-only"> {english ? "to" : "al"} </span>
+            <span className="sr-only"> {copy.common.rangeSeparator} </span>
             <time
               dateTime={endDateValue}
               className="block whitespace-nowrap sm:inline"
@@ -74,7 +73,7 @@ export function UpcomingEventCard({
           href={locationUrl}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label={english ? `Open the location of ${event.title} in Google Maps` : `Abrir ubicación de ${event.title} en Google Maps`}
+          aria-label={`${copy.calendar.openLocationLabel} ${event.title} ${copy.calendar.mapsPreposition} Google Maps`}
           aria-describedby={locationDescriptionId}
           className={`col-start-1 row-start-2 justify-self-center ${actionClass} ${focusRingClass}`}
         >
@@ -82,25 +81,25 @@ export function UpcomingEventCard({
             className="mr-1.5 size-3.5 shrink-0 text-site-accent"
             aria-hidden="true"
           />
-          <span>{english ? "Directions" : "Cómo llegar"}</span>
+          <span>{copy.event.directions}</span>
           <span id={locationDescriptionId} className="sr-only">
-            {english ? "Place" : "Lugar"}: {locationName}. {english ? "Opens Google Maps in a new tab." : "Abre Google Maps en una pestaña nueva."}
+            {copy.common.place}: {locationName}. {copy.common.opensMaps}
           </span>
         </a>
       ) : (
         <span
           className={`col-start-1 row-start-2 justify-self-center text-site-muted ${actionClass}`}
         >
-          {english ? "To be confirmed" : "Pendiente de confirmar"}
+          {copy.common.toBeConfirmed}
         </span>
       )}
 
       <Link
         to={getEventPath(event, language)}
-        aria-label={english ? `View details for ${event.title}` : `Consultar detalles del evento ${event.title}`}
+        aria-label={`${copy.event.viewDetailsLabel} ${event.title}`}
         className={`col-start-2 row-start-2 justify-self-end ${actionClass} ${focusRingClass}`}
       >
-        {english ? "Event details" : "Detalles del evento"}
+        {copy.common.eventDetails}
       </Link>
     </li>
   );

@@ -9,7 +9,6 @@ import { useTransientDirectionFeedback } from "../../hooks/useTransientDirection
 import {
   getGalleryDisplayText,
   getMobileDescriptionPreview,
-  OPEN_DETAILS_LABEL,
 } from "./galleryText";
 import {
   focusRingClass,
@@ -41,8 +40,8 @@ export function FeaturedImage({
   onSwipePrev,
   onSwipeNext,
 }: FeaturedImageProps) {
-  const { language } = useLanguage();
-  const openDetailsLabel = language === "en" ? "Open details" : OPEN_DETAILS_LABEL;
+  const { copy } = useLanguage();
+  const openDetailsLabel = copy.gallery.openDetails;
   const {
     activeDirection: activeArrow,
     showDirection: showArrowFeedback,
@@ -143,7 +142,7 @@ export function FeaturedImage({
 
       <button
         type="button"
-        aria-label={`${displayTitle}. ${displayTag}. ${positionLabel}. ${language === "en" ? "Open details in the gallery" : "Abrir detalles en la galería"}`}
+        aria-label={`${displayTitle}. ${displayTag}. ${positionLabel}. ${copy.gallery.openDetailsInGallery}`}
         className={`absolute inset-0 z-10 touch-pan-y cursor-pointer ${focusRingClass}`}
         onClick={(event) => {
           if (consumeSwipe()) {
@@ -161,7 +160,7 @@ export function FeaturedImage({
       <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-between px-3">
         <NavigationArrowButton
           direction="previous"
-          label={language === "en" ? "Previous image" : "Imagen anterior"}
+          label={copy.gallery.previousImage}
           isActive={activeArrow === "left"}
           onClick={(event) => {
             showArrowFeedback("left");
@@ -171,7 +170,7 @@ export function FeaturedImage({
         />
         <NavigationArrowButton
           direction="next"
-          label={language === "en" ? "Next image" : "Imagen siguiente"}
+          label={copy.gallery.nextImage}
           isActive={activeArrow === "right"}
           onClick={(event) => {
             showArrowFeedback("right");

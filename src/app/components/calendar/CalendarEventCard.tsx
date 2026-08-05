@@ -25,8 +25,7 @@ export function CalendarEventCard({
   isShareCopied,
   onShare,
 }: CalendarEventCardProps) {
-  const { language } = useLanguage();
-  const english = language === "en";
+  const { language, copy } = useLanguage();
   const { startDateLabel, endDateLabel, endDateValue } =
     getEventDateRangeLabels(event, language);
   const locationUrl = event.location
@@ -47,7 +46,7 @@ export function CalendarEventCard({
         {endDateLabel && endDateValue ? (
           <>
             <span aria-hidden="true">{" - "}</span>
-            <span className="sr-only"> {english ? "to" : "al"} </span>
+            <span className="sr-only"> {copy.common.rangeSeparator} </span>
             <time dateTime={endDateValue}>{endDateLabel}</time>
           </>
         ) : null}
@@ -57,11 +56,11 @@ export function CalendarEventCard({
       </p>
       <Link
         to={getEventPath(event, language)}
-        aria-label={english ? `View details for ${event.title}` : `Ver detalles del evento ${event.title}`}
+        aria-label={`${copy.calendar.viewDetailsLabel} ${event.title}`}
         className={`relative z-10 inline-flex min-h-11 cursor-pointer items-center justify-center rounded-full px-3 py-1 text-sm font-semibold transition hover:border-site-action hover:bg-site-media lg:min-h-8 ${actionControlSurfaceClass} ${focusRingClass}`}
       >
         <Info className="mr-1.5 size-4" />
-        {english ? "Event details" : "Detalles del evento"}
+        {copy.common.eventDetails}
       </Link>
       <div className="pointer-events-none relative z-10 flex items-center justify-center gap-2">
         {locationUrl ? (
@@ -69,7 +68,7 @@ export function CalendarEventCard({
             href={locationUrl}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={english ? `Open the location of ${event.title} in Google Maps` : `Abrir ubicación de ${event.title} en Google Maps`}
+            aria-label={`${copy.calendar.openLocationLabel} ${event.title} ${copy.calendar.mapsPreposition} Google Maps`}
             aria-describedby={locationDescriptionId}
             className={`pointer-events-auto inline-flex min-h-11 items-center justify-center rounded-lg px-3 py-1.5 text-sm font-semibold transition hover:border-site-action hover:bg-site-media lg:min-h-8 lg:px-2.5 lg:py-1 ${actionControlSurfaceClass} ${focusRingClass}`}
           >
@@ -77,24 +76,24 @@ export function CalendarEventCard({
               className="mr-1.5 size-3.5 shrink-0 text-site-accent-soft"
               aria-hidden="true"
             />
-            {english ? "View location" : "Ver ubicación"}
+            {copy.calendar.viewLocation}
             <span id={locationDescriptionId} className="sr-only">
-              {english ? "Place" : "Lugar"}: {locationName}. {english ? "Opens Google Maps in a new tab." : "Abre Google Maps en una pestaña nueva."}
+              {copy.common.place}: {locationName}. {copy.common.opensMaps}
             </span>
           </a>
         ) : (
           <span className="inline-flex min-h-11 items-center justify-center rounded-lg border border-site-border bg-site-surface px-3 py-1.5 text-sm font-semibold text-site-muted lg:min-h-8 lg:px-2.5 lg:py-1">
-            {english ? "To be confirmed" : "Pendiente de confirmar"}
+            {copy.common.toBeConfirmed}
           </span>
         )}
         <button
           type="button"
           aria-label={
             isShareCopied
-              ? english ? `Link for ${event.title} copied` : `Enlace de ${event.title} copiado`
-              : english ? `Share ${event.title} via WhatsApp or copy link` : `Compartir ${event.title} por WhatsApp o copiar enlace`
+              ? `${copy.calendar.copiedLabel} ${event.title} ${copy.calendar.copiedLabelSuffix}`
+              : `${copy.calendar.shareLabel} ${event.title} ${copy.calendar.shareLabelSuffix}`
           }
-          title={isShareCopied ? (english ? "Link copied" : "Enlace copiado") : (english ? "Share event" : "Compartir evento")}
+          title={isShareCopied ? copy.common.linkCopied : copy.common.shareEvent}
           onClick={() => onShare(event)}
           className={`pointer-events-auto flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors hover:border-site-action hover:bg-site-media lg:size-8 ${actionControlSurfaceClass} ${focusRingClass}`}
         >
