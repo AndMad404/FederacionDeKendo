@@ -79,6 +79,8 @@ latest_responsive_overlap_fix:
 
 latest_visual_regression_gate:
   id: FIX-2026-08-04-03
+  status: superseded
+  superseded_by: FIX-2026-08-04-04
   requested_scope: Treat the approved design as a site-wide CI contract so any generated page that breaks raises an error, rather than adding an Affiliates-only regression test.
   baseline:
     commit: d1df5cd3
@@ -99,7 +101,32 @@ latest_visual_regression_gate:
     - visual gate: 28 passed across seven page designs and four viewports
     - complete Playwright suite: 130 passed
     - all seven desktop baselines were visually inspected after generation
-  result: CI now rejects structural regressions on every generated page and material screenshot drift on every approved page design instead of relying on route presence and document height alone.
+  result: Historical implementation record. Its cross-platform screenshot gate and four-viewport all-route matrix were replaced by FIX-2026-08-04-04.
+
+latest_design_contract_migration:
+  id: FIX-2026-08-04-04
+  status: current
+  supersedes: FIX-2026-08-04-03
+  requested_scope: Replace redundant platform-sensitive screenshot gating with explicit geometry, relative-content, selected semantic accessibility, and responsive contracts.
+  baseline:
+    commit: c0e73e23
+    worktree: clean before implementation
+    visual_authority: Current owner-approved application geometry and rendered styles; the obsolete Figma was not used.
+  result_ref: uncommitted worktree based on c0e73e23
+  implemented:
+    - added tests/e2e/design-contract.ts as the explicit source for approved viewports, margins, padding, gaps, radius, and representative page selection
+    - added tests/e2e/geometry-contract.spec.ts with desktop checks for every generated route and complete viewport checks for seven representative page designs
+    - checks relative text, link and image presence without freezing ordinary event copy
+    - checks one h1, unique IDs, image alt declarations, link destinations, and accessible names for visible controls
+    - separated the 28 pixel screenshots into the manual test:visual workflow and excluded them from the default cross-platform CI gate
+    - removed the redundant assertion that Spanish and English homepage content must produce identical vertical geometry while retaining independent geometry checks for both routes
+  verification:
+    - TypeScript no-emit check passed
+    - production and SSR build plus generated route output passed
+    - default Playwright suite passed with 86 tests
+    - directed component-contract matrix passed with 28 tests
+    - manual Windows visual suite passed with 28 approved screenshots and no baseline regeneration
+  result: Default browser coverage is deterministic and content-relative while retaining explicit protection for approved spacing, containment, overlap, overflow, and responsive geometry.
 
 latest_session:
   id: REV-2026-08-01-02

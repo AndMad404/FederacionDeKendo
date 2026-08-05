@@ -30,6 +30,23 @@ Genera el build de produccion:
 pnpm run build
 ```
 
+## Pruebas
+
+La suite predeterminada usa contratos funcionales, geometricos, responsive y
+de accesibilidad que toleran cambios ordinarios de contenido. Las capturas se
+ejecutan por separado en Windows para evitar diferencias de renderizado con el
+CI de Ubuntu.
+
+```bash
+pnpm run build
+pnpm run test:e2e
+pnpm run test:visual
+```
+
+Consulta [TESTING.md](TESTING.md) para conocer la estrategia completa, el
+comportamiento ante eventos nuevos y el proceso aprobado para cambiar medidas
+o capturas.
+
 ### Diagnostico opcional con Knip
 
 Knip 6.29.0 se usa como herramienta global de diagnostico del entorno local; no

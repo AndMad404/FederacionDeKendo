@@ -137,40 +137,6 @@ test("preserves scroll position when switching languages", async ({ page }) => {
   expect(await page.evaluate(() => window.scrollY)).toBeCloseTo(scrollBefore, 0);
 });
 
-test("preserves homepage vertical geometry when switching languages", async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 1904, height: 904 });
-  await page.goto("/");
-
-  const spanishGeometry = await page.evaluate(() => ({
-    heroHeight:
-      document.querySelector("main section > header")?.getBoundingClientRect()
-        .height ?? 0,
-    eventsTop:
-      document.querySelector("#upcoming-events-title")?.getBoundingClientRect()
-        .top ?? 0,
-    footerTop: document.querySelector("footer")?.getBoundingClientRect().top ?? 0,
-  }));
-
-  await page.getByRole("link", { name: "View site in English" }).click();
-  await expect(page).toHaveURL(/\/en\/$/);
-
-  const englishGeometry = await page.evaluate(() => ({
-    heroHeight:
-      document.querySelector("main section > header")?.getBoundingClientRect()
-        .height ?? 0,
-    eventsTop:
-      document.querySelector("#upcoming-events-title")?.getBoundingClientRect()
-        .top ?? 0,
-    footerTop: document.querySelector("footer")?.getBoundingClientRect().top ?? 0,
-  }));
-
-  expect(englishGeometry.heroHeight).toBeCloseTo(spanishGeometry.heroHeight, 0);
-  expect(englishGeometry.eventsTop).toBeCloseTo(spanishGeometry.eventsTop, 0);
-  expect(englishGeometry.footerTop).toBeCloseTo(spanishGeometry.footerTop, 0);
-});
-
 const viewports = [
   { width: 360, height: 800 },
   { width: 390, height: 844 },

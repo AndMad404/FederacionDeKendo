@@ -9,6 +9,7 @@
     "dev": "vite",
     "preview": "vite preview",
     "test:e2e": "playwright test",
+    "test:visual": "playwright test --config=playwright.visual.config.ts",
     "test:generated": "node --test tests/generated-output.test.mjs",
     "test:unit": "node --test tests/calendar-sync.test.mjs",
     "typecheck": "tsc --noEmit",
