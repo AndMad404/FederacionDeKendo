@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, type RefObject } from "react";
+import { createPortal } from "react-dom";
 import type { GalleryImage } from "../types";
 import { useModalBehavior } from "../hooks/useModalBehavior";
 import { usePinchZoom } from "../hooks/usePinchZoom";
@@ -111,7 +112,7 @@ export function Lightbox({
     };
   }, [displayDescription, image.description, image.id]);
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex touch-manipulation items-center justify-center bg-site-navy/90 p-4 land-sm:p-2"
       onPointerDown={onBackdropInteraction}
@@ -223,6 +224,7 @@ export function Lightbox({
           />
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

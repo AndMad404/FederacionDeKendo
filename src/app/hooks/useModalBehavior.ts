@@ -31,12 +31,29 @@ export function useModalBehavior({
   const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const appRoot = document.querySelector<HTMLElement>("#root");
+    if (!appRoot) return;
+
+    const wasInert = appRoot.inert;
+    appRoot.inert = true;
+
+    return () => {
+      appRoot.inert = wasInert;
+    };
+  }, []);
+
+  useEffect(() => {
     (initialFocusRef?.current ?? dialogRef.current)?.focus();
   }, [initialFocusRef]);
 
   useEffect(() => {
     return () => {
-      triggerRef?.current?.focus();
+      const trigger = triggerRef?.current;
+      if (!trigger) return;
+
+      requestAnimationFrame(() => {
+        if (trigger.isConnected) trigger.focus();
+      });
     };
   }, [triggerRef]);
 

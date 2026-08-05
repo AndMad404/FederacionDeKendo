@@ -14,6 +14,7 @@ import {
   getRouteSeoPayload,
   type RouteComponent,
 } from "./config/seo";
+import { getRoutePresentation } from "./config/routePresentation";
 import {
   getLanguageFromPathname,
   isLanguageSwitch,
@@ -23,7 +24,6 @@ import {
 
 export interface RouteComponentRegistry {
   routes: Record<RouteComponent, ComponentType>;
-  notFound: ComponentType;
 }
 
 function applyRouteHead(pathname: string) {
@@ -57,10 +57,20 @@ function AppShell({
   routeComponents: RouteComponentRegistry;
 }) {
   const { copy } = useLanguage();
-  const NotFoundComponent = routeComponents.notFound;
+  const { pathname } = useLocation();
+  const routeComponent = getRouteMeta(pathname).component;
+  const NotFoundComponent = routeComponents.routes.notFound;
+  const allowsTabletContainment =
+    getRoutePresentation(routeComponent).tabletMode === "contained";
 
   return (
-    <div className="flex min-h-svh flex-col bg-site-canvas text-site-text tall-md:h-dvh tall-md:overflow-hidden">
+    <div
+      className={`flex min-h-svh flex-col bg-site-canvas text-site-text page-fit:h-dvh page-fit:overflow-hidden ${
+        allowsTabletContainment
+          ? "tablet-fit:h-dvh tablet-fit:overflow-hidden"
+          : ""
+      }`}
+    >
       <ScrollToTop />
       <RouteMetadata />
       <a
@@ -73,7 +83,11 @@ function AppShell({
 
       <main
         id="main-content"
-        className="px-2.5 pt-[calc(4rem_+_10px)] land-sm:pt-[calc(3rem_+_6px)] tall-md:min-h-0 tall-md:flex-1 tall-md:overflow-hidden"
+        className={`px-2.5 pt-[calc(4rem_+_10px)] land-sm:pt-[calc(3rem_+_6px)] tall-md:flex-1 page-fit:min-h-0 page-fit:overflow-hidden ${
+          allowsTabletContainment
+            ? "tablet-fit:min-h-0 tablet-fit:overflow-hidden"
+            : ""
+        }`}
       >
         <Routes>
           {getRouteManifest().map((route) => {

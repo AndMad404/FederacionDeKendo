@@ -13,15 +13,11 @@ import {
 } from "../utils/eventRoutes";
 import { getLanguageFromPathname, type Language } from "./i18n";
 import { getLocalizedEvent } from "../utils/localizedEvents";
+import type { RouteComponent } from "./routeTypes";
+
+export type { RouteComponent } from "./routeTypes";
 
 type SchemaType = "WebPage" | "CollectionPage";
-export type RouteComponent =
-  | "home"
-  | "calendar"
-  | "gallery"
-  | "affiliates"
-  | "event"
-  | "pastEvents";
 
 interface PreloadImage {
   href: string;
@@ -125,6 +121,7 @@ function assertSeoData(value: unknown): asserts value is SeoData {
     "affiliates",
     "event",
     "pastEvents",
+    "notFound",
   ]);
   const validSchemaTypes = new Set<SchemaType>(["WebPage", "CollectionPage"]);
 
@@ -214,7 +211,7 @@ function createNotFoundMeta(language: Language): RouteMeta {
     language,
     locale: english ? "en_US" : "es_CR",
     alternatePath: english ? "/404/" : "/en/404/",
-    component: "home",
+    component: "notFound",
     title: english
       ? `Page not found | ${SITE_NAME}`
       : `Página no encontrada | ${SITE_NAME}`,

@@ -2658,22 +2658,43 @@ latest_spa_mobile_review:
     included: [SPA navigation and hydration, route splitting, viewport and orientation strategy, content reachability, touch targets, modal isolation, responsive test matrix]
     excluded: [SEO depth, copy accuracy, visual fidelity, obsolete Figma comparison, live assistive technology, field performance, generator internals]
   baseline: { commit: a394c725, worktree: clean before this state update }
-  confirmed_findings: [STR-RESP-003, STR-ARCH-013, SMELL-A11Y-003, SMELL-A11Y-004]
+  confirmed_findings: [CRIT-RESP-001, STR-RESP-003, STR-ARCH-013, SMELL-A11Y-003, SMELL-A11Y-004]
   evidence:
     - inspected the declared source inventory and recorded responsive utility patterns with rg
     - inspected the configured 360x800, 390x844, 768x1024, and 1366x768 Playwright viewport matrix
     - inspected existing dist chunk sizes; no runtime or field-performance measurement was performed
-  result: The SPA foundations and base-first Tailwind cascade are sound, but viewport containment, component-local breakpoint composition, reduced large-screen targets, and incomplete modal isolation remain risks.
+    - headless Chromium reproduced hidden, non-scrollable interactive content at 768x641 on Calendar and Affiliates
+    - text enlargement to 200 percent reproduced clipped interactive content at the approved desktop and tablet viewports; this is a text-enlargement simulation, not a live assistive-technology test
+    - the open gallery lightbox retained 15 visible focusable controls outside the dialog subtree
+    - Calendar controls measured 32px high at 1366x768 except the 48px month-navigation controls
+  result: The SPA foundations and base-first Tailwind cascade are sound, but viewport containment now has a reproducible reachability failure at a breakpoint boundary; component-local breakpoint composition, reduced large-screen targets, and incomplete modal isolation remain additional risks.
 
   findings:
+    - id: CRIT-RESP-001
+      level: CRITICAL
+      axis: RESPONSIVE
+      status: resolved
+      target: 768x641 Calendar and Affiliates route content
+      problem: At exactly 768x641 the tall-md fixed-viewport mode activates, the document cannot scroll, and interactive Calendar and Affiliates content extends below overflow-hidden route containers without another reachable scroll owner.
+      fix: Do not select an implementation until the owner understands and approves a content-reachability contract; then ensure overflowing content has one explicit reachable scroll owner while preserving the separately approved 1366x768 composition.
+      cost_of_deferring: Users at affected intermediate viewports cannot reach event actions or affiliate contact and location links.
+      evidence: [Chromium measurements at 768x640 and 768x641 on commit a394c725, Calendar section 389px clientHeight versus 600px scrollHeight, Affiliates section 389px clientHeight versus 858px scrollHeight, document scrollHeight locked to 641px]
+      resolution:
+        resolved_at: 2026-08-05
+        summary: Named tablet-fit and page-fit modes now keep intermediate and short-height presentations in document flow, preserve verified contained compositions, and let the 768x1024 Affiliates page grow so every schedule remains reachable.
+        checks: [typecheck, build, unit tests, generated-output tests, 132-test Playwright suite, 39-case reachability matrix, 28 approved visual comparisons]
     - id: STR-RESP-003
       level: STRUCTURAL
       axis: RESPONSIVE
-      status: open
+      status: resolved
       target: src/app/App.tsx:63 and tall-md route containers
       problem: At tablet-or-wider widths and heights above 640px the shell and primary route containers switch to fixed viewport containment with overflow hidden, making content reachability depend on every descendant fitting its allocated height.
       fix: Keep document flow as the resilient default and scope the desktop no-scroll composition to an explicit desktop contract, with an internal overflow owner for variable or zoomed content.
       cost_of_deferring: Text zoom, localization growth, browser chrome, or an untested intermediate viewport can clip content even while the four approved viewport snapshots pass.
+      resolution:
+        resolved_at: 2026-08-05
+        summary: tablet-fit and page-fit replaced the broad tall-md viewport lock; intermediate and zoom-reflow widths use document flow, while contained modes are limited to verified route and viewport combinations.
+        checks: [39-case responsive reachability matrix, 132-test Playwright suite, 28 approved visual comparisons, 200-percent reflow-equivalent checks for four routes from desktop and tablet reference viewports]
     - id: STR-ARCH-013
       level: STRUCTURAL
       axis: ARCH
@@ -2682,20 +2703,279 @@ latest_spa_mobile_review:
       problem: Layout policy is distributed across width, height, and orientation variants inside individual components, including intersecting overrides whose source-order behavior has already caused a regression.
       fix: Define a small documented responsive composition contract and reuse non-visual shell primitives or named class sets for viewport ownership, banners, panels, and compact landscape behavior.
       cost_of_deferring: Each new route or breakpoint multiplies variant intersections and makes fixes easy to apply inconsistently.
+    - id: STR-ARCH-014
+      level: STRUCTURAL
+      axis: ARCH
+      status: resolved
+      target: src/app/App.tsx route containment decision and responsive reachability coverage
+      problem: The shell infers tablet containment through the negative exception component !== affiliates, so every future route is treated as safe to contain unless someone remembers to add another exception, while the intermediate-height test enumerates only three hand-picked routes.
+      fix: Introduce an exhaustive typed route-presentation policy keyed by RouteComponent with an explicit tablet mode for every component, and derive the reachability matrix from that contract or assert every route component has a tested decision.
+      cost_of_deferring: A new content-heavy route can silently inherit unsafe containment and remain absent from the boundary matrix until users encounter another clipping regression.
+      evidence: [src/app/config/routeTypes.ts exhaustive seven-design union, src/app/config/routePresentation.ts exhaustive tablet policy, exhaustive client and server registries, 91-case responsive reachability matrix, 184-test complete Playwright suite, 28 unchanged visual baselines]
     - id: SMELL-A11Y-003
       level: SMELL
       axis: A11Y
-      status: open
+      status: open_decision_required
       target: calendar and event controls using lg:min-h-8 or lg:size-8
-      problem: Several controls shrink from 44px to 32px at large widths even though large screens can still be touch-enabled or used under motor constraints.
-      fix: Preserve a 44px interactive hit area while allowing the visible control surface to remain visually compact.
-      cost_of_deferring: Desktop touch and pointer accessibility becomes less forgiving and the component contract varies by viewport rather than input capability.
+      problem: Several Calendar controls shrink from 44px to 32px at large widths even though large screens can still be touch-enabled or used under motor constraints; the measured targets satisfy the WCAG 2.2 AA minimum but not the 44px enhanced target policy.
+      fix: Decide whether the product targets WCAG 2.2 AA only or adopts a broader 44px ergonomic policy; if adopted, prefer expanding hit areas or using input-capability-aware sizing before increasing visible card geometry.
+      cost_of_deferring: Desktop touch and reduced-dexterity use remains less forgiving, but no measured control is currently below the 24px AA minimum.
+      evidence: [1366x768 measurement across Home, Calendar, Gallery, and Affiliates; Calendar event actions 32px high, share controls 32x32px, all measured visible targets at least 24px in both dimensions, W3C SC 2.5.8 and SC 2.5.5]
     - id: SMELL-A11Y-004
       level: SMELL
       axis: A11Y
-      status: open
+      status: resolved
       target: src/app/hooks/useModalBehavior.ts
-      problem: The gallery dialog traps focus and locks scrolling but does not mark the application background inert, so non-dialog content remains exposed to some assistive and programmatic navigation paths.
-      fix: Apply and restore inert on the application shell while the modal is open, retaining the existing focus return and scroll restoration.
-      cost_of_deferring: The visual modal and accessibility interaction boundary can disagree.
+      problem: The gallery dialog traps ordinary Tab navigation and locks scrolling but does not mark the application background inert, so 20 visible external controls remain programmatically focusable and focus can be moved outside the modal.
+      fix: Render the dialog through a body-level portal and apply/restore inert on the application root, or make the non-dialog sibling branches inert while retaining focus return and scroll restoration; the current dialog is nested inside the application root, so that root cannot simply become inert in place.
+      cost_of_deferring: The visual modal and accessibility interaction boundary can disagree in programmatic navigation and assistive technologies that do not fully enforce aria-modal semantics.
+      evidence: [Lightbox at 768x1024, initial focus on Close, eight Tab presses remained inside three dialog controls, Escape returned focus to the opener, 20 visible outside controls had no inert or aria-hidden ancestor, programmatic focus escaped to the skip link]
+      resolution:
+        resolved_at: 2026-08-05
+        summary: The existing lightbox is rendered through a body-level portal while #root is inert, with focus containment, scroll restoration, focus return, and cleanup preserved for Escape, backdrop closure, and route unmount.
+        checks: [4-case directed lightbox behavior suite, pixel-identical open-lightbox fingerprints at 360x800, 390x844, 768x1024, 844x390, and 1366x768, 188-test complete Playwright suite, 28 approved visual comparisons]
+    - id: SMELL-A11Y-005
+      level: SMELL
+      axis: A11Y
+      status: open_decision_required
+      target: src/styles/globals.css root font size and text-only enlargement behavior
+      problem: The root font size is fixed at 16px and the layouts are not resilient when only that value is doubled, even though the verified full-page reflow equivalent remains reachable.
+      fix: First decide whether text-only enlargement and user default-font preferences are an explicit product requirement beyond the verified full-page zoom path; only then test native browser mechanisms and choose between removing the fixed root size, adding a supported text-scale mode, or accepting zoom as the supported mechanism.
+      cost_of_deferring: Users who prefer text-only scaling instead of full-page zoom may encounter clipped content or horizontal overflow, but this is not currently proven to violate WCAG 1.4.4 because a supported zoom mechanism can be sufficient.
+      evidence: [src/styles/globals.css root --font-size 16px, temporary root 32px measurements at 768x1024 and 1366x768, W3C Understanding SC 1.4.4]
+
+phase_zero_spa_mobile:
+  status: responsive_problem_understood_and_fixed
+  rule: No test, layout, responsive, touch-target, or modal implementation is approved until the owner can explain the reproduced problem, affected scope, current scroll ownership, and chosen acceptance criteria.
+  baseline: { commit: a394c725, worktree: dirty only from review-state documentation }
+  completed:
+    - production, SSR, and generated-route build passed
+    - normal-flow behavior confirmed at 768x640
+    - breakpoint-boundary clipping confirmed at 768x641
+    - the 768px-wide height sweep confirmed that the failure is not limited to the boundary: clipped controls remain at 720px and 800px; at 900px Home and Affiliates still clip controls; all sampled controls are reachable at 1024px
+    - approved 1366x768 no-scroll geometry remained intact at normal text size
+    - 200-percent text-enlargement simulation exposed clipping on Home, Calendar, and Affiliates
+    - gallery lightbox focus started on Close but 15 visible background controls remained outside the dialog and not inert
+    - 32px Calendar event controls confirmed at 1366x768
+  pending:
+    - owner decision on whether text-only enlargement and default-font preferences are an explicit requirement beyond the full-page zoom mechanism
+    - owner decision on large-screen 44px hit areas
+    - owner decision on the modal isolation acceptance criterion
+  owner_confirmation:
+    recorded_at: 2026-08-05
+    understood: The intended mobile, mobile-landscape, tablet, and desktop presentations are implemented with overlapping media conditions rather than mutually exclusive modes; at 768x641 multiple conditions activate and the fixed-height overflow chain makes content unreachable.
+    decision: The responsive reachability failure is in scope and must be solved.
+    completed_later: Acceptance criteria, scroll ownership, implementation technique, visual differences, test changes, and the resulting Affiliates 768x1024 baseline were all explicitly approved before closure.
+
+phase_one_responsive_contract:
+  status: completed_and_owner_approved
+  evidence_update:
+    - At width 768, fixed containment is unsafe across the sampled 641, 720, 800, and 900px heights, not only at the 640/641 boundary.
+    - At 768x1024 all sampled interactive controls were reachable; Calendar and Gallery sections fit, while Affiliates retained 858px scrollHeight inside a 772px overflow-hidden section without sampled focusable clipping.
+    - Width and height must both participate in any future contained-layout mode; one tall-md condition cannot safely represent tablet and desktop composition.
+  proposed_acceptance:
+    - use document scrolling when a tablet or intermediate presentation cannot fit all content
+    - preserve the approved normal 768x1024 presentation
+    - preserve the strict 1366x768 no-document-scroll contract
+    - do not hide additional content to satisfy containment
+    - verify reachability at both sides of responsive boundaries and at representative intermediate heights
+  approval_scope: Historical first approval covered acceptance behavior and scroll ownership; the implementation conditions and exact visual delta were approved separately before baseline regeneration.
+  owner_approval:
+    recorded_at: 2026-08-05
+    approved: Use document scrolling when tablet or intermediate content cannot fit, preserve the intended 768x1024 tablet and strict 1366x768 desktop compositions, do not hide content, and do not introduce nested Calendar or Affiliates scroll owners.
+  red_test:
+    file: tests/e2e/responsive-reachability.spec.ts
+    result: 16 failed and 17 passed before implementation
+    confirmed:
+      - 15 failures cover Home, Calendar, and Affiliates across 768x641, 769x641, 768x720, 768x800, and 768x900.
+      - The approved 768x1024 Affiliates presentation also clips non-interactive schedule terms and descriptions even though its sampled controls remain reachable.
+      - Approved 1366x768 representatives and normal-flow boundary or short-landscape cases pass.
+    implication: Preserving 768x1024 must mean preserving its intended visual composition, not preserving the newly confirmed hidden schedule content defect.
+  implementation:
+    - Added named tablet-fit and page-fit composition variants so viewport containment is no longer selected by tall-md alone.
+    - Preserved tablet containment at 768x1024 only for route components verified to fit; Affiliates uses normal document flow because its schedule content does not fit.
+    - Limited the Calendar and Affiliates absolute banner-panel overlap to page-fit, requiring at least 1280x768.
+    - Added a 39-case reachability matrix across breakpoint boundaries, intermediate tablet heights, short landscape, short desktop, approved tablet, and approved desktop.
+  verification:
+    - typecheck passed
+    - production and SSR build plus generated route output passed
+    - unit tests passed: 10
+    - generated-output tests passed: 4
+    - complete Playwright suite passed: 132
+    - directed responsive reachability matrix passed: 39
+    - before baseline approval, visual comparison passed 27 of 28 baselines; mobile, every non-Affiliates tablet route, and desktop 1366x768 remained pixel-identical
+    - the sole reviewed visual difference was Affiliates at 768x1024, where the document continues below the first viewport and exposes the schedules previously clipped by the primary section
+    - after explicit owner approval and replacement of only affiliates-tablet-768x1024.png, the complete visual suite passed 28 of 28
+  final_owner_approval:
+    recorded_at: 2026-08-05
+    approved: The inspected Affiliates 768x1024 rendered result and replacement of its single visual baseline.
+
+phase_two_text_resize:
+  status: problem_explained_decision_pending
+  requested_scope: Understand the 200-percent text-enlargement concern before any approval or implementation.
+  actual_scope:
+    targets: [src/styles/globals.css, Home, Calendar, Gallery, Affiliates]
+    axes: [A11Y, RESPONSIVE]
+    included: [WCAG 1.4.4 mechanism distinction, 200-percent reflow equivalent, root-font-only enlargement, clipping, horizontal overflow, scroll ownership]
+    excluded: [application edits, native Firefox testing, live assistive technology, operating-system text scaling, visual approval]
+  baseline: { commit: 71159b8c, worktree: dirty with the approved responsive implementation }
+  verified:
+    - Reflow equivalents of 1366x768 at 200 percent (683x384 CSS viewport) kept all meaningful content reachable on Home, Calendar, Gallery, and Affiliates with document scrolling, no clipped content, no nested vertical scroll owner, and no horizontal overflow.
+    - Reflow equivalents of 768x1024 at 200 percent (384x512 CSS viewport) produced the same reachable result on all four routes.
+    - A separate text-only simulation forcing the root from 16px to 32px clipped content on Home, Calendar, and Gallery at 768x1024; Affiliates remained vertically reachable but grew to 831px width inside a 768px viewport.
+    - At 1366x768 the same text-only simulation clipped content on all four routes because page-fit containment remained active.
+  interpretation:
+    - Full-page zoom and text-only enlargement are different mechanisms because full-page zoom reduces the effective CSS viewport and activates responsive reflow, while changing only the root font size leaves desktop/tablet containment conditions active.
+    - W3C states that SC 1.4.4 can be satisfied when content scales to 200 percent through at least one user-agent-supported text scaling mechanism; failure of the exploratory root-font-only simulation does not by itself prove non-conformance when full-page zoom is supported.
+    - The in-app browser did not expose a trustworthy zoom-level control, so the current zoom evidence is a reflow-equivalent measurement rather than a direct native-browser zoom execution.
+    - No connected Chrome browser was available for a second native-zoom attempt in this session.
+    - Chromium CDP Emulation.setPageScaleFactor was rejected as evidence: at factor 2 it reduced only the visual viewport to 683x384, kept the 1366x768 layout viewport and min-width:1280 media query active, and reported page zoom 1.
+  decision_gate:
+    - Confirm native 200-percent zoom in at least one supported desktop browser before claiming WCAG conformance.
+    - Decide separately whether the product will support text-only enlargement or user-configured default font sizes as an additional accessibility objective.
+    - No layout or typography change is approved in this phase.
+
+phase_three_lightbox_isolation:
+  status: completed_and_owner_approved
+  requested_scope: Understand the semantic modal-isolation weakness before any approval or implementation.
+  actual_scope:
+    targets: [src/app/components/Lightbox.tsx, src/app/components/GallerySection.tsx, src/app/hooks/useModalBehavior.ts]
+    axes: [A11Y, REACT, ARCH]
+    included: [dialog semantics, focus entry and cycling, Escape, focus restoration, scroll lock, background focusability, inertness, DOM ownership]
+    excluded: [visual edits, gesture behavior changes, image presentation changes, live screen-reader testing]
+  baseline: { commit: 71159b8c, worktree: dirty with the approved responsive implementation }
+  verified_strengths:
+    - The dialog exposes role=dialog, aria-modal=true, an accessible title, and a conditional accessible description.
+    - Initial focus moves to Close; repeated Tab navigation cycles through Close, Previous, and Next without escaping.
+    - Escape closes the lightbox and returns focus to the image-opening control.
+    - After React effects settle, html and body both use overflow hidden while the lightbox is open.
+    - The full-screen overlay prevents ordinary pointer interaction with the obscured page.
+  verified_gap:
+    - Twenty visible focusable elements outside the dialog had neither an inert ancestor nor an aria-hidden ancestor at 768x1024.
+    - Programmatic focus moved from the dialog to the outside skip link while the modal remained open.
+    - aria-modal communicates modality to supporting assistive technologies but does not itself change DOM focusability or pointer behavior.
+  structural_constraint:
+    - The Lightbox is rendered inside GallerySection, which is inside #root.
+    - Applying inert directly to #root in the current structure would also inert the Lightbox descendant and is therefore invalid.
+  options:
+    - Keep the current custom ARIA modal and accept the residual compatibility gap; this preserves code and visuals but relies on focus trapping plus aria-modal support.
+    - Recommended: portal the existing overlay to document.body and apply/restore inert on #root while open; this preserves the current visual component and makes the background natively inoperable and absent from accessibility APIs.
+    - Migrate to a native dialog opened with showModal(); this provides browser-managed top-layer modality and inertness but has a broader rendering, event, and visual-regression surface.
+  decision_gate:
+    - The owner must choose whether native background inertness is required and, if so, approve the portal-plus-inert implementation or the broader native-dialog migration.
+    - No modal implementation or visual change is approved in this phase.
+  exact_recommended_proposal:
+    implementation:
+      - Return the existing Lightbox overlay through createPortal(..., document.body), retaining its current DOM subtree, classes, gestures, backdrop behavior, and ARIA attributes.
+      - While the modal is mounted, set the #root element inert and restore its exact prior inert state during cleanup.
+      - Retain the existing focus entry, Tab cycle, Escape handling, focus restoration, and html/body scroll lock as defense in depth.
+    tests:
+      - Opening places focus on Close and marks #root inert.
+      - Tab and Shift+Tab remain inside the three dialog controls.
+      - Programmatic focus attempts on a background link do not move focus outside the dialog.
+      - Escape and backdrop closure remove inert, restore scroll state, and return focus to the opener.
+      - Unmount or route cleanup cannot leave #root inert.
+    visual_contract:
+      - No intentional change to dimensions, position, backdrop opacity, typography, colors, image crop, captions, controls, gestures, or responsive presentation.
+      - Compare the open lightbox before and after at 360x800, 390x844, 768x1024, compact landscape, and 1366x768; any pixel difference is blocking unless separately approved.
+    files: [src/app/components/Lightbox.tsx, src/app/hooks/useModalBehavior.ts, directed lightbox behavior test]
+  approval_state: The owner explicitly approved the non-visual lightbox-isolation refactor on 2026-08-05.
+  implementation:
+    - Lightbox retains its existing overlay subtree and classes but returns it through createPortal(..., document.body).
+    - useModalBehavior records the prior #root inert state, enables inert while mounted, and restores that exact state during cleanup.
+    - Focus restoration is deferred one animation frame and guarded by isConnected so backdrop pointer completion cannot overwrite it and route unmount cannot focus a detached trigger.
+    - A directed Playwright suite covers portal ownership, inertness, programmatic focus containment, Tab and Shift+Tab, Escape, backdrop closure, scroll restoration, focus restoration, and route-unmount cleanup.
+  verification:
+    - the isolation test failed before implementation with dialogIsOutsideRoot=false, rootIsInert=false, and focusStayedInDialog=false
+    - typecheck passed
+    - production and SSR build plus generated route output passed
+    - unit tests passed: 10
+    - generated-output tests passed: 4
+    - directed lightbox behavior tests passed: 4
+    - complete Playwright suite passed: 188
+    - open-lightbox screenshots remained byte-identical at 360x800, 390x844, 768x1024, 844x390, and 1366x768
+    - visual regression suite passed: 28 of 28 without updating baselines
+
+phase_four_target_size:
+  status: problem_explained_decision_pending
+  requested_scope: Understand the large-screen 32px target concern before any approval or implementation.
+  actual_scope:
+    targets: [visible links and buttons on Home, Calendar, Gallery, and Affiliates at 1366x768]
+    axes: [A11Y, RESPONSIVE]
+    included: [bounding dimensions, WCAG 2.2 AA minimum, enhanced 44px criterion, desktop touch ergonomics, no-scroll tradeoff]
+    excluded: [application edits, physical-device testing, pointer accuracy study, visual approval]
+  baseline: { commit: 71159b8c, worktree: dirty with the approved responsive implementation }
+  verified:
+    - Every measured visible link and button was at least 24 CSS pixels in both bounding-box dimensions on all four routes.
+    - Calendar event details and location links measured 32px high, and share buttons measured 32x32px.
+    - Main month-navigation controls remain 48x48px; mobile-oriented controls retain 44px minimums through their base styles.
+    - Navigation links measured 26px or 30px high, footer and affiliate text links measured 24px high, and all had widths above 24px.
+  interpretation:
+    - WCAG 2.2 SC 2.5.8 Level AA requires at least 24x24 CSS pixels or an applicable exception, so the measured 32px controls are not an AA failure.
+    - WCAG SC 2.5.5 Target Size Enhanced uses 44x44 CSS pixels at Level AAA; adopting 44px everywhere is an optional stronger product policy.
+    - Increasing visible control height may consume the limited vertical budget protected by the approved 1366x768 no-scroll contract.
+  options:
+    - Keep 32px desktop controls and document WCAG 2.2 AA as the target; lowest visual and layout cost.
+    - Preserve the compact 32px visual surface while expanding non-overlapping interactive hit areas toward 44px; requires geometry and overlap verification.
+    - Use pointer/any-pointer capability queries to retain compact fine-pointer controls and provide 44px on coarse-pointer devices; helps hybrid touch hardware but is not a universal motor-accessibility policy.
+    - Adopt visible 44px controls everywhere and redesign the desktop density contract; largest visual scope and highest risk to 1366x768 containment.
+  decision_gate:
+    - The owner must choose the accessibility target (AA minimum or enhanced 44px policy) and whether the strict desktop no-scroll composition may change.
+    - No control-size or visual change is approved in this phase.
+
+phase_five_route_layout_policy:
+  status: completed_and_owner_approved
+  requested_scope: Identify structural weaknesses after the SPA and mobile-first review.
+  actual_scope:
+    targets: [src/app/config/routeTypes.ts, src/app/config/routePresentation.ts, src/app/App.tsx, src/app/config/seo.ts, src/app/routeRegistry.client.tsx, src/entry-server.tsx, tests/e2e/responsive-reachability.spec.ts]
+    axes: [ARCH, RESPONSIVE, TS]
+    included: [route containment ownership, explicitness, exhaustiveness, future-route behavior, boundary-test coverage]
+    excluded: [route redesign, SEO output changes, component folder migration, visual change]
+  baseline: { commit: 71159b8c, worktree: dirty with the approved responsive implementation }
+  verified:
+    - AppShell sets allowsTabletContainment by checking that the current RouteComponent is not affiliates.
+    - RouteComponent is a finite typed union already used by both the client registry and server registry.
+    - The responsive reachability matrix manually lists Home, Calendar, and Affiliates rather than deriving coverage from the route-component contract.
+    - A newly added RouteComponent would require registry and SEO updates but would still default to tablet containment and would not automatically enter the intermediate-height matrix.
+    - NotFoundSection is held in a separate registry property while createNotFoundMeta reports component home, so a policy keyed only by the current RouteComponent union would silently classify the 404 presentation as Home.
+    - A directed 52-case extension covering Gallery, Event, PastEvents, and NotFound across the eleven flow viewports plus 768x1024 and 1366x768 produced zero clipping, nested scroll, horizontal overflow, or unexpected shell flow locks.
+  recommended_direction:
+    - Move the renderable component identity to a route-types module and include all seven designs: home, calendar, gallery, affiliates, event, pastEvents, and notFound.
+    - Make both client and server registries exhaustive Records of that union instead of keeping notFound as an untyped special property.
+    - Correct createNotFoundMeta to report component notFound rather than home.
+    - Add a small typed route-presentation contract separate from public SEO copy, for example Record<RouteComponent, { tabletMode: 'contained' | 'flow' }>.
+    - Require one explicit policy value per RouteComponent so TypeScript prevents new page designs from inheriting containment accidentally.
+    - Expand the responsive matrix to one representative of each of the seven designs and validate behavior according to the declared policy without importing CSS implementation details.
+    - Keep page-fit as the shared verified desktop mode and preserve every approved visual result.
+  exact_non_visual_scope:
+    files: [new route types and presentation contract, src/app/App.tsx, client and server route registries, src/app/config/seo.ts, tests/e2e/responsive-reachability.spec.ts]
+    policy:
+      home: contained
+      calendar: contained
+      gallery: contained
+      affiliates: flow
+      event: contained
+      pastEvents: contained
+      notFound: contained
+    invariants:
+      - No route paths, lazy-loading boundaries, metadata, public copy, component output, breakpoint values, or CSS classes change.
+      - Every one of the 28 visual baselines remains pixel-identical.
+      - Existing responsive behavior remains identical; only ownership and exhaustiveness become explicit.
+  decision_gate:
+    - The owner explicitly approved the non-visual per-route responsive-contract refactor on 2026-08-05.
+    - The lightbox, control-size, typography, route redesign, and visual scopes remain unapproved and unchanged.
+  implementation:
+    - RouteComponent now represents all seven renderable designs, including notFound, in a dedicated route-types module.
+    - Client and server registries are exhaustive Records with no special notFound property.
+    - The 404 metadata now reports notFound while preserving its existing SEO payload and rendered output.
+    - The negative affiliates exception was replaced by an exhaustive typed tablet presentation policy: affiliates uses flow and the other six designs use contained.
+    - The reachability matrix covers one representative of every design across eleven flow viewports and two approved contained viewports.
+  verification:
+    - typecheck passed
+    - production and SSR build plus generated route output passed
+    - unit tests passed: 10
+    - generated-output tests passed: 4
+    - directed responsive reachability matrix passed: 91
+    - complete Playwright suite passed: 184
+    - visual regression suite passed: 28 of 28 without updating baselines
 ```

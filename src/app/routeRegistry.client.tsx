@@ -33,10 +33,10 @@ export const CLIENT_ROUTE_COMPONENTS: RouteComponentRegistry = {
         default: module.PastEventsSection,
       })),
     ),
+    notFound: lazy(() =>
+      import("./components/NotFoundSection").then((module) => ({
+        default: module.NotFoundSection,
+      })),
+    ),
   },
-  notFound: lazy(() =>
-    import("./components/NotFoundSection").then((module) => ({
-      default: module.NotFoundSection,
-    })),
-  ),
 };

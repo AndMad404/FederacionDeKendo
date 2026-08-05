@@ -25,8 +25,8 @@ const SERVER_ROUTE_COMPONENTS: RouteComponentRegistry = {
     affiliates: AfiliadosSection,
     event: EventPage,
     pastEvents: PastEventsSection,
+    notFound: NotFoundSection,
   },
-  notFound: NotFoundSection,
 };
 
 export function render(url: string) {
