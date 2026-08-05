@@ -2648,4 +2648,54 @@ migration:
     - Preserve legacy technical claims in the archive as provenance.
     - Use only this v2 state for current review decisions.
     - Do not promote legacy claims to verified coverage without a new review.
+
+latest_spa_mobile_review:
+  id: REV-2026-08-04-02
+  requested_scope: Critique the project as an SPA and mobile-first implementation, then identify structural weaknesses.
+  actual_scope:
+    targets: [src/app/App.tsx, src/main.tsx, src/app/routeRegistry.client.tsx, src/app/components/**/*.tsx, src/app/hooks/*.ts, src/styles/globals.css, responsive Playwright inventory]
+    axes: [ARCH, REACT, A11Y, PERF, RESPONSIVE]
+    included: [SPA navigation and hydration, route splitting, viewport and orientation strategy, content reachability, touch targets, modal isolation, responsive test matrix]
+    excluded: [SEO depth, copy accuracy, visual fidelity, obsolete Figma comparison, live assistive technology, field performance, generator internals]
+  baseline: { commit: a394c725, worktree: clean before this state update }
+  confirmed_findings: [STR-RESP-003, STR-ARCH-013, SMELL-A11Y-003, SMELL-A11Y-004]
+  evidence:
+    - inspected the declared source inventory and recorded responsive utility patterns with rg
+    - inspected the configured 360x800, 390x844, 768x1024, and 1366x768 Playwright viewport matrix
+    - inspected existing dist chunk sizes; no runtime or field-performance measurement was performed
+  result: The SPA foundations and base-first Tailwind cascade are sound, but viewport containment, component-local breakpoint composition, reduced large-screen targets, and incomplete modal isolation remain risks.
+
+  findings:
+    - id: STR-RESP-003
+      level: STRUCTURAL
+      axis: RESPONSIVE
+      status: open
+      target: src/app/App.tsx:63 and tall-md route containers
+      problem: At tablet-or-wider widths and heights above 640px the shell and primary route containers switch to fixed viewport containment with overflow hidden, making content reachability depend on every descendant fitting its allocated height.
+      fix: Keep document flow as the resilient default and scope the desktop no-scroll composition to an explicit desktop contract, with an internal overflow owner for variable or zoomed content.
+      cost_of_deferring: Text zoom, localization growth, browser chrome, or an untested intermediate viewport can clip content even while the four approved viewport snapshots pass.
+    - id: STR-ARCH-013
+      level: STRUCTURAL
+      axis: ARCH
+      status: open
+      target: custom responsive variants and route-level component utility chains
+      problem: Layout policy is distributed across width, height, and orientation variants inside individual components, including intersecting overrides whose source-order behavior has already caused a regression.
+      fix: Define a small documented responsive composition contract and reuse non-visual shell primitives or named class sets for viewport ownership, banners, panels, and compact landscape behavior.
+      cost_of_deferring: Each new route or breakpoint multiplies variant intersections and makes fixes easy to apply inconsistently.
+    - id: SMELL-A11Y-003
+      level: SMELL
+      axis: A11Y
+      status: open
+      target: calendar and event controls using lg:min-h-8 or lg:size-8
+      problem: Several controls shrink from 44px to 32px at large widths even though large screens can still be touch-enabled or used under motor constraints.
+      fix: Preserve a 44px interactive hit area while allowing the visible control surface to remain visually compact.
+      cost_of_deferring: Desktop touch and pointer accessibility becomes less forgiving and the component contract varies by viewport rather than input capability.
+    - id: SMELL-A11Y-004
+      level: SMELL
+      axis: A11Y
+      status: open
+      target: src/app/hooks/useModalBehavior.ts
+      problem: The gallery dialog traps focus and locks scrolling but does not mark the application background inert, so non-dialog content remains exposed to some assistive and programmatic navigation paths.
+      fix: Apply and restore inert on the application shell while the modal is open, retaining the existing focus return and scroll restoration.
+      cost_of_deferring: The visual modal and accessibility interaction boundary can disagree.
 ```
