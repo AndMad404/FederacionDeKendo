@@ -68,6 +68,7 @@ function renderRouteHtml(route) {
     /<title>[\s\S]*?<\/title>/i,
     `<title>${escapeText(seo.title)}</title>`,
   );
+  html = html.replace(/<html\s+lang="[^"]+"/i, `<html lang="${route.language}"`);
 
   const bodyHtml = render(route.path);
   html = html.replace('<div id="root"></div>', `<div id="root">${bodyHtml}</div>`);
@@ -95,6 +96,7 @@ function renderNotFoundHtml() {
     /<title>[\s\S]*?<\/title>/i,
     `<title>${escapeText(seo.title)}</title>`,
   );
+  html = html.replace(/<html\s+lang="[^"]+"/i, '<html lang="es"');
 
   const bodyHtml = render("/404-not-found/");
   html = html.replace('<div id="root"></div>', `<div id="root">${bodyHtml}</div>`);

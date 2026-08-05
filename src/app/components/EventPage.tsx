@@ -7,7 +7,9 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router";
-import { EVENT_AUDIENCE_NOTICE } from "../config/events";
+import { EVENT_AUDIENCE_NOTICE, EVENT_AUDIENCE_NOTICE_EN } from "../config/events";
+import { useLanguage } from "../config/i18n";
+import { getLocalizedEvent } from "../utils/localizedEvents";
 import {
   focusRingClass,
   panelSurfaceClass,
@@ -40,17 +42,20 @@ async function shareEvent(title: string, url: string) {
 }
 
 export function EventPage() {
+  const { language } = useLanguage();
+  const english = language === "en";
   const location = useLocation();
-  const event = findEventByPathname(location.pathname);
+  const sourceEvent = findEventByPathname(location.pathname);
   const [copied, setCopied] = useState(false);
 
-  if (!event) return null;
+  if (!sourceEvent) return null;
+  const event = getLocalizedEvent(sourceEvent, language);
 
   const isPast = getEventEndDate(event).getTime() < Date.now();
   const locationUrl = event.location
     ? getLocationMapUrl(event.location)
     : undefined;
-  const canonicalPath = getEventPath(event);
+  const canonicalPath = getEventPath(event, language);
   const eventTitle = event.title;
 
   async function handleShare() {
@@ -73,7 +78,7 @@ export function EventPage() {
           className="relative z-10 h-28 shrink-0 overflow-hidden land-compact:h-20"
           titleId="event-page-title"
           title={event.title}
-          description={event.type ?? "Actividad de kendo"}
+          description={event.type ?? (english ? "Kendo activity" : "Actividad de kendo")}
           image={{
             src: "/images/calendar/kendo-calendar-1600.webp",
             sources: [
@@ -96,27 +101,29 @@ export function EventPage() {
           >
             <div className="min-w-0">
               <p className="text-sm font-bold uppercase tracking-wider text-site-accent">
-                {isPast ? "Actividad finalizada" : "Actividad programada"}
+                {isPast
+                  ? english ? "Completed activity" : "Actividad finalizada"
+                  : english ? "Scheduled activity" : "Actividad programada"}
               </p>
               <dl className="mt-3 grid gap-2 text-sm md:grid-cols-2">
                 <div className="flex gap-2">
                   <CalendarDays className="size-5 shrink-0 text-site-accent-soft" aria-hidden="true" />
                   <div>
-                    <dt className="font-bold">Fecha</dt>
-                    <dd>{getEventDateLabel(event)}</dd>
+                    <dt className="font-bold">{english ? "Date" : "Fecha"}</dt>
+                    <dd>{getEventDateLabel(event, language)}</dd>
                   </div>
                 </div>
                 <div className="flex gap-2">
                   <Clock className="size-5 shrink-0 text-site-accent-soft" aria-hidden="true" />
                   <div>
-                    <dt className="font-bold">Horario</dt>
-                    <dd>{formatEventTime(event)}</dd>
+                    <dt className="font-bold">{english ? "Time" : "Horario"}</dt>
+                    <dd>{formatEventTime(event, language)}</dd>
                   </div>
                 </div>
                 <div className="flex gap-2 md:col-span-2">
                   <MapPin className="size-5 shrink-0 text-site-accent-soft" aria-hidden="true" />
                   <div className="min-w-0">
-                    <dt className="font-bold">Ubicación</dt>
+                    <dt className="font-bold">{english ? "Location" : "Ubicación"}</dt>
                     <dd>
                       {event.location && locationUrl ? (
                         <a
@@ -127,11 +134,11 @@ export function EventPage() {
                         >
                           {getEventLocationName(event.location)}
                           <span className="sr-only">
-                            . Abre Google Maps en una pestaña nueva.
+                            . {english ? "Opens Google Maps in a new tab." : "Abre Google Maps en una pestaña nueva."}
                           </span>
                         </a>
                       ) : (
-                        "Pendiente de confirmar"
+                        english ? "To be confirmed" : "Pendiente de confirmar"
                       )}
                     </dd>
                   </div>
@@ -139,15 +146,15 @@ export function EventPage() {
               </dl>
 
               <div className="mt-4">
-                <h2 className="font-bold">Descripción</h2>
+                <h2 className="font-bold">{english ? "Description" : "Descripción"}</h2>
                 <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-site-muted">
-                  {event.summary ?? "Información pendiente de confirmar."}
+                  {event.summary ?? (english ? "Information to be confirmed." : "Información pendiente de confirmar.")}
                 </p>
               </div>
             </div>
 
             <aside className="flex flex-col justify-between gap-4 rounded-xl bg-site-media p-4">
-              <p className="text-sm leading-relaxed">{EVENT_AUDIENCE_NOTICE}</p>
+              <p className="text-sm leading-relaxed">{english ? EVENT_AUDIENCE_NOTICE_EN : EVENT_AUDIENCE_NOTICE}</p>
               <div className="grid gap-2">
                 <button
                   type="button"
@@ -159,20 +166,22 @@ export function EventPage() {
                   ) : (
                     <Share2 className="mr-2 size-4" aria-hidden="true" />
                   )}
-                  {copied ? "Enlace copiado" : "Compartir evento"}
+                  {copied
+                    ? english ? "Link copied" : "Enlace copiado"
+                    : english ? "Share event" : "Compartir evento"}
                 </button>
                 <Link
-                  to="/calendario/"
+                  to={english ? "/en/calendar/" : "/calendario/"}
                   className={`${secondaryButtonClass} ${focusRingClass}`}
                 >
-                  Volver al calendario
+                  {english ? "Back to calendar" : "Volver al calendario"}
                 </Link>
                 {isPast ? (
                   <Link
-                    to="/eventos/pasados/"
+                    to={english ? "/en/events/past/" : "/eventos/pasados/"}
                     className={`text-center text-sm font-semibold underline underline-offset-4 ${focusRingClass}`}
                   >
-                    Ver archivo de eventos
+                    {english ? "View event archive" : "Ver archivo de eventos"}
                   </Link>
                 ) : null}
               </div>

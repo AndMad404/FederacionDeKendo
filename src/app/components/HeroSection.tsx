@@ -6,10 +6,12 @@ import {
   primaryButtonClass,
   secondaryButtonClass,
 } from "../styles/shared";
+import { useLanguage } from "../config/i18n";
 
 const imageVersion = "v=20260704-0120";
 
 function HeroBanner() {
+  const { copy } = useLanguage();
   return (
     <header className="relative my-2 flex h-[clamp(520px,calc(100svh_-_4rem_-_10px),680px)] items-stretch overflow-hidden rounded-xl land-sm:h-auto land-sm:min-h-[calc(100svh_-_3rem_-_6px)] tall-md:h-auto tall-md:min-h-[230px] tall-md:flex-1">
       <picture className="absolute inset-0">
@@ -20,7 +22,7 @@ function HeroBanner() {
         />
         <img
           src={`/images/hero/kendo-hero-formacion-1500.webp?${imageVersion}`}
-          alt="Grupo de practicantes de kendo reunidos después de una actividad"
+          alt={copy.home.heroAlt}
           width={1500}
           height={750}
           className="absolute inset-0 h-full w-full object-cover"
@@ -45,28 +47,26 @@ function HeroBanner() {
             className="mx-auto text-3xl sm:text-4xl land-sm:mx-0 land-sm:text-left land-tall:mx-0 land-tall:text-left"
             allowWrap
           >
-            Federación de Asociaciones
-            <span className="block sm:inline"> de Kendo</span>
+            {copy.home.title}
           </PageTitle>
           <p className="text-lg font-bold leading-snug sm:text-xl land-sm:mt-5">
-            Una comunidad que aprende, entrena y crece unida a través del
-            kendo en Costa Rica.
+            {copy.home.lead}
           </p>
           <p className="leading-relaxed text-site-subtle land-sm:mt-3">
-            Encuentra un dojo afiliado o consulta nuestros próximos encuentros.
+            {copy.home.description}
           </p>
           <div className="flex flex-col justify-center gap-3 sm:flex-row land-sm:mt-5 land-sm:justify-start land-tall:justify-start">
             <Link
-              to="/afiliados/"
+              to={copy.nav.links[3].path}
               className={`${primaryButtonClass} ${focusRingClass}`}
             >
-              Encuentra un dojo
+              {copy.home.dojos}
             </Link>
             <Link
-              to="/calendario/"
+              to={copy.nav.links[1].path}
               className={`${secondaryButtonClass} ${focusRingClass}`}
             >
-              Ver próximos eventos
+              {copy.home.events}
             </Link>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { GalleryImage } from "../../types";
+import { useLanguage } from "../../config/i18n";
 import { focusRingClass } from "../../styles/shared";
 
 const THUMBNAIL_SIZES = "(min-width: 768px) 168px, 17vw";
@@ -12,11 +13,12 @@ interface ThumbnailProps {
 }
 
 function Thumbnail({ image, isActive, buttonRef, onClick }: ThumbnailProps) {
+  const { language } = useLanguage();
   return (
     <button
       ref={buttonRef}
       type="button"
-      aria-label={`Ver imagen: ${image.title}`}
+      aria-label={language === "en" ? `View image: ${image.title}` : `Ver imagen: ${image.title}`}
       aria-current={isActive ? "true" : undefined}
       onClick={onClick}
       className={`group relative h-full w-full cursor-pointer overflow-hidden rounded-lg border-2 border-transparent bg-site-media transition-colors duration-300 ${
@@ -50,6 +52,7 @@ export function GalleryThumbnails({
   activeIndex,
   onSelect,
 }: GalleryThumbnailsProps) {
+  const { language } = useLanguage();
   const stripRef = useRef<HTMLDivElement | null>(null);
   const buttonRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const previousActiveIndexRef = useRef(activeIndex);
@@ -119,7 +122,7 @@ export function GalleryThumbnails({
       <div
         ref={stripRef}
         role="group"
-        aria-label="Miniaturas de galería"
+        aria-label={language === "en" ? "Gallery thumbnails" : "Miniaturas de galería"}
         className="grid h-14 w-full touch-manipulation scroll-smooth grid-flow-col auto-cols-[17%] gap-1.5 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden motion-reduce:scroll-auto sm:h-16 sm:auto-cols-[calc((100%_-_2.5rem)_/_6)] sm:gap-2 md:h-20"
       >
         {images.map((image, index) => (

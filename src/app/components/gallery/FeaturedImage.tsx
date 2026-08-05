@@ -16,6 +16,7 @@ import {
   mediaCaptionSurfaceClass,
 } from "../../styles/shared";
 import { NavigationArrowButton } from "../ui/ModalControls";
+import { useLanguage } from "../../config/i18n";
 
 const defaultFeaturedObjectPosition = "center 0%";
 
@@ -40,6 +41,8 @@ export function FeaturedImage({
   onSwipePrev,
   onSwipeNext,
 }: FeaturedImageProps) {
+  const { language } = useLanguage();
+  const openDetailsLabel = language === "en" ? "Open details" : OPEN_DETAILS_LABEL;
   const {
     activeDirection: activeArrow,
     showDirection: showArrowFeedback,
@@ -47,12 +50,12 @@ export function FeaturedImage({
   const positionLabel = `${index + 1} / ${total}`;
   const { displayTitle, displayTag, displayDescription } = getGalleryDisplayText(image);
   const descriptionPreview = displayDescription
-    ? getMobileDescriptionPreview(displayDescription)
+    ? getMobileDescriptionPreview(displayDescription, openDetailsLabel)
     : null;
   const previewText =
     descriptionPreview?.isTruncated
       ? descriptionPreview.preview
-          .slice(0, -OPEN_DETAILS_LABEL.length)
+          .slice(0, -openDetailsLabel.length)
           .trimEnd()
       : descriptionPreview?.preview;
   const handleSwipePrev = useCallback(() => {
@@ -125,7 +128,7 @@ export function FeaturedImage({
             aria-hidden="true"
             className={`${descriptionPreview?.isTruncated ? "relative block" : "hidden"} font-bold text-site-on-dark underline underline-offset-2 transition-colors group-hover:text-site-accent-soft sm:col-start-1 sm:row-start-3 sm:mt-2.5 sm:self-baseline land-sm:row-start-2 land-sm:mt-0 land-sm:block land-sm:text-sm land-sm:leading-none`}
           >
-            <span>{OPEN_DETAILS_LABEL}</span>
+            <span>{openDetailsLabel}</span>
             {descriptionPreview?.isTruncated && (
               <span className="absolute right-0 top-1/2 -translate-y-1/2 text-xs font-normal text-site-on-dark no-underline sm:hidden">
                 {positionLabel}
@@ -140,7 +143,7 @@ export function FeaturedImage({
 
       <button
         type="button"
-        aria-label={`${displayTitle}. ${displayTag}. ${positionLabel}. ${OPEN_DETAILS_LABEL} en la galería`}
+        aria-label={`${displayTitle}. ${displayTag}. ${positionLabel}. ${language === "en" ? "Open details in the gallery" : "Abrir detalles en la galería"}`}
         className={`absolute inset-0 z-10 touch-pan-y cursor-pointer ${focusRingClass}`}
         onClick={(event) => {
           if (consumeSwipe()) {
@@ -152,13 +155,13 @@ export function FeaturedImage({
         }}
         {...swipeHandlers}
       >
-        <span className="sr-only">{OPEN_DETAILS_LABEL}</span>
+        <span className="sr-only">{openDetailsLabel}</span>
       </button>
 
       <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-between px-3">
         <NavigationArrowButton
           direction="previous"
-          label="Imagen anterior"
+          label={language === "en" ? "Previous image" : "Imagen anterior"}
           isActive={activeArrow === "left"}
           onClick={(event) => {
             showArrowFeedback("left");
@@ -168,7 +171,7 @@ export function FeaturedImage({
         />
         <NavigationArrowButton
           direction="next"
-          label="Imagen siguiente"
+          label={language === "en" ? "Next image" : "Imagen siguiente"}
           isActive={activeArrow === "right"}
           onClick={(event) => {
             showArrowFeedback("right");

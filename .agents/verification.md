@@ -58,36 +58,39 @@ For semantic or interactive UI changes, inspect:
 
 For layout, spacing, component, or style changes:
 
-1. Restate the approved baseline and identify its source.
-2. Inspect the affected route at every target viewport named in the task.
-3. Compare the relevant outer margins, internal padding, gaps, dimensions,
+1. Record the owner's explicit approval for the exact intended visual change.
+2. Restate the approved baseline and identify its source.
+3. Inspect the affected route at every target viewport named in the task.
+4. Compare the relevant outer margins, internal padding, gaps, dimensions,
    alignment, component composition, tokens, and interactive states.
-4. Check document and component overflow, including content at its expected
+5. Check document and component overflow, including content at its expected
    maximum or variable length.
-5. Capture or record reproducible visual evidence when practical and list any
+6. Capture or record reproducible visual evidence when practical and list any
    intentional deviation from the baseline.
+7. Inspect the screenshot diff itself, not only the changed-pixel count. Map
+   every material changed region to an explicitly authorized requirement.
 
 An exact, narrowly scoped correction needs only the affected viewport and
 nearby regression checks. A change to a shared primitive or responsive rule
 must also inspect its affected consumers. A successful typecheck or build does
 not prove visual correctness.
 
-### Automated visual regression gate
+### Automated design-contract gate
 
-`tests/e2e/visual-regression.spec.ts` is the executable baseline for the
-approved application design:
+`tests/e2e/geometry-contract.spec.ts` is the default executable contract for
+the approved application design:
 
 - It discovers every generated `dist/**/index.html` route automatically and
-  includes the custom not-found page.
-- Every generated page is checked at 360x800, 390x844, 768x1024, and
-  1366x768 for horizontal overflow, visible heading bounds, declared
-  heading-to-content boundaries, and the desktop no-scroll contract.
+  enforces the strict 1366x768 shell, overflow, heading-boundary, footer, and
+  no-scroll rules on each route.
 - One representative of every page design (`home`, `calendar`, `gallery`,
-  `affiliates`, `event`, `pastEvents`, and `notFound`) is compared with an
-  approved screenshot at each viewport.
-- Screenshot comparisons allow at most a 1% pixel difference to absorb minor
-  cross-platform rendering variation while still rejecting material layout
-  changes.
+  `affiliates`, `event`, `pastEvents`, and `notFound`) is checked at 360x800,
+  390x844, 768x1024, and 1366x768.
+- Representative checks assert approved padding, margins, gaps, containment,
+  content presence, link/image validity, unique IDs, and accessible control names.
+- The values in `tests/e2e/design-contract.ts` describe the owner-approved
+  current application. Changing a value requires the same explicit approval
+  as changing the corresponding visual implementation.
 
 Run the complete gate with:
 
@@ -96,10 +99,33 @@ pnpm run build
 pnpm run test:e2e
 ```
 
+The platform-sensitive screenshot collection remains available as a directed
+manual review:
+
+```powershell
+pnpm run test:visual
+```
+
+It is intentionally excluded from the default CI gate. Use it only in the
+Windows environment where the approved snapshots were generated. A screenshot
+failure never authorizes updating a baseline by itself.
+
 Never update screenshot baselines merely to make a failing test pass. After
 the owner explicitly approves an intentional visual change, regenerate them
-with `pnpm test:e2e --update-snapshots`, inspect the changed images, and commit
+with `pnpm run test:visual -- --update-snapshots`, inspect the changed images, and commit
 the reviewed baselines with the implementation.
+
+Visual comparisons fail closed:
+
+- One expected difference does not waive unexpected differences elsewhere in
+  the same screenshot.
+- If the worktree contains unrelated visual changes, the result cannot verify
+  a narrow change until that patch is isolated or the combined scope is
+  explicitly approved.
+- A reviewer must inspect expected, actual, and diff images before describing a
+  failure as intentional.
+- Structural assertions passing do not override a screenshot failure.
+- Do not regenerate baselines from a mixed or partially approved worktree.
 
 ## Responsive Checks
 

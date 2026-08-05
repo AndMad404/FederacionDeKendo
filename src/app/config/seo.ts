@@ -1,5 +1,5 @@
 import seoData from "./seo-data.json";
-import { GALLERY_IMAGES } from "../data/gallery";
+import { GALLERY_IMAGES, getGalleryImages } from "../data/gallery";
 import { CALENDAR_EVENTS } from "../data/calendarEvents";
 import {
   EVENT_INDEXING_ENABLED,
@@ -11,6 +11,8 @@ import {
   getPastEvents,
   getEventPath,
 } from "../utils/eventRoutes";
+import { getLanguageFromPathname, type Language } from "./i18n";
+import { getLocalizedEvent } from "../utils/localizedEvents";
 
 type SchemaType = "WebPage" | "CollectionPage";
 export type RouteComponent =
@@ -48,6 +50,9 @@ interface SeoData {
 
 export interface RouteMeta {
   path: string;
+  language: Language;
+  locale: "es_CR" | "en_US";
+  alternatePath: string;
   component: RouteComponent;
   title: string;
   description: string;
@@ -127,6 +132,9 @@ function assertSeoData(value: unknown): asserts value is SeoData {
     const route = routeValue as Partial<RouteMeta>;
     if (
       route.path !== routeKey ||
+      (route.language !== "es" && route.language !== "en") ||
+      !route.locale ||
+      !route.alternatePath ||
       !route.title ||
       !route.description ||
       !route.image ||
@@ -150,13 +158,14 @@ const DATA: SeoData = seoData as SeoData;
 const SITE_URL = DATA.siteUrl.replace(/\/$/, "");
 const SITE_NAME = DATA.siteName;
 const DEFAULT_SITE_DESCRIPTION = DATA.defaultDescription;
-const SITE_LOCALE = DATA.locale;
-const SITE_LANGUAGE = DATA.language;
 const DEFAULT_SOCIAL_IMAGE_ALT = DATA.defaultImageAlt;
 const DEFAULT_SOCIAL_IMAGE_WIDTH = DATA.defaultImageWidth;
 const DEFAULT_SOCIAL_IMAGE_HEIGHT = DATA.defaultImageHeight;
 const ROUTE_META = DATA.routes;
-const CALENDAR_META = ROUTE_META["/calendario/"];
+const CALENDAR_META: Record<Language, RouteMeta> = {
+  es: ROUTE_META["/calendario/"],
+  en: ROUTE_META["/en/calendar/"],
+};
 
 function normalizeRoutePath(pathname: string) {
   if (pathname === "/") return pathname;
@@ -181,8 +190,8 @@ function buildGalleryStructuredData(
       url: canonicalUrl,
       name: meta.title,
       description: meta.description,
-      inLanguage: SITE_LANGUAGE,
-      image: GALLERY_IMAGES.map((image) => ({
+      inLanguage: meta.language,
+      image: getGalleryImages(meta.language).map((image) => ({
         "@type": "ImageObject",
         "@id": `${canonicalUrl}#image-${image.id}`,
         contentUrl: absoluteUrl(image.src),
@@ -198,20 +207,30 @@ function buildGalleryStructuredData(
   ];
 }
 
-const NOT_FOUND_META: RouteMeta = {
-  path: "/404/",
-  component: "home",
-  title: `Página no encontrada | ${SITE_NAME}`,
-  description: "La página que buscas no existe o fue movida.",
-  image: DATA.defaultImage,
-  imageAlt: DATA.defaultImageAlt,
-  imageWidth: DATA.defaultImageWidth,
-  imageHeight: DATA.defaultImageHeight,
-  imageType: "image/png",
-  schemaType: "WebPage",
-  noindex: true,
-  suppressStructuredData: true,
-};
+function createNotFoundMeta(language: Language): RouteMeta {
+  const english = language === "en";
+  return {
+    path: english ? "/en/404/" : "/404/",
+    language,
+    locale: english ? "en_US" : "es_CR",
+    alternatePath: english ? "/404/" : "/en/404/",
+    component: "home",
+    title: english
+      ? `Page not found | ${SITE_NAME}`
+      : `Página no encontrada | ${SITE_NAME}`,
+    description: english
+      ? "The page you are looking for does not exist or has moved."
+      : "La página que buscas no existe o fue movida.",
+    image: DATA.defaultImage,
+    imageAlt: DATA.defaultImageAlt,
+    imageWidth: DATA.defaultImageWidth,
+    imageHeight: DATA.defaultImageHeight,
+    imageType: "image/png",
+    schemaType: "WebPage",
+    noindex: true,
+    suppressStructuredData: true,
+  };
+}
 
 export function getRouteMeta(pathname: string) {
   const normalizedPath = normalizeRoutePath(pathname);
@@ -219,9 +238,10 @@ export function getRouteMeta(pathname: string) {
   if (configuredRoute) return configuredRoute;
 
   const event = findEventByPathname(normalizedPath);
-  if (event) return createEventRouteMeta(event);
+  if (event) return createEventRouteMeta(event, getLanguageFromPathname(pathname));
 
-  return getRouteManifest().find((route) => route.path === normalizedPath) ?? NOT_FOUND_META;
+  return getRouteManifest().find((route) => route.path === normalizedPath) ??
+    createNotFoundMeta(getLanguageFromPathname(pathname));
 }
 
 export function getRouteManifest() {
@@ -235,8 +255,14 @@ export function getRouteManifest() {
 
   return [
     ...Object.values(ROUTE_META),
-    ...CALENDAR_EVENTS.map(createEventRouteMeta),
+    ...CALENDAR_EVENTS.flatMap((event) => [
+      createEventRouteMeta(event, "es"),
+      createEventRouteMeta(event, "en"),
+    ]),
     ...archiveRoutes,
+    ...Array.from({ length: pastPageCount }, (_, index) =>
+      createArchiveRouteMeta(index + 1, "en"),
+    ),
   ];
 }
 
@@ -244,47 +270,72 @@ export function getEventRedirects() {
   return CALENDAR_EVENTS.flatMap((event) =>
     (event.aliases ?? [])
       .filter((alias) => alias !== event.id)
-      .map((alias) => ({
-        from: `/eventos/${alias}/`,
-        to: getEventPath(event),
-      })),
+      .flatMap((alias) => [
+        {
+          from: `/eventos/${alias}/`,
+          to: getEventPath(event, "es"),
+        },
+        {
+          from: `/en/events/${alias}/`,
+          to: getEventPath(event, "en"),
+        },
+      ]),
   );
 }
 
-function createEventRouteMeta(event: (typeof CALENDAR_EVENTS)[number]): RouteMeta {
+function createEventRouteMeta(
+  event: (typeof CALENDAR_EVENTS)[number],
+  language: Language,
+): RouteMeta {
+  const english = language === "en";
+  const localizedEvent = getLocalizedEvent(event, language);
+  const calendarMeta = CALENDAR_META[language];
   const description =
-    event.summary ||
-    `Consulta fecha, horario y detalles de ${event.title}.`;
+    localizedEvent.summary ||
+    (english
+      ? `View the date, time, and details for ${localizedEvent.title}.`
+      : `Consulta fecha, horario y detalles de ${event.title}.`);
   return {
-    path: getEventPath(event),
+    path: getEventPath(event, language),
+    language,
+    locale: english ? "en_US" : "es_CR",
+    alternatePath: getEventPath(event, english ? "es" : "en"),
     component: "event",
     eventId: event.id,
-    title: `${event.title} | ${SITE_NAME}`,
+    title: `${localizedEvent.title} | ${SITE_NAME}`,
     description: description.slice(0, 160),
-    image: CALENDAR_META.image,
-    imageAlt: CALENDAR_META.imageAlt,
-    imageWidth: CALENDAR_META.imageWidth,
-    imageHeight: CALENDAR_META.imageHeight,
-    imageType: CALENDAR_META.imageType,
+    image: calendarMeta.image,
+    imageAlt: calendarMeta.imageAlt,
+    imageWidth: calendarMeta.imageWidth,
+    imageHeight: calendarMeta.imageHeight,
+    imageType: calendarMeta.imageType,
     schemaType: "WebPage",
     noindex: !EVENT_INDEXING_ENABLED,
     canonicalWhileNoindex: true,
   };
 }
 
-function createArchiveRouteMeta(page: number): RouteMeta {
+function createArchiveRouteMeta(page: number, language: Language = "es"): RouteMeta {
+  const english = language === "en";
+  const calendarMeta = CALENDAR_META[language];
   return {
-    path: getArchivePagePath(page),
+    path: getArchivePagePath(page, language),
+    language,
+    locale: english ? "en_US" : "es_CR",
+    alternatePath: getArchivePagePath(page, english ? "es" : "en"),
     component: "pastEvents",
     archivePage: page,
-    title: `Eventos pasados${page > 1 ? ` — página ${page}` : ""} | ${SITE_NAME}`,
-    description:
-      "Archivo histórico de torneos, exámenes, seminarios y actividades de kendo.",
-    image: CALENDAR_META.image,
-    imageAlt: CALENDAR_META.imageAlt,
-    imageWidth: CALENDAR_META.imageWidth,
-    imageHeight: CALENDAR_META.imageHeight,
-    imageType: CALENDAR_META.imageType,
+    title: english
+      ? `Past events${page > 1 ? ` — page ${page}` : ""} | ${SITE_NAME}`
+      : `Eventos pasados${page > 1 ? ` — página ${page}` : ""} | ${SITE_NAME}`,
+    description: english
+      ? "Historical archive of kendo tournaments, examinations, seminars, and activities."
+      : "Archivo histórico de torneos, exámenes, seminarios y actividades de kendo.",
+    image: calendarMeta.image,
+    imageAlt: calendarMeta.imageAlt,
+    imageWidth: calendarMeta.imageWidth,
+    imageHeight: calendarMeta.imageHeight,
+    imageType: calendarMeta.imageType,
     schemaType: "CollectionPage",
     noindex: !EVENT_INDEXING_ENABLED,
     canonicalWhileNoindex: true,
@@ -343,6 +394,7 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
   if (meta.component === "event" && meta.eventId) {
     const event = CALENDAR_EVENTS.find((candidate) => candidate.id === meta.eventId);
     if (event?.location) {
+      const localizedEvent = getLocalizedEvent(event, meta.language);
       const startDate = event.startTime
         ? `${event.date}T${event.startTime}:00-06:00`
         : event.date;
@@ -356,8 +408,8 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
       routeEntities.push({
         "@type": "Event",
         "@id": `${canonicalUrl}#event`,
-        name: event.title,
-        description: event.summary || meta.description,
+        name: localizedEvent.title,
+        description: localizedEvent.summary || meta.description,
         startDate,
         ...(endDate ? { endDate } : {}),
         eventStatus: "https://schema.org/EventScheduled",
@@ -390,7 +442,7 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
         "@id": websiteId,
         url: `${SITE_URL}/`,
         name: SITE_NAME,
-        inLanguage: SITE_LANGUAGE,
+        inLanguage: meta.language,
         publisher: {
           "@id": organizationId,
         },
@@ -401,7 +453,7 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
         url: canonicalUrl,
         name: meta.title,
         description: meta.description,
-        inLanguage: SITE_LANGUAGE,
+        inLanguage: meta.language,
         isPartOf: {
           "@id": websiteId,
         },
@@ -434,7 +486,7 @@ export function getRouteSeoPayload(meta: RouteMeta): RouteSeoPayload {
     canonicalUrl:
       noindex && !meta.canonicalWhileNoindex ? null : getCanonicalUrl(meta),
     siteName: SITE_NAME,
-    locale: SITE_LOCALE,
+    locale: meta.locale,
     image: getRouteImageMetadata(meta),
     structuredData: getRouteStructuredData(meta),
     preloadImage: meta.preloadImage,
@@ -493,10 +545,40 @@ export function getRouteHeadDescriptors(meta: RouteMeta): HeadDescriptor[] {
       ["og:image:height", String(seo.image.height)],
       ["og:image:alt", seo.image.alt],
       ["og:locale", seo.locale],
+      ["og:locale:alternate", meta.language === "en" ? "es_CR" : "en_US"],
     ].map(([property, content]) => ({
       tag: "meta" as const,
       attributes: { property, content },
     })),
+  );
+
+  const spanishPath = meta.language === "es" ? meta.path : meta.alternatePath;
+  const englishPath = meta.language === "en" ? meta.path : meta.alternatePath;
+  descriptors.push(
+    {
+      tag: "link",
+      attributes: {
+        rel: "alternate",
+        hreflang: "es-CR",
+        href: absoluteUrl(spanishPath),
+      },
+    },
+    {
+      tag: "link",
+      attributes: {
+        rel: "alternate",
+        hreflang: "en",
+        href: absoluteUrl(englishPath),
+      },
+    },
+    {
+      tag: "link",
+      attributes: {
+        rel: "alternate",
+        hreflang: "x-default",
+        href: absoluteUrl(spanishPath),
+      },
+    },
   );
 
   if (seo.structuredData) {

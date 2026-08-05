@@ -4,9 +4,10 @@ import { DojoCard } from "./DojoCard";
 interface DojoListProps {
   dojos: DojoData[];
   startIndex: number;
+  language: "es" | "en";
 }
 
-export function DojoList({ dojos, startIndex }: DojoListProps) {
+export function DojoList({ dojos, startIndex, language }: DojoListProps) {
   const desktopGridClass =
     dojos.length === 1
       ? "xl:mx-auto xl:max-w-3xl"
@@ -22,6 +23,7 @@ export function DojoList({ dojos, startIndex }: DojoListProps) {
         <DojoCard
           key={dojo.title}
           headingId={`dojo-${startIndex + index + 1}-title`}
+          language={language}
           {...dojo}
         />
       ))}

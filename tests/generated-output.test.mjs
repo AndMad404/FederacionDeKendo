@@ -41,3 +41,25 @@ test("generates the archive route", async () => {
   assert.match(archive, /Eventos pasados/);
   assert.match(archive, /Página (?:<!-- -->)?1(?:<!-- -->)? de (?:<!-- -->)?1/);
 });
+
+test("generates localized English routes with reciprocal language metadata", async () => {
+  const home = await readDist("en/index.html");
+  const event = await readDist("en/events/2026-08-08-examen/index.html");
+  const sitemap = await readDist("sitemap.xml");
+
+  assert.match(home, /<html lang="en">/);
+  assert.match(home, />Home<\/a>/);
+  assert.match(home, /href="\/en\/calendar\/"/);
+  assert.match(
+    home,
+    /rel="alternate" hreflang="es-CR" href="https:\/\/fak-kendo\.pages\.dev\/"/,
+  );
+  assert.match(
+    home,
+    /rel="alternate" hreflang="en" href="https:\/\/fak-kendo\.pages\.dev\/en\/"/,
+  );
+  assert.match(event, /<h1[^>]*>Examination<\/h1>/);
+  assert.match(event, /Examinations from 8th to 2nd kyu/);
+  assert.match(sitemap, /<loc>https:\/\/fak-kendo\.pages\.dev\/en\/<\/loc>/);
+  assert.match(sitemap, /<loc>https:\/\/fak-kendo\.pages\.dev\/en\/gallery\/<\/loc>/);
+});

@@ -80,6 +80,10 @@ test("shares the canonical page and displays the complete description", async ({
 test("renders the historical archive and a custom not-found view", async ({
   page,
 }) => {
+  const consoleErrors: string[] = [];
+  page.on("console", (message) => {
+    if (message.type() === "error") consoleErrors.push(message.text());
+  });
   await page.goto("/eventos/pasados/");
   await expect(
     page.getByRole("heading", { name: "Eventos pasados", level: 1 }),
@@ -88,6 +92,49 @@ test("renders the historical archive and a custom not-found view", async ({
 
   await page.goto("/eventos/ruta-inexistente/");
   await expect(page.getByText(/página que buscas no existe/i)).toBeVisible();
+
+  await page.goto("/en/events/missing-route/");
+  await expect(page.getByText(/page you are looking for does not exist/i)).toBeVisible();
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  expect(consoleErrors).toEqual([]);
+});
+
+test("switches languages while preserving the current section", async ({ page }) => {
+  await page.goto("/galeria/");
+
+  await page.getByRole("link", { name: "View site in English" }).click();
+  await expect(page).toHaveURL(/\/en\/gallery\/$/);
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  await expect(page.getByRole("heading", { name: "Kendo gallery", level: 1 })).toBeVisible();
+
+  await page.getByRole("link", { name: "Ver sitio en español" }).click();
+  await expect(page).toHaveURL(/\/galeria\/$/);
+});
+
+test("exposes the language selector inside the mobile menu", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/en/");
+
+  await page.getByRole("button", { name: "Open menu" }).click();
+  await expect(page.getByText("Language", { exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "View site in English" })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
+});
+
+test("preserves scroll position when switching languages", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  await page.evaluate(() => window.scrollTo(0, 320));
+  const scrollBefore = await page.evaluate(() => window.scrollY);
+
+  await page.getByRole("button", { name: "Abrir menú" }).click();
+  await page.getByRole("link", { name: "View site in English" }).click();
+  await expect(page).toHaveURL(/\/en\/$/);
+  await page.waitForTimeout(350);
+
+  expect(await page.evaluate(() => window.scrollY)).toBeCloseTo(scrollBefore, 0);
 });
 
 const viewports = [
@@ -103,6 +150,10 @@ const routes = [
   "/afiliados/",
   canonicalEventPath,
   "/eventos/pasados/",
+  "/en/",
+  "/en/calendar/",
+  "/en/gallery/",
+  "/en/affiliates/",
 ];
 
 for (const viewport of viewports) {
@@ -120,9 +171,16 @@ for (const viewport of viewports) {
         const dimensions = await page.evaluate(() => ({
           scrollHeight: document.documentElement.scrollHeight,
           innerHeight: window.innerHeight,
+          sectionScrollHeight:
+            document.querySelector("main > section")?.scrollHeight ?? 0,
+          sectionClientHeight:
+            document.querySelector("main > section")?.clientHeight ?? 0,
         }));
         expect(dimensions.scrollHeight).toBeLessThanOrEqual(
           dimensions.innerHeight + 1,
+        );
+        expect(dimensions.sectionScrollHeight).toBeLessThanOrEqual(
+          dimensions.sectionClientHeight + 1,
         );
         await expect(page.locator("footer")).toBeVisible();
       }

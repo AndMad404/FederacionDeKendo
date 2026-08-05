@@ -1,17 +1,20 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useMemo } from "react";
 import { FeaturedImage } from "./gallery/FeaturedImage";
 import { GalleryThumbnails } from "./gallery/GalleryThumbnails";
-import { GALLERY_IMAGES } from "../data/gallery";
+import { getGalleryImages } from "../data/gallery";
 import { useCarousel } from "../hooks/useCarousel";
 import { useGalleryLightbox } from "../hooks/useGalleryLightbox";
 import { PageTitle } from "./PageTitle";
+import { useLanguage } from "../config/i18n";
 
 const Lightbox = lazy(() =>
   import("./Lightbox").then((module) => ({ default: module.Lightbox })),
 );
 
 export function GallerySection() {
-  const { index, prev, next, goTo } = useCarousel(GALLERY_IMAGES.length);
+  const { language } = useLanguage();
+  const images = useMemo(() => getGalleryImages(language), [language]);
+  const { index, prev, next, goTo } = useCarousel(images.length);
   const {
     closeLightbox,
     lightboxIndex,
@@ -20,9 +23,9 @@ export function GallerySection() {
     showNext,
     showPrev,
     triggerRef,
-  } = useGalleryLightbox(GALLERY_IMAGES);
+  } = useGalleryLightbox(images);
 
-  const featured = GALLERY_IMAGES[index];
+  const featured = images[index];
   return (
     <section
       aria-labelledby="gallery-title"
@@ -34,7 +37,7 @@ export function GallerySection() {
         tone="media"
         density="flush"
       >
-        Galería de kendo
+        {language === "en" ? "Kendo gallery" : "Galería de kendo"}
       </PageTitle>
       <div className="flex min-h-0 flex-col tall-md:h-full">
         <div className="flex min-h-0 flex-1 flex-col">
@@ -42,7 +45,7 @@ export function GallerySection() {
             <FeaturedImage
               image={featured}
               index={index}
-              total={GALLERY_IMAGES.length}
+              total={images.length}
               onOpen={(event) => openLightbox(featured.id, event)}
               onPrev={(event) => {
                 event.stopPropagation();
@@ -57,7 +60,7 @@ export function GallerySection() {
             />
 
             <GalleryThumbnails
-              images={GALLERY_IMAGES}
+              images={images}
               activeIndex={index}
               onSelect={goTo}
             />
@@ -70,7 +73,7 @@ export function GallerySection() {
           <Lightbox
             image={lightboxImage}
             index={lightboxIndex}
-            total={GALLERY_IMAGES.length}
+            total={images.length}
             triggerRef={triggerRef}
             onClose={closeLightbox}
             onPrev={showPrev}

@@ -22,6 +22,34 @@ design_source_status:
   planned_work: Recreate Figma from the approved current product, including supported routes, responsive viewports, components, tokens, and interactive states.
   recorded_at: 2026-08-01
 
+latest_process_incident:
+  id: INC-2026-08-04-01
+  requested_scope: Reduce the homepage hero overlay so a person at the right edge is more recognizable without weakening text contrast.
+  baseline:
+    commit: b59c5813
+    worktree: dirty with unrelated in-progress bilingual route and component changes across 31 files
+    approved_visual_oracle: committed Playwright screenshots for the current official design
+  observed:
+    - The desktop homepage screenshot comparison failed with 74504 changed pixels, an 8 percent ratio.
+    - The diff contained the intended overlay change plus unrelated navbar, hero geometry, and event-title differences.
+    - UpcomingEventCard.tsx had unrelated flex and min-height title changes that differed from the approved official presentation.
+    - The overlay change did not improve recognition enough to satisfy the owner's visual objective.
+  failure:
+    - The mixed dirty worktree was used to evaluate a narrow visual change.
+    - The screenshot failure was described as expected without first attributing every material changed region.
+    - Passing structural checks were allowed to overshadow the blocking visual comparison.
+  corrective_rules:
+    - Require explicit owner approval before every visual edit, including spacing, alignment, typography, color, filters, visibility, and responsive presentation.
+    - Feature approval does not authorize incidental design changes.
+    - Isolate narrow visual work from unrelated dirty visual changes before validation.
+    - Treat visual comparisons as fail-closed and inspect expected, actual, and diff images.
+    - Never approve or regenerate a baseline until every material difference is authorized by the owner.
+    - Preserve owner work and request explicit direction before any destructive reset, checkout, stash, or relocation.
+  corrective_action:
+    - removed the unapproved min-height and flex alignment added to homepage event titles
+    - reverted the rejected responsive hero-overlay change
+  status: documented; rejected visual changes removed and the remaining mixed implementation must not become a visual baseline without review
+
 latest_responsive_overlap_fix:
   id: FIX-2026-08-04-02
   requested_scope: Explain and fix the desktop banner overlap on Affiliates, check the duplicated Calendar layout pattern, and document the regression.
@@ -51,6 +79,8 @@ latest_responsive_overlap_fix:
 
 latest_visual_regression_gate:
   id: FIX-2026-08-04-03
+  status: superseded
+  superseded_by: FIX-2026-08-04-04
   requested_scope: Treat the approved design as a site-wide CI contract so any generated page that breaks raises an error, rather than adding an Affiliates-only regression test.
   baseline:
     commit: d1df5cd3
@@ -71,7 +101,32 @@ latest_visual_regression_gate:
     - visual gate: 28 passed across seven page designs and four viewports
     - complete Playwright suite: 130 passed
     - all seven desktop baselines were visually inspected after generation
-  result: CI now rejects structural regressions on every generated page and material screenshot drift on every approved page design instead of relying on route presence and document height alone.
+  result: Historical implementation record. Its cross-platform screenshot gate and four-viewport all-route matrix were replaced by FIX-2026-08-04-04.
+
+latest_design_contract_migration:
+  id: FIX-2026-08-04-04
+  status: current
+  supersedes: FIX-2026-08-04-03
+  requested_scope: Replace redundant platform-sensitive screenshot gating with explicit geometry, relative-content, selected semantic accessibility, and responsive contracts.
+  baseline:
+    commit: c0e73e23
+    worktree: clean before implementation
+    visual_authority: Current owner-approved application geometry and rendered styles; the obsolete Figma was not used.
+  result_ref: uncommitted worktree based on c0e73e23
+  implemented:
+    - added tests/e2e/design-contract.ts as the explicit source for approved viewports, margins, padding, gaps, radius, and representative page selection
+    - added tests/e2e/geometry-contract.spec.ts with desktop checks for every generated route and complete viewport checks for seven representative page designs
+    - checks relative text, link and image presence without freezing ordinary event copy
+    - checks one h1, unique IDs, image alt declarations, link destinations, and accessible names for visible controls
+    - separated the 28 pixel screenshots into the manual test:visual workflow and excluded them from the default cross-platform CI gate
+    - removed the redundant assertion that Spanish and English homepage content must produce identical vertical geometry while retaining independent geometry checks for both routes
+  verification:
+    - TypeScript no-emit check passed
+    - production and SSR build plus generated route output passed
+    - default Playwright suite passed with 86 tests
+    - directed component-contract matrix passed with 28 tests
+    - manual Windows visual suite passed with 28 approved screenshots and no baseline regeneration
+  result: Default browser coverage is deterministic and content-relative while retaining explicit protection for approved spacing, containment, overlap, overflow, and responsive geometry.
 
 latest_session:
   id: REV-2026-08-01-02

@@ -1,18 +1,17 @@
 import type { CalendarEvent } from "../types";
+import type { Language } from "../config/i18n";
 
-const eventDateFormatter = new Intl.DateTimeFormat("es-CR", {
-  day: "2-digit",
-  month: "short",
-  year: "numeric",
-  timeZone: "UTC",
-});
-
-function formatCalendarDate(date: Date) {
-  return eventDateFormatter.format(date).replace(".", "").toUpperCase();
+function formatCalendarDate(date: Date, language: Language) {
+  return new Intl.DateTimeFormat(language === "es" ? "es-CR" : "en", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date).replace(".", "").toUpperCase();
 }
 
-function formatEventDate(date: string) {
-  return formatCalendarDate(new Date(`${date}T00:00:00.000Z`));
+function formatEventDate(date: string, language: Language) {
+  return formatCalendarDate(new Date(`${date}T00:00:00.000Z`), language);
 }
 
 function getInclusiveEndDateValue(date: string) {
@@ -21,28 +20,34 @@ function getInclusiveEndDateValue(date: string) {
   return endDate.toISOString().slice(0, 10);
 }
 
-export function getEventDateRangeLabels({ date, endDate }: CalendarEvent) {
-  const startDateLabel = formatEventDate(date);
+export function getEventDateRangeLabels(
+  { date, endDate }: CalendarEvent,
+  language: Language = "es",
+) {
+  const startDateLabel = formatEventDate(date, language);
   const endDateValue = endDate
     ? getInclusiveEndDateValue(endDate)
     : undefined;
 
   return {
     startDateLabel,
-    endDateLabel: endDateValue ? formatEventDate(endDateValue) : undefined,
+    endDateLabel: endDateValue ? formatEventDate(endDateValue, language) : undefined,
     endDateValue,
   };
 }
 
-export function getEventDateLabel(event: CalendarEvent) {
-  const { startDateLabel, endDateLabel } = getEventDateRangeLabels(event);
+export function getEventDateLabel(event: CalendarEvent, language: Language = "es") {
+  const { startDateLabel, endDateLabel } = getEventDateRangeLabels(event, language);
   return endDateLabel
     ? `${startDateLabel} - ${endDateLabel}`
     : startDateLabel;
 }
 
-export function formatEventTime({ startTime, endTime }: CalendarEvent) {
-  if (!startTime) return "Todo el día";
+export function formatEventTime(
+  { startTime, endTime }: CalendarEvent,
+  language: Language = "es",
+) {
+  if (!startTime) return language === "en" ? "All day" : "Todo el día";
   return endTime ? `${startTime} - ${endTime}` : startTime;
 }
 

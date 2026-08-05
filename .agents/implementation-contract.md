@@ -39,6 +39,24 @@ Use this file when the user asks to apply, fix, build, implement, or change code
 - Keep responsive behavior component-scoped when possible.
 - Touch targets should be at least 44px for interactive mobile controls.
 
+### Visual Change Isolation
+
+Before implementing or evaluating a visual change:
+
+1. Obtain explicit owner approval for the exact visual change. Approval of a
+   feature or behavior does not authorize incidental design changes.
+2. Inspect `git status --short` and the diff for every affected route and
+   shared component.
+3. Identify unrelated visual changes already present in the worktree.
+4. Do not use a screenshot from that mixed worktree as evidence for the narrow
+   change. Isolate the authorized patch in a clean worktree or obtain explicit
+   owner approval for the complete combined visual scope.
+5. Record the expected changed regions before running screenshot comparisons.
+
+If isolation would require discarding, overwriting, stashing, or relocating
+owner work, stop and request explicit direction. Never perform those operations
+implicitly.
+
 ### Visual Change Baseline
 
 Project status as of 2026-08-01: the original Figma design is obsolete. Until a recreated Figma file is explicitly approved by the owner, use the current application and owner-approved measurements, screenshots, and rendered results as the visual baseline. Do not use the original Figma to undo current decisions or claim visual fidelity.
@@ -56,17 +74,18 @@ outer margins, internal padding, gaps, dimensions, alignment, component
 composition, style tokens, and interactive states. Mark items that do not
 apply instead of inventing values.
 
-- For a material or ambiguous change to layout, composition, responsive
-  behavior, or shared primitives, present the baseline and obtain user
-  approval before editing.
-- An exact, narrowly scoped correction may proceed without a checkpoint when
-  its source and value are explicit.
+- Every change to layout, composition, responsive behavior, typography, color,
+  filters, visibility, or shared primitives requires explicit owner approval
+  before editing, even when it is exact or narrowly scoped.
 - When the available references do not determine a material decision, stop
   and ask; do not silently treat the current implementation as approved.
 - Do not claim Figma fidelity when the Figma source is missing or stale.
 - Keep visual corrections separate from new behavior and unrelated refactors.
   If they are inseparable, explain the dependency before editing and keep the
   combined scope explicit.
+- A failing visual regression remains blocking until every material changed
+  region is attributed to an authorized requirement. Do not classify the whole
+  screenshot failure as expected merely because one intended change is present.
 
 ## SEO and Metadata
 
@@ -86,3 +105,5 @@ apply instead of inventing values.
   viewports and record any intentional deviation.
 - Summarize changed files and verification results.
 - If a check fails, report the failure and the likely next step.
+- Do not present a visual change as successful while its approved screenshot
+  comparison is failing or while unrelated differences remain unexplained.

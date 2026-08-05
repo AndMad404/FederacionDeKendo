@@ -1,4 +1,5 @@
 import type { DojoData } from "../types";
+import type { Language } from "../config/i18n";
 
 export const DOJOS: DojoData[] = [
   {
@@ -95,3 +96,32 @@ export const DOJOS: DojoData[] = [
     ],
   },
 ];
+
+export function getDojos(language: Language) {
+  if (language === "es") return DOJOS;
+
+  const labelMap: Record<string, string> = {
+    Correo: "Email",
+    "Teléfono": "Phone",
+    "Ver ubicación": "View location",
+  };
+  const dayMap: Record<string, string> = {
+    "Lunes, Miércoles y Viernes": "Monday, Wednesday, and Friday",
+    "Martes y Jueves": "Tuesday and Thursday",
+    Viernes: "Friday",
+    "Sábado": "Saturday",
+  };
+
+  return DOJOS.map((dojo) => ({
+    ...dojo,
+    info: dojo.info.map((item) => ({
+      ...item,
+      label: labelMap[item.label] ?? item.label,
+      value: labelMap[item.value] ?? item.value,
+    })),
+    schedule: dojo.schedule.map((slot) => ({
+      ...slot,
+      days: dayMap[slot.days] ?? slot.days,
+    })),
+  }));
+}

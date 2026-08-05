@@ -2,6 +2,7 @@ import {
   useEffect,
   useRef,
   useState,
+  useMemo,
   type PointerEvent as ReactPointerEvent,
 } from "react";
 import { useLocation, useNavigate } from "react-router";
@@ -15,20 +16,11 @@ import {
 } from "./calendar/CalendarMonth";
 import { CalendarNavigation } from "./calendar/CalendarNavigation";
 import { MediaPageBanner } from "./ui/MediaPageBanner";
+import { useLanguage, type Language } from "../config/i18n";
+import { getLocalizedEvents } from "../utils/localizedEvents";
 
 const monthSwipeThreshold = 48;
-const monthFormatter = new Intl.DateTimeFormat("es-CR", {
-  month: "long",
-  year: "numeric",
-  timeZone: "UTC",
-});
-const monthNameFormatter = new Intl.DateTimeFormat("es-CR", {
-  month: "long",
-  timeZone: "UTC",
-});
 const legacyEventHashPattern = /-[a-f0-9]{8}$/i;
-const EVENT_GROUPS = getUpcomingEventGroups(CALENDAR_EVENTS);
-const ALL_EVENTS = EVENT_GROUPS.flatMap((group) => group.events);
 
 function findEventByUrlId(events: CalendarEvent[], urlId: string) {
   const exactMatch = events.find(
@@ -42,13 +34,13 @@ function findEventByUrlId(events: CalendarEvent[], urlId: string) {
   return events.find((event) => event.id === cleanId);
 }
 
-function CalendarBanner() {
+function CalendarBanner({ language }: { language: Language }) {
   return (
     <MediaPageBanner
       className="relative z-10 h-28 shrink-0 overflow-hidden land-compact:h-20"
       titleId="calendar-title"
-      title="Calendario de eventos"
-      description="Torneos, exámenes y actividades de kendo."
+      title={language === "en" ? "Events calendar" : "Calendario de eventos"}
+      description={language === "en" ? "Kendo tournaments, examinations, and activities." : "Torneos, exámenes y actividades de kendo."}
       image={{
         src: "/images/calendar/kendo-calendar-1600.webp",
         sources: [
@@ -67,8 +59,12 @@ function CalendarBanner() {
   );
 }
 
-function formatMonth(monthKey: string) {
-  const label = monthFormatter
+function formatMonth(monthKey: string, language: Language) {
+  const label = new Intl.DateTimeFormat(language === "en" ? "en" : "es-CR", {
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  })
     .format(new Date(`${monthKey}-01T00:00:00.000Z`))
     .replace(" de ", " ");
   return label.charAt(0).toUpperCase() + label.slice(1);
@@ -77,20 +73,24 @@ function formatMonth(monthKey: string) {
 function formatMonthRange(
   currentMonthKey: string,
   nextMonthKey: string | undefined,
+  language: Language,
 ) {
-  if (!nextMonthKey) return formatMonth(currentMonthKey);
+  if (!nextMonthKey) return formatMonth(currentMonthKey, language);
 
   const currentDate = new Date(`${currentMonthKey}-01T00:00:00.000Z`);
   const nextDate = new Date(`${nextMonthKey}-01T00:00:00.000Z`);
 
   if (currentDate.getUTCFullYear() !== nextDate.getUTCFullYear()) {
-    return `${formatMonth(currentMonthKey)} — ${formatMonth(nextMonthKey)}`;
+    return `${formatMonth(currentMonthKey, language)} — ${formatMonth(nextMonthKey, language)}`;
   }
 
-  const currentMonth = monthNameFormatter.format(currentDate);
+  const currentMonth = new Intl.DateTimeFormat(language === "en" ? "en" : "es-CR", {
+    month: "long",
+    timeZone: "UTC",
+  }).format(currentDate);
   const capitalizedCurrentMonth =
     currentMonth.charAt(0).toUpperCase() + currentMonth.slice(1);
-  return `${capitalizedCurrentMonth} — ${formatMonth(nextMonthKey)}`;
+  return `${capitalizedCurrentMonth} — ${formatMonth(nextMonthKey, language)}`;
 }
 
 async function copyToClipboard(value: string) {
@@ -117,6 +117,15 @@ function usesTwoMonthLayout() {
 }
 
 export function CalendarSection() {
+  const { language } = useLanguage();
+  const eventGroups = useMemo(
+    () => getUpcomingEventGroups(getLocalizedEvents(CALENDAR_EVENTS, language)),
+    [language],
+  );
+  const allEvents = useMemo(
+    () => eventGroups.flatMap((group) => group.events),
+    [eventGroups],
+  );
   const location = useLocation();
   const navigate = useNavigate();
   const [groupIndex, setGroupIndex] = useState(0);
@@ -139,16 +148,18 @@ export function CalendarSection() {
       eventId = location.hash.slice(1);
     }
 
-    const matchingEvent = findEventByUrlId(ALL_EVENTS, eventId);
+    const matchingEvent = findEventByUrlId(allEvents, eventId);
 
     if (matchingEvent) {
-      void navigate(getEventPath(matchingEvent), { replace: true });
+      void navigate(getEventPath(matchingEvent, language), { replace: true });
     }
   }, [
     location.hash,
     location.pathname,
     location.search,
     navigate,
+    language,
+    allEvents,
   ]);
 
   useEffect(() => {
@@ -176,7 +187,7 @@ export function CalendarSection() {
   }, []);
 
   async function shareEvent(event: CalendarEvent) {
-    const eventUrl = new URL(getEventPath(event), window.location.origin);
+    const eventUrl = new URL(getEventPath(event, language), window.location.origin);
 
     if (navigator.share) {
       try {
@@ -214,8 +225,8 @@ export function CalendarSection() {
     }, 2200);
   }
 
-  const currentGroup = EVENT_GROUPS[groupIndex];
-  const nextGroup = EVENT_GROUPS[groupIndex + 1];
+  const currentGroup = eventGroups[groupIndex];
+  const nextGroup = eventGroups[groupIndex + 1];
 
   function changeMonth(nextIndex: number) {
     setGroupIndex(nextIndex);
@@ -267,7 +278,7 @@ export function CalendarSection() {
     const nextIndex =
       deltaX < 0 ? groupIndex + groupStep : groupIndex - groupStep;
 
-    if (nextIndex >= 0 && nextIndex < EVENT_GROUPS.length) {
+    if (nextIndex >= 0 && nextIndex < eventGroups.length) {
       changeMonth(nextIndex);
     }
   }
@@ -277,7 +288,7 @@ export function CalendarSection() {
         aria-labelledby="calendar-title"
         className="relative my-2 flex w-full flex-col overflow-hidden rounded-xl bg-site-canvas tall-md:h-[calc(100%_-_1rem)] tall-md:min-h-0"
       >
-        <CalendarBanner />
+        <CalendarBanner language={language} />
         {currentGroup ? (
           <div className="relative z-20 -mt-11 flex min-h-0 flex-1 items-start justify-center px-3 pb-0 pt-3 sm:-mt-13 sm:px-4 sm:pb-0 sm:pt-4 tall-md:p-4 xl:absolute xl:inset-0 xl:mt-0 xl:items-start xl:px-4 xl:pb-4 xl:pt-20 tall-md:xl:pt-20 land-sm:px-2 land-sm:pb-0 land-sm:pt-2 land-compact:-mt-8">
             <div
@@ -300,15 +311,16 @@ export function CalendarSection() {
               }}
             >
               <CalendarNavigation
-                currentMonthLabel={formatMonth(currentGroup.monthKey)}
+                currentMonthLabel={formatMonth(currentGroup.monthKey, language)}
                 monthRangeLabel={formatMonthRange(
                   currentGroup.monthKey,
                   nextGroup?.monthKey,
+                  language,
                 )}
                 canPreviousMonth={groupIndex > 0}
-                canNextMonth={groupIndex < EVENT_GROUPS.length - 1}
+                canNextMonth={groupIndex < eventGroups.length - 1}
                 canPreviousPair={groupIndex >= 2}
-                canNextPair={groupIndex + 2 < EVENT_GROUPS.length}
+                canNextPair={groupIndex + 2 < eventGroups.length}
                 onPreviousMonth={() => changeMonth(groupIndex - 1)}
                 onNextMonth={() => changeMonth(groupIndex + 1)}
                 onPreviousPair={() => changeMonth(groupIndex - 2)}
@@ -318,7 +330,7 @@ export function CalendarSection() {
               <div className="grid items-start gap-3 md:grid-cols-2 md:gap-4 xl:gap-8">
                 <CalendarMonth
                   group={currentGroup}
-                  monthLabel={formatMonth(currentGroup.monthKey)}
+                  monthLabel={formatMonth(currentGroup.monthKey, language)}
                   pageIndex={pageIndexes[currentGroup.monthKey] ?? 0}
                   copiedEventId={copiedEventId}
                   onPageChange={(nextPage) =>
@@ -331,7 +343,7 @@ export function CalendarSection() {
                   <div className="hidden md:block">
                     <CalendarMonth
                       group={nextGroup}
-                      monthLabel={formatMonth(nextGroup.monthKey)}
+                      monthLabel={formatMonth(nextGroup.monthKey, language)}
                       pageIndex={pageIndexes[nextGroup.monthKey] ?? 0}
                       copiedEventId={copiedEventId}
                       onPageChange={(nextPage) =>
@@ -345,7 +357,7 @@ export function CalendarSection() {
 
               <p className="sr-only" aria-live="polite">
                 {copiedEventId
-                  ? "Enlace del evento copiado al portapapeles."
+                  ? language === "en" ? "Event link copied to the clipboard." : "Enlace del evento copiado al portapapeles."
                   : ""}
               </p>
             </div>
@@ -355,7 +367,7 @@ export function CalendarSection() {
             <p
               className={`rounded-lg px-6 py-5 text-center text-lg ${surfaceClass}`}
             >
-              No hay próximos eventos publicados.
+              {language === "en" ? "There are no upcoming published events." : "No hay próximos eventos publicados."}
             </p>
           </div>
         )}

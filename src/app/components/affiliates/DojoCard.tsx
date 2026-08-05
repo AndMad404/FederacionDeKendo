@@ -84,7 +84,7 @@ function InfoCell({ item, side }: { item: InfoItem; side: "left" | "right" }) {
 function ScheduleRow({ days, hours }: Pick<ScheduleSlot, "days" | "hours">) {
   return (
     <div className={SCHEDULE_GRID}>
-      <dt className="text-center text-base [overflow-wrap:anywhere] md:col-start-2 md:text-left land-compact:col-start-auto land-compact:leading-tight">
+      <dt className="text-center text-base [overflow-wrap:anywhere] md:col-start-2 md:text-left xl:whitespace-nowrap land-compact:col-start-auto land-compact:leading-tight">
         {days}
       </dt>
       <dd className="text-center [overflow-wrap:anywhere] md:col-start-4 md:text-left land-compact:col-start-auto land-compact:leading-tight">
@@ -115,6 +115,7 @@ function getScheduleGroups(schedule: ScheduleSlot[]) {
 
 interface DojoCardProps extends DojoData {
   headingId: string;
+  language: "es" | "en";
 }
 
 export function DojoCard({
@@ -122,6 +123,7 @@ export function DojoCard({
   title,
   info,
   schedule,
+  language,
 }: DojoCardProps) {
   const scheduleGroups = getScheduleGroups(schedule);
 
@@ -148,7 +150,7 @@ export function DojoCard({
 
       <div className="grid gap-2 text-center land-compact:gap-1 land-compact:text-left">
         <h3 className="w-full text-center text-2xl font-bold land-compact:leading-tight">
-          Horario de clases:
+          {language === "en" ? "Class schedule:" : "Horario de clases:"}
         </h3>
         <div className="grid gap-2 text-base land-compact:leading-tight">
           {scheduleGroups.map(({ location, slots }) => (
