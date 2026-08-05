@@ -1,5 +1,6 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { GalleryImage } from "../../types";
+import { useLanguage } from "../../config/i18n";
 import { focusRingClass } from "../../styles/shared";
 
 const THUMBNAIL_SIZES = "(min-width: 768px) 168px, 17vw";
@@ -12,15 +13,16 @@ interface ThumbnailProps {
 }
 
 function Thumbnail({ image, isActive, buttonRef, onClick }: ThumbnailProps) {
+  const { copy } = useLanguage();
   return (
     <button
       ref={buttonRef}
       type="button"
-      aria-label={`Ver imagen: ${image.title}`}
+      aria-label={`${copy.gallery.viewImage} ${image.title}`}
       aria-current={isActive ? "true" : undefined}
       onClick={onClick}
-      className={`group relative aspect-[4/3] h-full w-full cursor-pointer overflow-hidden rounded-lg border-b-4 bg-site-media transition-colors duration-300 hover:border-site-accent ${
-        isActive ? "border-site-action" : "border-transparent"
+      className={`group relative h-full w-full cursor-pointer overflow-hidden rounded-lg border-2 border-transparent bg-site-media transition-colors duration-300 ${
+        isActive ? "border-b-4 border-b-site-accent" : ""
       } ${focusRingClass}`}
     >
       <img
@@ -50,9 +52,43 @@ export function GalleryThumbnails({
   activeIndex,
   onSelect,
 }: GalleryThumbnailsProps) {
+  const { copy } = useLanguage();
   const stripRef = useRef<HTMLDivElement | null>(null);
   const buttonRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const previousActiveIndexRef = useRef(activeIndex);
+  const [overflowState, setOverflowState] = useState({
+    canScrollLeft: false,
+    canScrollRight: false,
+  });
+
+  useEffect(() => {
+    const strip = stripRef.current;
+    if (!strip) return;
+
+    const updateOverflowState = () => {
+      const nextState = {
+        canScrollLeft: strip.scrollLeft > 1,
+        canScrollRight:
+          Math.ceil(strip.scrollLeft + strip.clientWidth) < strip.scrollWidth - 1,
+      };
+
+      setOverflowState((currentState) =>
+        currentState.canScrollLeft === nextState.canScrollLeft &&
+        currentState.canScrollRight === nextState.canScrollRight
+          ? currentState
+          : nextState,
+      );
+    };
+
+    updateOverflowState();
+    strip.addEventListener("scroll", updateOverflowState, { passive: true });
+    window.addEventListener("resize", updateOverflowState);
+
+    return () => {
+      strip.removeEventListener("scroll", updateOverflowState);
+      window.removeEventListener("resize", updateOverflowState);
+    };
+  }, [images.length]);
 
   useEffect(() => {
     const strip = stripRef.current;
@@ -82,23 +118,37 @@ export function GalleryThumbnails({
   }, [activeIndex, images.length]);
 
   return (
-    <div
-      ref={stripRef}
-      role="group"
-      aria-label="Miniaturas de galería"
-      className="grid h-14 scroll-smooth grid-flow-col auto-cols-[17%] gap-1.5 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden motion-reduce:scroll-auto sm:h-16 sm:auto-cols-[calc((100%_-_2.5rem)_/_6)] sm:gap-2 md:h-20 land-sm:hidden"
-    >
-      {images.map((image, index) => (
-        <Thumbnail
-          key={image.id}
-          image={image}
-          isActive={index === activeIndex}
-          buttonRef={(node) => {
-            buttonRefs.current[index] = node;
-          }}
-          onClick={() => onSelect(index)}
+    <div className="relative mx-auto w-full max-w-6xl land-sm:hidden">
+      <div
+        ref={stripRef}
+        role="group"
+        aria-label={copy.gallery.thumbnails}
+        className="grid h-14 w-full touch-manipulation scroll-smooth grid-flow-col auto-cols-[17%] gap-1.5 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden motion-reduce:scroll-auto sm:h-16 sm:auto-cols-[calc((100%_-_2.5rem)_/_6)] sm:gap-2 md:h-20"
+      >
+        {images.map((image, index) => (
+          <Thumbnail
+            key={image.id}
+            image={image}
+            isActive={index === activeIndex}
+            buttonRef={(node) => {
+              buttonRefs.current[index] = node;
+            }}
+            onClick={() => onSelect(index)}
+          />
+        ))}
+      </div>
+      {overflowState.canScrollLeft ? (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-site-canvas to-transparent"
         />
-      ))}
+      ) : null}
+      {overflowState.canScrollRight ? (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-site-canvas to-transparent"
+        />
+      ) : null}
     </div>
   );
 }

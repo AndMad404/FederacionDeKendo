@@ -3,44 +3,21 @@ import {
   type CSSProperties,
   type MouseEvent,
 } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { GalleryImage } from "../../types";
 import { useSwipeNavigation } from "../../hooks/useSwipeNavigation";
 import { useTransientDirectionFeedback } from "../../hooks/useTransientDirectionFeedback";
 import {
   getGalleryDisplayText,
   getMobileDescriptionPreview,
-  SEE_MORE_LABEL,
 } from "./galleryText";
-import { focusRingClass, panelSurfaceClass } from "../../styles/shared";
+import {
+  focusRingClass,
+  mediaCaptionSurfaceClass,
+} from "../../styles/shared";
+import { NavigationArrowButton } from "../ui/ModalControls";
+import { useLanguage } from "../../config/i18n";
 
 const defaultFeaturedObjectPosition = "center 0%";
-const activeArrowClass = "border-site-accent bg-site-accent-strong";
-
-interface NavArrowProps {
-  direction: "left" | "right";
-  isActive: boolean;
-  onClick: (event: MouseEvent<HTMLButtonElement>) => void;
-}
-
-function NavArrow({ direction, isActive, onClick }: NavArrowProps) {
-  return (
-    <button
-      type="button"
-      aria-label={direction === "left" ? "Imagen anterior" : "Imagen siguiente"}
-      onClick={onClick}
-      className={`pointer-events-auto flex size-11 items-center justify-center rounded-full border border-site-action/70 bg-site-overlay/70 transition-colors hover:bg-site-accent-strong ${
-        isActive ? activeArrowClass : ""
-      } ${focusRingClass}`}
-    >
-      {direction === "left" ? (
-        <ChevronLeft size={20} aria-hidden="true" className="text-site-on-dark" />
-      ) : (
-        <ChevronRight size={20} aria-hidden="true" className="text-site-on-dark" />
-      )}
-    </button>
-  );
-}
 
 interface FeaturedImageProps {
   image: GalleryImage;
@@ -63,6 +40,8 @@ export function FeaturedImage({
   onSwipePrev,
   onSwipeNext,
 }: FeaturedImageProps) {
+  const { copy } = useLanguage();
+  const openDetailsLabel = copy.gallery.openDetails;
   const {
     activeDirection: activeArrow,
     showDirection: showArrowFeedback,
@@ -70,11 +49,13 @@ export function FeaturedImage({
   const positionLabel = `${index + 1} / ${total}`;
   const { displayTitle, displayTag, displayDescription } = getGalleryDisplayText(image);
   const descriptionPreview = displayDescription
-    ? getMobileDescriptionPreview(displayDescription)
+    ? getMobileDescriptionPreview(displayDescription, openDetailsLabel)
     : null;
   const previewText =
     descriptionPreview?.isTruncated
-      ? descriptionPreview.preview.slice(0, -SEE_MORE_LABEL.length).trimEnd()
+      ? descriptionPreview.preview
+          .slice(0, -openDetailsLabel.length)
+          .trimEnd()
       : descriptionPreview?.preview;
   const handleSwipePrev = useCallback(() => {
     showArrowFeedback("left");
@@ -109,13 +90,13 @@ export function FeaturedImage({
     : "";
 
   return (
-    <figure className="gallery-featured-frame group relative h-[clamp(420px,62svh,620px)] w-full flex-none cursor-pointer overflow-hidden rounded-3xl bg-site-media tall-md:min-h-0 tall-md:flex-1 land-sm:h-[calc(100svh_-_3rem_-_6px)] land-sm:flex-none">
+    <figure className="gallery-featured-frame group relative h-[clamp(420px,62svh,620px)] w-full flex-none cursor-pointer overflow-hidden rounded-xl bg-site-media tall-md:h-[calc(100%_-_5.5rem)] tall-md:min-h-0 tall-md:flex-none land-sm:h-[calc(100svh_-_3rem_-_17px)] land-sm:flex-none">
       <img
         key={image.id}
         src={featuredSrc}
         srcSet={featuredSrcSet}
         sizes={image.sizes}
-        alt={image.title}
+        alt={image.alt}
         width={featuredWidth}
         height={featuredHeight}
         loading="eager"
@@ -125,35 +106,35 @@ export function FeaturedImage({
         className={`gallery-featured-image ${objectPositionClass} h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-105`}
       />
       <div
-        className="absolute inset-0 bg-gradient-to-t from-site-overlay/70 via-site-overlay/10 to-transparent"
+        className="absolute inset-0 bg-gradient-to-b from-site-navy/55 via-transparent to-site-navy/80"
         aria-hidden="true"
       />
 
-      <figcaption className="absolute inset-x-0 bottom-0 flex justify-center p-3 sm:block sm:p-6 land-sm:flex land-sm:justify-center land-sm:px-16 land-sm:py-2">
-        <div className={`grid w-full max-w-[28rem] items-center rounded-3xl px-4 py-3 text-center text-site-on-dark shadow-xl backdrop-blur-sm sm:items-start sm:px-5 sm:py-4 sm:text-left land-sm:max-w-[28rem] land-sm:grid-cols-[minmax(0,1fr)_auto] land-sm:grid-rows-[auto_auto] land-sm:gap-x-6 land-sm:px-4 land-sm:py-2 ${panelSurfaceClass}`}>
-          <h2 className="text-xl font-bold leading-tight sm:text-2xl land-sm:text-base">
+      <figcaption className="absolute inset-x-0 bottom-0">
+        <div className={`grid w-full items-center p-2.5 text-center sm:grid-cols-[minmax(0,1fr)_auto] sm:grid-rows-[auto_auto_auto] sm:items-start sm:px-20 sm:text-left land-sm:grid-rows-[auto_auto] land-sm:gap-x-6 land-sm:gap-y-0.5 land-sm:px-2.5 land-sm:py-2.5 ${mediaCaptionSurfaceClass}`}>
+          <h2 className="text-xl font-bold leading-tight sm:col-start-1 sm:row-start-1 sm:self-baseline sm:text-2xl land-sm:text-base">
             {displayTitle}
           </h2>
-          <p className="truncate pt-1 text-base font-bold uppercase tracking-widest text-site-accent land-sm:text-[10px]">
+          <p className="truncate text-xl font-bold uppercase leading-tight text-site-accent-soft sm:col-start-2 sm:row-start-1 sm:self-baseline sm:text-right sm:text-2xl land-sm:text-base">
             {displayTag}
           </p>
           {previewText && (
-            <p className="text-sm leading-snug text-site-subtle land-sm:hidden">
+            <p className="text-sm leading-snug text-site-subtle sm:col-start-1 sm:row-start-2 land-sm:hidden">
               {previewText}
-              {descriptionPreview?.isTruncated && (
-                <span
-                  aria-hidden="true"
-                  className="block font-bold text-site-action-text underline underline-offset-2 transition-colors group-hover:text-site-accent"
-                >
-                  {SEE_MORE_LABEL}
-                </span>
-              )}
             </p>
           )}
-          <p className="hidden font-bold text-site-action-text underline underline-offset-2 transition-colors group-hover:text-site-accent land-sm:col-start-2 land-sm:row-start-1 land-sm:block land-sm:self-end land-sm:text-sm">
-            {SEE_MORE_LABEL}
+          <p
+            aria-hidden="true"
+            className={`${descriptionPreview?.isTruncated ? "relative block" : "hidden"} font-bold text-site-on-dark underline underline-offset-2 transition-colors group-hover:text-site-accent-soft sm:col-start-1 sm:row-start-3 sm:mt-2.5 sm:self-baseline land-sm:row-start-2 land-sm:mt-0 land-sm:block land-sm:text-sm land-sm:leading-none`}
+          >
+            <span>{openDetailsLabel}</span>
+            {descriptionPreview?.isTruncated && (
+              <span className="absolute right-0 top-1/2 -translate-y-1/2 text-xs font-normal text-site-on-dark no-underline sm:hidden">
+                {positionLabel}
+              </span>
+            )}
           </p>
-          <p className="text-xs land-sm:col-start-2 land-sm:row-start-2 land-sm:self-start land-sm:text-right land-sm:text-[10px]">
+          <p className={`${descriptionPreview?.isTruncated ? "hidden sm:block" : ""} text-right text-xs sm:col-start-2 sm:row-start-3 sm:mt-2.5 sm:self-baseline land-sm:row-start-2 land-sm:mt-0 land-sm:text-[10px] land-sm:leading-none`}>
             {positionLabel}
           </p>
         </div>
@@ -161,8 +142,8 @@ export function FeaturedImage({
 
       <button
         type="button"
-        aria-label={`${displayTitle}. ${displayTag}. ${positionLabel}. Abrir imagen para ver mas detalles`}
-        className={`absolute inset-0 z-10 block h-full w-full touch-pan-y cursor-pointer ${focusRingClass}`}
+        aria-label={`${displayTitle}. ${displayTag}. ${positionLabel}. ${copy.gallery.openDetailsInGallery}`}
+        className={`absolute inset-0 z-10 touch-pan-y cursor-pointer ${focusRingClass}`}
         onClick={(event) => {
           if (consumeSwipe()) {
             event.preventDefault();
@@ -173,25 +154,29 @@ export function FeaturedImage({
         }}
         {...swipeHandlers}
       >
-        <span className="sr-only">Abrir imagen</span>
+        <span className="sr-only">{openDetailsLabel}</span>
       </button>
 
       <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-between px-3">
-        <NavArrow
-          direction="left"
+        <NavigationArrowButton
+          direction="previous"
+          label={copy.gallery.previousImage}
           isActive={activeArrow === "left"}
           onClick={(event) => {
             showArrowFeedback("left");
             onPrev(event);
           }}
+          className="pointer-events-auto"
         />
-        <NavArrow
-          direction="right"
+        <NavigationArrowButton
+          direction="next"
+          label={copy.gallery.nextImage}
           isActive={activeArrow === "right"}
           onClick={(event) => {
             showArrowFeedback("right");
             onNext(event);
           }}
+          className="pointer-events-auto"
         />
       </div>
     </figure>

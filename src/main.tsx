@@ -1,12 +1,13 @@
 import { createRoot, hydrateRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
 import App from "./app/App.tsx";
+import { CLIENT_ROUTE_COMPONENTS } from "./app/routeRegistry.client.tsx";
 import "./styles/index.css";
 
 const rootElement = document.getElementById("root")!;
 const app = (
   <BrowserRouter>
-    <App />
+    <App routeComponents={CLIENT_ROUTE_COMPONENTS} />
   </BrowserRouter>
 );
 

@@ -7,14 +7,23 @@ Stack:
 - TypeScript
 - Tailwind CSS 4
 - Vite
-- Figma-originated UI
+- UI originated in Figma Make; the original design is obsolete and is not a current source of truth
 
 ## Core Rules
 
+- Until a recreated Figma file is explicitly approved, use the current application plus owner-approved measurements, screenshots, and rendered results as the temporary visual baseline. Do not claim fidelity to or drift from the obsolete original Figma.
 - Read the relevant files before making claims or edits.
 - Keep work scoped to the user's requested file, route, concern, or task.
 - Prefer existing project patterns over new abstractions.
 - Do not refactor unrelated code while implementing a narrow change.
+- Do not validate a narrow visual change on top of unrelated visual worktree
+  changes. First isolate the authorized patch or stop and ask how the existing
+  changes should be preserved.
+- Do not implement any visual change without explicit owner approval. This
+  includes spacing, dimensions, alignment, typography, colors, filters,
+  visibility, responsive presentation, and shared visual tokens.
+- Treat every unexpected visual-regression difference as blocking. An intended
+  difference in one region does not authorize or explain differences elsewhere.
 - Separate verified repo facts from suggestions or future ideas.
 - Treat legal, SEO metadata, and public copy constraints from the user as hard requirements.
 - When creating a commit, follow the message convention in `CONTRIBUTING.md`.

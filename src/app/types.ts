@@ -17,6 +17,7 @@ export interface GalleryImage {
   objectPosition?: string;
   mobileObjectPosition?: string;
   title: string;
+  alt: string;
   tag: string;
   description?: string;
 }

@@ -1,6 +1,12 @@
 # Federacion de Asociaciones de Kendo
 
-Sitio oficial de la Federacion de Asociaciones de Kendo, desarrollado con React, TypeScript, Tailwind CSS y Vite a partir del diseño base en Figma.
+Sitio oficial de la Federacion de Asociaciones de Kendo, desarrollado con React, TypeScript, Tailwind CSS y Vite. La primera version partio de Figma Make, pero ese diseño inicial quedo obsoleto y ya no representa la interfaz vigente.
+
+## Estado de la fuente de diseño
+
+Hasta que se recree y apruebe un nuevo archivo de Figma, la referencia visual temporal es la aplicacion vigente junto con las medidas, capturas y resultados renderizados aprobados por el propietario. El Figma original se conserva solo como antecedente historico y no debe usarse para afirmar fidelidad, detectar drift ni revertir decisiones visuales actuales.
+
+La recreacion debe partir del producto aprobado, cubrir las rutas y viewports soportados, documentar tokens, componentes y estados interactivos, y recibir aprobacion explicita antes de convertirse otra vez en fuente de diseño.
 
 ## Desarrollo
 
@@ -23,6 +29,41 @@ Genera el build de produccion:
 ```bash
 pnpm run build
 ```
+
+## Pruebas
+
+La suite predeterminada usa contratos funcionales, geometricos, responsive y
+de accesibilidad que toleran cambios ordinarios de contenido. Las capturas se
+ejecutan por separado en Windows para evitar diferencias de renderizado con el
+CI de Ubuntu.
+
+```bash
+pnpm run build
+pnpm run test:e2e
+pnpm run test:visual
+```
+
+Consulta [TESTING.md](TESTING.md) para conocer la estrategia completa, el
+comportamiento ante eventos nuevos y el proceso aprobado para cambiar medidas
+o capturas.
+
+### Diagnostico opcional con Knip
+
+Knip 6.29.0 se usa como herramienta global de diagnostico del entorno local; no
+es una dependencia del proyecto ni participa en desarrollo, CI, build o
+postbuild. La configuracion `knip.json` permanece en la raiz del repositorio
+porque describe su entrada SSR especifica.
+
+En una maquina nueva, instala la herramienta y ejecuta el analisis:
+
+```bash
+npm install --global knip@6.29.0
+knip
+```
+
+No muevas `knip.json` al directorio global de npm: sus rutas pertenecen a este
+repositorio y una actualizacion global podria reemplazar archivos en esa
+ubicacion.
 
 ## Prerender e hidratacion
 
@@ -95,5 +136,26 @@ Las rutas LCP usan variantes responsive:
 - `public/images/gallery/kendo-gallery-08-1600.webp`
 - `public/images/affiliates/kendo-affiliates-768.webp`
 - `public/images/affiliates/kendo-affiliates-1200.webp`
+
+### Contrato responsive del pie de galeria
+
+`src/app/components/gallery/FeaturedImage.tsx` mantiene un pie superpuesto con
+reglas explicitas por viewport:
+
+- Movil, antes de `sm`: composicion centrada en una columna, padding de 10 px
+  (`p-2.5`), titulo y tag de 20 px, descripcion visible, accion centrada y
+  contador a 10 px del borde derecho.
+- Tablet y escritorio, desde `sm`: dos columnas y tres filas. Titulo y tag
+  comparten tamano de 24 px y linea base en la primera fila; la descripcion
+  ocupa la segunda; accion y contador comparten linea base en la tercera. La
+  fila inferior conserva 10 px de separacion sobre la descripcion.
+- Landscape compacto (`orientation: landscape` y `max-height: 640px`):
+  cuadricula de dos columnas y dos filas. La descripcion se oculta; titulo y
+  tag comparten tamano de 16 px y linea base arriba, y accion y contador se
+  alinean abajo.
+
+Al modificar este pie, verifica al menos `386x669`, `669x386`, `768x1024` y
+`1366x768`. El documento y el carrusel no deben tener overflow horizontal, y
+el modo landscape debe conservar sus dos filas dentro del viewport.
 
 Si Windows reporta una imagen como ocupada, cierra el navegador, vistas previas o el servidor local que la este usando y vuelve a correr el comando.

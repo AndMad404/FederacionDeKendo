@@ -5,6 +5,7 @@ import {
   getRouteManifest,
   getRouteMeta,
   getRouteSeoPayload,
+  getRouteSitemapImageUrls,
   render,
 } from "../dist-ssr/entry-server.js";
 
@@ -66,6 +67,7 @@ function renderRouteHtml(route) {
     /<title>[\s\S]*?<\/title>/i,
     `<title>${escapeText(seo.title)}</title>`,
   );
+  html = html.replace(/<html\s+lang="[^"]+"/i, `<html lang="${route.language}"`);
 
   const bodyHtml = render(route.path);
   html = html.replace('<div id="root"></div>', `<div id="root">${bodyHtml}</div>`);
@@ -93,6 +95,7 @@ function renderNotFoundHtml() {
     /<title>[\s\S]*?<\/title>/i,
     `<title>${escapeText(seo.title)}</title>`,
   );
+  html = html.replace(/<html\s+lang="[^"]+"/i, '<html lang="es"');
 
   const bodyHtml = render("/404-not-found/");
   html = html.replace('<div id="root"></div>', `<div id="root">${bodyHtml}</div>`);
@@ -117,11 +120,20 @@ await writeNotFoundHtml();
 
 const sitemap = [
   '<?xml version="1.0" encoding="UTF-8"?>',
-  '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+  '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">',
   ...routes.flatMap((route) => {
-    const canonicalUrl = getRouteSeoPayload(route).canonicalUrl;
-    return canonicalUrl
-      ? ["  <url>", `    <loc>${escapeText(canonicalUrl)}</loc>`, "  </url>"]
+    const seo = getRouteSeoPayload(route);
+    return seo.canonicalUrl && seo.robots === "index, follow"
+      ? [
+          "  <url>",
+          `    <loc>${escapeText(seo.canonicalUrl)}</loc>`,
+          ...getRouteSitemapImageUrls(route).flatMap((imageUrl) => [
+            "    <image:image>",
+            `      <image:loc>${escapeText(imageUrl)}</image:loc>`,
+            "    </image:image>",
+          ]),
+          "  </url>",
+        ]
       : [];
   }),
   "</urlset>",

@@ -1,4 +1,5 @@
 import type { GalleryImage } from "../types";
+import type { Language } from "../config/i18n";
 
 const assetVersion = "v=20260704-0200";
 const versioned = (path: string) => `${path}?${assetVersion}`;
@@ -20,6 +21,7 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     thumbnailHeight: 160,
     mobileObjectPosition: "25%",
     title: "Practicantes en seiza",
+    alt: "Practicantes de kendo sentados en seiza con sus shinai alineados en el dojo",
     tag: "Reiho",
     description:
       "La posición de seiza marca el inicio y cierre de la práctica con respeto, atención y disciplina.",
@@ -36,6 +38,7 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     thumbnailWidth: 320,
     thumbnailHeight: 180,
     title: "Combates con armadura",
+    alt: "Practicantes de kendo con bogu realizan ejercicios de combate en el dojo",
     tag: "Bogu geiko",
     description:
       "Practicantes con bogu aplican distancia, timing y precisión durante ejercicios de combate controlado.",
@@ -52,6 +55,7 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     thumbnailWidth: 320,
     thumbnailHeight: 213,
     title: "Armaduras",
+    alt: "Armaduras de kendo con men, kote, do y tare preparadas para el entrenamiento",
     tag: "Bogu",
     description:
       "Detalle del equipo de protección usado en kendo: men, kote, do y tare listos para la práctica.",
@@ -68,6 +72,7 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     thumbnailWidth: 320,
     thumbnailHeight: 160,
     title: "Entrenamiento multinivel",
+    alt: "Practicantes observan un ejercicio de kendo realizado en el centro del dojo",
     tag: "Mitori geiko",
     description:
       "La observación activa permite aprender ritmo, postura y etiqueta antes de entrar al combate.",
@@ -86,6 +91,7 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     objectPosition: "center",
     mobileObjectPosition: "center 0%",
     title: "Uniforme",
+    alt: "Fila de practicantes de kendo sentados en seiza sobre el piso del dojo",
     tag: "Gi y Hakama",
     description:
       "El gi y la hakama forman el uniforme tradicional, preparado para moverse con orden y seguridad.",
@@ -103,6 +109,7 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     thumbnailHeight: 160,
     disableObjectPosition: true,
     title: "Comunidad de kendo",
+    alt: "Grupo de practicantes de kendo y acompañantes reunidos después de una competencia",
     tag: "Equipo y convivencia",
     description:
       "La comunidad crece compartiendo entrenamientos, apoyo entre practicantes y momentos fuera del dojo.",
@@ -119,6 +126,7 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     thumbnailWidth: 320,
     thumbnailHeight: 180,
     title: "Kirikaeshi",
+    alt: "Dos competidores de kendo intercambian golpes de shinai durante un combate",
     tag: "Técnica",
     description:
       "Kirikaeshi trabaja cortes repetidos, desplazamiento y respiración para fortalecer fundamentos.",
@@ -136,8 +144,31 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     thumbnailHeight: 303,
     disableObjectPosition: true,
     title: "Combate competitivo",
+    alt: "Combate de kendo en el que un competidor avanza para atacar con el shinai",
     tag: "Shiai",
     description:
       "El shiai pone a prueba técnica, decisión y respeto dentro de un formato competitivo.",
   },
 ];
+
+const ENGLISH_GALLERY_COPY: Record<
+  number,
+  Pick<GalleryImage, "title" | "alt" | "tag" | "description">
+> = {
+  1: { title: "Practitioners in seiza", alt: "Kendo practitioners seated in seiza with their shinai aligned in the dojo", tag: "Reiho", description: "The seiza position marks the beginning and end of practice with respect, attention, and discipline." },
+  2: { title: "Armored practice", alt: "Kendo practitioners wearing bogu perform combat exercises in the dojo", tag: "Bogu geiko", description: "Practitioners wearing bogu apply distance, timing, and precision during controlled combat exercises." },
+  3: { title: "Armor", alt: "Kendo armor with men, kote, do, and tare prepared for training", tag: "Bogu", description: "A close look at the protective equipment used in kendo: men, kote, do, and tare ready for practice." },
+  4: { title: "Mixed-level training", alt: "Practitioners observe a kendo exercise performed in the center of the dojo", tag: "Mitori geiko", description: "Active observation helps practitioners learn rhythm, posture, and etiquette before entering combat." },
+  5: { title: "Uniform", alt: "A row of kendo practitioners seated in seiza on the dojo floor", tag: "Gi and Hakama", description: "The gi and hakama form the traditional uniform, prepared for orderly and safe movement." },
+  6: { title: "Kendo community", alt: "A group of kendo practitioners and companions gathered after a competition", tag: "Team and community", description: "The community grows by sharing training, mutual support, and moments outside the dojo." },
+  7: { title: "Kirikaeshi", alt: "Two kendo competitors exchange shinai strikes during a match", tag: "Technique", description: "Kirikaeshi develops repeated cuts, footwork, and breathing to strengthen core fundamentals." },
+  8: { title: "Competitive match", alt: "A kendo match in which one competitor advances to attack with the shinai", tag: "Shiai", description: "Shiai tests technique, decision-making, and respect within a competitive format." },
+};
+
+export function getGalleryImages(language: Language) {
+  if (language === "es") return GALLERY_IMAGES;
+  return GALLERY_IMAGES.map((image) => ({
+    ...image,
+    ...ENGLISH_GALLERY_COPY[image.id],
+  }));
+}

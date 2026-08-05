@@ -1,13 +1,20 @@
+import { lazy, Suspense, useMemo } from "react";
 import { FeaturedImage } from "./gallery/FeaturedImage";
 import { GalleryThumbnails } from "./gallery/GalleryThumbnails";
-import { GALLERY_IMAGES } from "../data/gallery";
+import { getGalleryImages } from "../data/gallery";
 import { useCarousel } from "../hooks/useCarousel";
 import { useGalleryLightbox } from "../hooks/useGalleryLightbox";
-import { Lightbox } from "./Lightbox";
 import { PageTitle } from "./PageTitle";
+import { useLanguage } from "../config/i18n";
+
+const Lightbox = lazy(() =>
+  import("./Lightbox").then((module) => ({ default: module.Lightbox })),
+);
 
 export function GallerySection() {
-  const { index, prev, next, goTo } = useCarousel(GALLERY_IMAGES.length);
+  const { language, copy } = useLanguage();
+  const images = useMemo(() => getGalleryImages(language), [language]);
+  const { index, prev, next, goTo } = useCarousel(images.length);
   const {
     closeLightbox,
     lightboxIndex,
@@ -16,27 +23,29 @@ export function GallerySection() {
     showNext,
     showPrev,
     triggerRef,
-  } = useGalleryLightbox(GALLERY_IMAGES);
+  } = useGalleryLightbox(images);
 
-  const featured = GALLERY_IMAGES[index];
+  const featured = images[index];
   return (
     <section
       aria-labelledby="gallery-title"
-      className="relative overflow-hidden bg-site-canvas tall-md:h-full tall-md:min-h-0"
+      className="relative my-2 overflow-hidden rounded-xl bg-site-canvas tall-md:h-[calc(100%_-_1rem)] tall-md:min-h-0 land-sm:mt-[11px]"
     >
       <PageTitle
         id="gallery-title"
         placement="floating"
+        tone="media"
+        density="flush"
       >
-        Galería de kendo
+        {copy.gallery.title}
       </PageTitle>
-      <div className="mx-auto flex min-h-0 flex-col tall-md:h-full">
+      <div className="flex min-h-0 flex-col tall-md:h-full">
         <div className="flex min-h-0 flex-1 flex-col">
           <div className="flex min-h-0 flex-1 flex-col gap-2 land-sm:gap-1">
             <FeaturedImage
               image={featured}
               index={index}
-              total={GALLERY_IMAGES.length}
+              total={images.length}
               onOpen={(event) => openLightbox(featured.id, event)}
               onPrev={(event) => {
                 event.stopPropagation();
@@ -51,7 +60,7 @@ export function GallerySection() {
             />
 
             <GalleryThumbnails
-              images={GALLERY_IMAGES}
+              images={images}
               activeIndex={index}
               onSelect={goTo}
             />
@@ -60,15 +69,17 @@ export function GallerySection() {
       </div>
 
       {lightboxImage && (
-        <Lightbox
-          image={lightboxImage}
-          index={lightboxIndex}
-          total={GALLERY_IMAGES.length}
-          triggerRef={triggerRef}
-          onClose={closeLightbox}
-          onPrev={showPrev}
-          onNext={showNext}
-        />
+        <Suspense fallback={null}>
+          <Lightbox
+            image={lightboxImage}
+            index={lightboxIndex}
+            total={images.length}
+            triggerRef={triggerRef}
+            onClose={closeLightbox}
+            onPrev={showPrev}
+            onNext={showNext}
+          />
+        </Suspense>
       )}
     </section>
   );
