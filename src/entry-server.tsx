@@ -11,6 +11,7 @@ import { PastEventsSection } from "./app/components/PastEventsSection";
 
 export {
   getRouteHeadDescriptors,
+  getEventRedirects,
   getRouteManifest,
   getRouteMeta,
   getRouteSeoPayload,

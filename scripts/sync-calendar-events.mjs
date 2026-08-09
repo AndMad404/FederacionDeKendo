@@ -2,6 +2,11 @@ import { createHash } from "node:crypto";
 import { appendFile, mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import {
+  calculateArchiveEligibleAt,
+  getArchiveEligibleAt,
+  isArchiveEligible,
+} from "../src/app/utils/eventArchive.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "..");
@@ -206,19 +211,6 @@ function toIsoDate(date) {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
-export function getEventEndDateTime(event) {
-  if (event.endDate) {
-    return createLocalDate(event.endDate, event.endTime);
-  }
-  if (event.endTime) return createLocalDate(event.date, event.endTime);
-  if (event.startTime) {
-    const result = createLocalDate(event.date, event.startTime);
-    result.setHours(result.getHours() + 1);
-    return result;
-  }
-  return addDays(createLocalDate(event.date), 1);
-}
-
 function slugify(value) {
   return value
     .normalize("NFD")
@@ -307,6 +299,15 @@ export function parseCalendarEvent(properties, warnings = []) {
     }
   }
 
+  const lastEventDate =
+    start.isDateOnly && end?.isDateOnly
+      ? toIsoDate(addDays(createLocalDate(end.date), -1))
+      : end?.date ?? start.date;
+  event.archiveEligibleAt = calculateArchiveEligibleAt(
+    lastEventDate,
+    defaultTimeZone,
+  ).toISOString();
+
   const optionalProperties = {
     location: properties.get("LOCATION")?.value,
     summary: properties.get("DESCRIPTION")?.value,
@@ -334,13 +335,18 @@ export function parseCalendarEvent(properties, warnings = []) {
 function assertUniqueCurrentSlugs(events) {
   const ownerBySlug = new Map();
   for (const event of events) {
-    const previousOwner = ownerBySlug.get(event.slug);
-    if (previousOwner) {
-      throw new Error(
-        `Duplicate calendar canonical slug: ${event.slug} (${previousOwner} and ${event.sourceId}).`,
-      );
+    for (const slug of [event.slug, ...(event.aliases ?? [])]) {
+      const previousOwner = ownerBySlug.get(slug);
+      if (previousOwner) {
+        const label = slug === event.slug
+          ? "Duplicate calendar canonical slug"
+          : "Duplicate calendar canonical slug or alias";
+        throw new Error(
+          `${label}: ${slug} (${previousOwner} and ${event.sourceId}).`,
+        );
+      }
+      ownerBySlug.set(slug, event.sourceId);
     }
-    ownerBySlug.set(event.slug, event.sourceId);
   }
 }
 
@@ -350,20 +356,51 @@ export function mergeRegistry(
   now = new Date(),
 ) {
   assertUniqueCurrentSlugs(currentEvents);
-  const currentSourceIds = new Set(currentEvents.map((event) => event.sourceId));
+  const previousBySourceId = new Map(
+    (previousRegistry.events ?? []).map((event) => [event.sourceId, event]),
+  );
+  const reconciledCurrentEvents = currentEvents.map((currentEvent) => {
+    const previousEvent = previousBySourceId.get(currentEvent.sourceId);
+    const aliases = previousEvent?.aliases;
+    const wasHistorical =
+      previousEvent?.historical === true ||
+      (previousEvent ? isArchiveEligible(previousEvent, now) : false);
+    const becomesHistorical =
+      new Date(currentEvent.archiveEligibleAt).getTime() <= now.getTime();
+
+    if (wasHistorical) {
+      return {
+        ...currentEvent,
+        sourceId: previousEvent.sourceId,
+        slug: previousEvent.slug,
+        title: previousEvent.title,
+        date: previousEvent.date,
+        archiveEligibleAt: getArchiveEligibleAt(previousEvent).toISOString(),
+        historical: true,
+        ...(aliases?.length ? { aliases } : {}),
+      };
+    }
+
+    return {
+      ...currentEvent,
+      ...(becomesHistorical ? { historical: true } : {}),
+      ...(aliases?.length ? { aliases } : {}),
+    };
+  });
+  const currentSourceIds = new Set(reconciledCurrentEvents.map((event) => event.sourceId));
   const retainedHistoricalEvents = (previousRegistry.events ?? []).filter(
     (event) =>
       !currentSourceIds.has(event.sourceId) &&
-      getEventEndDateTime(event).getTime() < now.getTime(),
+      (event.historical === true || isArchiveEligible(event, now)),
   );
-  const merged = [...currentEvents, ...retainedHistoricalEvents];
+  const merged = [...reconciledCurrentEvents, ...retainedHistoricalEvents];
   assertUniqueCurrentSlugs(merged);
   merged.sort(
     (a, b) =>
       createLocalDate(a.date, a.startTime).getTime() -
       createLocalDate(b.date, b.startTime).getTime(),
   );
-  return { version: 2, events: merged };
+  return { version: 3, events: merged };
 }
 
 function serializeProperty(name, value, isLast) {
@@ -373,6 +410,8 @@ function serializeProperty(name, value, isLast) {
 function serializeCalendarEvent(event) {
   const entries = [
     ["id", event.slug],
+    ["aliases", event.aliases],
+    ["archiveEligibleAt", event.archiveEligibleAt],
     ["title", event.title],
     ["date", event.date],
     ["endDate", event.endDate],
@@ -418,12 +457,12 @@ async function readCalendarSource(source) {
 async function readRegistry(registryPath) {
   try {
     const registry = JSON.parse(await readFile(registryPath, "utf8"));
-    if (registry.version !== 2 || !Array.isArray(registry.events)) {
+    if (![2, 3].includes(registry.version) || !Array.isArray(registry.events)) {
       throw new Error("Unsupported calendar event registry.");
     }
     return registry;
   } catch (error) {
-    if (error?.code === "ENOENT") return { version: 2, events: [] };
+    if (error?.code === "ENOENT") return { version: 3, events: [] };
     throw error;
   }
 }

@@ -99,11 +99,11 @@ test("shares the canonical page and displays the complete description", async ({
 test("uses injected time for the current transition into event history", async ({
   page,
 }) => {
-  await page.clock.setFixedTime(new Date("2026-08-08T14:00:00-06:00"));
+  await page.clock.setFixedTime(new Date("2026-08-10T23:59:59-06:00"));
   await page.goto("/eventos/pasados/");
   await expect(page.locator(`a[href="${HISTORICAL_EVENT_PATH}"]`)).toHaveCount(0);
 
-  await page.clock.setFixedTime(new Date("2026-08-08T15:01:00-06:00"));
+  await page.clock.setFixedTime(new Date("2026-08-11T00:00:00-06:00"));
   await page.reload();
   await expect(page.locator(`a[href="${HISTORICAL_EVENT_PATH}"]`)).toBeVisible();
 

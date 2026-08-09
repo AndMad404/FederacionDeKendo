@@ -11,6 +11,7 @@ import {
   parseVEvents,
   synchronizeCalendar,
 } from "../scripts/sync-calendar-events.mjs";
+import { calculateArchiveEligibleAt } from "../src/app/utils/eventArchive.js";
 
 const fixturePath = new URL("./fixtures/calendar-events.ics", import.meta.url);
 
@@ -81,7 +82,7 @@ test("omits drafts and recurring events and warns about incomplete content", asy
   assert.equal(warnings.some((warning) => warning.includes("ubicación")), true);
 });
 
-test("uses the current canonical slug when the title changes", () => {
+test("Given a pending event, When its title changes, Then its identity remains editable", () => {
   const previous = {
     version: 2,
     events: [
@@ -104,9 +105,10 @@ test("uses the current canonical slug when the title changes", () => {
 
   const [event] = mergeRegistry(previous, current, new Date("2026-07-01")).events;
   assert.equal(event.slug, "2026-08-08-examen-nacional");
+  assert.equal(event.title, "Examen nacional");
 });
 
-test("uses the current canonical slug when the date changes", () => {
+test("Given a historical event, When Calendar changes its date and title, Then its identity stays frozen", () => {
   const previous = {
     version: 2,
     events: [
@@ -115,20 +117,105 @@ test("uses the current canonical slug when the date changes", () => {
         slug: "2026-08-08-examen",
         title: "Examen",
         date: "2026-08-08",
+        archiveEligibleAt: "2026-08-11T06:00:00.000Z",
+        historical: true,
+        aliases: ["2026-08-01-examen-anterior"],
       },
     ],
   };
   const current = [
     {
       sourceId: "same-source",
-      slug: "2026-08-15-examen",
-      title: "Examen",
+      slug: "2026-08-15-examen-nacional",
+      title: "Examen nacional",
       date: "2026-08-15",
+      archiveEligibleAt: "2026-08-18T06:00:00.000Z",
     },
   ];
 
-  const [event] = mergeRegistry(previous, current, new Date("2026-07-01")).events;
-  assert.equal(event.slug, "2026-08-15-examen");
+  const [event] = mergeRegistry(previous, current, new Date("2026-08-20T00:00:00Z")).events;
+  assert.equal(event.slug, "2026-08-08-examen");
+  assert.equal(event.title, "Examen");
+  assert.equal(event.date, "2026-08-08");
+  assert.equal(event.archiveEligibleAt, "2026-08-11T06:00:00.000Z");
+  assert.deepEqual(event.aliases, ["2026-08-01-examen-anterior"]);
+});
+
+test("Given a version 2 historical event, When the registry migrates, Then its existing identity is frozen", () => {
+  const previous = {
+    version: 2,
+    events: [{
+      sourceId: "legacy-source",
+      slug: "2025-12-31-examen",
+      title: "Examen original",
+      date: "2025-12-31",
+    }],
+  };
+  const current = [{
+    sourceId: "legacy-source",
+    slug: "2026-01-10-examen-corregido",
+    title: "Examen corregido",
+    date: "2026-01-10",
+    archiveEligibleAt: "2026-01-13T06:00:00.000Z",
+  }];
+
+  const [event] = mergeRegistry(previous, current, new Date("2026-02-01T00:00:00Z")).events;
+  assert.equal(event.slug, "2025-12-31-examen");
+  assert.equal(event.title, "Examen original");
+  assert.equal(event.date, "2025-12-31");
+  assert.equal(event.archiveEligibleAt, "2026-01-03T06:00:00.000Z");
+  assert.equal(event.historical, true);
+});
+
+test("Given an event at month end, When two full preparation days pass, Then it is eligible on the third midnight", () => {
+  assert.equal(
+    calculateArchiveEligibleAt("2026-01-31").toISOString(),
+    "2026-02-03T06:00:00.000Z",
+  );
+});
+
+test("Given an event at year end, When two full preparation days pass, Then eligibility crosses the year", () => {
+  assert.equal(
+    calculateArchiveEligibleAt("2026-12-31").toISOString(),
+    "2027-01-03T06:00:00.000Z",
+  );
+});
+
+test("Given foreign daylight-saving dates, When eligibility is calculated, Then Costa Rica midnight stays stable", () => {
+  assert.equal(
+    calculateArchiveEligibleAt("2026-03-08").toISOString(),
+    "2026-03-11T06:00:00.000Z",
+  );
+  assert.equal(
+    calculateArchiveEligibleAt("2026-11-01").toISOString(),
+    "2026-11-04T06:00:00.000Z",
+  );
+});
+
+test("Given timed and all-day events, When parsed, Then eligibility uses the last local event day instead of its ending hour", () => {
+  const timed = parseCalendarEvent(parseVEvents([
+    "BEGIN:VCALENDAR",
+    "BEGIN:VEVENT",
+    "UID:timed@example.test",
+    "DTSTART;TZID=America/Costa_Rica:20260808T130000",
+    "DTEND;TZID=America/Costa_Rica:20260808T150000",
+    "SUMMARY:Timed",
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ].join("\n"))[0]);
+  const allDay = parseCalendarEvent(parseVEvents([
+    "BEGIN:VCALENDAR",
+    "BEGIN:VEVENT",
+    "UID:all-day@example.test",
+    "DTSTART;VALUE=DATE:20260808",
+    "DTEND;VALUE=DATE:20260809",
+    "SUMMARY:All day",
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ].join("\n"))[0]);
+
+  assert.equal(timed.archiveEligibleAt, "2026-08-11T06:00:00.000Z");
+  assert.equal(allDay.archiveEligibleAt, "2026-08-11T06:00:00.000Z");
 });
 
 test("removes missing future events and preserves missing historical events", () => {

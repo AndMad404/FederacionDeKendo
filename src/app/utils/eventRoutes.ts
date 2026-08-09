@@ -1,7 +1,7 @@
 import { CALENDAR_EVENTS } from "../data/calendarEvents";
 import type { CalendarEvent } from "../types";
-import { getEventEndDate } from "./calendarEvents";
 import type { Language } from "../config/i18n";
+import { isArchiveEligible } from "./eventArchive.js";
 
 export function getEventPath(event: CalendarEvent, language: Language = "es") {
   return language === "en"
@@ -10,7 +10,9 @@ export function getEventPath(event: CalendarEvent, language: Language = "es") {
 }
 
 function findEventBySlug(slug: string) {
-  return CALENDAR_EVENTS.find((event) => event.id === slug);
+  return CALENDAR_EVENTS.find(
+    (event) => event.id === slug || event.aliases?.includes(slug),
+  );
 }
 
 export function findEventByPathname(pathname: string) {
@@ -20,7 +22,7 @@ export function findEventByPathname(pathname: string) {
 
 export function getPastEvents(now = new Date()) {
   return [...CALENDAR_EVENTS]
-    .filter((event) => getEventEndDate(event).getTime() < now.getTime())
+    .filter((event) => isArchiveEligible(event, now))
     .sort(
       (a, b) =>
         new Date(`${b.date}T${b.startTime ?? "00:00"}`).getTime() -
