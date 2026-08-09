@@ -47,7 +47,7 @@ export function UpcomingEventCard({
         {event.title}
       </h3>
       <span
-        className="col-start-1 row-start-1 max-w-[10rem] shrink-0 rounded-lg bg-site-media px-2.5 py-2 text-center text-sm font-bold uppercase leading-tight text-site-action land-tall:max-w-none lg:max-w-none lg:px-2 lg:py-1.5"
+        className="col-start-1 row-start-1 w-28 shrink-0 rounded-lg bg-site-media px-2.5 py-2 text-center text-sm font-bold uppercase leading-tight text-site-action sm:w-auto land-tall:max-w-none lg:max-w-none lg:px-2 lg:py-1.5"
       >
         <time dateTime={event.date} className="whitespace-nowrap">
           {startDateLabel}
