@@ -1,13 +1,30 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
-const canonicalEventPath = "/eventos/2026-08-08-examen/";
+const FIXED_UPCOMING_TIME = new Date("2026-08-09T12:00:00-06:00");
+const HISTORICAL_EVENT_PATH = "/eventos/2026-08-08-examen/";
+
+async function discoverUpcomingEvent(page: Page) {
+  await page.clock.setFixedTime(FIXED_UPCOMING_TIME);
+  await page.goto("/calendario/");
+
+  const eventLink = page.getByRole("link", { name: /Ver detalles del evento/ }).first();
+  const path = await eventLink.getAttribute("href");
+  expect(path).toMatch(/^\/eventos\/[^/]+\/$/);
+
+  const accessibleName = await eventLink.getAttribute("aria-label");
+  const title = accessibleName?.replace("Ver detalles del evento ", "");
+  expect(title).toBeTruthy();
+
+  return { eventLink, path: path!, title: title! };
+}
 
 test("opens a prerendered event route with temporary noindex metadata", async ({
   page,
 }) => {
-  await page.goto(canonicalEventPath);
+  const { path, title } = await discoverUpcomingEvent(page);
+  await page.goto(path);
 
-  await expect(page.getByRole("heading", { name: "Examen", level: 1 })).toBeVisible();
+  await expect(page.getByRole("heading", { name: title, level: 1 })).toBeVisible();
   await expect(page.getByText("Actividad programada")).toBeVisible();
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
     "content",
@@ -15,19 +32,15 @@ test("opens a prerendered event route with temporary noindex metadata", async ({
   );
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     "href",
-    "https://fak-kendo.pages.dev/eventos/2026-08-08-examen/",
+    `https://fak-kendo.pages.dev${path}`,
   );
 });
 
 test("calendar cards link to the canonical event page", async ({ page }) => {
-  await page.goto("/calendario/");
-
-  const eventLink = page
-    .getByRole("link", { name: "Ver detalles del evento Examen" })
-    .first();
-  await expect(eventLink).toHaveAttribute("href", canonicalEventPath);
+  const { eventLink, path } = await discoverUpcomingEvent(page);
+  await expect(eventLink).toHaveAttribute("href", path);
   await eventLink.click();
-  await expect(page).toHaveURL(new RegExp(`${canonicalEventPath}$`));
+  await expect(page).toHaveURL(new RegExp(`${path}$`));
 });
 
 test("accepts only current canonical event routes", async ({ page }) => {
@@ -42,14 +55,16 @@ test("accepts only current canonical event routes", async ({ page }) => {
 });
 
 test("homepage event details link to the canonical event page", async ({ page }) => {
+  await page.clock.setFixedTime(FIXED_UPCOMING_TIME);
   await page.goto("/");
 
-  await page
-    .getByRole("link", { name: "Consultar detalles del evento Examen" })
-    .first()
-    .click();
-  await expect(page).toHaveURL(new RegExp(`${canonicalEventPath}$`));
-  await expect(page.getByRole("heading", { name: "Examen", level: 1 })).toBeVisible();
+  const eventLink = page
+    .getByRole("link", { name: /Consultar detalles del evento/ })
+    .first();
+  const path = await eventLink.getAttribute("href");
+  expect(path).toMatch(/^\/eventos\/[^/]+\/$/);
+  await eventLink.click();
+  await expect(page).toHaveURL(new RegExp(`${path}$`));
 });
 
 test("shares the canonical page and displays the complete description", async ({
@@ -64,18 +79,36 @@ test("shares the canonical page and displays the complete description", async ({
     });
   });
   await page.setViewportSize({ width: 1366, height: 768 });
-  await page.goto(canonicalEventPath);
+  const { path } = await discoverUpcomingEvent(page);
+  await page.goto(path);
 
   await page.getByRole("button", { name: "Compartir evento" }).click();
   await expect(page.getByRole("button", { name: "Enlace copiado" })).toBeVisible();
   expect(await page.evaluate(() => navigator.clipboard.readText())).toContain(
-    canonicalEventPath,
+    path,
   );
 
-  await expect(page.getByText("Exámenes de 8vo a 2do kyu")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Descripción", level: 2 }).locator("+ p"),
+  ).not.toBeEmpty();
   await expect(
     page.getByRole("button", { name: "Leer descripción completa" }),
   ).toHaveCount(0);
+});
+
+test("uses injected time for the current transition into event history", async ({
+  page,
+}) => {
+  await page.clock.setFixedTime(new Date("2026-08-08T14:00:00-06:00"));
+  await page.goto("/eventos/pasados/");
+  await expect(page.locator(`a[href="${HISTORICAL_EVENT_PATH}"]`)).toHaveCount(0);
+
+  await page.clock.setFixedTime(new Date("2026-08-08T15:01:00-06:00"));
+  await page.reload();
+  await expect(page.locator(`a[href="${HISTORICAL_EVENT_PATH}"]`)).toBeVisible();
+
+  await page.goto(HISTORICAL_EVENT_PATH);
+  await expect(page.getByText("Actividad finalizada")).toBeVisible();
 });
 
 test("renders the historical archive and a custom not-found view", async ({
@@ -149,7 +182,7 @@ const routes = [
   "/calendario/",
   "/galeria/",
   "/afiliados/",
-  canonicalEventPath,
+  HISTORICAL_EVENT_PATH,
   "/eventos/pasados/",
   "/en/",
   "/en/calendar/",
