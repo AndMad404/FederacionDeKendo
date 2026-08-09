@@ -77,6 +77,7 @@ export function EventPage() {
           className="relative z-10 h-28 shrink-0 overflow-hidden land-compact:h-20"
           titleId="event-page-title"
           title={event.title}
+          allowTitleWrap
           description={event.type ?? copy.event.defaultType}
           image={{
             src: "/images/calendar/kendo-calendar-1600.webp",

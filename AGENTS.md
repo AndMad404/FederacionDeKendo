@@ -45,6 +45,9 @@ If a request mixes review and implementation, review first, then ask or infer wh
 - Extended project documentation is stored outside this runtime repository at
   `../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/` in the owner's
   local workspace.
+- Start documentation work with `docs/index.md` in that private project. Use
+  its routing table to select the smallest relevant document set; do not read
+  the full documentation tree by default.
 - For architecture, ADR, backlog, calendar-operation, or historical-document
   work, read the relevant file from that location when it is available.
 - Never make application code, build scripts, tests, deployment, or workflows

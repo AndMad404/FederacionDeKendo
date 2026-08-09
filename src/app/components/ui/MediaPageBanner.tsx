@@ -19,6 +19,7 @@ interface MediaPageBannerProps {
   className: string;
   titleId: string;
   title: ReactNode;
+  allowTitleWrap?: boolean;
   description: ReactNode;
   image: MediaPageBannerImage;
 }
@@ -27,6 +28,7 @@ export function MediaPageBanner({
   className,
   titleId,
   title,
+  allowTitleWrap = false,
   description,
   image,
 }: MediaPageBannerProps) {
@@ -57,7 +59,13 @@ export function MediaPageBanner({
         aria-hidden="true"
       />
       <div className="relative z-10 flex h-full flex-col items-center justify-start px-4 pt-4 text-center text-site-on-dark">
-        <PageTitle id={titleId} tone="media" density="flush">
+        <PageTitle
+          id={titleId}
+          className={allowTitleWrap ? "max-w-full break-words line-clamp-2" : ""}
+          allowWrap={allowTitleWrap}
+          tone="media"
+          density="flush"
+        >
           {title}
         </PageTitle>
         <p className="mt-1 text-sm text-site-subtle land-compact:hidden">
