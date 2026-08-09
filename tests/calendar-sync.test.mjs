@@ -4,6 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import sharp from "sharp";
 
 import {
   createCanonicalSlug,
@@ -340,16 +341,30 @@ test("phase 2 normalizes public descriptions and event types without publishing 
   const tempDirectory = await mkdtemp(path.join(os.tmpdir(), "fak-calendar-"));
   const outputPath = path.join(tempDirectory, "calendarEvents.ts");
   const registryPath = path.join(tempDirectory, "registry.json");
+  const galleryManifestPath = path.join(tempDirectory, "eventGalleries.ts");
+  const galleryStatePath = path.join(tempDirectory, "eventGalleryState.json");
+  const galleryImagesRoot = path.join(tempDirectory, "event-images");
 
   try {
+    const galleryImage = await sharp({
+      create: { width: 640, height: 480, channels: 3, background: "red" },
+    }).jpeg().toBuffer();
     const result = await synchronizeCalendar({
       source: fileURLToPath(phase2FixturePath),
       outputPath,
       registryPath,
       now: new Date("2026-08-10T12:00:00Z"),
+      galleryOptions: {
+        manifestPath: galleryManifestPath,
+        statePath: galleryStatePath,
+        imagesRoot: galleryImagesRoot,
+        listFolder: async () => [{ id: "private-file-id", name: "photo1.jpg" }],
+        downloadFile: async () => galleryImage,
+      },
     });
     const output = await readFile(outputPath, "utf8");
     const registry = await readFile(registryPath, "utf8");
+    const galleryManifest = await readFile(galleryManifestPath, "utf8");
     const byTitle = new Map(result.registry.events.map((event) => [event.title, event]));
 
     assert.equal(byTitle.get("Torneo futuro").historical, undefined);
@@ -368,6 +383,7 @@ test("phase 2 normalizes public descriptions and event types without publishing 
     assert.equal(output.includes("ALBUM_FOTOS"), false);
     assert.equal(output.includes("drive.google.com"), false);
     assert.equal(registry.includes("drive.google.com"), false);
+    assert.equal(/drive\.google|phase2ValidAlbum|private-file-id/.test(galleryManifest), false);
   } finally {
     await rm(tempDirectory, { recursive: true, force: true });
   }

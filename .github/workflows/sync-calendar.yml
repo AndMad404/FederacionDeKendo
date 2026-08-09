@@ -58,13 +58,13 @@ jobs:
 
       - name: Commit calendar changes
         run: |
-          if [[ -z "$(git status --porcelain src/app/data/calendarEvents.ts src/app/data/calendarEventRegistry.json)" ]]; then
+          if [[ -z "$(git status --porcelain src/app/data/calendarEvents.ts src/app/data/calendarEventRegistry.json src/app/data/eventGalleries.ts src/app/data/eventGalleryState.json public/images/events)" ]]; then
             echo "No calendar changes to commit."
             exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/app/data/calendarEvents.ts src/app/data/calendarEventRegistry.json
+          git add src/app/data/calendarEvents.ts src/app/data/calendarEventRegistry.json src/app/data/eventGalleries.ts src/app/data/eventGalleryState.json public/images/events
           git commit -m "chore: sync calendar events"
           git push

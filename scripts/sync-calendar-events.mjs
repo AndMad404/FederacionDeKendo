@@ -7,6 +7,7 @@ import {
   getArchiveEligibleAt,
   isArchiveEligible,
 } from "../src/app/utils/eventArchive.js";
+import { synchronizeEventGalleries } from "./sync-event-galleries.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "..");
@@ -29,6 +30,11 @@ const draftPrefix = "[BORRADOR]";
 const approvedEventTypes = new Set(["torneo", "examen", "seminario", "evento"]);
 const inferredEventTypes = ["torneo", "examen", "seminario"];
 const googleDriveFolderUrl = /^https:\/\/drive\.google\.com\/drive\/folders\/[A-Za-z0-9_-]+(?:[/?#].*)?$/;
+const albumUrlSymbol = Symbol("privateAlbumUrl");
+
+export function getPrivateAlbumUrl(event) {
+  return event?.[albumUrlSymbol];
+}
 
 function unfoldIcsLines(icsText) {
   return icsText
@@ -271,6 +277,7 @@ function parseTechnicalDescription(description, title, warnings) {
   return {
     publicDescription: lines.slice(0, separatorIndex).join("\n").trim() || undefined,
     eventType,
+    albumUrl,
   };
 }
 
@@ -362,6 +369,9 @@ export function parseCalendarEvent(properties, warnings = []) {
       Object.entries(optionalProperties).filter(([, value]) => Boolean(value)),
     ),
   );
+  if (description.albumUrl) {
+    Object.defineProperty(event, albumUrlSymbol, { value: description.albumUrl });
+  }
 
   const missing = [
     !event.location && "ubicación",
@@ -569,6 +579,7 @@ export async function synchronizeCalendar({
   outputPath = defaultOutputPath,
   registryPath = defaultRegistryPath,
   now = new Date(),
+  galleryOptions,
 } = {}) {
   if (!source) {
     throw new Error(
@@ -581,8 +592,25 @@ export async function synchronizeCalendar({
   const parsed = parseVEvents(icsText)
     .map((properties) => parseCalendarEvent(properties, warnings))
     .filter(Boolean);
+  const currentBySourceId = new Map(parsed.map((event) => [event.sourceId, event]));
   const previousRegistry = await readRegistry(registryPath);
   const registry = mergeRegistry(previousRegistry, parsed, now);
+
+  const galleryEvents = registry.events
+    .filter((event) => event.historical === true)
+    .map((event) => ({
+      slug: event.slug,
+      title: event.title,
+      albumUrl: getPrivateAlbumUrl(currentBySourceId.get(event.sourceId)),
+    }));
+  let galleryResult;
+  if (galleryEvents.some((event) => event.albumUrl) || galleryOptions?.force) {
+    galleryResult = await synchronizeEventGalleries({
+      events: galleryEvents,
+      ...galleryOptions,
+    });
+    warnings.push(...galleryResult.warnings);
+  }
 
   await writeAtomically([
     [registryPath, `${JSON.stringify(registry, null, 2)}\n`],
@@ -590,7 +618,7 @@ export async function synchronizeCalendar({
   ]);
   await writeActionSummary(warnings, registry.events.length);
 
-  return { registry, warnings };
+  return { registry, galleryResult, warnings };
 }
 
 async function main() {
