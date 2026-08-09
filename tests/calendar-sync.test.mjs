@@ -3,6 +3,7 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 
 import {
   createCanonicalSlug,
@@ -14,6 +15,14 @@ import {
 import { calculateArchiveEligibleAt } from "../src/app/utils/eventArchive.js";
 
 const fixturePath = new URL("./fixtures/calendar-events.ics", import.meta.url);
+const phase2FixturePath = new URL(
+  "./fixtures/calendar-events-phase-2.ics",
+  import.meta.url,
+);
+const invalidPhase2FixturePath = new URL(
+  "./fixtures/calendar-events-phase-2-invalid.ics",
+  import.meta.url,
+);
 
 function createIcs(events) {
   return [
@@ -322,6 +331,68 @@ test("an invalid feed leaves the last published files untouched", async () => {
       await readFile(registryPath, "utf8"),
       '{"version":2,"events":[]}',
     );
+  } finally {
+    await rm(tempDirectory, { recursive: true, force: true });
+  }
+});
+
+test("phase 2 normalizes public descriptions and event types without publishing album URLs", async () => {
+  const tempDirectory = await mkdtemp(path.join(os.tmpdir(), "fak-calendar-"));
+  const outputPath = path.join(tempDirectory, "calendarEvents.ts");
+  const registryPath = path.join(tempDirectory, "registry.json");
+
+  try {
+    const result = await synchronizeCalendar({
+      source: fileURLToPath(phase2FixturePath),
+      outputPath,
+      registryPath,
+      now: new Date("2026-08-10T12:00:00Z"),
+    });
+    const output = await readFile(outputPath, "utf8");
+    const registry = await readFile(registryPath, "utf8");
+    const byTitle = new Map(result.registry.events.map((event) => [event.title, event]));
+
+    assert.equal(byTitle.get("Torneo futuro").historical, undefined);
+    assert.equal(byTitle.get("Examen en preparación").historical, undefined);
+    assert.equal(byTitle.get("Seminario histórico").historical, true);
+    assert.equal(
+      byTitle.get("Encuentro actualizado").summary,
+      "Descripción pública actualizada.",
+    );
+    assert.equal(byTitle.get("Torneo sin álbum").eventType, "torneo");
+    assert.equal(byTitle.get("Examen con álbum").eventType, "examen");
+    assert.equal(byTitle.get("Seminario técnico").eventType, "seminario");
+    assert.equal(byTitle.get("Encuentro federativo").eventType, "evento");
+    assert.equal(result.warnings.some((warning) => warning.includes("using evento")), true);
+    assert.equal(output.includes("TIPO_EVENTO"), false);
+    assert.equal(output.includes("ALBUM_FOTOS"), false);
+    assert.equal(output.includes("drive.google.com"), false);
+    assert.equal(registry.includes("drive.google.com"), false);
+  } finally {
+    await rm(tempDirectory, { recursive: true, force: true });
+  }
+});
+
+test("invalid technical metadata preserves both previously published artifacts", async () => {
+  const tempDirectory = await mkdtemp(path.join(os.tmpdir(), "fak-calendar-"));
+  const outputPath = path.join(tempDirectory, "calendarEvents.ts");
+  const registryPath = path.join(tempDirectory, "registry.json");
+  const previousOutput = "previous output";
+  const previousRegistry = '{"version":3,"events":[]}';
+  await writeFile(outputPath, previousOutput);
+  await writeFile(registryPath, previousRegistry);
+
+  try {
+    await assert.rejects(
+      synchronizeCalendar({
+        source: fileURLToPath(invalidPhase2FixturePath),
+        outputPath,
+        registryPath,
+      }),
+      /Invalid ALBUM_FOTOS/,
+    );
+    assert.equal(await readFile(outputPath, "utf8"), previousOutput);
+    assert.equal(await readFile(registryPath, "utf8"), previousRegistry);
   } finally {
     await rm(tempDirectory, { recursive: true, force: true });
   }

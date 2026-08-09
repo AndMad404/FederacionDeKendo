@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { appendFile, mkdir, readFile, rename, writeFile } from "node:fs/promises";
+import { appendFile, mkdir, readFile, rename, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import {
@@ -26,6 +26,9 @@ const defaultRegistryPath = path.join(
 );
 const defaultTimeZone = process.env.CALENDAR_TIME_ZONE ?? "America/Costa_Rica";
 const draftPrefix = "[BORRADOR]";
+const approvedEventTypes = new Set(["torneo", "examen", "seminario", "evento"]);
+const inferredEventTypes = ["torneo", "examen", "seminario"];
+const googleDriveFolderUrl = /^https:\/\/drive\.google\.com\/drive\/folders\/[A-Za-z0-9_-]+(?:[/?#].*)?$/;
 
 function unfoldIcsLines(icsText) {
   return icsText
@@ -229,23 +232,56 @@ export function createCanonicalSlug(title, date) {
   return `${date}-${slugify(title) || "actividad"}`;
 }
 
-function getEventType(property) {
-  if (!property) return undefined;
-  const supported = new Map(
-    [
-      "Examen",
-      "Torneo",
-      "Seminario",
-      "Entrenamiento especial",
-      "Actividad federativa",
-    ].map((type) => [slugify(type), type]),
-  );
+function parseTechnicalDescription(description, title, warnings) {
+  if (!description) return { publicDescription: undefined };
 
-  for (const category of property.value.split(",")) {
-    const match = supported.get(slugify(category.trim()));
-    if (match) return match;
+  const lines = description.replace(/\r\n?/g, "\n").split("\n");
+  const separatorIndex = lines.findLastIndex((line) => /^---\s*$/.test(line));
+  if (separatorIndex === -1) return { publicDescription: description };
+
+  const metadata = new Map();
+  for (const line of lines.slice(separatorIndex + 1)) {
+    if (!line.trim()) continue;
+    const match = /^([A-Z_]+)\s*:\s*(.+)$/.exec(line.trim());
+    if (!match || !["TIPO_EVENTO", "ALBUM_FOTOS"].includes(match[1])) {
+      throw new Error(`Invalid technical metadata for ${title}: ${line.trim()}`);
+    }
+    if (metadata.has(match[1])) {
+      throw new Error(`Duplicate technical metadata ${match[1]} for ${title}.`);
+    }
+    metadata.set(match[1], match[2].trim());
   }
-  return undefined;
+
+  const explicitType = metadata.get("TIPO_EVENTO")?.toLowerCase();
+  let eventType;
+  if (explicitType) {
+    if (approvedEventTypes.has(explicitType)) {
+      eventType = explicitType;
+    } else {
+      eventType = "evento";
+      warnings.push(`${title} has invalid TIPO_EVENTO; using evento.`);
+    }
+  }
+
+  const albumUrl = metadata.get("ALBUM_FOTOS");
+  if (albumUrl && !googleDriveFolderUrl.test(albumUrl)) {
+    throw new Error(`Invalid ALBUM_FOTOS for ${title}.`);
+  }
+
+  return {
+    publicDescription: lines.slice(0, separatorIndex).join("\n").trim() || undefined,
+    eventType,
+  };
+}
+
+function inferEventType(title, warnings) {
+  const normalizedTitle = slugify(title).replace(/-/g, " ");
+  const inferred = inferredEventTypes.find((type) =>
+    new RegExp(`(?:^|\\s)${type}(?:$|\\s)`).test(normalizedTitle),
+  );
+  if (inferred) return inferred;
+  warnings.push(`${title} has no controlled event type; using evento.`);
+  return "evento";
 }
 
 function getOrganizer(property) {
@@ -278,6 +314,11 @@ export function parseCalendarEvent(properties, warnings = []) {
   }
 
   const title = rawTitle || "Actividad sin título";
+  const description = parseTechnicalDescription(
+    properties.get("DESCRIPTION")?.value,
+    title,
+    warnings,
+  );
   const end = parseIcsDate(properties.get("DTEND"));
   const event = {
     sourceId: hash(uid),
@@ -310,8 +351,8 @@ export function parseCalendarEvent(properties, warnings = []) {
 
   const optionalProperties = {
     location: properties.get("LOCATION")?.value,
-    summary: properties.get("DESCRIPTION")?.value,
-    type: getEventType(properties.get("CATEGORIES")),
+    summary: description.publicDescription,
+    eventType: description.eventType ?? inferEventType(title, warnings),
     organizer: getOrganizer(properties.get("ORGANIZER")),
     infoUrl: properties.get("URL")?.value,
   };
@@ -419,7 +460,7 @@ function serializeCalendarEvent(event) {
     ["endTime", event.endTime],
     ["location", event.location],
     ["summary", event.summary],
-    ["type", event.type],
+    ["eventType", event.eventType],
     ["organizer", event.organizer],
     ["infoUrl", event.infoUrl],
     ["timeZone", event.timeZone],
@@ -469,6 +510,8 @@ async function readRegistry(registryPath) {
 
 async function writeAtomically(files) {
   const temporaryFiles = [];
+  const backupFiles = [];
+  const publishedFiles = [];
   try {
     for (const [filePath, contents] of files) {
       await mkdir(path.dirname(filePath), { recursive: true });
@@ -476,14 +519,31 @@ async function writeAtomically(files) {
       await writeFile(temporaryPath, contents, "utf8");
       temporaryFiles.push([temporaryPath, filePath]);
     }
+    for (const [, filePath] of temporaryFiles) {
+      const backupPath = `${filePath}.${process.pid}.backup`;
+      try {
+        await rename(filePath, backupPath);
+        backupFiles.push([backupPath, filePath]);
+      } catch (error) {
+        if (error?.code !== "ENOENT") throw error;
+      }
+    }
     for (const [temporaryPath, filePath] of temporaryFiles) {
       await rename(temporaryPath, filePath);
+      publishedFiles.push(filePath);
     }
+    await Promise.allSettled(
+      backupFiles.map(([backupPath]) => unlink(backupPath)),
+    );
   } catch (error) {
     await Promise.allSettled(
-      temporaryFiles.map(([temporaryPath]) =>
-        import("node:fs/promises").then(({ unlink }) => unlink(temporaryPath)),
-      ),
+      temporaryFiles.map(([temporaryPath]) => unlink(temporaryPath)),
+    );
+    await Promise.allSettled(
+      publishedFiles.map((filePath) => unlink(filePath)),
+    );
+    await Promise.allSettled(
+      backupFiles.map(([backupPath, filePath]) => rename(backupPath, filePath)),
     );
     throw error;
   }

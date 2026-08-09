@@ -1,0 +1,52 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//FAK//Calendar phase 2 tests//ES
+BEGIN:VEVENT
+UID:future@example.test
+DTSTART;VALUE=DATE:20261010
+SUMMARY:Torneo futuro
+DESCRIPTION:Descripción pública.\n---\nTIPO_EVENTO: torneo
+END:VEVENT
+BEGIN:VEVENT
+UID:preparation@example.test
+DTSTART;VALUE=DATE:20260808
+SUMMARY:Examen en preparación
+DESCRIPTION:Resultado pendiente.\n---\nTIPO_EVENTO: examen
+END:VEVENT
+BEGIN:VEVENT
+UID:historical@example.test
+DTSTART;VALUE=DATE:20260110
+SUMMARY:Seminario histórico
+DESCRIPTION:Memoria institucional.\n---\nTIPO_EVENTO: seminario
+END:VEVENT
+BEGIN:VEVENT
+UID:updated@example.test
+DTSTART;VALUE=DATE:20260214
+SUMMARY:Encuentro actualizado
+DESCRIPTION:Descripción pública actualizada.\n---\nTIPO_EVENTO: evento
+END:VEVENT
+BEGIN:VEVENT
+UID:no-album@example.test
+DTSTART;VALUE=DATE:20260321
+SUMMARY:Torneo sin álbum
+DESCRIPTION:Sin fotografías.\n---\nTIPO_EVENTO: torneo
+END:VEVENT
+BEGIN:VEVENT
+UID:valid-album@example.test
+DTSTART;VALUE=DATE:20260418
+SUMMARY:Examen con álbum
+DESCRIPTION:Fotografías aprobadas.\n---\nTIPO_EVENTO: examen\nALBUM_FOTOS: https://drive.google.com/drive/folders/phase2ValidAlbum
+END:VEVENT
+BEGIN:VEVENT
+UID:inferred@example.test
+DTSTART;VALUE=DATE:20260523
+SUMMARY:Seminario técnico
+DESCRIPTION:Tipo inferido por título.
+END:VEVENT
+BEGIN:VEVENT
+UID:fallback@example.test
+DTSTART;VALUE=DATE:20260620
+SUMMARY:Encuentro federativo
+DESCRIPTION:Tipo general.\n---\nTIPO_EVENTO: convivencia
+END:VEVENT
+END:VCALENDAR
