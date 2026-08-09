@@ -40,6 +40,29 @@ Use the smallest mode that fits the user's request.
 
 If a request mixes review and implementation, review first, then ask or infer which findings should be applied.
 
+## Phased Roadmap Execution
+
+- Execute an approved roadmap one independently verifiable phase at a time.
+  Do not combine parser, data pipeline, UI, visual, SEO, or documentation phases
+  merely because they belong to the same feature.
+- Start each phase from its canonical roadmap or backlog entry instead of
+  repeating the full project history in the task prompt.
+- Read only the documentation routed by `docs/index.md` plus the source files
+  required by the current phase. Do not preload later-phase context.
+- Use a fresh task when the primary responsibility changes, such as moving
+  from tests to synchronization, images, filters, or UI. Keep the current task
+  for direct fixes to the phase being implemented.
+- During implementation, run the narrowest reproducing or directed check
+  first. Run broader typecheck, build, E2E, or visual gates once the directed
+  checks pass and the phase is ready for final verification.
+- Keep each completed phase suitable for an atomic commit and independent
+  review. Do not create a commit unless the user requests it.
+- Resolve blocking CI or test regressions before starting dependent structural
+  or visual phases.
+- Do not use parallel agents for sequential phases that share files or depend
+  on each other's output. Parallel work is appropriate only for genuinely
+  independent investigation or review.
+
 ## Documentation Scope
 
 - Extended project documentation is stored outside this runtime repository at

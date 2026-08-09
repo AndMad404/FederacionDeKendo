@@ -30,6 +30,32 @@ No toques archivos no relacionados.
 Al final corre los checks relevantes de .agents/verification.md.
 ```
 
+## Implement One Roadmap Phase
+
+```text
+Implementa unicamente la Fase [numero] de [roadmap].
+
+Lee AGENTS.md, el roadmap y los contratos aplicables. Usa docs/index.md para
+seleccionar el contexto documental minimo; no cargues fases posteriores.
+
+Alcance:
+- [resultados autorizados de esta fase]
+
+Fuera de alcance:
+- [responsabilidades de fases posteriores]
+- cambios visuales no aprobados;
+- refactors no requeridos.
+
+Criterio de salida:
+- primero pasan las pruebas dirigidas de la fase;
+- despues pasan las verificaciones finales indicadas por
+  .agents/verification.md;
+- el diff queda limitado, revisable y apto para un commit atomico.
+
+Detente ante una diferencia visual inesperada o una decision de producto que
+el roadmap no haya resuelto. No crees un commit salvo que se solicite.
+```
+
 ## SEO Change
 
 ```text
