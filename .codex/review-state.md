@@ -2,7 +2,7 @@
 
 ```yaml
 schema_version: 2
-last_updated: 2026-08-04
+last_updated: 2026-08-09
 contract: .agents/review-contract.md
 
 state_rules:
@@ -2978,4 +2978,80 @@ phase_five_route_layout_policy:
     - directed responsive reachability matrix passed: 91
     - complete Playwright suite passed: 184
     - visual regression suite passed: 28 of 28 without updating baselines
+latest_hero_overlay_review:
+  id: REV-2026-08-09-01
+  requested_scope: Compare the local HeroSection change with the approved 1366x768 and mobile visual baseline, measure text legibility, and assess whether the gradient recognizes the person on the right without regressions.
+  actual_scope:
+    targets: [src/app/components/HeroSection.tsx, homepage at 360x800, 390x844, 768x1024, and 1366x768]
+    axes: [A11Y, RESPONSIVE]
+    included: [saved Git diff, approved screenshot comparison, text-to-image contrast, right-side subject visibility]
+    excluded: [style edits, baseline regeneration, obsolete Figma, production behavior, other routes except contamination checks]
+  baseline:
+    commit: 88733b9c
+    worktree: dirty with unrelated EventPage.tsx and MediaPageBanner.tsx visual changes
+    HeroSection_sha256: 79DDDD42DAA7D4925E2D7E3B3F487CEC558CD472640BAA3B43D0C6344FE366CD
+    approved_visual_oracle: committed Playwright screenshots
+  evidence:
+    - HeroSection.tsx has no saved staged or unstaged difference from HEAD.
+    - The unrelated dirty files do not feed the homepage hero; the directed homepage screenshots passed at 360x800, 390x844, and 1366x768 without updating baselines.
+    - The homepage tablet screenshot failed at 768x1024 with 57611 changed pixels (8 percent); expected, actual, and diff showed a material whole-page composition difference and it remains blocking outside the requested desktop/mobile targets.
+    - Reconstructed image-plus-gradient sampling at core glyph pixels measured desktop minima of 6.00:1 for the title, 5.85:1 for the bold lead, and 7.36:1 for the description.
+    - At 360x800 and 390x844, the large title remained above 3:1, but 10.35 percent and 9.82 percent of sampled bold-lead core pixels fell below 4.5:1; 2.37 percent and 1.79 percent of description core pixels fell below 4.5:1.
+    - The desktop right-side subject remains visibly recognizable and the right-side region retains luminance variation, but the saved implementation is identical to the approved baseline and therefore provides no verified improvement over it; mobile object-cover cropping does not preserve that same far-right subject.
+  confirmed_findings: [SMELL-A11Y-003, POL-RESP-010]
+  findings:
+    - id: SMELL-A11Y-003
+      level: SMELL
+      axis: A11Y
+      status: open
+      target: src/app/components/HeroSection.tsx:35
+      problem: The mobile gradient does not keep all lead and description glyph locations at 4.5:1 against the variable image background.
+      fix: Requires owner-approved visual treatment; no change was made during review.
+      cost_of_deferring: Legibility remains image-position-dependent for portions of the mobile copy.
+    - id: POL-RESP-010
+      level: POLISH
+      axis: RESPONSIVE
+      status: open
+      target: src/app/components/HeroSection.tsx:35
+      problem: The saved gradient is baseline-identical, so it cannot substantiate the requested improvement, and the far-right desktop subject is cropped out on mobile.
+      fix: Clarify whether subject recognition is a desktop-only objective and provide the saved candidate change for comparison before approving any visual adjustment.
+      cost_of_deferring: The recognition objective remains unverified as an improvement rather than merely preserving the approved presentation.
+    - id: STR-RESP-011
+      level: STRUCTURAL
+      axis: RESPONSIVE
+      status: open
+      target: tests/e2e/visual-regression.spec.ts-snapshots/home-tablet-768x1024.png
+      problem: The approved Home tablet screenshot predates the ES/EN navigation and tablet containment changes, while the deterministic geometry gate does not assert the complete tablet shell or footer-in-viewport composition.
+      fix: Requires owner direction on whether the current tablet composition or the historical screenshot is authoritative; only then may implementation or the baseline be changed, followed by complete visual inspection.
+      cost_of_deferring: The manual visual suite remains red at tablet and the geometry suite can pass without detecting this whole-page composition mismatch.
+      evidence:
+        - The Home tablet snapshot was last changed by b59c5813 on 2026-08-04 15:44 -0600.
+        - Commit c0e73e23 added the visible ES/EN selector and responsive content changes later that day without updating the Home tablet snapshot.
+        - Commit c7684604 added tablet containment and updated only the Affiliates tablet snapshot.
+        - Current Home at 768x1024 differs by 57611 pixels (8 percent), including the navbar, hero height, event-card composition, and absent footer in the captured viewport.
+        - The directed responsive reachability checks passed 13 Home cases and the directed tablet geometry contract passed 1 case, demonstrating the coverage gap rather than visual equivalence.
+  result: Desktop and requested mobile screenshots preserve their approved baselines, but the current saved gradient does not fully meet the combined recognition-and-uniform-legibility objective. The tablet failure is traced to a stale pre-bilingual Home screenshot plus incomplete tablet whole-shell assertions; no visual files or baselines were changed.
+
+latest_home_tablet_frame_fix:
+  id: FIX-2026-08-09-01
+  requested_scope: Keep the approved ES/EN control and restore the approved complete Home framing at 768x1024 without regenerating baselines.
+  approval: The owner explicitly approved the tablet Home visual correction and confirmed the current ES/EN design on 2026-08-09.
+  baseline:
+    commit: 88733b9c
+    visual_oracle: committed Home screenshots plus the owner-approved ES/EN selector as the sole allowed historical-baseline difference
+    worktree: dirty with unrelated EventPage.tsx and MediaPageBanner.tsx visual changes that do not feed Home
+  implementation:
+    - fixed the Home hero to 348px only at tablet-fit so it no longer consumes the event/footer budget
+    - restored the 10rem tablet date-label cap while preserving the current mobile width and the unrestricted desktop width
+    - kept ES/EN, hero content, colors, gradient, typography, buttons, mobile presentation, and desktop presentation unchanged
+  verification:
+    - typecheck passed
+    - production and SSR build plus generated route output passed
+    - the four Home visual comparisons passed without updating baselines under the configured 1 percent tolerance
+    - the directed Home tablet geometry contract passed
+    - all 13 directed Home responsive reachability cases passed
+    - a temporary zero-tolerance comparison found 3040 residual changed pixels; inspected diff attributed the remaining material region to the owner-approved ES/EN navbar addition
+    - no screenshot baseline was regenerated
+  result: Home again presents navbar, 348px hero, all three visible event cards, and footer inside the 768x1024 frame; mobile and 1366x768 remain baseline-matching.
+
 ```
