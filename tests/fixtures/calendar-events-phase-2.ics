@@ -34,19 +34,19 @@ END:VEVENT
 BEGIN:VEVENT
 UID:valid-album@example.test
 DTSTART;VALUE=DATE:20260418
-SUMMARY:Examen con álbum
-DESCRIPTION:Fotografías aprobadas.\n---\nTIPO_EVENTO: examen\nALBUM_FOTOS: https://drive.google.com/drive/folders/phase2ValidAlbum
+SUMMARY:Exámenes con álbum
+DESCRIPTION:Fotografías aprobadas.\nhttps://drive.google.com/drive/folders/phase2ValidAlbum
 END:VEVENT
 BEGIN:VEVENT
 UID:inferred@example.test
 DTSTART;VALUE=DATE:20260523
-SUMMARY:Seminario técnico
+SUMMARY:Seminarios técnicos
 DESCRIPTION:Tipo inferido por título.
 END:VEVENT
 BEGIN:VEVENT
 UID:fallback@example.test
 DTSTART;VALUE=DATE:20260620
 SUMMARY:Encuentro federativo
-DESCRIPTION:Tipo general.\n---\nTIPO_EVENTO: convivencia
+DESCRIPTION:Tipo general.
 END:VEVENT
 END:VCALENDAR

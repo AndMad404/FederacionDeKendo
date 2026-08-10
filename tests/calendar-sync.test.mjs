@@ -375,8 +375,9 @@ test("phase 2 normalizes public descriptions and event types without publishing 
       "Descripción pública actualizada.",
     );
     assert.equal(byTitle.get("Torneo sin álbum").eventType, "torneo");
-    assert.equal(byTitle.get("Examen con álbum").eventType, "examen");
-    assert.equal(byTitle.get("Seminario técnico").eventType, "seminario");
+    assert.equal(byTitle.get("Exámenes con álbum").eventType, "examen");
+    assert.equal(byTitle.get("Exámenes con álbum").summary, "Fotografías aprobadas.");
+    assert.equal(byTitle.get("Seminarios técnicos").eventType, "seminario");
     assert.equal(byTitle.get("Encuentro federativo").eventType, "evento");
     assert.equal(result.warnings.some((warning) => warning.includes("using evento")), true);
     assert.equal(output.includes("TIPO_EVENTO"), false);

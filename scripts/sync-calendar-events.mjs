@@ -27,9 +27,13 @@ const defaultRegistryPath = path.join(
 );
 const defaultTimeZone = process.env.CALENDAR_TIME_ZONE ?? "America/Costa_Rica";
 const draftPrefix = "[BORRADOR]";
-const approvedEventTypes = new Set(["torneo", "examen", "seminario", "evento"]);
-const inferredEventTypes = ["torneo", "examen", "seminario"];
+const inferredEventTypes = [
+  ["torneo", /(?:^|\s)torneos?(?:$|\s)/],
+  ["examen", /(?:^|\s)examen(?:es)?(?:$|\s)/],
+  ["seminario", /(?:^|\s)seminarios?(?:$|\s)/],
+];
 const googleDriveFolderUrl = /^https:\/\/drive\.google\.com\/drive\/folders\/[A-Za-z0-9_-]+(?:[/?#].*)?$/;
+const embeddedGoogleDriveFolderUrl = /https:\/\/drive\.google\.com\/drive\/folders\/[A-Za-z0-9_-]+(?:[/?#][^\s]*)?/g;
 const albumUrlSymbol = Symbol("privateAlbumUrl");
 
 export function getPrivateAlbumUrl(event) {
@@ -238,15 +242,15 @@ export function createCanonicalSlug(title, date) {
   return `${date}-${slugify(title) || "actividad"}`;
 }
 
-function parseTechnicalDescription(description, title, warnings) {
+function parseTechnicalDescription(description, title) {
   if (!description) return { publicDescription: undefined };
 
   const lines = description.replace(/\r\n?/g, "\n").split("\n");
   const separatorIndex = lines.findLastIndex((line) => /^---\s*$/.test(line));
-  if (separatorIndex === -1) return { publicDescription: description };
+  const publicLines = separatorIndex === -1 ? lines : lines.slice(0, separatorIndex);
 
   const metadata = new Map();
-  for (const line of lines.slice(separatorIndex + 1)) {
+  for (const line of separatorIndex === -1 ? [] : lines.slice(separatorIndex + 1)) {
     if (!line.trim()) continue;
     const match = /^([A-Z_]+)\s*:\s*(.+)$/.exec(line.trim());
     if (!match || !["TIPO_EVENTO", "ALBUM_FOTOS"].includes(match[1])) {
@@ -258,35 +262,34 @@ function parseTechnicalDescription(description, title, warnings) {
     metadata.set(match[1], match[2].trim());
   }
 
-  const explicitType = metadata.get("TIPO_EVENTO")?.toLowerCase();
-  let eventType;
-  if (explicitType) {
-    if (approvedEventTypes.has(explicitType)) {
-      eventType = explicitType;
-    } else {
-      eventType = "evento";
-      warnings.push(`${title} has invalid TIPO_EVENTO; using evento.`);
-    }
-  }
-
-  const albumUrl = metadata.get("ALBUM_FOTOS");
+  let albumUrl = metadata.get("ALBUM_FOTOS");
   if (albumUrl && !googleDriveFolderUrl.test(albumUrl)) {
     throw new Error(`Invalid ALBUM_FOTOS for ${title}.`);
   }
 
+  const sanitizedPublicLines = publicLines.map((line) => {
+    const matches = [...line.matchAll(embeddedGoogleDriveFolderUrl)].map(
+      (match) => match[0],
+    );
+    for (const match of matches) {
+      if (albumUrl && albumUrl !== match) {
+        throw new Error(`Multiple album URLs for ${title}.`);
+      }
+      albumUrl = match;
+    }
+    return matches.reduce((text, match) => text.replace(match, ""), line).trimEnd();
+  });
+
   return {
-    publicDescription: lines.slice(0, separatorIndex).join("\n").trim() || undefined,
-    eventType,
+    publicDescription: sanitizedPublicLines.join("\n").trim() || undefined,
     albumUrl,
   };
 }
 
 function inferEventType(title, warnings) {
   const normalizedTitle = slugify(title).replace(/-/g, " ");
-  const inferred = inferredEventTypes.find((type) =>
-    new RegExp(`(?:^|\\s)${type}(?:$|\\s)`).test(normalizedTitle),
-  );
-  if (inferred) return inferred;
+  const inferred = inferredEventTypes.find(([, pattern]) => pattern.test(normalizedTitle));
+  if (inferred) return inferred[0];
   warnings.push(`${title} has no controlled event type; using evento.`);
   return "evento";
 }
@@ -324,7 +327,6 @@ export function parseCalendarEvent(properties, warnings = []) {
   const description = parseTechnicalDescription(
     properties.get("DESCRIPTION")?.value,
     title,
-    warnings,
   );
   const end = parseIcsDate(properties.get("DTEND"));
   const event = {
@@ -359,7 +361,7 @@ export function parseCalendarEvent(properties, warnings = []) {
   const optionalProperties = {
     location: properties.get("LOCATION")?.value,
     summary: description.publicDescription,
-    eventType: description.eventType ?? inferEventType(title, warnings),
+    eventType: inferEventType(title, warnings),
     organizer: getOrganizer(properties.get("ORGANIZER")),
     infoUrl: properties.get("URL")?.value,
   };
