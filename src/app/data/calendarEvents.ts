@@ -5,7 +5,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: "2026-05-02-federacion-examen",
     archiveEligibleAt: "2026-05-05T06:00:00.000Z",
-    title: "FEDERACIÓN  : Examen",
+    title: "Examen",
     date: "2026-05-02",
     eventType: "examen",
     timeZone: "America/Costa_Rica"
@@ -22,7 +22,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: "2026-05-30-federacion-seminario-y-reunion",
     archiveEligibleAt: "2026-06-02T06:00:00.000Z",
-    title: "FEDERACIÓN : Seminario y Reunión",
+    title: "Seminario",
     date: "2026-05-30",
     eventType: "seminario",
     timeZone: "America/Costa_Rica"
