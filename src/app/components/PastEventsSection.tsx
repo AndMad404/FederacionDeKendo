@@ -95,6 +95,7 @@ export function PastEventsSection() {
             <label className="relative min-w-0 text-xs font-bold text-site-muted">
               <select
                 name="year"
+                aria-label={copy.archive.year}
                 value={filters.year ?? ""}
                 onChange={(event) => changeFilter("year", event.target.value)}
                 className={`min-h-11 w-full rounded-lg px-3 py-2 text-center text-sm ${focusRingClass} border border-site-border bg-site-surface text-site-action`}
@@ -106,6 +107,7 @@ export function PastEventsSection() {
             <label className="relative min-w-0 text-xs font-bold text-site-muted">
               <select
                 name="type"
+                aria-label={copy.archive.type}
                 value={filters.type ?? ""}
                 onChange={(event) => changeFilter("type", event.target.value)}
                 className={`min-h-11 w-full rounded-lg px-3 py-2 text-center text-sm ${focusRingClass} border border-site-border bg-site-surface text-site-action`}
