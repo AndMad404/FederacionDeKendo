@@ -2,7 +2,7 @@
 
 ```yaml
 schema_version: 2
-last_updated: 2026-08-09
+last_updated: 2026-08-10
 contract: .agents/review-contract.md
 
 state_rules:
@@ -21,6 +21,38 @@ design_source_status:
   rule: Do not claim fidelity to or drift from the original Figma. A recreated Figma becomes authoritative only after explicit owner approval.
   planned_work: Recreate Figma from the approved current product, including supported routes, responsive viewports, components, tokens, and interactive states.
   recorded_at: 2026-08-01
+
+latest_calendar_freeze_review:
+  id: REV-2026-08-10-01
+  requested_scope: Review calendar synchronization so historical event data is captured once and later Calendar changes require manual confirmation.
+  actual_scope:
+    targets:
+      - scripts/sync-calendar-events.mjs
+      - scripts/sync-event-galleries.mjs
+      - tests/calendar-sync.test.mjs
+      - tests/event-gallery-sync.test.mjs
+      - .github/workflows/sync-calendar.yml
+    axes: [ARCH]
+    included:
+      - historical snapshot immutability
+      - change detection and warning delivery
+      - automatic commit behavior
+      - unit-test coverage of the freeze contract
+    excluded:
+      - implementation changes
+      - gallery UI and visual design
+      - deployment and external notification integrations
+  baseline:
+    commit: aa454631
+    worktree: clean
+  confirmed_findings:
+    - STR-ARCH-015
+    - STR-ARCH-016
+    - SMELL-ARCH-011
+  evidence:
+    - corepack pnpm run test:unit passed 33 tests
+    - direct mergeRegistry reproduction showed historical startTime, endTime, location, summary, and eventType replaced without warning
+  result: Historical event identity is only partially frozen; non-identity public fields still update automatically, and current warnings do not create a manual approval gate.
 
 latest_process_incident:
   id: INC-2026-08-04-01
@@ -1957,6 +1989,45 @@ legacy_coverage:
       evidence: Detailed commands and baselines were not consistently recorded in v1.
 
 active_findings:
+  - id: STR-ARCH-015
+    level: STRUCTURAL
+    axis: ARCH
+    status: open
+    target: scripts/sync-calendar-events.mjs:424
+    problem: Historical events spread the current Calendar record and restore only identity fields, so time, location, description, type, organizer, URL, and timezone continue changing automatically after archival.
+    fix: Treat the entire published historical event as an immutable snapshot; compare the current normalized record against it and preserve every published field until a separate explicit correction operation is approved.
+    cost_of_deferring: Editing or deleting past Calendar documentation can silently rewrite the public historical record.
+    evidence:
+      - mergeRegistry returns currentEvent before overriding only sourceId, slug, title, date, archiveEligibleAt, aliases, and historical
+      - direct mergeRegistry reproduction replaced historical startTime, endTime, location, summary, and eventType
+    introduced_in: REV-2026-08-10-01
+
+  - id: STR-ARCH-016
+    level: STRUCTURAL
+    axis: ARCH
+    status: open
+    target: scripts/sync-calendar-events.mjs:599
+    problem: The synchronization neither detects nor reports field-level changes or disappearance of frozen historical events, and the workflow automatically commits any resulting data changes.
+    fix: Produce a deterministic historical-change report, preserve the frozen snapshot, and route proposed corrections through a separate manual approval command that names the event and accepted fields.
+    cost_of_deferring: There is no reliable confirmation boundary between an accidental Calendar edit and a published historical correction.
+    evidence:
+      - mergeRegistry returns no warnings or change set
+      - missing historical events are retained silently
+      - the workflow commits synchronization paths whenever they differ
+    introduced_in: REV-2026-08-10-01
+
+  - id: SMELL-ARCH-011
+    level: SMELL
+    axis: ARCH
+    status: open
+    target: tests/calendar-sync.test.mjs historical freeze coverage
+    problem: The historical-freeze test asserts only slug, title, date, archiveEligibleAt, and aliases, allowing all remaining public fields to mutate while the suite stays green.
+    fix: Add owner-approved Given/When/Then cases covering every persisted public field, event removal, album metadata changes, warning content, and the manual-confirmation path.
+    cost_of_deferring: Passing unit tests continue to certify a narrower contract than the owner requires.
+    evidence:
+      - corepack pnpm run test:unit passed all 33 tests while the direct full-field reproduction demonstrated mutation
+    introduced_in: REV-2026-08-10-01
+
   - id: STR-ARCH-011
     level: STRUCTURAL
     axis: ARCH
