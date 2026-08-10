@@ -39,7 +39,7 @@ export const GALLERY_IMAGES: GalleryImage[] = [
     thumbnailHeight: 180,
     title: "Combates con armadura",
     alt: "Practicantes de kendo con bogu realizan ejercicios de combate en el dojo",
-    tag: "Bogu geiko",
+    tag: "Geiko",
     description:
       "Practicantes con bogu aplican distancia, timing y precisión durante ejercicios de combate controlado.",
   },
