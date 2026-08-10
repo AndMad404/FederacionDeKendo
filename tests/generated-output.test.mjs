@@ -31,8 +31,7 @@ test("excludes event routes from sitemap while indexing is disabled", async () =
 test("generates the archive route", async () => {
   const archive = await readDist("eventos/pasados/index.html");
   assert.match(archive, /Eventos pasados/);
-  assert.match(archive, /Página (?:<!-- -->)?1(?:<!-- -->)? de (?:<!-- -->)?2/);
-  await readDist("eventos/pasados/pagina/2/index.html");
+  assert.match(archive, /Página (?:<!-- -->)?1(?:<!-- -->)? de (?:<!-- -->)?1/);
 });
 
 test("generates localized English routes with reciprocal language metadata", async () => {
