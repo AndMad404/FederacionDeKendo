@@ -153,8 +153,26 @@ export function EventPage() {
             </div>
 
             <aside className="flex flex-col justify-between gap-4 rounded-xl bg-site-media p-4">
-              <p className="text-sm leading-relaxed">{copy.event.audienceNotice}</p>
+              {!isPast ? (
+                <p className="text-sm leading-relaxed">{copy.event.audienceNotice}</p>
+              ) : null}
               <div className="grid gap-2">
+                {isPast ? (
+                  <>
+                    <Link
+                      to={english ? "/en/calendar/" : "/calendario/"}
+                      className={`${secondaryButtonClass} ${focusRingClass}`}
+                    >
+                      {copy.archive.upcomingEvents}
+                    </Link>
+                    <Link
+                      to={english ? "/en/events/past/" : "/eventos/pasados/"}
+                      className={`${secondaryButtonClass} ${focusRingClass}`}
+                    >
+                      {copy.event.viewArchive}
+                    </Link>
+                  </>
+                ) : null}
                 <button
                   type="button"
                   onClick={() => void handleShare()}
@@ -167,20 +185,14 @@ export function EventPage() {
                   )}
                   {copied ? copy.common.linkCopied : copy.common.shareEvent}
                 </button>
-                <Link
-                  to={
-                    isPast
-                      ? english
-                        ? "/en/events/past/"
-                        : "/eventos/pasados/"
-                      : english
-                        ? "/en/calendar/"
-                        : "/calendario/"
-                  }
-                  className={`${secondaryButtonClass} ${focusRingClass}`}
-                >
-                  {isPast ? copy.event.viewArchive : copy.event.backToCalendar}
-                </Link>
+                {!isPast ? (
+                  <Link
+                    to={english ? "/en/calendar/" : "/calendario/"}
+                    className={`${secondaryButtonClass} ${focusRingClass}`}
+                  >
+                    {copy.event.backToCalendar}
+                  </Link>
+                ) : null}
               </div>
             </aside>
           </article>

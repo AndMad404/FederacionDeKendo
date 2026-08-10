@@ -122,7 +122,7 @@ test("renders the historical archive and a custom not-found view", async ({
   await expect(
     page.getByRole("heading", { name: "Eventos pasados", level: 1 }),
   ).toBeVisible();
-  await expect(page.getByText("Página 1 de 2")).toBeVisible();
+  await expect(page.getByText("Página 1 de 1")).toBeVisible();
 
   await page.goto("/eventos/ruta-inexistente/");
   await expect(page.getByText(/página que buscas no existe/i)).toBeVisible();

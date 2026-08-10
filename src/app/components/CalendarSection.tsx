@@ -114,6 +114,15 @@ export function CalendarSection() {
               className={`flex w-full touch-pan-y select-none flex-col justify-start gap-3 px-3 py-4 text-center sm:px-2 md:max-w-6xl md:gap-2 md:py-3 xl:min-h-[26.125rem] land-sm:gap-2 land-sm:px-2 land-sm:py-2 ${panelSurfaceClass}`}
               {...swipeHandlers}
             >
+              <div className="flex justify-center">
+                <Link
+                  to={archivePath}
+                  className={`${secondaryButtonClass} ${focusRingClass}`}
+                >
+                  {copy.calendar.pastEvents}
+                </Link>
+              </div>
+
               <CalendarNavigation
                 currentMonthLabel={formatMonth(currentGroup.monthKey, language)}
                 monthRangeLabel={formatMonthRange(
@@ -130,15 +139,6 @@ export function CalendarSection() {
                 onPreviousPair={previousPair}
                 onNextPair={nextPair}
               />
-
-              <div className="flex justify-center">
-                <Link
-                  to={archivePath}
-                  className={`${secondaryButtonClass} ${focusRingClass}`}
-                >
-                  {copy.calendar.pastEvents}
-                </Link>
-              </div>
 
               <div className="grid items-start gap-3 md:grid-cols-2 md:gap-4 xl:gap-8">
                 <CalendarMonth

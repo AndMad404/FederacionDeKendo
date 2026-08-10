@@ -85,14 +85,14 @@ export function PastEventsSection() {
 
       <div className="relative z-20 -mt-11 flex min-h-0 flex-1 items-start justify-center px-3 pb-0 pt-3 sm:-mt-13 sm:px-4 sm:pb-0 sm:pt-4 tall-md:p-4 land-sm:px-3 land-sm:pb-0 land-sm:pt-3 land-compact:-mt-8">
         <div className={`flex w-full max-w-5xl flex-col gap-3 p-4 ${panelSurfaceClass}`}>
-          <div className="flex flex-wrap items-end justify-center gap-3">
+          <div className="grid grid-cols-2 items-end gap-3 md:flex md:flex-wrap md:justify-center">
             <Link
               to={calendarPath}
-              className={`${secondaryButtonClass} ${focusRingClass}`}
+              className={`col-span-2 ${secondaryButtonClass} ${focusRingClass} md:col-span-1`}
             >
               {copy.archive.upcomingEvents}
             </Link>
-            <label className="flex flex-col gap-1 text-xs font-bold text-site-muted">
+            <label className="flex min-w-0 flex-col gap-1 text-xs font-bold text-site-muted">
               {copy.archive.year}
               <select
                 name="year"
@@ -104,7 +104,7 @@ export function PastEventsSection() {
                 {years.map((year) => <option key={year} value={year}>{year}</option>)}
               </select>
             </label>
-            <label className="flex flex-col gap-1 text-xs font-bold text-site-muted">
+            <label className="flex min-w-0 flex-col gap-1 text-xs font-bold text-site-muted">
               {copy.archive.type}
               <select
                 name="type"
@@ -119,7 +119,7 @@ export function PastEventsSection() {
           </div>
 
           {pageEvents.length ? (
-            <ul className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+            <ul className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
               {pageEvents.map((event) => (
                 <li
                   key={event.id}
