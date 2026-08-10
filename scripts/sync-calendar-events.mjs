@@ -318,12 +318,19 @@ export function parseCalendarEvent(properties, warnings = []) {
 
   const uid = properties.get("UID")?.value;
   const start = parseIcsDate(properties.get("DTSTART"));
-  if (!uid || !start) {
-    warnings.push(`Event omitted because UID or DTSTART is missing: ${rawTitle || "(untitled)"}`);
+  const missingRequired = [
+    !rawTitle?.trim() && "title",
+    !start && "date",
+  ].filter(Boolean);
+  if (!uid || missingRequired.length) {
+    const reason = !uid
+      ? "UID"
+      : missingRequired.join(" and ");
+    warnings.push(`Event omitted because required ${reason} is missing: ${rawTitle || "(untitled)"}`);
     return undefined;
   }
 
-  const title = rawTitle || "Actividad sin título";
+  const title = rawTitle.trim();
   const description = parseTechnicalDescription(
     properties.get("DESCRIPTION")?.value,
     title,
@@ -337,7 +344,6 @@ export function parseCalendarEvent(properties, warnings = []) {
     timeZone: start.timeZone ?? defaultTimeZone,
   };
 
-  if (!rawTitle) warnings.push(`Published with placeholder title on ${start.date}.`);
   if (!start.isDateOnly && start.time) event.startTime = start.time;
   if (end) {
     if (start.isDateOnly && end.isDateOnly) {
@@ -375,13 +381,6 @@ export function parseCalendarEvent(properties, warnings = []) {
     Object.defineProperty(event, albumUrlSymbol, { value: description.albumUrl });
   }
 
-  const missing = [
-    !event.location && "ubicación",
-    !event.summary && "descripción",
-  ].filter(Boolean);
-  if (missing.length) {
-    warnings.push(`${title} (${start.date}) published without ${missing.join(" y ")}.`);
-  }
   return event;
 }
 

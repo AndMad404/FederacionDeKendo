@@ -78,7 +78,7 @@ test("stores the exclusive DTEND for all-day ranges", async () => {
   assert.equal(events[1].endDate, "2026-09-13");
 });
 
-test("omits drafts and recurring events and warns about incomplete content", async () => {
+test("omits drafts and recurring events while allowing optional content to be absent", async () => {
   const warnings = [];
   const events = parseVEvents(await readFile(fixturePath, "utf8"))
     .map((event) => parseCalendarEvent(event, warnings))
@@ -89,7 +89,29 @@ test("omits drafts and recurring events and warns about incomplete content", asy
   assert.equal(events.some((event) => event.title === "Actividad sin detalles"), true);
   assert.equal(warnings.some((warning) => warning.includes("Draft omitted")), true);
   assert.equal(warnings.some((warning) => warning.includes("Recurring event omitted")), true);
-  assert.equal(warnings.some((warning) => warning.includes("ubicación")), true);
+  assert.equal(warnings.some((warning) => /location|description|gallery|ubicación|descripción/i.test(warning)), false);
+});
+
+test("omits an event and warns when title or date is missing", () => {
+  const warnings = [];
+  const events = parseVEvents([
+    "BEGIN:VCALENDAR",
+    "BEGIN:VEVENT",
+    "UID:missing-title@example.test",
+    "DTSTART;VALUE=DATE:20260808",
+    "END:VEVENT",
+    "BEGIN:VEVENT",
+    "UID:missing-date@example.test",
+    "SUMMARY:Evento sin fecha",
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ].join("\n"))
+    .map((event) => parseCalendarEvent(event, warnings))
+    .filter(Boolean);
+
+  assert.deepEqual(events, []);
+  assert.equal(warnings.some((warning) => warning.includes("title")), true);
+  assert.equal(warnings.some((warning) => warning.includes("date")), true);
 });
 
 test("Given a pending event, When its title changes, Then its identity remains editable", () => {

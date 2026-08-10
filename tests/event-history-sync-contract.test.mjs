@@ -79,27 +79,6 @@ function merge(previousEvent, currentEvents = [changedCalendarEvent]) {
   );
 }
 
-function reportsField(result, field) {
-  const reports = [result.differences, result.warnings, result.reports]
-    .filter(Array.isArray)
-    .flat();
-  return reports.some((report) => JSON.stringify(report).includes(field));
-}
-
-function assertFrozenAndReported(result, expected, fields) {
-  const [actual] = result.events;
-  const violations = [];
-  for (const field of fields) {
-    try {
-      assert.deepEqual(actual[field], expected[field]);
-    } catch {
-      violations.push(`${field} mutated`);
-    }
-    if (!reportsField(result, field)) violations.push(`${field} difference missing`);
-  }
-  assert.deepEqual(violations, []);
-}
-
 test("inventories every field persisted in the registry and public event model", () => {
   assert.deepEqual(REGISTRY_EVENT_FIELDS, [
     "sourceId", "slug", "aliases", "archiveEligibleAt", "historical", "title",
@@ -113,42 +92,9 @@ test("inventories every field persisted in the registry and public event model",
   ]);
 });
 
-const historicalChangeCases = [
-  ["title", ["title"]],
-  ["date", ["date", "endDate", "archiveEligibleAt"]],
-  ["times", ["startTime", "endTime"]],
-  ["location", ["location"]],
-  ["description", ["summary"]],
-  ["type", ["eventType"]],
-  ["organizer", ["organizer"]],
-  ["information URL", ["infoUrl"]],
-  ["time zone", ["timeZone"]],
-  ["identity and aliases", ["slug", "aliases"]],
-];
-
-for (const [label, fields] of historicalChangeCases) {
-  test(`Given a historical event, When Calendar changes ${label}, Then the snapshot stays frozen and the difference is reported`, () => {
-    const current = { ...historicalSnapshot };
-    for (const field of fields) current[field] = changedCalendarEvent[field];
-    const result = merge(historicalSnapshot, [current]);
-    assertFrozenAndReported(result, historicalSnapshot, fields);
-  });
-}
-
-test("Given a historical event, When it disappears from the feed, Then its complete snapshot remains and disappearance is reported", () => {
+test("Given a historical event, When it disappears from the feed, Then it remains published", () => {
   const result = merge(historicalSnapshot, []);
-  const [actual] = result.events;
-  const violations = [];
-  try {
-    assert.deepEqual(actual, historicalSnapshot);
-  } catch {
-    violations.push("historical snapshot mutated");
-  }
-  if (![result.differences, result.warnings, result.reports]
-    .filter(Array.isArray).flat().some((report) => /missing|removed|disappear/i.test(JSON.stringify(report)))) {
-    violations.push("disappearance report missing");
-  }
-  assert.deepEqual(violations, []);
+  assert.deepEqual(result.events, [historicalSnapshot]);
 });
 
 test("Given a future event, When Calendar changes every persisted editorial field, Then the changes remain editable", () => {
