@@ -1,7 +1,13 @@
 import { useMemo } from "react";
+import { Link } from "react-router";
 import { CALENDAR_EVENTS } from "../data/calendarEvents";
 import { getUpcomingEventGroups } from "../utils/calendarEvents";
-import { panelSurfaceClass, surfaceClass } from "../styles/shared";
+import {
+  focusRingClass,
+  panelSurfaceClass,
+  secondaryButtonClass,
+  surfaceClass,
+} from "../styles/shared";
 import {
   CalendarMonth,
 } from "./calendar/CalendarMonth";
@@ -92,6 +98,8 @@ export function CalendarSection() {
 
   const currentGroup = eventGroups[groupIndex];
   const nextGroup = eventGroups[groupIndex + 1];
+  const archivePath =
+    language === "en" ? "/en/events/past/" : "/eventos/pasados/";
 
   return (
       <section
@@ -122,6 +130,15 @@ export function CalendarSection() {
                 onPreviousPair={previousPair}
                 onNextPair={nextPair}
               />
+
+              <div className="flex justify-center">
+                <Link
+                  to={archivePath}
+                  className={`${secondaryButtonClass} ${focusRingClass}`}
+                >
+                  {copy.calendar.pastEvents}
+                </Link>
+              </div>
 
               <div className="grid items-start gap-3 md:grid-cols-2 md:gap-4 xl:gap-8">
                 <CalendarMonth

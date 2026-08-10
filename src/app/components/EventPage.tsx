@@ -168,19 +168,19 @@ export function EventPage() {
                   {copied ? copy.common.linkCopied : copy.common.shareEvent}
                 </button>
                 <Link
-                  to={english ? "/en/calendar/" : "/calendario/"}
+                  to={
+                    isPast
+                      ? english
+                        ? "/en/events/past/"
+                        : "/eventos/pasados/"
+                      : english
+                        ? "/en/calendar/"
+                        : "/calendario/"
+                  }
                   className={`${secondaryButtonClass} ${focusRingClass}`}
                 >
-                  {copy.event.backToCalendar}
+                  {isPast ? copy.event.viewArchive : copy.event.backToCalendar}
                 </Link>
-                {isPast ? (
-                  <Link
-                    to={english ? "/en/events/past/" : "/eventos/pasados/"}
-                    className={`text-center text-sm font-semibold underline underline-offset-4 ${focusRingClass}`}
-                  >
-                    {copy.event.viewArchive}
-                  </Link>
-                ) : null}
               </div>
             </aside>
           </article>
