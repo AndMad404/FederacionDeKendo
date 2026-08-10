@@ -13,6 +13,10 @@ Stack:
 - Use the current application plus owner-approved measurements, screenshots, and rendered results as the visual baseline.
 - Read the relevant files before making claims or edits.
 - Keep work scoped to the user's requested file, route, concern, or task.
+- When the user does not know the relevant files, routes, or tests, read
+  `.agents/project-map.md` and discover the smallest evidence-based scope.
+  Do not inspect every route by default. Summarize the discovered scope before
+  editing when the request is investigative or materially ambiguous.
 - Prefer existing project patterns over new abstractions.
 - Do not refactor unrelated code while implementing a narrow change.
 - Do not validate a narrow visual change on top of unrelated visual worktree

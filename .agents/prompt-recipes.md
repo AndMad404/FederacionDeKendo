@@ -2,6 +2,41 @@
 
 Use these prompts as starting points for Codex work in this repo.
 
+The owner also maintains a companion visual reference,
+`Guia_rapida_ahorro_tokens_Codex.docx`. It is a memory aid, not an
+authoritative project input. Do not load it unless the user asks. When the
+scope-discovery recipes below change materially, flag the visual reference for
+manual synchronization.
+
+## Discover Scope Without Editing
+
+```text
+Investiga [problema].
+Usa .agents/project-map.md para descubrir las rutas, archivos, componentes y
+pruebas relacionadas. Resume el alcance en maximo 10 lineas. No edites todavia.
+No revises todas las rutas salvo que encuentres una dependencia compartida que
+lo justifique; si amplias el alcance, explica por que.
+```
+
+## Implement The Discovered Scope
+
+```text
+Implementa unicamente el alcance identificado para [problema].
+No explores mejoras adicionales ni refactorices fuera de alcance.
+Ejecuta primero la prueba dirigida y despues solo la verificacion final que
+corresponda segun .agents/verification.md.
+```
+
+## Discover And Implement When Unambiguous
+
+```text
+Corrige [problema].
+Primero usa .agents/project-map.md para identificar el alcance minimo. Si la
+causa y el cambio son inequivocos, implementa sin ampliar el alcance y ejecuta
+solo las pruebas relacionadas. Si hay mas de una interpretacion material,
+resume las opciones en maximo 10 lineas y espera mi decision.
+```
+
 ## Review One File
 
 ```text
