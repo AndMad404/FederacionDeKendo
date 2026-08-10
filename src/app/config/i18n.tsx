@@ -194,6 +194,10 @@ const COPY = {
       next: "Siguiente",
       page: "Página",
       of: "de",
+      year: "Año",
+      type: "Tipo",
+      all: "Todos",
+      types: { torneo: "Torneo", examen: "Examen", seminario: "Seminario", evento: "Evento" },
     },
     notFound: {
       title: "Página no encontrada",
@@ -314,6 +318,10 @@ const COPY = {
       next: "Next",
       page: "Page",
       of: "of",
+      year: "Year",
+      type: "Type",
+      all: "All",
+      types: { torneo: "Tournament", examen: "Examination", seminario: "Seminar", evento: "Event" },
     },
     notFound: {
       title: "Page not found",

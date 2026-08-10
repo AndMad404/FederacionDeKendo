@@ -1,4 +1,10 @@
 const ARCHIVE_TIME_ZONE = "America/Costa_Rica";
+const ARCHIVE_EVENT_TYPES = new Set([
+  "torneo",
+  "examen",
+  "seminario",
+  "evento",
+]);
 
 function parseDate(date) {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
@@ -69,4 +75,43 @@ export function getArchiveEligibleAt(event) {
 
 export function isArchiveEligible(event, now = new Date()) {
   return getArchiveEligibleAt(event).getTime() <= now.getTime();
+}
+
+export function normalizeArchiveFilters(filters) {
+  const normalized = {};
+  if (/^\d{4}$/.test(filters.year ?? "")) normalized.year = filters.year;
+  if (ARCHIVE_EVENT_TYPES.has(filters.type)) normalized.type = filters.type;
+  return normalized;
+}
+
+export function filterAndSortArchiveEvents(events, filters) {
+  const normalized = normalizeArchiveFilters(filters);
+  return [...events]
+    .filter((event) => !normalized.year || event.date.startsWith(`${normalized.year}-`))
+    .filter((event) => !normalized.type || event.eventType === normalized.type)
+    .sort(
+      (a, b) =>
+        new Date(`${b.date}T${b.startTime ?? "00:00"}`).getTime() -
+        new Date(`${a.date}T${a.startTime ?? "00:00"}`).getTime(),
+    );
+}
+
+export function getArchiveYears(events) {
+  return [...new Set(events.map((event) => event.date.slice(0, 4)))].sort(
+    (a, b) => Number(b) - Number(a),
+  );
+}
+
+export function buildArchiveUrl(page, language = "es", filters = {}) {
+  const normalized = normalizeArchiveFilters(filters);
+  const basePath =
+    language === "en"
+      ? page <= 1
+        ? "/en/events/past/"
+        : `/en/events/past/page/${page}/`
+      : page <= 1
+        ? "/eventos/pasados/"
+        : `/eventos/pasados/pagina/${page}/`;
+  const search = new URLSearchParams(normalized).toString();
+  return search ? `${basePath}?${search}` : basePath;
 }

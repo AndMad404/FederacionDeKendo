@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { PAST_EVENTS_PAGE_SIZE } from "../config/events";
 import {
   focusRingClass,
@@ -8,19 +8,36 @@ import {
 import { getEventDateLabel } from "../utils/calendarEventPresentation";
 import {
   getArchivePageFromPathname,
-  getArchivePagePath,
   getEventPath,
   getPastEvents,
 } from "../utils/eventRoutes";
+import {
+  buildArchiveUrl,
+  filterAndSortArchiveEvents,
+  getArchiveYears,
+  normalizeArchiveFilters,
+  type ArchiveEventType,
+} from "../utils/eventArchive.js";
 import { MediaPageBanner } from "./ui/MediaPageBanner";
 import { useLanguage } from "../config/i18n";
 import { getLocalizedEvents } from "../utils/localizedEvents";
 
 export function PastEventsSection() {
   const { language, copy } = useLanguage();
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
+  const navigate = useNavigate();
   const requestedPage = getArchivePageFromPathname(pathname) ?? 1;
-  const events = getLocalizedEvents(getPastEvents(), language);
+  const historicalEvents = getPastEvents();
+  const searchParams = new URLSearchParams(search);
+  const filters = normalizeArchiveFilters({
+    year: searchParams.get("year") ?? undefined,
+    type: searchParams.get("type") ?? undefined,
+  });
+  const events = getLocalizedEvents(
+    filterAndSortArchiveEvents(historicalEvents, filters),
+    language,
+  );
+  const years = getArchiveYears(historicalEvents);
   const pageCount = Math.max(1, Math.ceil(events.length / PAST_EVENTS_PAGE_SIZE));
   const page = Math.min(requestedPage, pageCount);
   const pageLabel = `${copy.archive.page} ${page} ${copy.archive.of} ${pageCount}`;
@@ -29,6 +46,16 @@ export function PastEventsSection() {
     page * PAST_EVENTS_PAGE_SIZE,
   );
   const calendarPath = language === "en" ? "/en/calendar/" : "/calendario/";
+  const eventTypes: ArchiveEventType[] = [
+    "torneo",
+    "examen",
+    "seminario",
+    "evento",
+  ];
+
+  function changeFilter(name: "year" | "type", value: string) {
+    navigate(buildArchiveUrl(1, language, { ...filters, [name]: value || undefined }));
+  }
 
   return (
     <section
@@ -58,13 +85,37 @@ export function PastEventsSection() {
 
       <div className="relative z-20 -mt-11 flex min-h-0 flex-1 items-start justify-center px-3 pb-0 pt-3 sm:-mt-13 sm:px-4 sm:pb-0 sm:pt-4 tall-md:p-4 land-sm:px-3 land-sm:pb-0 land-sm:pt-3 land-compact:-mt-8">
         <div className={`flex w-full max-w-5xl flex-col gap-3 p-4 ${panelSurfaceClass}`}>
-          <div className="flex justify-center">
+          <div className="flex flex-wrap items-end justify-center gap-3">
             <Link
               to={calendarPath}
               className={`${secondaryButtonClass} ${focusRingClass}`}
             >
               {copy.archive.upcomingEvents}
             </Link>
+            <label className="flex flex-col gap-1 text-xs font-bold text-site-muted">
+              {copy.archive.year}
+              <select
+                name="year"
+                value={filters.year ?? ""}
+                onChange={(event) => changeFilter("year", event.target.value)}
+                className={`min-h-11 rounded-lg px-3 py-2 text-sm ${focusRingClass} border border-site-border bg-site-surface text-site-action`}
+              >
+                <option value="">{copy.archive.all}</option>
+                {years.map((year) => <option key={year} value={year}>{year}</option>)}
+              </select>
+            </label>
+            <label className="flex flex-col gap-1 text-xs font-bold text-site-muted">
+              {copy.archive.type}
+              <select
+                name="type"
+                value={filters.type ?? ""}
+                onChange={(event) => changeFilter("type", event.target.value)}
+                className={`min-h-11 rounded-lg px-3 py-2 text-sm ${focusRingClass} border border-site-border bg-site-surface text-site-action`}
+              >
+                <option value="">{copy.archive.all}</option>
+                {eventTypes.map((type) => <option key={type} value={type}>{copy.archive.types[type]}</option>)}
+              </select>
+            </label>
           </div>
 
           {pageEvents.length ? (
@@ -104,7 +155,7 @@ export function PastEventsSection() {
           >
             {page > 1 ? (
               <Link
-                to={getArchivePagePath(page - 1, language)}
+                to={buildArchiveUrl(page - 1, language, filters)}
                 className={`${secondaryButtonClass} ${focusRingClass}`}
               >
                 {copy.archive.previous}
@@ -115,7 +166,7 @@ export function PastEventsSection() {
             </span>
             {page < pageCount ? (
               <Link
-                to={getArchivePagePath(page + 1, language)}
+                to={buildArchiveUrl(page + 1, language, filters)}
                 className={`${secondaryButtonClass} ${focusRingClass}`}
               >
                 {copy.archive.next}
