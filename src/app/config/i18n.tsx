@@ -89,6 +89,9 @@ const COPY = {
       language: "Idioma",
       switchToSpanish: "Ver sitio en español",
       switchToEnglish: "View site in English",
+      calendarMenu: "Opciones del calendario",
+      upcomingEvents: "Próximos eventos",
+      pastEvents: "Eventos pasados",
       links: [
         { path: "/", label: "Inicio" },
         { path: "/calendario/", label: "Calendario" },
@@ -214,6 +217,9 @@ const COPY = {
       language: "Language",
       switchToSpanish: "Ver sitio en español",
       switchToEnglish: "View site in English",
+      calendarMenu: "Calendar options",
+      upcomingEvents: "Upcoming events",
+      pastEvents: "Past events",
       links: [
         { path: "/en/", label: "Home" },
         { path: "/en/calendar/", label: "Calendar" },
