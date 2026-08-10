@@ -71,6 +71,32 @@ const changedCalendarEvent = {
   timeZone: "America/Guatemala",
 };
 
+const HISTORICAL_DIFFERENCE_FIELDS = [
+  "slug",
+  "aliases",
+  "archiveEligibleAt",
+  "title",
+  "date",
+  "endDate",
+  "startTime",
+  "endTime",
+  "location",
+  "summary",
+  "eventType",
+  "organizer",
+  "infoUrl",
+  "timeZone",
+];
+
+const REMOVED_HISTORICAL_FIELDS = [
+  "endDate",
+  "endTime",
+  "location",
+  "summary",
+  "organizer",
+  "infoUrl",
+];
+
 function merge(previousEvent, currentEvents = [changedCalendarEvent]) {
   return mergeRegistry(
     { version: 3, events: [structuredClone(previousEvent)] },
@@ -106,6 +132,43 @@ test("Given a future event, When Calendar changes every persisted editorial fiel
     new Date("2026-03-01T00:00:00.000Z"),
   );
   assert.deepEqual(result.events[0], { ...current, aliases: previous.aliases });
+});
+
+test("Given a historical event, When Calendar changes every persisted field, Then its snapshot remains intact and every difference is reported", () => {
+  const result = merge(historicalSnapshot);
+
+  assert.deepEqual(result.events, [historicalSnapshot]);
+  assert.deepEqual(result.historicalDifferences, [
+    {
+      sourceId: historicalSnapshot.sourceId,
+      differences: HISTORICAL_DIFFERENCE_FIELDS.map((field) => ({
+        field,
+        published: historicalSnapshot[field],
+        proposed: changedCalendarEvent[field],
+        type: "modificado",
+      })),
+    },
+  ]);
+});
+
+test("Given a historical event, When Calendar removes persisted fields, Then its snapshot remains intact and every removal is reported", () => {
+  const current = { ...changedCalendarEvent };
+  for (const field of REMOVED_HISTORICAL_FIELDS) delete current[field];
+
+  const result = merge(historicalSnapshot, [current]);
+
+  assert.deepEqual(result.events, [historicalSnapshot]);
+  assert.deepEqual(result.historicalDifferences, [
+    {
+      sourceId: historicalSnapshot.sourceId,
+      differences: REMOVED_HISTORICAL_FIELDS.map((field) => ({
+        field,
+        published: historicalSnapshot[field],
+        proposed: undefined,
+        type: "eliminado",
+      })),
+    },
+  ]);
 });
 
 async function galleryFixture() {
