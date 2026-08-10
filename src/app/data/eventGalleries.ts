@@ -9,9 +9,6 @@ export interface EventGalleryImage {
   sizes: string;
 }
 
-export interface EventGallery {
-  fingerprint: string;
-  images: EventGalleryImage[];
-}
+export interface EventGallery { fingerprint: string; images: EventGalleryImage[] }
 
 export const EVENT_GALLERIES: Record<string, EventGallery> = {};
