@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import {
   calculateArchiveEligibleAt,
+  calculateGalleryCheckAt,
   getArchiveEligibleAt,
   isArchiveEligible,
 } from "../src/app/utils/eventArchive.js";
@@ -598,7 +599,17 @@ export async function synchronizeCalendar({
   const registry = mergeRegistry(previousRegistry, parsed, now);
 
   const galleryEvents = registry.events
-    .filter((event) => event.historical === true)
+    .filter((event) => {
+      const lastEventDate =
+        event.endDate && !event.startTime && !event.endTime
+          ? toIsoDate(addDays(createLocalDate(event.endDate), -1))
+          : event.endDate ?? event.date;
+      return (
+        event.historical === true ||
+        calculateGalleryCheckAt(lastEventDate, event.timeZone).getTime() <=
+          now.getTime()
+      );
+    })
     .map((event) => ({
       slug: event.slug,
       title: event.title,

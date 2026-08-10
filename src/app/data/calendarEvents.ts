@@ -29,7 +29,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2026-08-08-examen",
-    archiveEligibleAt: "2026-08-11T06:00:00.000Z",
+    archiveEligibleAt: "2026-08-10T06:00:00.000Z",
     title: "Examen",
     date: "2026-08-08",
     startTime: "13:00",
@@ -41,7 +41,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2026-08-22-3er-torneo",
-    archiveEligibleAt: "2026-08-25T06:00:00.000Z",
+    archiveEligibleAt: "2026-08-24T06:00:00.000Z",
     title: "3er Torneo",
     date: "2026-08-22",
     startTime: "13:00",
@@ -53,7 +53,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2026-09-11-gasshuku-monteverde",
-    archiveEligibleAt: "2026-09-15T06:00:00.000Z",
+    archiveEligibleAt: "2026-09-14T06:00:00.000Z",
     title: "Gasshuku Monteverde",
     date: "2026-09-11",
     endDate: "2026-09-13",
@@ -64,7 +64,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2026-10-10-clak-1er-panamericano-brasil",
-    archiveEligibleAt: "2026-10-14T06:00:00.000Z",
+    archiveEligibleAt: "2026-10-13T06:00:00.000Z",
     title: "CLAK 1er Panamericano BRASIL",
     date: "2026-10-10",
     endDate: "2026-10-12",
@@ -73,7 +73,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2026-10-31-examen",
-    archiveEligibleAt: "2026-11-03T06:00:00.000Z",
+    archiveEligibleAt: "2026-11-02T06:00:00.000Z",
     title: "Examen",
     date: "2026-10-31",
     startTime: "13:00",
@@ -85,7 +85,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2026-11-21-panama-torneo-por-equipos",
-    archiveEligibleAt: "2026-11-24T06:00:00.000Z",
+    archiveEligibleAt: "2026-11-23T06:00:00.000Z",
     title: "PANAMA Torneo por Equipos",
     date: "2026-11-21",
     summary: "Torneo por Equipos en Panamá. Invitación de Shinsei Panamá.",
@@ -94,7 +94,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2026-12-12-4to-torneo",
-    archiveEligibleAt: "2026-12-15T06:00:00.000Z",
+    archiveEligibleAt: "2026-12-14T06:00:00.000Z",
     title: "4to Torneo",
     date: "2026-12-12",
     startTime: "13:00",
@@ -106,7 +106,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2027-01-30-examen",
-    archiveEligibleAt: "2027-02-02T06:00:00.000Z",
+    archiveEligibleAt: "2027-02-01T06:00:00.000Z",
     title: "Examen",
     date: "2027-01-30",
     startTime: "13:00",
@@ -118,7 +118,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2027-04-03-5to-torneo",
-    archiveEligibleAt: "2027-04-06T06:00:00.000Z",
+    archiveEligibleAt: "2027-04-05T06:00:00.000Z",
     title: "5to Torneo",
     date: "2027-04-03",
     startTime: "13:00",
@@ -130,7 +130,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2027-05-01-examen",
-    archiveEligibleAt: "2027-05-04T06:00:00.000Z",
+    archiveEligibleAt: "2027-05-03T06:00:00.000Z",
     title: "Examen",
     date: "2027-05-01",
     startTime: "13:00",
@@ -142,7 +142,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2027-07-31-examen",
-    archiveEligibleAt: "2027-08-03T06:00:00.000Z",
+    archiveEligibleAt: "2027-08-02T06:00:00.000Z",
     title: "Examen",
     date: "2027-07-31",
     startTime: "13:00",
@@ -154,7 +154,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2027-08-14-6to-torneo",
-    archiveEligibleAt: "2027-08-17T06:00:00.000Z",
+    archiveEligibleAt: "2027-08-16T06:00:00.000Z",
     title: "6to Torneo",
     date: "2027-08-14",
     startTime: "13:00",
@@ -166,7 +166,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2027-10-30-examen",
-    archiveEligibleAt: "2027-11-02T06:00:00.000Z",
+    archiveEligibleAt: "2027-11-01T06:00:00.000Z",
     title: "Examen",
     date: "2027-10-30",
     startTime: "13:00",
@@ -178,7 +178,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2027-12-11-7mo-torneo",
-    archiveEligibleAt: "2027-12-14T06:00:00.000Z",
+    archiveEligibleAt: "2027-12-13T06:00:00.000Z",
     title: "7mo Torneo",
     date: "2027-12-11",
     startTime: "13:00",

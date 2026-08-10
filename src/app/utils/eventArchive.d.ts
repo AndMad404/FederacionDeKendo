@@ -14,6 +14,10 @@ export function calculateArchiveEligibleAt(
 
 export function isArchiveEligible(event: CalendarEvent, now?: Date): boolean;
 export function getArchiveEligibleAt(event: CalendarEvent): Date;
+export function calculateGalleryCheckAt(
+  lastEventDate: string,
+  timeZone?: string,
+): Date;
 export function normalizeArchiveFilters(filters: Record<string, string | undefined>): ArchiveFilters;
 export function filterAndSortArchiveEvents(events: CalendarEvent[], filters: ArchiveFilters | Record<string, string | undefined>): CalendarEvent[];
 export function getArchiveYears(events: CalendarEvent[]): string[];

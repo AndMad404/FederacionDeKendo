@@ -11,7 +11,7 @@ BEGIN:VEVENT
 UID:preparation@example.test
 DTSTART;VALUE=DATE:20260808
 SUMMARY:Examen en preparación
-DESCRIPTION:Resultado pendiente.\n---\nTIPO_EVENTO: examen
+DESCRIPTION:Resultado pendiente.\n---\nTIPO_EVENTO: examen\nALBUM_FOTOS: https://drive.google.com/drive/folders/preparationAlbum
 END:VEVENT
 BEGIN:VEVENT
 UID:historical@example.test
