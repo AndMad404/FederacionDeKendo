@@ -618,8 +618,6 @@ export async function synchronizeCalendar({
     [registryPath, `${JSON.stringify(registry, null, 2)}\n`],
     [outputPath, serializeCalendarEvents(registry.events)],
   ]);
-  await writeActionSummary(warnings, registry.events.length);
-
   return { registry, galleryResult, warnings };
 }
 
@@ -633,6 +631,7 @@ async function main() {
   console.log(
     `Synced ${result.registry.events.length} event(s) with ${result.warnings.length} warning(s).`,
   );
+  await writeActionSummary(result.warnings, result.registry.events.length);
 }
 
 const isDirectExecution =
