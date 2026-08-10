@@ -1,12 +1,12 @@
 # Federacion de Asociaciones de Kendo
 
-Sitio oficial de la Federacion de Asociaciones de Kendo, desarrollado con React, TypeScript, Tailwind CSS y Vite. La primera version partio de Figma Make, pero ese diseño inicial quedo obsoleto y ya no representa la interfaz vigente.
+Sitio oficial de la Federacion de Asociaciones de Kendo, desarrollado con React, TypeScript, Tailwind CSS y Vite.
 
-## Estado de la fuente de diseño
+## Referencia visual
 
-Hasta que se recree y apruebe un nuevo archivo de Figma, la referencia visual temporal es la aplicacion vigente junto con las medidas, capturas y resultados renderizados aprobados por el propietario. El Figma original se conserva solo como antecedente historico y no debe usarse para afirmar fidelidad, detectar drift ni revertir decisiones visuales actuales.
+La referencia visual es la aplicacion vigente junto con las medidas, capturas y resultados renderizados aprobados por el propietario.
 
-La recreacion debe partir del producto aprobado, cubrir las rutas y viewports soportados, documentar tokens, componentes y estados interactivos, y recibir aprobacion explicita antes de convertirse otra vez en fuente de diseño.
+Un rediseño futuro debe partir del producto aprobado, cubrir las rutas y viewports soportados, documentar tokens, componentes y estados interactivos, y recibir aprobacion explicita antes de convertirse en una fuente de diseño.
 
 ## Desarrollo
 

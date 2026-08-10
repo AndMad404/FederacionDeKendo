@@ -59,7 +59,7 @@ implicitly.
 
 ### Visual Change Baseline
 
-Project status as of 2026-08-01: the original Figma design is obsolete. Until a recreated Figma file is explicitly approved by the owner, use the current application and owner-approved measurements, screenshots, and rendered results as the visual baseline. Do not use the original Figma to undo current decisions or claim visual fidelity.
+Use the current application and owner-approved measurements, screenshots, and rendered results as the visual baseline.
 
 Before editing a visual or layout concern, record the smallest baseline that
 can determine the intended result:
@@ -67,7 +67,6 @@ can determine the intended result:
 1. Explicit user-approved requirements and measurements.
 2. An approved screenshot or rendered result from the current task.
 3. Existing product components, semantic tokens, and geometry.
-4. Figma only when the user confirms that it represents the current design.
 
 The baseline must name the affected routes and viewports plus the relevant
 outer margins, internal padding, gaps, dimensions, alignment, component
@@ -79,7 +78,6 @@ apply instead of inventing values.
   before editing, even when it is exact or narrowly scoped.
 - When the available references do not determine a material decision, stop
   and ask; do not silently treat the current implementation as approved.
-- Do not claim Figma fidelity when the Figma source is missing or stale.
 - Keep visual corrections separate from new behavior and unrelated refactors.
   If they are inseparable, explain the dependency before editing and keep the
   combined scope explicit.
