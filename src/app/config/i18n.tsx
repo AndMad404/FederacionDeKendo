@@ -186,6 +186,7 @@ const COPY = {
     archive: {
       title: "Eventos pasados",
       description: "Archivo histórico de actividades publicadas.",
+      upcomingEvents: "Próximos eventos",
       empty: "Todavía no hay eventos en el archivo.",
       viewEvent: "Ver página del evento",
       pagination: "Paginación del archivo",
@@ -305,6 +306,7 @@ const COPY = {
     archive: {
       title: "Past events",
       description: "Historical archive of published activities.",
+      upcomingEvents: "Upcoming events",
       empty: "There are no events in the archive yet.",
       viewEvent: "View event page",
       pagination: "Archive pagination",

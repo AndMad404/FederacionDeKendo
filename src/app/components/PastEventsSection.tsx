@@ -28,6 +28,7 @@ export function PastEventsSection() {
     (page - 1) * PAST_EVENTS_PAGE_SIZE,
     page * PAST_EVENTS_PAGE_SIZE,
   );
+  const calendarPath = language === "en" ? "/en/calendar/" : "/calendario/";
 
   return (
     <section
@@ -57,6 +58,15 @@ export function PastEventsSection() {
 
       <div className="flex min-h-0 flex-1 items-start justify-center px-3 pb-0 pt-3 sm:px-4 sm:pb-0 sm:pt-4 tall-md:p-4 land-sm:px-3 land-sm:pb-0 land-sm:pt-3">
         <div className={`flex w-full max-w-5xl flex-col gap-3 p-4 ${panelSurfaceClass}`}>
+          <div className="flex justify-center">
+            <Link
+              to={calendarPath}
+              className={`${secondaryButtonClass} ${focusRingClass}`}
+            >
+              {copy.archive.upcomingEvents}
+            </Link>
+          </div>
+
           {pageEvents.length ? (
             <ul className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
               {pageEvents.map((event) => (
