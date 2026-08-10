@@ -1,12 +1,15 @@
 {
-  "version": 2,
+  "version": 3,
   "events": [
     {
       "sourceId": "7bd8989c63db48fab752ce0f",
       "slug": "2026-05-02-federacion-examen",
       "title": "FEDERACIÓN  : Examen",
       "date": "2026-05-02",
-      "timeZone": "America/Costa_Rica"
+      "timeZone": "America/Costa_Rica",
+      "archiveEligibleAt": "2026-05-05T06:00:00.000Z",
+      "eventType": "examen",
+      "historical": true
     },
     {
       "sourceId": "462f5f7da99a1d17474471bd",
@@ -14,14 +17,20 @@
       "title": "CLAK Seminario Instructores CHILE",
       "date": "2026-05-29",
       "timeZone": "America/Costa_Rica",
-      "endDate": "2026-06-01"
+      "endDate": "2026-06-01",
+      "archiveEligibleAt": "2026-06-03T06:00:00.000Z",
+      "eventType": "seminario",
+      "historical": true
     },
     {
       "sourceId": "9c63151cacb01bef733c39cb",
       "slug": "2026-05-30-federacion-seminario-y-reunion",
       "title": "FEDERACIÓN : Seminario y Reunión",
       "date": "2026-05-30",
-      "timeZone": "America/Costa_Rica"
+      "timeZone": "America/Costa_Rica",
+      "archiveEligibleAt": "2026-06-02T06:00:00.000Z",
+      "eventType": "seminario",
+      "historical": true
     },
     {
       "sourceId": "89d31aa2d6937a78b1866283",
@@ -31,8 +40,10 @@
       "timeZone": "America/Costa_Rica",
       "startTime": "13:00",
       "endTime": "15:00",
+      "archiveEligibleAt": "2026-08-11T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
-      "summary": "Exámenes de 8vo a 2do kyu"
+      "summary": "Exámenes de 8vo a 2do kyu",
+      "eventType": "examen"
     },
     {
       "sourceId": "72f0b1f2f02e0f5d73ae28ec",
@@ -42,8 +53,10 @@
       "timeZone": "America/Costa_Rica",
       "startTime": "13:00",
       "endTime": "17:00",
+      "archiveEligibleAt": "2026-08-25T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
-      "summary": "Categoría con Bogu y sin Bogu"
+      "summary": "Categoría con Bogu y sin Bogu",
+      "eventType": "torneo"
     },
     {
       "sourceId": "45c4376b5e5e0fcf347835d0",
@@ -52,8 +65,10 @@
       "date": "2026-09-11",
       "timeZone": "America/Costa_Rica",
       "endDate": "2026-09-13",
+      "archiveEligibleAt": "2026-09-15T06:00:00.000Z",
       "location": "El Establo Mountain Hotel, Provincia de Puntarenas, Monteverde, Costa Rica",
-      "summary": "Entrenamientos intensivos de protocolo, técnica y combate."
+      "summary": "Entrenamientos intensivos de protocolo, técnica y combate.",
+      "eventType": "evento"
     },
     {
       "sourceId": "e25ca7168de483e195f1aaf1",
@@ -61,7 +76,9 @@
       "title": "CLAK 1er Panamericano BRASIL",
       "date": "2026-10-10",
       "timeZone": "America/Costa_Rica",
-      "endDate": "2026-10-12"
+      "endDate": "2026-10-12",
+      "archiveEligibleAt": "2026-10-14T06:00:00.000Z",
+      "eventType": "evento"
     },
     {
       "sourceId": "56f8899c9ee30db7265945af",
@@ -71,8 +88,10 @@
       "timeZone": "America/Costa_Rica",
       "startTime": "13:00",
       "endTime": "15:00",
+      "archiveEligibleAt": "2026-11-03T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
-      "summary": "Exámenes de 8vo a 2do kyu"
+      "summary": "Exámenes de 8vo a 2do kyu",
+      "eventType": "examen"
     },
     {
       "sourceId": "2d5bad84832b0a2be6193e52",
@@ -80,7 +99,9 @@
       "title": "PANAMA Torneo por Equipos",
       "date": "2026-11-21",
       "timeZone": "America/Costa_Rica",
-      "summary": "Torneo por Equipos en Panamá. Invitación de Shinsei Panamá."
+      "archiveEligibleAt": "2026-11-24T06:00:00.000Z",
+      "summary": "Torneo por Equipos en Panamá. Invitación de Shinsei Panamá.",
+      "eventType": "torneo"
     },
     {
       "sourceId": "d5e995f4e75da854e455e4a5",
@@ -90,8 +111,10 @@
       "timeZone": "America/Costa_Rica",
       "startTime": "13:00",
       "endTime": "17:00",
+      "archiveEligibleAt": "2026-12-15T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
-      "summary": "Categoría con Bogu y sin Bogu"
+      "summary": "Categoría con Bogu y sin Bogu",
+      "eventType": "torneo"
     },
     {
       "sourceId": "8f7f631510e2e2523d7345c1",
@@ -101,8 +124,10 @@
       "timeZone": "America/Costa_Rica",
       "startTime": "13:00",
       "endTime": "15:00",
+      "archiveEligibleAt": "2027-02-02T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
-      "summary": "Exámenes de 8vo a 2do kyu"
+      "summary": "Exámenes de 8vo a 2do kyu",
+      "eventType": "examen"
     },
     {
       "sourceId": "325fa23572d746c098463cfc",
@@ -112,8 +137,10 @@
       "timeZone": "America/Costa_Rica",
       "startTime": "13:00",
       "endTime": "15:00",
+      "archiveEligibleAt": "2027-04-06T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
-      "summary": "Categoría con Bogu y sin Bogu"
+      "summary": "Categoría con Bogu y sin Bogu",
+      "eventType": "torneo"
     },
     {
       "sourceId": "2c34e1accb679991a55100bb",
@@ -123,8 +150,10 @@
       "timeZone": "America/Costa_Rica",
       "startTime": "13:00",
       "endTime": "15:00",
+      "archiveEligibleAt": "2027-05-04T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
-      "summary": "Exámenes de 8vo a 2do kyu"
+      "summary": "Exámenes de 8vo a 2do kyu",
+      "eventType": "examen"
     },
     {
       "sourceId": "1361a31e6ed86361f014c7c1",
@@ -134,8 +163,10 @@
       "timeZone": "America/Costa_Rica",
       "startTime": "13:00",
       "endTime": "15:00",
+      "archiveEligibleAt": "2027-08-03T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
-      "summary": "Exámenes de 8vo a 2do kyu"
+      "summary": "Exámenes de 8vo a 2do kyu",
+      "eventType": "examen"
     },
     {
       "sourceId": "af94c6be4ebe10e334a37951",
@@ -145,8 +176,10 @@
       "timeZone": "America/Costa_Rica",
       "startTime": "13:00",
       "endTime": "17:00",
+      "archiveEligibleAt": "2027-08-17T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
-      "summary": "Categoría con Bogu y sin Bogu"
+      "summary": "Categoría con Bogu y sin Bogu",
+      "eventType": "torneo"
     },
     {
       "sourceId": "2d0ecad0919db5dc75e39dd5",
@@ -156,8 +189,10 @@
       "timeZone": "America/Costa_Rica",
       "startTime": "13:00",
       "endTime": "15:00",
+      "archiveEligibleAt": "2027-11-02T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
-      "summary": "Exámenes de 8vo a 2do kyu"
+      "summary": "Exámenes de 8vo a 2do kyu",
+      "eventType": "examen"
     },
     {
       "sourceId": "26e2ecffe893577fa8a242ec",
@@ -167,8 +202,10 @@
       "timeZone": "America/Costa_Rica",
       "startTime": "13:00",
       "endTime": "17:00",
+      "archiveEligibleAt": "2027-12-14T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
-      "summary": "Categoría con Bogu y sin Bogu"
+      "summary": "Categoría con Bogu y sin Bogu",
+      "eventType": "torneo"
     }
   ]
 }
