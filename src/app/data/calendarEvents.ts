@@ -47,7 +47,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
     startTime: "13:00",
     endTime: "17:00",
     location: "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
-    summary: "Categoría con Bogu y sin Bogu",
+    summary: "- Categoría con Bogu y sin Bogu\n- Categoría por equipos",
     eventType: "torneo",
     timeZone: "America/Costa_Rica"
   },
