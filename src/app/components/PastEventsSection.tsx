@@ -3,6 +3,7 @@ import { PAST_EVENTS_PAGE_SIZE } from "../config/events";
 import {
   focusRingClass,
   panelSurfaceClass,
+  primaryButtonClass,
   secondaryButtonClass,
 } from "../styles/shared";
 import { getEventDateLabel } from "../utils/calendarEventPresentation";
@@ -92,25 +93,29 @@ export function PastEventsSection() {
             >
               {copy.archive.upcomingEvents}
             </Link>
-            <label className="flex min-w-0 flex-col gap-1 text-xs font-bold text-site-muted">
-              {copy.archive.year}
+            <label className="relative min-w-0 text-xs font-bold text-site-muted">
+              <span className="pointer-events-none absolute left-3 top-1.5 z-10">
+                {copy.archive.year}
+              </span>
               <select
                 name="year"
                 value={filters.year ?? ""}
                 onChange={(event) => changeFilter("year", event.target.value)}
-                className={`min-h-11 rounded-lg px-3 py-2 text-sm ${focusRingClass} border border-site-border bg-site-surface text-site-action`}
+                className={`min-h-14 w-full rounded-lg px-3 pb-1.5 pt-5 text-sm ${focusRingClass} border border-site-border bg-site-surface text-site-action`}
               >
                 <option value="">{copy.archive.all}</option>
                 {years.map((year) => <option key={year} value={year}>{year}</option>)}
               </select>
             </label>
-            <label className="flex min-w-0 flex-col gap-1 text-xs font-bold text-site-muted">
-              {copy.archive.type}
+            <label className="relative min-w-0 text-xs font-bold text-site-muted">
+              <span className="pointer-events-none absolute left-3 top-1.5 z-10">
+                {copy.archive.type}
+              </span>
               <select
                 name="type"
                 value={filters.type ?? ""}
                 onChange={(event) => changeFilter("type", event.target.value)}
-                className={`min-h-11 rounded-lg px-3 py-2 text-sm ${focusRingClass} border border-site-border bg-site-surface text-site-action`}
+                className={`min-h-14 w-full rounded-lg px-3 pb-1.5 pt-5 text-sm ${focusRingClass} border border-site-border bg-site-surface text-site-action`}
               >
                 <option value="">{copy.archive.all}</option>
                 {eventTypes.map((type) => <option key={type} value={type}>{copy.archive.types[type]}</option>)}
@@ -136,7 +141,7 @@ export function PastEventsSection() {
                   </div>
                   <Link
                     to={getEventPath(event, language)}
-                    className={`text-sm ${secondaryButtonClass} ${focusRingClass}`}
+                    className={`text-sm ${primaryButtonClass} ${focusRingClass}`}
                   >
                     {copy.archive.viewEvent}
                   </Link>
