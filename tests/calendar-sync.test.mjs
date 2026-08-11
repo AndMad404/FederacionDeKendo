@@ -250,7 +250,7 @@ test("Given timed and all-day events, When parsed, Then eligibility uses the las
   assert.equal(allDay.archiveEligibleAt, "2026-08-10T06:00:00.000Z");
 });
 
-test("removes missing future events and preserves missing historical events", () => {
+test("removes missing future events and retains an individually missing historical event as inactive", () => {
   const previous = {
     version: 2,
     events: [
@@ -266,11 +266,22 @@ test("removes missing future events and preserves missing historical events", ()
         title: "Future",
         date: "2027-01-01",
       },
+      {
+        sourceId: "present-past",
+        slug: "2025-02-01-present-past",
+        title: "Present past",
+        date: "2025-02-01",
+      },
     ],
   };
 
-  const merged = mergeRegistry(previous, [], new Date("2026-07-01"));
-  assert.deepEqual(merged.events.map((event) => event.sourceId), ["past"]);
+  const merged = mergeRegistry(
+    previous,
+    [previous.events[2]],
+    new Date("2026-07-01"),
+  );
+  assert.deepEqual(merged.events.map((event) => event.sourceId), ["past", "present-past"]);
+  assert.equal(merged.events[0].inactive, true);
 });
 
 test("canonical slug starts with the date and normalizes accents", () => {

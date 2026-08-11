@@ -37,6 +37,36 @@ const googleDriveFolderUrl = /^https:\/\/drive\.google\.com\/drive\/folders\/[A-
 const embeddedGoogleDriveFolderUrl = /https:\/\/drive\.google\.com\/drive\/folders\/[A-Za-z0-9_-]+(?:[/?#][^\s]*)?/g;
 const albumUrlSymbol = Symbol("privateAlbumUrl");
 
+export const HISTORICAL_COMPARISON_FIELDS = [
+  "slug",
+  "archiveEligibleAt",
+  "title",
+  "date",
+  "endDate",
+  "startTime",
+  "endTime",
+  "location",
+  "summary",
+  "eventType",
+  "organizer",
+  "infoUrl",
+  "timeZone",
+];
+
+export const HISTORICAL_SNAPSHOT_FIELDS = [
+  "sourceId",
+  "slug",
+  "aliases",
+  "archiveEligibleAt",
+  "historical",
+  "inactive",
+  ...HISTORICAL_COMPARISON_FIELDS.filter(
+    (field) => !["slug", "archiveEligibleAt"].includes(field),
+  ),
+];
+
+const driveUrl = /https?:\/\/(?:[A-Za-z0-9-]+\.)?drive\.google\.com\/[^\s<>)\]]+/gi;
+
 export function getPrivateAlbumUrl(event) {
   return event?.[albumUrlSymbol];
 }
@@ -409,9 +439,24 @@ export function mergeRegistry(
   now = new Date(),
 ) {
   assertUniqueCurrentSlugs(currentEvents);
+  const historicalEvents = (previousRegistry.events ?? []).filter(
+    (event) => event.historical === true || isArchiveEligible(event, now),
+  );
+  const currentSourceIds = new Set(currentEvents.map((event) => event.sourceId));
+  if (
+    historicalEvents.length > 0 &&
+    historicalEvents.every((event) => !currentSourceIds.has(event.sourceId))
+  ) {
+    throw new Error("All historical events disappeared from the Calendar feed; no files were changed.");
+  }
   const previousBySourceId = new Map(
     (previousRegistry.events ?? []).map((event) => [event.sourceId, event]),
   );
+  const freezeHistoricalSnapshot = (event) => ({
+    ...event,
+    archiveEligibleAt: getArchiveEligibleAt(event).toISOString(),
+    historical: true,
+  });
   const reconciledCurrentEvents = currentEvents.map((currentEvent) => {
     const previousEvent = previousBySourceId.get(currentEvent.sourceId);
     const aliases = previousEvent?.aliases;
@@ -422,16 +467,7 @@ export function mergeRegistry(
       new Date(currentEvent.archiveEligibleAt).getTime() <= now.getTime();
 
     if (wasHistorical) {
-      return {
-        ...currentEvent,
-        sourceId: previousEvent.sourceId,
-        slug: previousEvent.slug,
-        title: previousEvent.title,
-        date: previousEvent.date,
-        archiveEligibleAt: getArchiveEligibleAt(previousEvent).toISOString(),
-        historical: true,
-        ...(aliases?.length ? { aliases } : {}),
-      };
+      return freezeHistoricalSnapshot(previousEvent);
     }
 
     return {
@@ -440,12 +476,14 @@ export function mergeRegistry(
       ...(aliases?.length ? { aliases } : {}),
     };
   });
-  const currentSourceIds = new Set(reconciledCurrentEvents.map((event) => event.sourceId));
-  const retainedHistoricalEvents = (previousRegistry.events ?? []).filter(
-    (event) =>
-      !currentSourceIds.has(event.sourceId) &&
-      (event.historical === true || isArchiveEligible(event, now)),
-  );
+  const reconciledSourceIds = new Set(reconciledCurrentEvents.map((event) => event.sourceId));
+  const retainedHistoricalEvents = (previousRegistry.events ?? [])
+    .filter(
+      (event) =>
+        !reconciledSourceIds.has(event.sourceId) &&
+        (event.historical === true || isArchiveEligible(event, now)),
+    )
+    .map((event) => ({ ...freezeHistoricalSnapshot(event), inactive: true }));
   const merged = [...reconciledCurrentEvents, ...retainedHistoricalEvents];
   assertUniqueCurrentSlugs(merged);
   merged.sort(
@@ -454,6 +492,109 @@ export function mergeRegistry(
       createLocalDate(b.date, b.startTime).getTime(),
   );
   return { version: 3, events: merged };
+}
+
+function canonicalValue(value) {
+  return value === undefined ? { absent: true } : value;
+}
+
+export function fingerprintOrderedFields(value, fields) {
+  const canonical = fields.map((field) => [field, canonicalValue(value[field])]);
+  return createHash("sha256").update(JSON.stringify(canonical)).digest("hex");
+}
+
+export function fingerprintHistoricalSnapshot(event) {
+  return fingerprintOrderedFields(event, HISTORICAL_SNAPSHOT_FIELDS);
+}
+
+export function fingerprintHistoricalProposal(sourceId, differences) {
+  const byField = new Map(differences.map((difference) => [difference.field, difference]));
+  const canonical = HISTORICAL_COMPARISON_FIELDS
+    .filter((field) => byField.has(field))
+    .map((field) => {
+      const difference = byField.get(field);
+      return [field, difference.type, canonicalValue(difference.proposed)];
+    });
+  return createHash("sha256")
+    .update(JSON.stringify([sourceId, canonical]))
+    .digest("hex");
+}
+
+function reportValue(value) {
+  if (value === undefined) return null;
+  if (typeof value === "string") return value.replace(driveUrl, "[redacted]");
+  return value;
+}
+
+export function detectHistoricalChanges(previousRegistry, currentEvents, now = new Date()) {
+  const currentBySourceId = new Map(
+    currentEvents.map((event) => [event.sourceId, event]),
+  );
+  const changes = [];
+
+  for (const publishedEvent of previousRegistry.events ?? []) {
+    const isHistorical =
+      publishedEvent.historical === true || isArchiveEligible(publishedEvent, now);
+    if (!isHistorical) continue;
+
+    const currentEvent = currentBySourceId.get(publishedEvent.sourceId);
+    const differences = [];
+    if (!currentEvent) {
+      differences.push({
+        field: "feed",
+        published: "presente",
+        proposed: "ausente",
+        type: "desaparecido_del_feed",
+      });
+    } else {
+      for (const field of HISTORICAL_COMPARISON_FIELDS) {
+        const published = publishedEvent[field];
+        const proposed = currentEvent[field];
+        if (JSON.stringify(published) === JSON.stringify(proposed)) continue;
+        differences.push({
+          field,
+          published: reportValue(published),
+          proposed: reportValue(proposed),
+          type: proposed === undefined ? "eliminado" : "modificado",
+        });
+      }
+    }
+
+    if (differences.length) {
+      const change = {
+        sourceId: publishedEvent.sourceId,
+        publicIdentity: {
+          slug: publishedEvent.slug,
+          title: reportValue(publishedEvent.title),
+          date: publishedEvent.date,
+        },
+        differences,
+        publishedFingerprint: fingerprintHistoricalSnapshot(publishedEvent),
+        proposalFingerprint: fingerprintHistoricalProposal(
+          publishedEvent.sourceId,
+          differences,
+        ),
+      };
+      changes.push(change);
+    }
+  }
+
+  changes.sort((a, b) => a.sourceId.localeCompare(b.sourceId));
+  return { version: 2, historicalChanges: changes };
+}
+
+function redactReportSecrets(report, secrets) {
+  const redact = (value) => {
+    if (Array.isArray(value)) return value.map(redact);
+    if (value && typeof value === "object") {
+      return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, redact(item)]));
+    }
+    if (typeof value !== "string") return value;
+    return secrets
+      .filter((secret) => typeof secret === "string" && secret.length > 0)
+      .reduce((text, secret) => text.replaceAll(secret, "[redacted]"), value);
+  };
+  return redact(report);
 }
 
 function serializeProperty(name, value, isLast) {
@@ -491,7 +632,7 @@ export function serializeCalendarEvents(events) {
 
 // Auto-generated from Google Calendar. Do not edit manually.
 export const CALENDAR_EVENTS: CalendarEvent[] = [
-${events.map(serializeCalendarEvent).join(",\n")}
+${events.filter((event) => event.inactive !== true).map(serializeCalendarEvent).join(",\n")}
 ];
 `;
 }
@@ -520,7 +661,7 @@ async function readRegistry(registryPath) {
   }
 }
 
-async function writeAtomically(files) {
+export async function writeAtomically(files) {
   const temporaryFiles = [];
   const backupFiles = [];
   const publishedFiles = [];
@@ -561,16 +702,58 @@ async function writeAtomically(files) {
   }
 }
 
-async function writeActionSummary(warnings, eventCount) {
-  const summaryPath = process.env.GITHUB_STEP_SUMMARY;
+function escapeActionText(value) {
+  return String(value)
+    .replace(/[\u0000-\u001f\u007f]/g, " ")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/([\\`*_{}\[\]()#+.!|~-])/g, "\\$1");
+}
+
+export async function writeHistoricalChangesReport(report, reportPath) {
+  if (!reportPath) return;
+  await mkdir(path.dirname(reportPath), { recursive: true });
+  await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+}
+
+export async function writeActionSummary(
+  warnings,
+  eventCount,
+  historicalReport,
+  summaryPath = process.env.GITHUB_STEP_SUMMARY,
+) {
   if (!summaryPath) return;
+  const historicalChanges = historicalReport?.historicalChanges ?? [];
   const lines = [
     "## Calendar synchronization",
     "",
     `Published events: ${eventCount}`,
-    `Warnings: ${warnings.length}`,
+    `Operational warnings: ${warnings.length}`,
+    `Historical events requiring confirmation: ${historicalChanges.length}`,
     "",
-    ...warnings.map((warning) => `- ⚠️ ${warning}`),
+    "### Operational warnings",
+    "",
+    ...(warnings.length
+      ? warnings.map((warning) => `- ${escapeActionText(warning)}`)
+      : ["None."]),
+    "",
+    "### Historical changes requiring confirmation",
+    "",
+    ...(historicalChanges.length
+      ? historicalChanges.flatMap((event) => [
+          `#### ${escapeActionText(event.publicIdentity.title)} (${escapeActionText(event.publicIdentity.date)})`,
+          "",
+          `Internal identity: \`${escapeActionText(event.sourceId)}\``,
+          `Public identity: \`${escapeActionText(event.publicIdentity.slug)}\``,
+          "",
+          ...event.differences.map(
+            (difference) =>
+              `- ${escapeActionText(difference.field)}: ${escapeActionText(difference.type)}`,
+          ),
+          "",
+        ])
+      : ["None."]),
     "",
   ];
   await appendFile(summaryPath, lines.join("\n"), "utf8");
@@ -596,6 +779,10 @@ export async function synchronizeCalendar({
     .filter(Boolean);
   const currentBySourceId = new Map(parsed.map((event) => [event.sourceId, event]));
   const previousRegistry = await readRegistry(registryPath);
+  const historicalReport = redactReportSecrets(
+    detectHistoricalChanges(previousRegistry, parsed, now),
+    [source, process.env.CALENDAR_ICS_URL],
+  );
   const registry = mergeRegistry(previousRegistry, parsed, now);
 
   const galleryEvents = registry.events
@@ -628,7 +815,11 @@ export async function synchronizeCalendar({
     [registryPath, `${JSON.stringify(registry, null, 2)}\n`],
     [outputPath, serializeCalendarEvents(registry.events)],
   ]);
-  return { registry, galleryResult, warnings };
+  await writeHistoricalChangesReport(
+    historicalReport,
+    process.env.HISTORICAL_CHANGES_REPORT_PATH,
+  );
+  return { registry, galleryResult, warnings, historicalReport };
 }
 
 async function main() {
@@ -641,7 +832,16 @@ async function main() {
   console.log(
     `Synced ${result.registry.events.length} event(s) with ${result.warnings.length} warning(s).`,
   );
-  await writeActionSummary(result.warnings, result.registry.events.length);
+  if (result.historicalReport.historicalChanges.length) {
+    console.log(
+      `::warning title=Historical calendar changes::${result.historicalReport.historicalChanges.length} historical event(s) require confirmation.`,
+    );
+  }
+  await writeActionSummary(
+    result.warnings,
+    result.registry.events.length,
+    result.historicalReport,
+  );
 }
 
 const isDirectExecution =
