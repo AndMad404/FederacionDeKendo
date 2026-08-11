@@ -19,7 +19,6 @@ jobs:
     env:
       CALENDAR_ICS_URL: ${{ secrets.CALENDAR_ICS_URL }}
       CALENDAR_TIME_ZONE: America/Costa_Rica
-      HISTORICAL_CHANGES_REPORT_PATH: ${{ runner.temp }}/calendar-historical-changes.json
 
     steps:
       - name: Checkout repository
@@ -38,6 +37,8 @@ jobs:
 
       - name: Sync calendar events
         run: pnpm run sync:calendar
+        env:
+          HISTORICAL_CHANGES_REPORT_PATH: ${{ runner.temp }}/calendar-historical-changes.json
 
       - name: Upload historical changes report
         uses: actions/upload-artifact@v4
