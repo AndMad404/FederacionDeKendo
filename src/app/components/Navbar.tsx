@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router";
-import { Menu, X } from "lucide-react";
+import { ChevronDown, Menu, X } from "lucide-react";
 import { focusRingClass } from "../styles/shared";
 import { getLocalizedPath, useLanguage } from "../config/i18n";
 
@@ -15,21 +15,129 @@ export function Navbar() {
   const { pathname } = useLocation();
   const { language, copy } = useLanguage();
   const [open, setOpen] = useState(false);
+  const [calendarOpen, setCalendarOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const calendarButtonRef = useRef<HTMLButtonElement>(null);
+  const calendarMenuRef = useRef<HTMLLIElement>(null);
+  const mobileCalendarMenuRef = useRef<HTMLLIElement>(null);
+
+  const calendarPaths =
+    language === "en"
+      ? ["/en/calendar/", "/en/events/past/"]
+      : ["/calendario/", "/eventos/pasados/"];
+  const calendarActive = calendarPaths.some((path) =>
+    pathname.startsWith(path),
+  );
 
   useEffect(() => {
-    if (!open) return;
+    setCalendarOpen(false);
+    setOpen(false);
+  }, [pathname]);
 
+  useEffect(() => {
     function handleEscape(event: KeyboardEvent) {
       if (event.key !== "Escape") return;
 
-      setOpen(false);
-      menuButtonRef.current?.focus();
+      if (calendarOpen) {
+        setCalendarOpen(false);
+        calendarButtonRef.current?.focus();
+      } else if (open) {
+        setOpen(false);
+        menuButtonRef.current?.focus();
+      }
+    }
+
+    function handlePointerDown(event: PointerEvent) {
+      if (
+        calendarOpen &&
+        !calendarMenuRef.current?.contains(event.target as Node) &&
+        !mobileCalendarMenuRef.current?.contains(event.target as Node)
+      ) {
+        setCalendarOpen(false);
+      }
     }
 
     window.addEventListener("keydown", handleEscape);
-    return () => window.removeEventListener("keydown", handleEscape);
-  }, [open]);
+    window.addEventListener("pointerdown", handlePointerDown);
+    return () => {
+      window.removeEventListener("keydown", handleEscape);
+      window.removeEventListener("pointerdown", handlePointerDown);
+    };
+  }, [calendarOpen, open]);
+
+  function closeNavigation() {
+    setCalendarOpen(false);
+    setOpen(false);
+  }
+
+  function renderCalendarMenu(mobile = false) {
+    return (
+      <li
+        key={copy.nav.links[1].path}
+        ref={mobile ? mobileCalendarMenuRef : calendarMenuRef}
+        className={mobile ? "w-full" : "relative"}
+        onMouseEnter={mobile ? undefined : () => setCalendarOpen(true)}
+        onMouseLeave={mobile ? undefined : () => setCalendarOpen(false)}
+        onBlur={
+          mobile
+            ? undefined
+            : (event) => {
+                if (
+                  !event.currentTarget.contains(event.relatedTarget as Node | null)
+                ) {
+                  setCalendarOpen(false);
+                }
+              }
+        }
+      >
+        <button
+          ref={mobile ? undefined : calendarButtonRef}
+          type="button"
+          aria-expanded={calendarOpen}
+          aria-controls={mobile ? "mobile-calendar-menu" : "desktop-calendar-menu"}
+          onClick={() => setCalendarOpen((value) => !value)}
+          className={`inline-flex min-h-11 items-center justify-center gap-1 ${navLinkClass({ isActive: calendarActive })}`}
+        >
+          {copy.nav.links[1].label}
+          <ChevronDown
+            size={18}
+            aria-hidden="true"
+            className={`transition-transform ${calendarOpen ? "rotate-180" : ""}`}
+          />
+        </button>
+        {calendarOpen && (
+          <ul
+            id={mobile ? "mobile-calendar-menu" : "desktop-calendar-menu"}
+            aria-label={copy.nav.calendarMenu}
+            className={
+              mobile
+                ? "mt-2 flex flex-col items-center gap-2 border-y border-site-on-dark/20 py-2"
+                : "absolute left-1/2 top-full z-10 mt-2 min-w-52 -translate-x-1/2 rounded-lg border border-site-on-dark/20 bg-site-navy p-2 shadow-lg before:absolute before:-top-2 before:left-0 before:h-2 before:w-full before:content-['']"
+            }
+          >
+            {calendarPaths.map((path, index) => (
+              <li key={path} className={mobile ? undefined : "w-full"}>
+                <NavLink
+                  to={path}
+                  className={({ isActive }) =>
+                    `block min-h-11 rounded-md px-4 py-2.5 text-base transition-colors ${focusRingClass} ${
+                      isActive
+                        ? "bg-site-on-dark text-site-navy"
+                        : "text-site-on-dark/85 hover:bg-site-on-dark/10 hover:text-site-on-dark"
+                    }`
+                  }
+                >
+                  {index === 0
+                    ? copy.nav.upcomingEvents
+                    : copy.nav.pastEvents}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        )}
+      </li>
+    );
+  }
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-site-on-dark/10 bg-site-navy">
@@ -59,7 +167,7 @@ export function Navbar() {
         </Link>
 
         <ul className="hidden items-center gap-8 md:flex land-sm:gap-6">
-          {copy.nav.links.map((link, index) => (
+          {copy.nav.links.map((link, index) => index === 1 ? renderCalendarMenu() : (
             <li key={link.path}>
               <NavLink
                 to={link.path}
@@ -82,7 +190,10 @@ export function Navbar() {
           aria-controls="mobile-menu"
           aria-expanded={open}
           aria-label={open ? copy.nav.close : copy.nav.open}
-          onClick={() => setOpen(!open)}
+          onClick={() => {
+            setCalendarOpen(false);
+            setOpen(!open);
+          }}
         >
           {open ? (
             <X size={22} aria-hidden="true" />
@@ -97,13 +208,13 @@ export function Navbar() {
           id="mobile-menu"
           className="flex flex-col items-center gap-5 bg-site-navy px-6 py-5 text-center md:hidden"
         >
-          {copy.nav.links.map((link, index) => (
+          {copy.nav.links.map((link, index) => index === 1 ? renderCalendarMenu(true) : (
             <li key={link.path}>
               <NavLink
                 to={link.path}
                 end={index === 0}
                 className={navLinkClass}
-                onClick={() => setOpen(false)}
+                onClick={closeNavigation}
               >
                 {link.label}
               </NavLink>

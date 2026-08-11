@@ -7,13 +7,16 @@ Stack:
 - TypeScript
 - Tailwind CSS 4
 - Vite
-- UI originated in Figma Make; the original design is obsolete and is not a current source of truth
 
 ## Core Rules
 
-- Until a recreated Figma file is explicitly approved, use the current application plus owner-approved measurements, screenshots, and rendered results as the temporary visual baseline. Do not claim fidelity to or drift from the obsolete original Figma.
+- Use the current application plus owner-approved measurements, screenshots, and rendered results as the visual baseline.
 - Read the relevant files before making claims or edits.
 - Keep work scoped to the user's requested file, route, concern, or task.
+- When the user does not know the relevant files, routes, or tests, read
+  `.agents/project-map.md` and discover the smallest evidence-based scope.
+  Do not inspect every route by default. Summarize the discovered scope before
+  editing when the request is investigative or materially ambiguous.
 - Prefer existing project patterns over new abstractions.
 - Do not refactor unrelated code while implementing a narrow change.
 - Do not validate a narrow visual change on top of unrelated visual worktree
@@ -40,11 +43,37 @@ Use the smallest mode that fits the user's request.
 
 If a request mixes review and implementation, review first, then ask or infer which findings should be applied.
 
+## Phased Roadmap Execution
+
+- Execute an approved roadmap one independently verifiable phase at a time.
+  Do not combine parser, data pipeline, UI, visual, SEO, or documentation phases
+  merely because they belong to the same feature.
+- Start each phase from its canonical roadmap or backlog entry instead of
+  repeating the full project history in the task prompt.
+- Read only the documentation routed by `docs/index.md` plus the source files
+  required by the current phase. Do not preload later-phase context.
+- Use a fresh task when the primary responsibility changes, such as moving
+  from tests to synchronization, images, filters, or UI. Keep the current task
+  for direct fixes to the phase being implemented.
+- During implementation, run the narrowest reproducing or directed check
+  first. Run broader typecheck, build, E2E, or visual gates once the directed
+  checks pass and the phase is ready for final verification.
+- Keep each completed phase suitable for an atomic commit and independent
+  review. Do not create a commit unless the user requests it.
+- Resolve blocking CI or test regressions before starting dependent structural
+  or visual phases.
+- Do not use parallel agents for sequential phases that share files or depend
+  on each other's output. Parallel work is appropriate only for genuinely
+  independent investigation or review.
+
 ## Documentation Scope
 
 - Extended project documentation is stored outside this runtime repository at
   `../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/` in the owner's
   local workspace.
+- Start documentation work with `docs/index.md` in that private project. Use
+  its routing table to select the smallest relevant document set; do not read
+  the full documentation tree by default.
 - For architecture, ADR, backlog, calendar-operation, or historical-document
   work, read the relevant file from that location when it is available.
 - Never make application code, build scripts, tests, deployment, or workflows

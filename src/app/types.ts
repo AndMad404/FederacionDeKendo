@@ -23,6 +23,12 @@ export interface GalleryImage {
 }
 
 type CalendarEventType =
+  | "torneo"
+  | "examen"
+  | "seminario"
+  | "evento";
+
+type LegacyCalendarEventType =
   | "Examen"
   | "Torneo"
   | "Seminario"
@@ -31,6 +37,8 @@ type CalendarEventType =
 
 export interface CalendarEvent {
   id: string;
+  aliases?: string[];
+  archiveEligibleAt?: string;
   title: string;
   date: string;
   endDate?: string;
@@ -38,7 +46,8 @@ export interface CalendarEvent {
   endTime?: string;
   location?: string;
   summary?: string;
-  type?: CalendarEventType;
+  eventType?: CalendarEventType;
+  type?: LegacyCalendarEventType;
   organizer?: string;
   infoUrl?: string;
   ctaLabel?: string;

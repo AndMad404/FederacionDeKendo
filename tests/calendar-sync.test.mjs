@@ -3,6 +3,8 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
+import sharp from "sharp";
 
 import {
   createCanonicalSlug,
@@ -11,8 +13,17 @@ import {
   parseVEvents,
   synchronizeCalendar,
 } from "../scripts/sync-calendar-events.mjs";
+import { calculateArchiveEligibleAt } from "../src/app/utils/eventArchive.js";
 
 const fixturePath = new URL("./fixtures/calendar-events.ics", import.meta.url);
+const phase2FixturePath = new URL(
+  "./fixtures/calendar-events-phase-2.ics",
+  import.meta.url,
+);
+const invalidPhase2FixturePath = new URL(
+  "./fixtures/calendar-events-phase-2-invalid.ics",
+  import.meta.url,
+);
 
 function createIcs(events) {
   return [
@@ -67,7 +78,7 @@ test("stores the exclusive DTEND for all-day ranges", async () => {
   assert.equal(events[1].endDate, "2026-09-13");
 });
 
-test("omits drafts and recurring events and warns about incomplete content", async () => {
+test("omits drafts and recurring events while allowing optional content to be absent", async () => {
   const warnings = [];
   const events = parseVEvents(await readFile(fixturePath, "utf8"))
     .map((event) => parseCalendarEvent(event, warnings))
@@ -78,10 +89,32 @@ test("omits drafts and recurring events and warns about incomplete content", asy
   assert.equal(events.some((event) => event.title === "Actividad sin detalles"), true);
   assert.equal(warnings.some((warning) => warning.includes("Draft omitted")), true);
   assert.equal(warnings.some((warning) => warning.includes("Recurring event omitted")), true);
-  assert.equal(warnings.some((warning) => warning.includes("ubicación")), true);
+  assert.equal(warnings.some((warning) => /location|description|gallery|ubicación|descripción/i.test(warning)), false);
 });
 
-test("uses the current canonical slug when the title changes", () => {
+test("omits an event and warns when title or date is missing", () => {
+  const warnings = [];
+  const events = parseVEvents([
+    "BEGIN:VCALENDAR",
+    "BEGIN:VEVENT",
+    "UID:missing-title@example.test",
+    "DTSTART;VALUE=DATE:20260808",
+    "END:VEVENT",
+    "BEGIN:VEVENT",
+    "UID:missing-date@example.test",
+    "SUMMARY:Evento sin fecha",
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ].join("\n"))
+    .map((event) => parseCalendarEvent(event, warnings))
+    .filter(Boolean);
+
+  assert.deepEqual(events, []);
+  assert.equal(warnings.some((warning) => warning.includes("title")), true);
+  assert.equal(warnings.some((warning) => warning.includes("date")), true);
+});
+
+test("Given a pending event, When its title changes, Then its identity remains editable", () => {
   const previous = {
     version: 2,
     events: [
@@ -104,9 +137,10 @@ test("uses the current canonical slug when the title changes", () => {
 
   const [event] = mergeRegistry(previous, current, new Date("2026-07-01")).events;
   assert.equal(event.slug, "2026-08-08-examen-nacional");
+  assert.equal(event.title, "Examen nacional");
 });
 
-test("uses the current canonical slug when the date changes", () => {
+test("Given a historical event, When Calendar changes its date and title, Then its identity stays frozen", () => {
   const previous = {
     version: 2,
     events: [
@@ -115,23 +149,108 @@ test("uses the current canonical slug when the date changes", () => {
         slug: "2026-08-08-examen",
         title: "Examen",
         date: "2026-08-08",
+        archiveEligibleAt: "2026-08-10T06:00:00.000Z",
+        historical: true,
+        aliases: ["2026-08-01-examen-anterior"],
       },
     ],
   };
   const current = [
     {
       sourceId: "same-source",
-      slug: "2026-08-15-examen",
-      title: "Examen",
+      slug: "2026-08-15-examen-nacional",
+      title: "Examen nacional",
       date: "2026-08-15",
+      archiveEligibleAt: "2026-08-17T06:00:00.000Z",
     },
   ];
 
-  const [event] = mergeRegistry(previous, current, new Date("2026-07-01")).events;
-  assert.equal(event.slug, "2026-08-15-examen");
+  const [event] = mergeRegistry(previous, current, new Date("2026-08-20T00:00:00Z")).events;
+  assert.equal(event.slug, "2026-08-08-examen");
+  assert.equal(event.title, "Examen");
+  assert.equal(event.date, "2026-08-08");
+  assert.equal(event.archiveEligibleAt, "2026-08-10T06:00:00.000Z");
+  assert.deepEqual(event.aliases, ["2026-08-01-examen-anterior"]);
 });
 
-test("removes missing future events and preserves missing historical events", () => {
+test("Given a version 2 historical event, When the registry migrates, Then its existing identity is frozen", () => {
+  const previous = {
+    version: 2,
+    events: [{
+      sourceId: "legacy-source",
+      slug: "2025-12-31-examen",
+      title: "Examen original",
+      date: "2025-12-31",
+    }],
+  };
+  const current = [{
+    sourceId: "legacy-source",
+    slug: "2026-01-10-examen-corregido",
+    title: "Examen corregido",
+    date: "2026-01-10",
+    archiveEligibleAt: "2026-01-13T06:00:00.000Z",
+  }];
+
+  const [event] = mergeRegistry(previous, current, new Date("2026-02-01T00:00:00Z")).events;
+  assert.equal(event.slug, "2025-12-31-examen");
+  assert.equal(event.title, "Examen original");
+  assert.equal(event.date, "2025-12-31");
+  assert.equal(event.archiveEligibleAt, "2026-01-02T06:00:00.000Z");
+  assert.equal(event.historical, true);
+});
+
+test("Given an event at month end, When the 48-hour calendar checkpoint arrives, Then it is eligible", () => {
+  assert.equal(
+    calculateArchiveEligibleAt("2026-01-31").toISOString(),
+    "2026-02-02T06:00:00.000Z",
+  );
+});
+
+test("Given an event at year end, When the 48-hour calendar checkpoint arrives, Then eligibility crosses the year", () => {
+  assert.equal(
+    calculateArchiveEligibleAt("2026-12-31").toISOString(),
+    "2027-01-02T06:00:00.000Z",
+  );
+});
+
+test("Given foreign daylight-saving dates, When eligibility is calculated, Then Costa Rica midnight stays stable", () => {
+  assert.equal(
+    calculateArchiveEligibleAt("2026-03-08").toISOString(),
+    "2026-03-10T06:00:00.000Z",
+  );
+  assert.equal(
+    calculateArchiveEligibleAt("2026-11-01").toISOString(),
+    "2026-11-03T06:00:00.000Z",
+  );
+});
+
+test("Given timed and all-day events, When parsed, Then eligibility uses the last local event day instead of its ending hour", () => {
+  const timed = parseCalendarEvent(parseVEvents([
+    "BEGIN:VCALENDAR",
+    "BEGIN:VEVENT",
+    "UID:timed@example.test",
+    "DTSTART;TZID=America/Costa_Rica:20260808T130000",
+    "DTEND;TZID=America/Costa_Rica:20260808T150000",
+    "SUMMARY:Timed",
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ].join("\n"))[0]);
+  const allDay = parseCalendarEvent(parseVEvents([
+    "BEGIN:VCALENDAR",
+    "BEGIN:VEVENT",
+    "UID:all-day@example.test",
+    "DTSTART;VALUE=DATE:20260808",
+    "DTEND;VALUE=DATE:20260809",
+    "SUMMARY:All day",
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ].join("\n"))[0]);
+
+  assert.equal(timed.archiveEligibleAt, "2026-08-10T06:00:00.000Z");
+  assert.equal(allDay.archiveEligibleAt, "2026-08-10T06:00:00.000Z");
+});
+
+test("removes missing future events and retains an individually missing historical event as inactive", () => {
   const previous = {
     version: 2,
     events: [
@@ -147,11 +266,22 @@ test("removes missing future events and preserves missing historical events", ()
         title: "Future",
         date: "2027-01-01",
       },
+      {
+        sourceId: "present-past",
+        slug: "2025-02-01-present-past",
+        title: "Present past",
+        date: "2025-02-01",
+      },
     ],
   };
 
-  const merged = mergeRegistry(previous, [], new Date("2026-07-01"));
-  assert.deepEqual(merged.events.map((event) => event.sourceId), ["past"]);
+  const merged = mergeRegistry(
+    previous,
+    [previous.events[2]],
+    new Date("2026-07-01"),
+  );
+  assert.deepEqual(merged.events.map((event) => event.sourceId), ["past", "present-past"]);
+  assert.equal(merged.events[0].inactive, true);
 });
 
 test("canonical slug starts with the date and normalizes accents", () => {
@@ -235,6 +365,85 @@ test("an invalid feed leaves the last published files untouched", async () => {
       await readFile(registryPath, "utf8"),
       '{"version":2,"events":[]}',
     );
+  } finally {
+    await rm(tempDirectory, { recursive: true, force: true });
+  }
+});
+
+test("phase 2 normalizes public descriptions and event types without publishing album URLs", async () => {
+  const tempDirectory = await mkdtemp(path.join(os.tmpdir(), "fak-calendar-"));
+  const outputPath = path.join(tempDirectory, "calendarEvents.ts");
+  const registryPath = path.join(tempDirectory, "registry.json");
+  const galleryManifestPath = path.join(tempDirectory, "eventGalleries.ts");
+  const galleryStatePath = path.join(tempDirectory, "eventGalleryState.json");
+  const galleryImagesRoot = path.join(tempDirectory, "event-images");
+
+  try {
+    const galleryImage = await sharp({
+      create: { width: 640, height: 480, channels: 3, background: "red" },
+    }).jpeg().toBuffer();
+    const result = await synchronizeCalendar({
+      source: fileURLToPath(phase2FixturePath),
+      outputPath,
+      registryPath,
+      now: new Date("2026-08-09T12:00:00Z"),
+      galleryOptions: {
+        manifestPath: galleryManifestPath,
+        statePath: galleryStatePath,
+        imagesRoot: galleryImagesRoot,
+        listFolder: async () => [{ id: "private-file-id", name: "photo1.jpg" }],
+        downloadFile: async () => galleryImage,
+      },
+    });
+    const output = await readFile(outputPath, "utf8");
+    const registry = await readFile(registryPath, "utf8");
+    const galleryManifest = await readFile(galleryManifestPath, "utf8");
+    const byTitle = new Map(result.registry.events.map((event) => [event.title, event]));
+
+    assert.equal(byTitle.get("Torneo futuro").historical, undefined);
+    assert.equal(byTitle.get("Examen en preparación").historical, undefined);
+    assert.ok(result.galleryResult.state.galleries["2026-08-08-examen-en-preparacion"]);
+    assert.equal(byTitle.get("Seminario histórico").historical, true);
+    assert.equal(
+      byTitle.get("Encuentro actualizado").summary,
+      "Descripción pública actualizada.",
+    );
+    assert.equal(byTitle.get("Torneo sin álbum").eventType, "torneo");
+    assert.equal(byTitle.get("Exámenes con álbum").eventType, "examen");
+    assert.equal(byTitle.get("Exámenes con álbum").summary, "Fotografías aprobadas.");
+    assert.equal(byTitle.get("Seminarios técnicos").eventType, "seminario");
+    assert.equal(byTitle.get("Encuentro federativo").eventType, "evento");
+    assert.equal(result.warnings.some((warning) => warning.includes("using evento")), true);
+    assert.equal(output.includes("TIPO_EVENTO"), false);
+    assert.equal(output.includes("ALBUM_FOTOS"), false);
+    assert.equal(output.includes("drive.google.com"), false);
+    assert.equal(registry.includes("drive.google.com"), false);
+    assert.equal(/drive\.google|phase2ValidAlbum|private-file-id/.test(galleryManifest), false);
+  } finally {
+    await rm(tempDirectory, { recursive: true, force: true });
+  }
+});
+
+test("invalid technical metadata preserves both previously published artifacts", async () => {
+  const tempDirectory = await mkdtemp(path.join(os.tmpdir(), "fak-calendar-"));
+  const outputPath = path.join(tempDirectory, "calendarEvents.ts");
+  const registryPath = path.join(tempDirectory, "registry.json");
+  const previousOutput = "previous output";
+  const previousRegistry = '{"version":3,"events":[]}';
+  await writeFile(outputPath, previousOutput);
+  await writeFile(registryPath, previousRegistry);
+
+  try {
+    await assert.rejects(
+      synchronizeCalendar({
+        source: fileURLToPath(invalidPhase2FixturePath),
+        outputPath,
+        registryPath,
+      }),
+      /Invalid ALBUM_FOTOS/,
+    );
+    assert.equal(await readFile(outputPath, "utf8"), previousOutput);
+    assert.equal(await readFile(registryPath, "utf8"), previousRegistry);
   } finally {
     await rm(tempDirectory, { recursive: true, force: true });
   }

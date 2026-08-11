@@ -54,38 +54,38 @@ export function CalendarEventCard({
       <p className="text-sm leading-tight text-site-action-soft">
         {formatEventTime(event, language)}
       </p>
-      <Link
-        to={getEventPath(event, language)}
-        aria-label={`${copy.calendar.viewDetailsLabel} ${event.title}`}
-        className={`relative z-10 inline-flex min-h-11 cursor-pointer items-center justify-center rounded-full px-3 py-1 text-sm font-semibold transition hover:border-site-action hover:bg-site-media lg:min-h-8 ${actionControlSurfaceClass} ${focusRingClass}`}
-      >
-        <Info className="mr-1.5 size-4" />
-        {copy.common.eventDetails}
-      </Link>
-      <div className="pointer-events-none relative z-10 flex items-center justify-center gap-2">
-        {locationUrl ? (
-          <a
-            href={locationUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`${copy.calendar.openLocationLabel} ${event.title} ${copy.calendar.mapsPreposition} Google Maps`}
-            aria-describedby={locationDescriptionId}
-            className={`pointer-events-auto inline-flex min-h-11 items-center justify-center rounded-lg px-3 py-1.5 text-sm font-semibold transition hover:border-site-action hover:bg-site-media lg:min-h-8 lg:px-2.5 lg:py-1 ${actionControlSurfaceClass} ${focusRingClass}`}
-          >
-            <MapPin
-              className="mr-1.5 size-3.5 shrink-0 text-site-accent-soft"
-              aria-hidden="true"
-            />
-            {copy.calendar.viewLocation}
-            <span id={locationDescriptionId} className="sr-only">
-              {copy.common.place}: {locationName}. {copy.common.opensMaps}
-            </span>
-          </a>
-        ) : (
-          <span className="inline-flex min-h-11 items-center justify-center rounded-lg border border-site-border bg-site-surface px-3 py-1.5 text-sm font-semibold text-site-muted lg:min-h-8 lg:px-2.5 lg:py-1">
-            {copy.common.toBeConfirmed}
+      {locationUrl ? (
+        <a
+          href={locationUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`${copy.calendar.openLocationLabel} ${event.title} ${copy.calendar.mapsPreposition} Google Maps`}
+          aria-describedby={locationDescriptionId}
+          className={`relative z-10 inline-flex min-h-11 items-center justify-center rounded-lg px-3 py-1.5 text-sm font-semibold transition hover:border-site-action hover:bg-site-media lg:min-h-8 lg:px-2.5 lg:py-1 ${actionControlSurfaceClass} ${focusRingClass}`}
+        >
+          <MapPin
+            className="mr-1.5 size-3.5 shrink-0 text-site-accent-soft"
+            aria-hidden="true"
+          />
+          {copy.calendar.viewLocation}
+          <span id={locationDescriptionId} className="sr-only">
+            {copy.common.place}: {locationName}. {copy.common.opensMaps}
           </span>
-        )}
+        </a>
+      ) : (
+        <span className="inline-flex min-h-11 items-center justify-center rounded-lg border border-site-border bg-site-surface px-3 py-1.5 text-sm font-semibold text-site-muted lg:min-h-8 lg:px-2.5 lg:py-1">
+          {copy.common.toBeConfirmed}
+        </span>
+      )}
+      <div className="pointer-events-none relative z-10 flex items-center justify-center gap-2">
+        <Link
+          to={getEventPath(event, language)}
+          aria-label={`${copy.calendar.viewDetailsLabel} ${event.title}`}
+          className={`pointer-events-auto inline-flex min-h-11 cursor-pointer items-center justify-center rounded-full px-3 py-1 text-sm font-semibold transition hover:border-site-action hover:bg-site-media lg:min-h-8 ${actionControlSurfaceClass} ${focusRingClass}`}
+        >
+          <Info className="mr-1.5 size-4" />
+          {copy.common.eventDetails}
+        </Link>
         <button
           type="button"
           aria-label={

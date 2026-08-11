@@ -1,7 +1,14 @@
 import { createHash } from "node:crypto";
-import { appendFile, mkdir, readFile, rename, writeFile } from "node:fs/promises";
+import { appendFile, mkdir, readFile, rename, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import {
+  calculateArchiveEligibleAt,
+  calculateGalleryCheckAt,
+  getArchiveEligibleAt,
+  isArchiveEligible,
+} from "../src/app/utils/eventArchive.js";
+import { synchronizeEventGalleries } from "./sync-event-galleries.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "..");
@@ -21,6 +28,48 @@ const defaultRegistryPath = path.join(
 );
 const defaultTimeZone = process.env.CALENDAR_TIME_ZONE ?? "America/Costa_Rica";
 const draftPrefix = "[BORRADOR]";
+const inferredEventTypes = [
+  ["torneo", /(?:^|\s)torneos?(?:$|\s)/],
+  ["examen", /(?:^|\s)examen(?:es)?(?:$|\s)/],
+  ["seminario", /(?:^|\s)seminarios?(?:$|\s)/],
+];
+const googleDriveFolderUrl = /^https:\/\/drive\.google\.com\/drive\/folders\/[A-Za-z0-9_-]+(?:[/?#].*)?$/;
+const embeddedGoogleDriveFolderUrl = /https:\/\/drive\.google\.com\/drive\/folders\/[A-Za-z0-9_-]+(?:[/?#][^\s]*)?/g;
+const albumUrlSymbol = Symbol("privateAlbumUrl");
+
+export const HISTORICAL_COMPARISON_FIELDS = [
+  "slug",
+  "archiveEligibleAt",
+  "title",
+  "date",
+  "endDate",
+  "startTime",
+  "endTime",
+  "location",
+  "summary",
+  "eventType",
+  "organizer",
+  "infoUrl",
+  "timeZone",
+];
+
+export const HISTORICAL_SNAPSHOT_FIELDS = [
+  "sourceId",
+  "slug",
+  "aliases",
+  "archiveEligibleAt",
+  "historical",
+  "inactive",
+  ...HISTORICAL_COMPARISON_FIELDS.filter(
+    (field) => !["slug", "archiveEligibleAt"].includes(field),
+  ),
+];
+
+const driveUrl = /https?:\/\/(?:[A-Za-z0-9-]+\.)?drive\.google\.com\/[^\s<>)\]]+/gi;
+
+export function getPrivateAlbumUrl(event) {
+  return event?.[albumUrlSymbol];
+}
 
 function unfoldIcsLines(icsText) {
   return icsText
@@ -206,19 +255,6 @@ function toIsoDate(date) {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
-export function getEventEndDateTime(event) {
-  if (event.endDate) {
-    return createLocalDate(event.endDate, event.endTime);
-  }
-  if (event.endTime) return createLocalDate(event.date, event.endTime);
-  if (event.startTime) {
-    const result = createLocalDate(event.date, event.startTime);
-    result.setHours(result.getHours() + 1);
-    return result;
-  }
-  return addDays(createLocalDate(event.date), 1);
-}
-
 function slugify(value) {
   return value
     .normalize("NFD")
@@ -237,23 +273,56 @@ export function createCanonicalSlug(title, date) {
   return `${date}-${slugify(title) || "actividad"}`;
 }
 
-function getEventType(property) {
-  if (!property) return undefined;
-  const supported = new Map(
-    [
-      "Examen",
-      "Torneo",
-      "Seminario",
-      "Entrenamiento especial",
-      "Actividad federativa",
-    ].map((type) => [slugify(type), type]),
-  );
+function parseTechnicalDescription(description, title) {
+  if (!description) return { publicDescription: undefined };
 
-  for (const category of property.value.split(",")) {
-    const match = supported.get(slugify(category.trim()));
-    if (match) return match;
+  const lines = description.replace(/\r\n?/g, "\n").split("\n");
+  const separatorIndex = lines.findLastIndex((line) => /^---\s*$/.test(line));
+  const publicLines = separatorIndex === -1 ? lines : lines.slice(0, separatorIndex);
+
+  const metadata = new Map();
+  for (const line of separatorIndex === -1 ? [] : lines.slice(separatorIndex + 1)) {
+    if (!line.trim()) continue;
+    const match = /^([A-Z_]+)\s*:\s*(.+)$/.exec(line.trim());
+    if (!match || !["TIPO_EVENTO", "ALBUM_FOTOS"].includes(match[1])) {
+      throw new Error(`Invalid technical metadata for ${title}: ${line.trim()}`);
+    }
+    if (metadata.has(match[1])) {
+      throw new Error(`Duplicate technical metadata ${match[1]} for ${title}.`);
+    }
+    metadata.set(match[1], match[2].trim());
   }
-  return undefined;
+
+  let albumUrl = metadata.get("ALBUM_FOTOS");
+  if (albumUrl && !googleDriveFolderUrl.test(albumUrl)) {
+    throw new Error(`Invalid ALBUM_FOTOS for ${title}.`);
+  }
+
+  const sanitizedPublicLines = publicLines.map((line) => {
+    const matches = [...line.matchAll(embeddedGoogleDriveFolderUrl)].map(
+      (match) => match[0],
+    );
+    for (const match of matches) {
+      if (albumUrl && albumUrl !== match) {
+        throw new Error(`Multiple album URLs for ${title}.`);
+      }
+      albumUrl = match;
+    }
+    return matches.reduce((text, match) => text.replace(match, ""), line).trimEnd();
+  });
+
+  return {
+    publicDescription: sanitizedPublicLines.join("\n").trim() || undefined,
+    albumUrl,
+  };
+}
+
+function inferEventType(title, warnings) {
+  const normalizedTitle = slugify(title).replace(/-/g, " ");
+  const inferred = inferredEventTypes.find(([, pattern]) => pattern.test(normalizedTitle));
+  if (inferred) return inferred[0];
+  warnings.push(`${title} has no controlled event type; using evento.`);
+  return "evento";
 }
 
 function getOrganizer(property) {
@@ -280,12 +349,23 @@ export function parseCalendarEvent(properties, warnings = []) {
 
   const uid = properties.get("UID")?.value;
   const start = parseIcsDate(properties.get("DTSTART"));
-  if (!uid || !start) {
-    warnings.push(`Event omitted because UID or DTSTART is missing: ${rawTitle || "(untitled)"}`);
+  const missingRequired = [
+    !rawTitle?.trim() && "title",
+    !start && "date",
+  ].filter(Boolean);
+  if (!uid || missingRequired.length) {
+    const reason = !uid
+      ? "UID"
+      : missingRequired.join(" and ");
+    warnings.push(`Event omitted because required ${reason} is missing: ${rawTitle || "(untitled)"}`);
     return undefined;
   }
 
-  const title = rawTitle || "Actividad sin título";
+  const title = rawTitle.trim();
+  const description = parseTechnicalDescription(
+    properties.get("DESCRIPTION")?.value,
+    title,
+  );
   const end = parseIcsDate(properties.get("DTEND"));
   const event = {
     sourceId: hash(uid),
@@ -295,7 +375,6 @@ export function parseCalendarEvent(properties, warnings = []) {
     timeZone: start.timeZone ?? defaultTimeZone,
   };
 
-  if (!rawTitle) warnings.push(`Published with placeholder title on ${start.date}.`);
   if (!start.isDateOnly && start.time) event.startTime = start.time;
   if (end) {
     if (start.isDateOnly && end.isDateOnly) {
@@ -307,10 +386,19 @@ export function parseCalendarEvent(properties, warnings = []) {
     }
   }
 
+  const lastEventDate =
+    start.isDateOnly && end?.isDateOnly
+      ? toIsoDate(addDays(createLocalDate(end.date), -1))
+      : end?.date ?? start.date;
+  event.archiveEligibleAt = calculateArchiveEligibleAt(
+    lastEventDate,
+    defaultTimeZone,
+  ).toISOString();
+
   const optionalProperties = {
     location: properties.get("LOCATION")?.value,
-    summary: properties.get("DESCRIPTION")?.value,
-    type: getEventType(properties.get("CATEGORIES")),
+    summary: description.publicDescription,
+    eventType: inferEventType(title, warnings),
     organizer: getOrganizer(properties.get("ORGANIZER")),
     infoUrl: properties.get("URL")?.value,
   };
@@ -320,27 +408,28 @@ export function parseCalendarEvent(properties, warnings = []) {
       Object.entries(optionalProperties).filter(([, value]) => Boolean(value)),
     ),
   );
-
-  const missing = [
-    !event.location && "ubicación",
-    !event.summary && "descripción",
-  ].filter(Boolean);
-  if (missing.length) {
-    warnings.push(`${title} (${start.date}) published without ${missing.join(" y ")}.`);
+  if (description.albumUrl) {
+    Object.defineProperty(event, albumUrlSymbol, { value: description.albumUrl });
   }
+
   return event;
 }
 
 function assertUniqueCurrentSlugs(events) {
   const ownerBySlug = new Map();
   for (const event of events) {
-    const previousOwner = ownerBySlug.get(event.slug);
-    if (previousOwner) {
-      throw new Error(
-        `Duplicate calendar canonical slug: ${event.slug} (${previousOwner} and ${event.sourceId}).`,
-      );
+    for (const slug of [event.slug, ...(event.aliases ?? [])]) {
+      const previousOwner = ownerBySlug.get(slug);
+      if (previousOwner) {
+        const label = slug === event.slug
+          ? "Duplicate calendar canonical slug"
+          : "Duplicate calendar canonical slug or alias";
+        throw new Error(
+          `${label}: ${slug} (${previousOwner} and ${event.sourceId}).`,
+        );
+      }
+      ownerBySlug.set(slug, event.sourceId);
     }
-    ownerBySlug.set(event.slug, event.sourceId);
   }
 }
 
@@ -350,20 +439,162 @@ export function mergeRegistry(
   now = new Date(),
 ) {
   assertUniqueCurrentSlugs(currentEvents);
-  const currentSourceIds = new Set(currentEvents.map((event) => event.sourceId));
-  const retainedHistoricalEvents = (previousRegistry.events ?? []).filter(
-    (event) =>
-      !currentSourceIds.has(event.sourceId) &&
-      getEventEndDateTime(event).getTime() < now.getTime(),
+  const historicalEvents = (previousRegistry.events ?? []).filter(
+    (event) => event.historical === true || isArchiveEligible(event, now),
   );
-  const merged = [...currentEvents, ...retainedHistoricalEvents];
+  const currentSourceIds = new Set(currentEvents.map((event) => event.sourceId));
+  if (
+    historicalEvents.length > 0 &&
+    historicalEvents.every((event) => !currentSourceIds.has(event.sourceId))
+  ) {
+    throw new Error("All historical events disappeared from the Calendar feed; no files were changed.");
+  }
+  const previousBySourceId = new Map(
+    (previousRegistry.events ?? []).map((event) => [event.sourceId, event]),
+  );
+  const freezeHistoricalSnapshot = (event) => ({
+    ...event,
+    archiveEligibleAt: getArchiveEligibleAt(event).toISOString(),
+    historical: true,
+  });
+  const reconciledCurrentEvents = currentEvents.map((currentEvent) => {
+    const previousEvent = previousBySourceId.get(currentEvent.sourceId);
+    const aliases = previousEvent?.aliases;
+    const wasHistorical =
+      previousEvent?.historical === true ||
+      (previousEvent ? isArchiveEligible(previousEvent, now) : false);
+    const becomesHistorical =
+      new Date(currentEvent.archiveEligibleAt).getTime() <= now.getTime();
+
+    if (wasHistorical) {
+      return freezeHistoricalSnapshot(previousEvent);
+    }
+
+    return {
+      ...currentEvent,
+      ...(becomesHistorical ? { historical: true } : {}),
+      ...(aliases?.length ? { aliases } : {}),
+    };
+  });
+  const reconciledSourceIds = new Set(reconciledCurrentEvents.map((event) => event.sourceId));
+  const retainedHistoricalEvents = (previousRegistry.events ?? [])
+    .filter(
+      (event) =>
+        !reconciledSourceIds.has(event.sourceId) &&
+        (event.historical === true || isArchiveEligible(event, now)),
+    )
+    .map((event) => ({ ...freezeHistoricalSnapshot(event), inactive: true }));
+  const merged = [...reconciledCurrentEvents, ...retainedHistoricalEvents];
   assertUniqueCurrentSlugs(merged);
   merged.sort(
     (a, b) =>
       createLocalDate(a.date, a.startTime).getTime() -
       createLocalDate(b.date, b.startTime).getTime(),
   );
-  return { version: 2, events: merged };
+  return { version: 3, events: merged };
+}
+
+function canonicalValue(value) {
+  return value === undefined ? { absent: true } : value;
+}
+
+export function fingerprintOrderedFields(value, fields) {
+  const canonical = fields.map((field) => [field, canonicalValue(value[field])]);
+  return createHash("sha256").update(JSON.stringify(canonical)).digest("hex");
+}
+
+export function fingerprintHistoricalSnapshot(event) {
+  return fingerprintOrderedFields(event, HISTORICAL_SNAPSHOT_FIELDS);
+}
+
+export function fingerprintHistoricalProposal(sourceId, differences) {
+  const byField = new Map(differences.map((difference) => [difference.field, difference]));
+  const canonical = HISTORICAL_COMPARISON_FIELDS
+    .filter((field) => byField.has(field))
+    .map((field) => {
+      const difference = byField.get(field);
+      return [field, difference.type, canonicalValue(difference.proposed)];
+    });
+  return createHash("sha256")
+    .update(JSON.stringify([sourceId, canonical]))
+    .digest("hex");
+}
+
+function reportValue(value) {
+  if (value === undefined) return null;
+  if (typeof value === "string") return value.replace(driveUrl, "[redacted]");
+  return value;
+}
+
+export function detectHistoricalChanges(previousRegistry, currentEvents, now = new Date()) {
+  const currentBySourceId = new Map(
+    currentEvents.map((event) => [event.sourceId, event]),
+  );
+  const changes = [];
+
+  for (const publishedEvent of previousRegistry.events ?? []) {
+    const isHistorical =
+      publishedEvent.historical === true || isArchiveEligible(publishedEvent, now);
+    if (!isHistorical) continue;
+
+    const currentEvent = currentBySourceId.get(publishedEvent.sourceId);
+    const differences = [];
+    if (!currentEvent) {
+      differences.push({
+        field: "feed",
+        published: "presente",
+        proposed: "ausente",
+        type: "desaparecido_del_feed",
+      });
+    } else {
+      for (const field of HISTORICAL_COMPARISON_FIELDS) {
+        const published = publishedEvent[field];
+        const proposed = currentEvent[field];
+        if (JSON.stringify(published) === JSON.stringify(proposed)) continue;
+        differences.push({
+          field,
+          published: reportValue(published),
+          proposed: reportValue(proposed),
+          type: proposed === undefined ? "eliminado" : "modificado",
+        });
+      }
+    }
+
+    if (differences.length) {
+      const change = {
+        sourceId: publishedEvent.sourceId,
+        publicIdentity: {
+          slug: publishedEvent.slug,
+          title: reportValue(publishedEvent.title),
+          date: publishedEvent.date,
+        },
+        differences,
+        publishedFingerprint: fingerprintHistoricalSnapshot(publishedEvent),
+        proposalFingerprint: fingerprintHistoricalProposal(
+          publishedEvent.sourceId,
+          differences,
+        ),
+      };
+      changes.push(change);
+    }
+  }
+
+  changes.sort((a, b) => a.sourceId.localeCompare(b.sourceId));
+  return { version: 2, historicalChanges: changes };
+}
+
+function redactReportSecrets(report, secrets) {
+  const redact = (value) => {
+    if (Array.isArray(value)) return value.map(redact);
+    if (value && typeof value === "object") {
+      return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, redact(item)]));
+    }
+    if (typeof value !== "string") return value;
+    return secrets
+      .filter((secret) => typeof secret === "string" && secret.length > 0)
+      .reduce((text, secret) => text.replaceAll(secret, "[redacted]"), value);
+  };
+  return redact(report);
 }
 
 function serializeProperty(name, value, isLast) {
@@ -373,6 +604,8 @@ function serializeProperty(name, value, isLast) {
 function serializeCalendarEvent(event) {
   const entries = [
     ["id", event.slug],
+    ["aliases", event.aliases],
+    ["archiveEligibleAt", event.archiveEligibleAt],
     ["title", event.title],
     ["date", event.date],
     ["endDate", event.endDate],
@@ -380,7 +613,7 @@ function serializeCalendarEvent(event) {
     ["endTime", event.endTime],
     ["location", event.location],
     ["summary", event.summary],
-    ["type", event.type],
+    ["eventType", event.eventType],
     ["organizer", event.organizer],
     ["infoUrl", event.infoUrl],
     ["timeZone", event.timeZone],
@@ -399,7 +632,7 @@ export function serializeCalendarEvents(events) {
 
 // Auto-generated from Google Calendar. Do not edit manually.
 export const CALENDAR_EVENTS: CalendarEvent[] = [
-${events.map(serializeCalendarEvent).join(",\n")}
+${events.filter((event) => event.inactive !== true).map(serializeCalendarEvent).join(",\n")}
 ];
 `;
 }
@@ -418,18 +651,20 @@ async function readCalendarSource(source) {
 async function readRegistry(registryPath) {
   try {
     const registry = JSON.parse(await readFile(registryPath, "utf8"));
-    if (registry.version !== 2 || !Array.isArray(registry.events)) {
+    if (![2, 3].includes(registry.version) || !Array.isArray(registry.events)) {
       throw new Error("Unsupported calendar event registry.");
     }
     return registry;
   } catch (error) {
-    if (error?.code === "ENOENT") return { version: 2, events: [] };
+    if (error?.code === "ENOENT") return { version: 3, events: [] };
     throw error;
   }
 }
 
-async function writeAtomically(files) {
+export async function writeAtomically(files) {
   const temporaryFiles = [];
+  const backupFiles = [];
+  const publishedFiles = [];
   try {
     for (const [filePath, contents] of files) {
       await mkdir(path.dirname(filePath), { recursive: true });
@@ -437,29 +672,88 @@ async function writeAtomically(files) {
       await writeFile(temporaryPath, contents, "utf8");
       temporaryFiles.push([temporaryPath, filePath]);
     }
+    for (const [, filePath] of temporaryFiles) {
+      const backupPath = `${filePath}.${process.pid}.backup`;
+      try {
+        await rename(filePath, backupPath);
+        backupFiles.push([backupPath, filePath]);
+      } catch (error) {
+        if (error?.code !== "ENOENT") throw error;
+      }
+    }
     for (const [temporaryPath, filePath] of temporaryFiles) {
       await rename(temporaryPath, filePath);
+      publishedFiles.push(filePath);
     }
+    await Promise.allSettled(
+      backupFiles.map(([backupPath]) => unlink(backupPath)),
+    );
   } catch (error) {
     await Promise.allSettled(
-      temporaryFiles.map(([temporaryPath]) =>
-        import("node:fs/promises").then(({ unlink }) => unlink(temporaryPath)),
-      ),
+      temporaryFiles.map(([temporaryPath]) => unlink(temporaryPath)),
+    );
+    await Promise.allSettled(
+      publishedFiles.map((filePath) => unlink(filePath)),
+    );
+    await Promise.allSettled(
+      backupFiles.map(([backupPath, filePath]) => rename(backupPath, filePath)),
     );
     throw error;
   }
 }
 
-async function writeActionSummary(warnings, eventCount) {
-  const summaryPath = process.env.GITHUB_STEP_SUMMARY;
+function escapeActionText(value) {
+  return String(value)
+    .replace(/[\u0000-\u001f\u007f]/g, " ")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/([\\`*_{}\[\]()#+.!|~-])/g, "\\$1");
+}
+
+export async function writeHistoricalChangesReport(report, reportPath) {
+  if (!reportPath) return;
+  await mkdir(path.dirname(reportPath), { recursive: true });
+  await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+}
+
+export async function writeActionSummary(
+  warnings,
+  eventCount,
+  historicalReport,
+  summaryPath = process.env.GITHUB_STEP_SUMMARY,
+) {
   if (!summaryPath) return;
+  const historicalChanges = historicalReport?.historicalChanges ?? [];
   const lines = [
     "## Calendar synchronization",
     "",
     `Published events: ${eventCount}`,
-    `Warnings: ${warnings.length}`,
+    `Operational warnings: ${warnings.length}`,
+    `Historical events requiring confirmation: ${historicalChanges.length}`,
     "",
-    ...warnings.map((warning) => `- ⚠️ ${warning}`),
+    "### Operational warnings",
+    "",
+    ...(warnings.length
+      ? warnings.map((warning) => `- ${escapeActionText(warning)}`)
+      : ["None."]),
+    "",
+    "### Historical changes requiring confirmation",
+    "",
+    ...(historicalChanges.length
+      ? historicalChanges.flatMap((event) => [
+          `#### ${escapeActionText(event.publicIdentity.title)} (${escapeActionText(event.publicIdentity.date)})`,
+          "",
+          `Internal identity: \`${escapeActionText(event.sourceId)}\``,
+          `Public identity: \`${escapeActionText(event.publicIdentity.slug)}\``,
+          "",
+          ...event.differences.map(
+            (difference) =>
+              `- ${escapeActionText(difference.field)}: ${escapeActionText(difference.type)}`,
+          ),
+          "",
+        ])
+      : ["None."]),
     "",
   ];
   await appendFile(summaryPath, lines.join("\n"), "utf8");
@@ -470,6 +764,7 @@ export async function synchronizeCalendar({
   outputPath = defaultOutputPath,
   registryPath = defaultRegistryPath,
   now = new Date(),
+  galleryOptions,
 } = {}) {
   if (!source) {
     throw new Error(
@@ -482,16 +777,49 @@ export async function synchronizeCalendar({
   const parsed = parseVEvents(icsText)
     .map((properties) => parseCalendarEvent(properties, warnings))
     .filter(Boolean);
+  const currentBySourceId = new Map(parsed.map((event) => [event.sourceId, event]));
   const previousRegistry = await readRegistry(registryPath);
+  const historicalReport = redactReportSecrets(
+    detectHistoricalChanges(previousRegistry, parsed, now),
+    [source, process.env.CALENDAR_ICS_URL],
+  );
   const registry = mergeRegistry(previousRegistry, parsed, now);
+
+  const galleryEvents = registry.events
+    .filter((event) => {
+      const lastEventDate =
+        event.endDate && !event.startTime && !event.endTime
+          ? toIsoDate(addDays(createLocalDate(event.endDate), -1))
+          : event.endDate ?? event.date;
+      return (
+        event.historical === true ||
+        calculateGalleryCheckAt(lastEventDate, event.timeZone).getTime() <=
+          now.getTime()
+      );
+    })
+    .map((event) => ({
+      slug: event.slug,
+      title: event.title,
+      albumUrl: getPrivateAlbumUrl(currentBySourceId.get(event.sourceId)),
+    }));
+  let galleryResult;
+  if (galleryEvents.some((event) => event.albumUrl) || galleryOptions?.force) {
+    galleryResult = await synchronizeEventGalleries({
+      events: galleryEvents,
+      ...galleryOptions,
+    });
+    warnings.push(...galleryResult.warnings);
+  }
 
   await writeAtomically([
     [registryPath, `${JSON.stringify(registry, null, 2)}\n`],
     [outputPath, serializeCalendarEvents(registry.events)],
   ]);
-  await writeActionSummary(warnings, registry.events.length);
-
-  return { registry, warnings };
+  await writeHistoricalChangesReport(
+    historicalReport,
+    process.env.HISTORICAL_CHANGES_REPORT_PATH,
+  );
+  return { registry, galleryResult, warnings, historicalReport };
 }
 
 async function main() {
@@ -503,6 +831,16 @@ async function main() {
   });
   console.log(
     `Synced ${result.registry.events.length} event(s) with ${result.warnings.length} warning(s).`,
+  );
+  if (result.historicalReport.historicalChanges.length) {
+    console.log(
+      `::warning title=Historical calendar changes::${result.historicalReport.historicalChanges.length} historical event(s) require confirmation.`,
+    );
+  }
+  await writeActionSummary(
+    result.warnings,
+    result.registry.events.length,
+    result.historicalReport,
   );
 }
 

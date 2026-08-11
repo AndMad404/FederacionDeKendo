@@ -74,9 +74,11 @@ export function EventPage() {
         className="relative my-2 flex w-full flex-col overflow-hidden rounded-xl bg-site-canvas tall-md:h-[calc(100%_-_1rem)] tall-md:min-h-0"
       >
         <MediaPageBanner
-          className="relative z-10 h-28 shrink-0 overflow-hidden land-compact:h-20"
+          className="relative z-10 min-h-28 shrink-0 overflow-hidden land-compact:min-h-20"
           titleId="event-page-title"
           title={event.title}
+          allowTitleWrap
+          adaptiveHeight
           description={event.type ?? copy.event.defaultType}
           image={{
             src: "/images/calendar/kendo-calendar-1600.webp",
@@ -94,7 +96,7 @@ export function EventPage() {
           }}
         />
 
-        <div className="flex min-h-0 flex-1 items-start justify-center px-3 pb-0 pt-3 sm:px-4 sm:pb-0 sm:pt-4 tall-md:items-center tall-md:p-4 land-sm:px-3 land-sm:pb-0 land-sm:pt-3">
+        <div className="relative z-20 -mt-11 flex min-h-0 flex-1 items-start justify-center px-3 pb-0 pt-3 sm:-mt-13 sm:px-4 sm:pb-0 sm:pt-4 tall-md:p-4 land-sm:px-3 land-sm:pb-0 land-sm:pt-3 land-compact:-mt-8">
           <article
             className={`grid w-full max-w-5xl gap-4 p-4 md:grid-cols-[minmax(0,1fr)_minmax(16rem,0.8fr)] md:p-5 land-sm:gap-2 land-sm:p-3 ${panelSurfaceClass}`}
           >
@@ -151,8 +153,26 @@ export function EventPage() {
             </div>
 
             <aside className="flex flex-col justify-between gap-4 rounded-xl bg-site-media p-4">
-              <p className="text-sm leading-relaxed">{copy.event.audienceNotice}</p>
+              {!isPast ? (
+                <p className="text-sm leading-relaxed">{copy.event.audienceNotice}</p>
+              ) : null}
               <div className="grid gap-2">
+                {isPast ? (
+                  <>
+                    <Link
+                      to={english ? "/en/calendar/" : "/calendario/"}
+                      className={`${secondaryButtonClass} ${focusRingClass}`}
+                    >
+                      {copy.archive.upcomingEvents}
+                    </Link>
+                    <Link
+                      to={english ? "/en/events/past/" : "/eventos/pasados/"}
+                      className={`${secondaryButtonClass} ${focusRingClass}`}
+                    >
+                      {copy.event.viewArchive}
+                    </Link>
+                  </>
+                ) : null}
                 <button
                   type="button"
                   onClick={() => void handleShare()}
@@ -165,18 +185,12 @@ export function EventPage() {
                   )}
                   {copied ? copy.common.linkCopied : copy.common.shareEvent}
                 </button>
-                <Link
-                  to={english ? "/en/calendar/" : "/calendario/"}
-                  className={`${secondaryButtonClass} ${focusRingClass}`}
-                >
-                  {copy.event.backToCalendar}
-                </Link>
-                {isPast ? (
+                {!isPast ? (
                   <Link
-                    to={english ? "/en/events/past/" : "/eventos/pasados/"}
-                    className={`text-center text-sm font-semibold underline underline-offset-4 ${focusRingClass}`}
+                    to={english ? "/en/calendar/" : "/calendario/"}
+                    className={`${secondaryButtonClass} ${focusRingClass}`}
                   >
-                    {copy.event.viewArchive}
+                    {copy.event.backToCalendar}
                   </Link>
                 ) : null}
               </div>

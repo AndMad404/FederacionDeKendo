@@ -37,6 +37,16 @@ jobs:
 
       - name: Sync calendar events
         run: pnpm run sync:calendar
+        env:
+          HISTORICAL_CHANGES_REPORT_PATH: ${{ runner.temp }}/calendar-historical-changes.json
+
+      - name: Upload historical changes report
+        uses: actions/upload-artifact@v4
+        with:
+          name: calendar-historical-changes
+          path: ${{ runner.temp }}/calendar-historical-changes.json
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Typecheck
         run: pnpm run typecheck
@@ -58,13 +68,23 @@ jobs:
 
       - name: Commit calendar changes
         run: |
-          if [[ -z "$(git status --porcelain src/app/data/calendarEvents.ts src/app/data/calendarEventRegistry.json)" ]]; then
+          sync_paths=(
+            src/app/data/calendarEvents.ts
+            src/app/data/calendarEventRegistry.json
+            src/app/data/eventGalleries.ts
+            src/app/data/eventGalleryState.json
+          )
+          if [[ -d public/images/events ]] || git ls-files --error-unmatch public/images/events >/dev/null 2>&1; then
+            sync_paths+=(public/images/events)
+          fi
+
+          if [[ -z "$(git status --porcelain -- "${sync_paths[@]}")" ]]; then
             echo "No calendar changes to commit."
             exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/app/data/calendarEvents.ts src/app/data/calendarEventRegistry.json
+          git add -A -- "${sync_paths[@]}"
           git commit -m "chore: sync calendar events"
           git push

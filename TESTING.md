@@ -8,7 +8,7 @@ regresion visual.
 ## Principios
 
 - La aplicacion vigente y las medidas aprobadas por el propietario son la
-  referencia temporal de diseno. El Figma original es obsoleto.
+  referencia de diseno.
 - El contenido ordinario es relativo: texto, enlaces e imagenes pueden cambiar
   siempre que mantengan su estructura y validez.
 - El contenido exacto se reserva para requisitos legales, nombre oficial,

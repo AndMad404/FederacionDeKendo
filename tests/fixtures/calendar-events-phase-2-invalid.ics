@@ -1,0 +1,10 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//FAK//Calendar phase 2 invalid metadata//ES
+BEGIN:VEVENT
+UID:invalid-album@example.test
+DTSTART;VALUE=DATE:20260808
+SUMMARY:Evento con metadata inválida
+DESCRIPTION:No debe publicarse.\n---\nTIPO_EVENTO: evento\nALBUM_FOTOS: https://example.test/private-album
+END:VEVENT
+END:VCALENDAR

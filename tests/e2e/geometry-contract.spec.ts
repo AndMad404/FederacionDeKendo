@@ -92,8 +92,11 @@ async function expectRelativeContent(page: Page) {
   await expect(heading).toHaveCount(1);
   await expect(heading).not.toHaveText(/^\s*$/);
 
-  for (const link of await page.locator("main a:visible").all()) {
-    expect((await link.getAttribute("href"))?.trim(), "visible links must have a destination").toBeTruthy();
+  const visibleLinkDestinations = await page
+    .locator("main a:visible")
+    .evaluateAll((links) => links.map((link) => link.getAttribute("href")?.trim()));
+  for (const destination of visibleLinkDestinations) {
+    expect(destination, "visible links must have a destination").toBeTruthy();
   }
 
   for (const image of await page.locator("main img").all()) {
