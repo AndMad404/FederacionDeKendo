@@ -16,7 +16,6 @@ import { MediaPageBanner } from "./ui/MediaPageBanner";
 import { useLanguage, type Language } from "../config/i18n";
 import { getLocalizedEvents } from "../utils/localizedEvents";
 import { useCalendarNavigation } from "../hooks/useCalendarNavigation";
-import { useCalendarEventSharing } from "../hooks/useCalendarEventSharing";
 
 function CalendarBanner() {
   const { copy } = useLanguage();
@@ -84,7 +83,6 @@ export function CalendarSection() {
     () => getUpcomingEventGroups(getLocalizedEvents(CALENDAR_EVENTS, language)),
     [language],
   );
-  const { copiedEventId, shareEvent } = useCalendarEventSharing(language);
   const {
     changeMonthPage,
     groupIndex,
@@ -145,11 +143,9 @@ export function CalendarSection() {
                   group={currentGroup}
                   monthLabel={formatMonth(currentGroup.monthKey, language)}
                   pageIndex={pageIndexes[currentGroup.monthKey] ?? 0}
-                  copiedEventId={copiedEventId}
                   onPageChange={(nextPage) =>
                     changeMonthPage(currentGroup.monthKey, nextPage)
                   }
-                  onShareEvent={(event) => void shareEvent(event)}
                 />
 
                 {nextGroup ? (
@@ -158,19 +154,14 @@ export function CalendarSection() {
                       group={nextGroup}
                       monthLabel={formatMonth(nextGroup.monthKey, language)}
                       pageIndex={pageIndexes[nextGroup.monthKey] ?? 0}
-                      copiedEventId={copiedEventId}
                       onPageChange={(nextPage) =>
                         changeMonthPage(nextGroup.monthKey, nextPage)
                       }
-                      onShareEvent={(event) => void shareEvent(event)}
                     />
                   </div>
                 ) : null}
               </div>
 
-              <p className="sr-only" aria-live="polite">
-                {copiedEventId ? copy.calendar.copiedAnnouncement : ""}
-              </p>
             </div>
           </div>
         ) : (
