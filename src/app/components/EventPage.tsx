@@ -24,6 +24,7 @@ import {
 } from "../utils/calendarEventPresentation";
 import { findEventByPathname, getEventPath } from "../utils/eventRoutes";
 import { MediaPageBanner } from "./ui/MediaPageBanner";
+import { HistoricalEventGallery } from "./HistoricalEventGallery";
 
 async function shareEvent(title: string, url: string) {
   if (navigator.share) {
@@ -150,6 +151,7 @@ export function EventPage() {
                   {event.summary ?? copy.common.informationPending}
                 </p>
               </div>
+              {isPast ? <HistoricalEventGallery eventId={event.id} eventTitle={eventTitle} /> : null}
             </div>
 
             <aside className="flex flex-col justify-between gap-4 rounded-xl bg-site-media p-4">
