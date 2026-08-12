@@ -1,5 +1,6 @@
 import {
   CalendarDays,
+  CalendarPlus,
   Check,
   Clock,
   MapPin,
@@ -19,11 +20,13 @@ import { getEventEndDate } from "../utils/calendarEvents";
 import {
   formatEventTime,
   getEventDateLabel,
+  getGoogleCalendarUrl,
   getEventLocationName,
   getLocationMapUrl,
 } from "../utils/calendarEventPresentation";
 import { findEventByPathname, getEventPath } from "../utils/eventRoutes";
 import { MediaPageBanner } from "./ui/MediaPageBanner";
+import { HistoricalEventGallery } from "./HistoricalEventGallery";
 
 async function shareEvent(title: string, url: string) {
   if (navigator.share) {
@@ -71,7 +74,7 @@ export function EventPage() {
   return (
     <section
         aria-labelledby="event-page-title"
-        className="relative my-2 flex w-full flex-col overflow-hidden rounded-xl bg-site-canvas tall-md:h-[calc(100%_-_1rem)] tall-md:min-h-0"
+        className="relative my-2 flex w-full flex-col overflow-hidden rounded-xl bg-site-canvas"
       >
         <MediaPageBanner
           className="relative z-10 min-h-28 shrink-0 overflow-hidden land-compact:min-h-20"
@@ -96,30 +99,30 @@ export function EventPage() {
           }}
         />
 
-        <div className="relative z-20 -mt-11 flex min-h-0 flex-1 items-start justify-center px-3 pb-0 pt-3 sm:-mt-13 sm:px-4 sm:pb-0 sm:pt-4 tall-md:p-4 land-sm:px-3 land-sm:pb-0 land-sm:pt-3 land-compact:-mt-8">
-          <article
-            className={`grid w-full max-w-5xl gap-4 p-4 md:grid-cols-[minmax(0,1fr)_minmax(16rem,0.8fr)] md:p-5 land-sm:gap-2 land-sm:p-3 ${panelSurfaceClass}`}
-          >
-            <div className="min-w-0">
-              <p className="text-sm font-bold uppercase tracking-wider text-site-accent">
+        <div className="relative z-20 -mt-11 flex items-start justify-center px-3 pb-0 pt-3 sm:-mt-13 sm:px-4 sm:pb-0 sm:pt-4 tall-md:p-4 land-sm:px-3 land-sm:pb-0 land-sm:pt-3 land-compact:-mt-8">
+          <div className="flex w-full max-w-5xl flex-col gap-4 land-sm:gap-2">
+            <article className={`grid gap-4 p-4 md:p-5 land-sm:gap-2 land-sm:p-3 ${panelSurfaceClass}`}>
+            <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(16rem,0.8fr)] land-sm:gap-2">
+              <div className="min-w-0">
+                <p className="text-sm font-bold uppercase tracking-wider text-site-accent">
                 {isPast ? copy.event.completed : copy.event.scheduled}
               </p>
               <dl className="mt-3 grid gap-2 text-sm md:grid-cols-2">
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2">
                   <CalendarDays className="size-5 shrink-0 text-site-accent-soft" aria-hidden="true" />
                   <div>
                     <dt className="font-bold">{copy.event.date}</dt>
                     <dd>{getEventDateLabel(event, language)}</dd>
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2">
                   <Clock className="size-5 shrink-0 text-site-accent-soft" aria-hidden="true" />
                   <div>
                     <dt className="font-bold">{copy.event.time}</dt>
                     <dd>{formatEventTime(event, language)}</dd>
                   </div>
                 </div>
-                <div className="flex gap-2 md:col-span-2">
+                <div className="flex items-center gap-2">
                   <MapPin className="size-5 shrink-0 text-site-accent-soft" aria-hidden="true" />
                   <div className="min-w-0">
                     <dt className="font-bold">{copy.event.location}</dt>
@@ -142,6 +145,19 @@ export function EventPage() {
                     </dd>
                   </div>
                 </div>
+                {!isPast ? (
+                  <div className="flex items-center">
+                    <a
+                      href={getGoogleCalendarUrl(event)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`${secondaryButtonClass} ${focusRingClass}`}
+                    >
+                      <CalendarPlus className="mr-2 size-4" aria-hidden="true" />
+                      {copy.event.addToCalendar}
+                    </a>
+                  </div>
+                ) : null}
               </dl>
 
               <div className="mt-4">
@@ -150,52 +166,57 @@ export function EventPage() {
                   {event.summary ?? copy.common.informationPending}
                 </p>
               </div>
-            </div>
+              </div>
 
-            <aside className="flex flex-col justify-between gap-4 rounded-xl bg-site-media p-4">
-              {!isPast ? (
-                <p className="text-sm leading-relaxed">{copy.event.audienceNotice}</p>
-              ) : null}
-              <div className="grid gap-2">
+              <aside className="flex self-center flex-col justify-between gap-4 rounded-xl bg-site-media p-4">
+                {!isPast ? (
+                  <p className="text-sm leading-relaxed">{copy.event.audienceNotice}</p>
+                ) : null}
+                <div className="grid gap-2">
                 {isPast ? (
                   <>
-                    <Link
-                      to={english ? "/en/calendar/" : "/calendario/"}
-                      className={`${secondaryButtonClass} ${focusRingClass}`}
-                    >
-                      {copy.archive.upcomingEvents}
-                    </Link>
                     <Link
                       to={english ? "/en/events/past/" : "/eventos/pasados/"}
                       className={`${secondaryButtonClass} ${focusRingClass}`}
                     >
                       {copy.event.viewArchive}
                     </Link>
+                    <Link
+                      to={english ? "/en/calendar/" : "/calendario/"}
+                      className={`${primaryButtonClass} ${focusRingClass}`}
+                    >
+                      {copy.archive.upcomingEvents}
+                    </Link>
                   </>
                 ) : null}
-                <button
-                  type="button"
-                  onClick={() => void handleShare()}
-                  className={`${primaryButtonClass} ${focusRingClass}`}
-                >
-                  {copied ? (
-                    <Check className="mr-2 size-4" aria-hidden="true" />
-                  ) : (
-                    <Share2 className="mr-2 size-4" aria-hidden="true" />
-                  )}
-                  {copied ? copy.common.linkCopied : copy.common.shareEvent}
-                </button>
+                {!isPast ? (
+                  <button
+                    type="button"
+                    onClick={() => void handleShare()}
+                    className={`${secondaryButtonClass} ${focusRingClass}`}
+                  >
+                    {copied ? (
+                      <Check className="mr-2 size-4" aria-hidden="true" />
+                    ) : (
+                      <Share2 className="mr-2 size-4" aria-hidden="true" />
+                    )}
+                    {copied ? copy.common.linkCopied : copy.common.shareEvent}
+                  </button>
+                ) : null}
                 {!isPast ? (
                   <Link
                     to={english ? "/en/calendar/" : "/calendario/"}
-                    className={`${secondaryButtonClass} ${focusRingClass}`}
+                    className={`${primaryButtonClass} ${focusRingClass}`}
                   >
                     {copy.event.backToCalendar}
                   </Link>
                 ) : null}
-              </div>
-            </aside>
+                </div>
+              </aside>
+            </div>
           </article>
+            {isPast ? <HistoricalEventGallery eventId={event.id} eventTitle={eventTitle} /> : null}
+          </div>
         </div>
     </section>
   );

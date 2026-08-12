@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { GalleryImage } from "../../types";
 import { useLanguage } from "../../config/i18n";
-import { focusRingClass } from "../../styles/shared";
+import { focusRingClass, galleryThumbnailActiveClass } from "../../styles/shared";
 
 const THUMBNAIL_SIZES = "(min-width: 768px) 168px, 17vw";
 
@@ -22,7 +22,7 @@ function Thumbnail({ image, isActive, buttonRef, onClick }: ThumbnailProps) {
       aria-current={isActive ? "true" : undefined}
       onClick={onClick}
       className={`group relative h-full w-full cursor-pointer overflow-hidden rounded-lg border-2 border-transparent bg-site-media transition-colors duration-300 ${
-        isActive ? "border-b-4 border-b-site-accent" : ""
+        isActive ? galleryThumbnailActiveClass : ""
       } ${focusRingClass}`}
     >
       <img

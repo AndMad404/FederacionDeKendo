@@ -1,7 +1,7 @@
 import type { DojoData } from "../types";
 import type { Language } from "../config/i18n";
 
-export const DOJOS: DojoData[] = [
+const DOJOS: DojoData[] = [
   {
     title: "Asociación Deportiva Kendo Koken Chiai",
     info: [

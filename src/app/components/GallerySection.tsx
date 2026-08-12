@@ -78,6 +78,7 @@ export function GallerySection() {
             onClose={closeLightbox}
             onPrev={showPrev}
             onNext={showNext}
+            showDetails
           />
         </Suspense>
       )}

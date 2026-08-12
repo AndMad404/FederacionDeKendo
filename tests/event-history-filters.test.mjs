@@ -15,7 +15,7 @@ const events = [
   { id: "seminar", date: "2025-01-10", eventType: "seminario" },
 ];
 
-test("orders archive events chronologically descending", () => {
+test("orders archive events from most recent to oldest", () => {
   assert.deepEqual(
     filterAndSortArchiveEvents(events, {}).map(({ id }) => id),
     ["tournament", "exam", "seminar", "no-gallery"],

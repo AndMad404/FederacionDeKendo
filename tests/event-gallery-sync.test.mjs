@@ -7,6 +7,7 @@ import sharp from "sharp";
 
 import {
   EVENT_GALLERY_LIMITS,
+  extractDriveFiles,
   getDriveFolderId,
   synchronizeEventGalleries,
 } from "../scripts/sync-event-galleries.mjs";
@@ -31,7 +32,7 @@ async function fixture(files) {
 async function run(options, albumUrl = "https://drive.google.com/drive/folders/publicAlbum") {
   return synchronizeEventGalleries({
     ...options,
-    events: [{ slug: "2026-01-01-evento", title: "Evento", albumUrl }],
+    events: [{ slug: "2026-01-01-evento", title: "Evento", date: "2026-01-01", albumUrl }],
   });
 }
 
@@ -41,6 +42,18 @@ test("uses approved input and 4K limits", () => {
   assert.equal(EVENT_GALLERY_LIMITS.maxLongEdge, 3840);
   assert.equal(EVENT_GALLERY_LIMITS.maxPixels, 3840 * 2160);
   assert.equal(getDriveFolderId("https://example.test/folder"), undefined);
+});
+
+test("reads public Drive folder indexes encoded with hexadecimal JavaScript escapes", () => {
+  const rows = [[["image-id", null, "photo.jpg", "image/jpeg"]]];
+  const encoded = [...JSON.stringify(rows)]
+    .map((character) => `\\x${character.charCodeAt(0).toString(16).padStart(2, "0")}`)
+    .join("");
+
+  assert.deepEqual(
+    extractDriveFiles(`window['_DRIVE_ivd'] = '${encoded}'`),
+    [{ id: "image-id", name: "photo.jpg" }],
+  );
 });
 
 test("accepts the minimum dimensions independently of orientation", async () => {
@@ -65,7 +78,7 @@ test("valid public album freezes five naturally ordered sanitized responsive ima
     const manifest = await readFile(context.options.manifestPath, "utf8");
     assert.match(manifest, /photo-1-480\.webp 480w/);
     assert.match(manifest, /photo-1-480\.avif 480w/);
-    assert.match(manifest, /Evento - foto 5/);
+    assert.match(manifest, /Federaciones de Asociaciones de Kendo - Evento 2026-01-01/);
     assert.equal(/drive\.google|publicAlbum|private-/.test(manifest), false);
     const firstPath = path.join(context.options.imagesRoot, "2026-01-01-evento", "photo-1-480.webp");
     const firstBuffer = await readFile(firstPath);
@@ -77,22 +90,22 @@ test("valid public album freezes five naturally ordered sanitized responsive ima
   }
 });
 
-test("rejects invalid URL and inaccessible folder without replacing a frozen gallery", async () => {
+test("does not inspect an already published gallery", async () => {
   const context = await fixture([{ name: "1.jpg", id: "one", buffer: await image("red") }]);
   try {
     await run(context.options);
     const before = await readFile(context.options.manifestPath, "utf8");
     const invalid = await run(context.options, "https://example.test/folder");
-    assert.equal(invalid.warnings.some((warning) => warning.includes("invalid Google Drive")), true);
+    assert.deepEqual(invalid.warnings, []);
     const inaccessible = await run({ ...context.options, listFolder: async () => { throw new Error("not public"); } });
-    assert.equal(inaccessible.warnings.some((warning) => warning.includes("not public")), true);
+    assert.deepEqual(inaccessible.warnings, []);
     assert.equal(await readFile(context.options.manifestPath, "utf8"), before);
   } finally {
     await rm(context.directory, { recursive: true, force: true });
   }
 });
 
-test("false MIME, dimensions, weight, duplicates and partial downloads are warned and never replace prior output", async () => {
+test("does not validate later Drive contents after a gallery is published", async () => {
   const initial = [{ name: "1.jpg", id: "one", buffer: await image("red") }];
   const context = await fixture(initial);
   try {
@@ -114,7 +127,7 @@ test("false MIME, dimensions, weight, duplicates and partial downloads are warne
           return file.buffer;
         },
       });
-      assert.equal(result.warnings.length > 0, true);
+      assert.deepEqual(result.warnings, []);
       assert.equal(await readFile(context.options.manifestPath, "utf8"), before);
     }
     const duplicateBuffer = await image("blue");
@@ -134,22 +147,43 @@ test("false MIME, dimensions, weight, duplicates and partial downloads are warne
   }
 });
 
-test("absent albums preserve the first gallery and later Drive changes only warn", async () => {
+test("an existing gallery is preserved without later Drive checks", async () => {
   const files = [{ name: "1.jpg", id: "one", buffer: await image("red") }];
   const context = await fixture(files);
   try {
     const first = await run(context.options);
     const fingerprint = first.galleries["2026-01-01-evento"].fingerprint;
     const manifest = await readFile(context.options.manifestPath, "utf8");
-    await synchronizeEventGalleries({ ...context.options, events: [{ slug: "2026-01-01-evento", title: "Evento" }] });
+    const absent = await synchronizeEventGalleries({ ...context.options, events: [{ slug: "2026-01-01-evento", title: "Evento" }] });
     assert.equal(await readFile(context.options.manifestPath, "utf8"), manifest);
+    assert.deepEqual(absent.alarms, []);
     const changed = await run({
       ...context.options,
       listFolder: async () => [{ name: "1.jpg", id: "changed", buffer: await image("blue") }],
     });
     assert.equal(changed.galleries["2026-01-01-evento"].fingerprint, fingerprint);
-    assert.equal(changed.warnings.some((warning) => warning.includes("Drive changed")), true);
+    assert.deepEqual(changed.warnings, []);
+    assert.deepEqual(changed.alarms, []);
     await stat(path.join(context.options.imagesRoot, "2026-01-01-evento", "photo-1-480.webp"));
+  } finally {
+    await rm(context.directory, { recursive: true, force: true });
+  }
+});
+
+test("reports an unpublished album without inventing a frozen gallery", async () => {
+  const context = await fixture([]);
+  try {
+    const result = await synchronizeEventGalleries({
+      ...context.options,
+      events: [{ slug: "2026-01-01-evento", title: "Evento" }],
+    });
+    assert.deepEqual(result.alarms, [{
+      slug: "2026-01-01-evento",
+      status: "album_aun_no_publicado",
+      reason: "album_ausente",
+    }]);
+    await assert.rejects(stat(context.options.manifestPath), /ENOENT/);
+    await assert.rejects(stat(context.options.statePath), /ENOENT/);
   } finally {
     await rm(context.directory, { recursive: true, force: true });
   }

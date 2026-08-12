@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -293,7 +293,7 @@ test("C2: synchronization writes a private-safe report without changing frozen p
 
 test("C2: workflow uploads the structured report without issue permissions or failure gates", async () => {
   const workflow = await readFile(path.resolve(".github/workflows/sync-calendar.yml"), "utf8");
-  assert.match(workflow, /actions\/upload-artifact@v4/);
+  assert.match(workflow, /actions\/upload-artifact@v5/);
   assert.match(workflow, /calendar-historical-changes\.json/);
   assert.doesNotMatch(workflow, /issues:\s*write|exit\s+1/);
 });
@@ -344,7 +344,7 @@ test("Given the first valid album, When galleries synchronize, Then it is publis
   }
 });
 
-test("Given a frozen gallery, When Drive changes, Then the gallery stays intact and a reproducible warning is emitted", async () => {
+test("Given a frozen gallery, When Drive changes, Then the site does not inspect it again", async () => {
   const context = await galleryFixture();
   const event = { ...historicalSnapshot, albumUrl: "https://drive.google.com/drive/folders/approved" };
   try {
@@ -366,8 +366,45 @@ test("Given a frozen gallery, When Drive changes, Then the gallery stays intact 
     });
     assert.equal(await readFile(context.options.manifestPath, "utf8"), manifest);
     assert.equal(changed.galleries[event.slug].fingerprint, first.galleries[event.slug].fingerprint);
-    assert.deepEqual(changed.warnings, [`${event.slug}: Drive changed; frozen gallery preserved.`]);
+    assert.deepEqual(changed.warnings, []);
   } finally {
     await rm(context.directory, { recursive: true, force: true });
+  }
+});
+
+test("C4: Calendar and a first gallery publication leave no mixed artifacts when staging calendar output fails", async () => {
+  const directory = await mkdtemp(path.join(os.tmpdir(), "fak-c4-atomic-"));
+  const sourcePath = path.join(directory, "calendar.ics");
+  const blockedParent = path.join(directory, "blocked");
+  const galleryOptions = {
+    manifestPath: path.join(directory, "eventGalleries.ts"),
+    statePath: path.join(directory, "eventGalleryState.json"),
+    imagesRoot: path.join(directory, "images"),
+    listFolder: async () => [{ id: "private-id", name: "1.jpg" }],
+  };
+  try {
+    await writeFile(blockedParent, "not a directory");
+    await writeFile(sourcePath, [
+      "BEGIN:VCALENDAR", "BEGIN:VEVENT", "UID:c4@example.test",
+      "DTSTART;VALUE=DATE:20260110", "SUMMARY:C4 event",
+      "DESCRIPTION:Public text\\n---\\nALBUM_FOTOS: https://drive.google.com/drive/folders/approved",
+      "END:VEVENT", "END:VCALENDAR", "",
+    ].join("\r\n"));
+    galleryOptions.downloadFile = async () => sharp({
+      create: { width: 640, height: 480, channels: 3, background: "red" },
+    }).jpeg().toBuffer();
+    await assert.rejects(synchronizeCalendar({
+      source: sourcePath,
+      registryPath: path.join(directory, "registry.json"),
+      outputPath: path.join(blockedParent, "calendarEvents.ts"),
+      now: new Date("2026-03-01T00:00:00.000Z"),
+      galleryOptions,
+    }));
+    await assert.rejects(stat(galleryOptions.manifestPath), /ENOENT/);
+    await assert.rejects(stat(galleryOptions.statePath), /ENOENT/);
+    await assert.rejects(stat(galleryOptions.imagesRoot), /ENOENT/);
+    await assert.rejects(stat(path.join(directory, "registry.json")), /ENOENT/);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
   }
 });

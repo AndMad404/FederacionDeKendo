@@ -3,8 +3,9 @@ import type { CalendarEvent } from "../types";
 // Auto-generated from Google Calendar. Do not edit manually.
 export const CALENDAR_EVENTS: CalendarEvent[] = [
   {
-    id: "2026-05-02-federacion-examen",
-    archiveEligibleAt: "2026-05-05T06:00:00.000Z",
+    id: "2026-05-02-examen",
+    aliases: ["2026-05-02-federacion-examen"],
+    archiveEligibleAt: "2026-05-04T06:00:00.000Z",
     title: "Examen",
     date: "2026-05-02",
     eventType: "examen",
@@ -12,7 +13,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2026-05-29-clak-seminario-instructores-chile",
-    archiveEligibleAt: "2026-06-03T06:00:00.000Z",
+    archiveEligibleAt: "2026-06-02T06:00:00.000Z",
     title: "CLAK Seminario Instructores CHILE",
     date: "2026-05-29",
     endDate: "2026-06-01",
@@ -20,8 +21,9 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
     timeZone: "America/Costa_Rica"
   },
   {
-    id: "2026-05-30-federacion-seminario-y-reunion",
-    archiveEligibleAt: "2026-06-02T06:00:00.000Z",
+    id: "2026-05-30-seminario",
+    aliases: ["2026-05-30-federacion-seminario-y-reunion"],
+    archiveEligibleAt: "2026-06-01T06:00:00.000Z",
     title: "Seminario",
     date: "2026-05-30",
     eventType: "seminario",
@@ -52,13 +54,13 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
     timeZone: "America/Costa_Rica"
   },
   {
-    id: "2026-09-11-gasshuku-monteverde",
-    archiveEligibleAt: "2026-09-14T06:00:00.000Z",
+    id: "2026-09-12-gasshuku-monteverde",
+    archiveEligibleAt: "2026-09-15T06:00:00.000Z",
     title: "Gasshuku Monteverde",
-    date: "2026-09-11",
-    endDate: "2026-09-13",
+    date: "2026-09-12",
+    endDate: "2026-09-14",
     location: "El Establo Mountain Hotel, Provincia de Puntarenas, Monteverde, Costa Rica",
-    summary: "Entrenamientos intensivos de protocolo, técnica y combate.",
+    summary: "La participación incluye:\n\n* Transporte ida y vuelta\n* Almuerzo primer día\n* Desayuno del segundo día\n* Habitación compartida\n* Acceso a las instalaciones y senderos del hotel\n* Uso de los salones de entrenamiento\n* Experiencia intensiva de entrenamiento a cargo de senséis de alto nivel\n\nEste encuentro guiado por cuatro senséis japoneses de alto rango nace con el propósito de vivir el kendo más allá del entrenamiento habitual: compartir dos días de disciplina, convivencia y aprendizaje.\n\nEl Gasshuku se desarrollará en el Establo Mountain Hotel, Monteverde. Sus instalaciones y salones de madera ofrecerán un espacio para entrenar, alejarnos por unos días de la rutina y disfrutar de una experiencia diferente alrededor del kendo.",
     eventType: "evento",
     timeZone: "America/Costa_Rica"
   },

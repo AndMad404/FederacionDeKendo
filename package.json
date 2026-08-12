@@ -16,6 +16,7 @@
     "typecheck": "tsc --noEmit",
     "sync:calendar": "node scripts/sync-calendar-events.mjs",
     "correct:calendar-history": "node scripts/correct-calendar-history.mjs",
+    "correct:calendar-history-range": "node scripts/correct-calendar-history-range.mjs",
     "images:responsive": "node scripts/generate-responsive-images.mjs"
   },
   "dependencies": {

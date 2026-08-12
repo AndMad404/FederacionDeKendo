@@ -1,0 +1,91 @@
+name: Apply approved historical calendar range
+
+on:
+  workflow_dispatch:
+    inputs:
+      report_run_id:
+        description: Run ID that produced the approved historical changes report
+        required: true
+        type: string
+      from:
+        description: Inclusive first historical event date (YYYY-MM-DD)
+        required: true
+        type: string
+      to:
+        description: Inclusive last historical event date (YYYY-MM-DD)
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: correct-calendar-history-range
+  cancel-in-progress: false
+
+jobs:
+  correct-history:
+    name: Apply approved historical range
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Download approved historical changes report
+        uses: actions/download-artifact@v5
+        with:
+          name: calendar-historical-changes
+          run-id: ${{ inputs.report_run_id }}
+          github-token: ${{ github.token }}
+          path: .
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Apply approved historical range
+        run: pnpm run correct:calendar-history-range --report calendar-historical-changes.json --from "${{ inputs.from }}" --to "${{ inputs.to }}"
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      - name: Unit tests
+        run: pnpm run test:unit
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Generated output tests
+        run: pnpm run test:generated
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Browser tests
+        run: pnpm run test:e2e
+
+      - name: Commit approved historical range
+        run: |
+          sync_paths=(
+            src/app/data/calendarEvents.ts
+            src/app/data/calendarEventRegistry.json
+          )
+          if [[ -z "$(git status --porcelain -- "${sync_paths[@]}")" ]]; then
+            echo "No approved historical changes to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- "${sync_paths[@]}"
+          git commit -m "chore: correct historical calendar range"
+          git push

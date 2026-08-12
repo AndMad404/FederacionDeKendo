@@ -1,4 +1,3 @@
-import type { CalendarEvent } from "../../types";
 import type { UpcomingEventGroup } from "../../utils/calendarEvents";
 import { NavigationArrowButton } from "../ui/ModalControls";
 import { CalendarEventCard } from "./CalendarEventCard";
@@ -10,18 +9,14 @@ interface CalendarMonthProps {
   group: UpcomingEventGroup;
   monthLabel: string;
   pageIndex: number;
-  copiedEventId: string | null;
   onPageChange: (page: number) => void;
-  onShareEvent: (event: CalendarEvent) => void;
 }
 
 export function CalendarMonth({
   group,
   monthLabel,
   pageIndex,
-  copiedEventId,
   onPageChange,
-  onShareEvent,
 }: CalendarMonthProps) {
   const { copy } = useLanguage();
   const pageCount = Math.ceil(
@@ -45,8 +40,6 @@ export function CalendarMonth({
           <CalendarEventCard
             key={event.id}
             event={event}
-            isShareCopied={copiedEventId === event.id}
-            onShare={onShareEvent}
           />
         ))}
       </ul>

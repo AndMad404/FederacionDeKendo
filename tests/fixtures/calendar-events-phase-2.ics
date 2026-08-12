@@ -40,7 +40,7 @@ END:VEVENT
 BEGIN:VEVENT
 UID:inferred@example.test
 DTSTART;VALUE=DATE:20260523
-SUMMARY:Seminarios técnicos
+SUMMARY:Gasshuku técnico
 DESCRIPTION:Tipo inferido por título.
 END:VEVENT
 BEGIN:VEVENT

@@ -139,6 +139,8 @@ test.describe("all generated routes preserve the desktop shell contract", () => 
   test.use({ viewport: SHELL_CONTRACT.desktopViewport });
 
   for (const approvedPage of approvedPages) {
+    if (approvedPage.design === "event") continue;
+
     test(`${approvedPage.path} remains bounded and non-overlapping`, async ({ page }) => {
       await preparePage(page, approvedPage.path);
 
@@ -187,6 +189,34 @@ test.describe("all generated routes preserve the desktop shell contract", () => 
       expect(geometry.headingClearsContent).toBe(true);
       expectCssPixels(geometry.mainPaddingLeft, SHELL_CONTRACT.mainPaddingInline, "main left padding");
       expectCssPixels(geometry.mainPaddingRight, SHELL_CONTRACT.mainPaddingInline, "main right padding");
+    });
+  }
+});
+
+test.describe("event details preserve desktop document flow", () => {
+  test.use({ viewport: SHELL_CONTRACT.desktopViewport });
+
+  for (const approvedPage of approvedPages.filter((page) => page.design === "event")) {
+    test(`${approvedPage.path} keeps its content reachable`, async ({ page }) => {
+      await preparePage(page, approvedPage.path);
+
+      const geometry = await page.evaluate(() => {
+        const root = document.documentElement;
+        const section = document.querySelector("main > section");
+        const footer = document.querySelector("footer");
+        return {
+          hasHorizontalOverflow: root.scrollWidth > root.clientWidth + 1,
+          sectionScrollHeight: section?.scrollHeight ?? 0,
+          sectionClientHeight: section?.clientHeight ?? 0,
+          footerBottom: footer?.getBoundingClientRect().bottom ?? 0,
+        };
+      });
+
+      expect(geometry.hasHorizontalOverflow).toBe(false);
+      expect(geometry.sectionScrollHeight).toBeLessThanOrEqual(
+        geometry.sectionClientHeight + 1,
+      );
+      expect(geometry.footerBottom).toBeGreaterThan(0);
     });
   }
 });

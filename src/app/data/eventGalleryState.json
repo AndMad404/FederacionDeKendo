@@ -1,4 +1,8 @@
 {
   "version": 1,
-  "galleries": {}
+  "galleries": {
+    "2026-08-08-examen": {
+      "fingerprint": "2164e8b1aa9e2137057d27be603d707fb25d0c2b8c31e5ed1be3912763284fe8"
+    }
+  }
 }

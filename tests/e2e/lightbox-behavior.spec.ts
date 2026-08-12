@@ -16,6 +16,12 @@ async function openLightbox(page: Page) {
 test("isolates the open lightbox from the application", async ({ page }) => {
   const { dialog } = await openLightbox(page);
 
+  await expect(dialog).toHaveAttribute("aria-labelledby", "lightbox-title");
+  await expect(dialog).toHaveAttribute("aria-describedby", "lightbox-description");
+  await expect(dialog.locator("#lightbox-title")).toBeVisible();
+  await expect(dialog.locator("#lightbox-description")).toBeVisible();
+  await expect(dialog.getByText(/^1 \/ \d+$/)).toBeVisible();
+
   const isolation = await page.evaluate(() => {
     const root = document.querySelector<HTMLElement>("#root");
     const openDialog = document.querySelector<HTMLElement>('[role="dialog"]');

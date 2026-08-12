@@ -3,13 +3,16 @@
   "events": [
     {
       "sourceId": "7bd8989c63db48fab752ce0f",
-      "slug": "2026-05-02-federacion-examen",
+      "slug": "2026-05-02-examen",
       "title": "Examen",
       "date": "2026-05-02",
       "timeZone": "America/Costa_Rica",
-      "archiveEligibleAt": "2026-05-05T06:00:00.000Z",
+      "archiveEligibleAt": "2026-05-04T06:00:00.000Z",
       "eventType": "examen",
-      "historical": true
+      "historical": true,
+      "aliases": [
+        "2026-05-02-federacion-examen"
+      ]
     },
     {
       "sourceId": "462f5f7da99a1d17474471bd",
@@ -18,19 +21,22 @@
       "date": "2026-05-29",
       "timeZone": "America/Costa_Rica",
       "endDate": "2026-06-01",
-      "archiveEligibleAt": "2026-06-03T06:00:00.000Z",
+      "archiveEligibleAt": "2026-06-02T06:00:00.000Z",
       "eventType": "seminario",
       "historical": true
     },
     {
       "sourceId": "9c63151cacb01bef733c39cb",
-      "slug": "2026-05-30-federacion-seminario-y-reunion",
+      "slug": "2026-05-30-seminario",
       "title": "Seminario",
       "date": "2026-05-30",
       "timeZone": "America/Costa_Rica",
-      "archiveEligibleAt": "2026-06-02T06:00:00.000Z",
+      "archiveEligibleAt": "2026-06-01T06:00:00.000Z",
       "eventType": "seminario",
-      "historical": true
+      "historical": true,
+      "aliases": [
+        "2026-05-30-federacion-seminario-y-reunion"
+      ]
     },
     {
       "sourceId": "89d31aa2d6937a78b1866283",
@@ -61,14 +67,14 @@
     },
     {
       "sourceId": "45c4376b5e5e0fcf347835d0",
-      "slug": "2026-09-11-gasshuku-monteverde",
+      "slug": "2026-09-12-gasshuku-monteverde",
       "title": "Gasshuku Monteverde",
-      "date": "2026-09-11",
+      "date": "2026-09-12",
       "timeZone": "America/Costa_Rica",
-      "endDate": "2026-09-13",
-      "archiveEligibleAt": "2026-09-14T06:00:00.000Z",
+      "endDate": "2026-09-14",
+      "archiveEligibleAt": "2026-09-15T06:00:00.000Z",
       "location": "El Establo Mountain Hotel, Provincia de Puntarenas, Monteverde, Costa Rica",
-      "summary": "Entrenamientos intensivos de protocolo, técnica y combate.",
+      "summary": "La participación incluye:\n\n* Transporte ida y vuelta\n* Almuerzo primer día\n* Desayuno del segundo día\n* Habitación compartida\n* Acceso a las instalaciones y senderos del hotel\n* Uso de los salones de entrenamiento\n* Experiencia intensiva de entrenamiento a cargo de senséis de alto nivel\n\nEste encuentro guiado por cuatro senséis japoneses de alto rango nace con el propósito de vivir el kendo más allá del entrenamiento habitual: compartir dos días de disciplina, convivencia y aprendizaje.\n\nEl Gasshuku se desarrollará en el Establo Mountain Hotel, Monteverde. Sus instalaciones y salones de madera ofrecerán un espacio para entrenar, alejarnos por unos días de la rutina y disfrutar de una experiencia diferente alrededor del kendo.",
       "eventType": "evento"
     },
     {

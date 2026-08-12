@@ -18,7 +18,7 @@
 
   <rect width="1200" height="630" fill="url(#bg)"/>
 
-  <rect x="72" y="72" width="720" height="488" rx="28" fill="#000000" fill-opacity=".62" stroke="#3b82f6" stroke-width="2" filter="url(#panel-shadow)"/>
+  <rect x="72" y="72" width="1056" height="488" rx="28" fill="#000000" fill-opacity=".62" stroke="#3b82f6" stroke-width="2" filter="url(#panel-shadow)"/>
 
   <text class="sans bold" x="118" y="174" fill="#60a5fa" font-size="22" letter-spacing="1.2">SITIO OFICIAL</text>
   <text class="sans bold" x="116" y="226" fill="#ffffff" font-size="52">
@@ -31,5 +31,6 @@
     <tspan x="118" dy="31">kendo con disciplina, respeto y continuidad.</tspan>
   </text>
   <text class="sans bold" x="118" y="486" fill="#93c5fd" font-size="24">fak-kendo.pages.dev</text>
+  <image href="../logo/fakcr-logo.png" x="844" y="136" width="248" height="358" preserveAspectRatio="xMidYMid meet"/>
 
 </svg>

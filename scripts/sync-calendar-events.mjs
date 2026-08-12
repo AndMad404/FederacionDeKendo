@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { appendFile, mkdir, readFile, rename, unlink, writeFile } from "node:fs/promises";
+import { appendFile, mkdir, readFile, rename, rm, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import {
@@ -8,7 +8,7 @@ import {
   getArchiveEligibleAt,
   isArchiveEligible,
 } from "../src/app/utils/eventArchive.js";
-import { synchronizeEventGalleries } from "./sync-event-galleries.mjs";
+import { replaceTransaction, synchronizeEventGalleries } from "./sync-event-galleries.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "..");
@@ -31,7 +31,6 @@ const draftPrefix = "[BORRADOR]";
 const inferredEventTypes = [
   ["torneo", /(?:^|\s)torneos?(?:$|\s)/],
   ["examen", /(?:^|\s)examen(?:es)?(?:$|\s)/],
-  ["seminario", /(?:^|\s)seminarios?(?:$|\s)/],
 ];
 const googleDriveFolderUrl = /^https:\/\/drive\.google\.com\/drive\/folders\/[A-Za-z0-9_-]+(?:[/?#].*)?$/;
 const embeddedGoogleDriveFolderUrl = /https:\/\/drive\.google\.com\/drive\/folders\/[A-Za-z0-9_-]+(?:[/?#][^\s]*)?/g;
@@ -317,12 +316,11 @@ function parseTechnicalDescription(description, title) {
   };
 }
 
-function inferEventType(title, warnings) {
+function inferEventType(title) {
   const normalizedTitle = slugify(title).replace(/-/g, " ");
   const inferred = inferredEventTypes.find(([, pattern]) => pattern.test(normalizedTitle));
   if (inferred) return inferred[0];
-  warnings.push(`${title} has no controlled event type; using evento.`);
-  return "evento";
+  return "seminario";
 }
 
 function getOrganizer(property) {
@@ -398,7 +396,7 @@ export function parseCalendarEvent(properties, warnings = []) {
   const optionalProperties = {
     location: properties.get("LOCATION")?.value,
     summary: description.publicDescription,
-    eventType: inferEventType(title, warnings),
+    eventType: inferEventType(title),
     organizer: getOrganizer(properties.get("ORGANIZER")),
     infoUrl: properties.get("URL")?.value,
   };
@@ -702,6 +700,13 @@ export async function writeAtomically(files) {
   }
 }
 
+async function stageTextFile(filePath, contents) {
+  await mkdir(path.dirname(filePath), { recursive: true });
+  const staged = `${filePath}.${process.pid}.stage`;
+  await writeFile(staged, contents, "utf8");
+  return { target: filePath, staged };
+}
+
 function escapeActionText(value) {
   return String(value)
     .replace(/[\u0000-\u001f\u007f]/g, " ")
@@ -725,12 +730,14 @@ export async function writeActionSummary(
 ) {
   if (!summaryPath) return;
   const historicalChanges = historicalReport?.historicalChanges ?? [];
+  const galleryChanges = historicalReport?.galleryChanges ?? [];
   const lines = [
     "## Calendar synchronization",
     "",
     `Published events: ${eventCount}`,
     `Operational warnings: ${warnings.length}`,
     `Historical events requiring confirmation: ${historicalChanges.length}`,
+    `Gallery states requiring attention: ${galleryChanges.length}`,
     "",
     "### Operational warnings",
     "",
@@ -753,6 +760,12 @@ export async function writeActionSummary(
           ),
           "",
         ])
+      : ["None."]),
+    "",
+    "### Gallery states requiring attention",
+    "",
+    ...(galleryChanges.length
+      ? galleryChanges.map((change) => `- ${escapeActionText(change.slug)}: ${escapeActionText(change.status)} (${escapeActionText(change.reason)})`)
       : ["None."]),
     "",
   ];
@@ -783,6 +796,7 @@ export async function synchronizeCalendar({
     detectHistoricalChanges(previousRegistry, parsed, now),
     [source, process.env.CALENDAR_ICS_URL],
   );
+  historicalReport.galleryChanges = [];
   const registry = mergeRegistry(previousRegistry, parsed, now);
 
   const galleryEvents = registry.events
@@ -791,29 +805,38 @@ export async function synchronizeCalendar({
         event.endDate && !event.startTime && !event.endTime
           ? toIsoDate(addDays(createLocalDate(event.endDate), -1))
           : event.endDate ?? event.date;
-      return (
-        event.historical === true ||
-        calculateGalleryCheckAt(lastEventDate, event.timeZone).getTime() <=
-          now.getTime()
-      );
+      return calculateGalleryCheckAt(lastEventDate, event.timeZone).getTime() <= now.getTime();
     })
     .map((event) => ({
       slug: event.slug,
       title: event.title,
+      date: event.date,
       albumUrl: getPrivateAlbumUrl(currentBySourceId.get(event.sourceId)),
     }));
   let galleryResult;
-  if (galleryEvents.some((event) => event.albumUrl) || galleryOptions?.force) {
+  if (galleryEvents.length || galleryOptions?.force) {
     galleryResult = await synchronizeEventGalleries({
       events: galleryEvents,
       ...galleryOptions,
+      deferPublish: true,
     });
     warnings.push(...galleryResult.warnings);
+    historicalReport.galleryChanges = galleryResult.alarms;
   }
 
-  await writeAtomically([
-    [registryPath, `${JSON.stringify(registry, null, 2)}\n`],
-    [outputPath, serializeCalendarEvents(registry.events)],
+  let calendarPublication;
+  try {
+    calendarPublication = await Promise.all([
+      stageTextFile(registryPath, `${JSON.stringify(registry, null, 2)}\n`),
+      stageTextFile(outputPath, serializeCalendarEvents(registry.events)),
+    ]);
+  } catch (error) {
+    await Promise.all((galleryResult?.publication ?? []).map(({ staged }) => rm(staged, { recursive: true, force: true })));
+    throw error;
+  }
+  await replaceTransaction([
+    ...(galleryResult?.publication ?? []),
+    ...calendarPublication,
   ]);
   await writeHistoricalChangesReport(
     historicalReport,

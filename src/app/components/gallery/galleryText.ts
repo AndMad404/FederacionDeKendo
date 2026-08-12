@@ -2,7 +2,7 @@ const GALLERY_TITLE_MAX_LENGTH = 32;
 const GALLERY_TAG_MAX_LENGTH = 20;
 const GALLERY_DESCRIPTION_MAX_LENGTH = 200;
 const MOBILE_DESCRIPTION_MAX_LENGTH = 70;
-export const OPEN_DETAILS_LABEL = "Abrir detalles";
+const OPEN_DETAILS_LABEL = "Abrir detalles";
 
 const ellipsis = "...";
 

@@ -2,7 +2,7 @@
 
 ```yaml
 schema_version: 2
-last_updated: 2026-08-10
+last_updated: 2026-08-12
 contract: .agents/review-contract.md
 
 state_rules:
@@ -11,6 +11,78 @@ state_rules:
   - A reviewed target is not automatically verified.
   - Changed targets make prior coverage stale until re-reviewed.
   - Legacy claims without reproducible evidence are historical, not current coverage.
+
+latest_c2_alarm_review:
+  id: REV-2026-08-11-01
+  requested_scope: Review the pending Phase C2 historical-calendar alarm.
+  actual_scope:
+    targets:
+      - scripts/sync-calendar-events.mjs
+      - .github/workflows/sync-calendar.yml
+      - tests/event-history-sync-contract.test.mjs
+      - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/event-history-roadmap.md
+    axes: [ARCH]
+    included:
+      - deterministic historical-change detection
+      - immutability of historical snapshots
+      - private-data redaction
+      - GitHub Actions alarm channel and structured artifact
+      - alignment of the canonical roadmap status with repository evidence
+    excluded:
+      - implementation changes
+      - external GitHub Actions execution
+      - visual UI, gallery-pipeline, correction-operation, and deployment review
+  baseline:
+    commit: 2555735b
+    worktree: clean
+  confirmed_findings: []
+  evidence:
+    - corepack pnpm exec node --test tests/event-history-sync-contract.test.mjs passed 15 tests
+    - scripts/sync-calendar-events.mjs exports detectHistoricalChanges, redacts report values, writes the report, and emits an Actions warning and summary
+    - .github/workflows/sync-calendar.yml uploads calendar-historical-changes.json for 30 days without issue permissions or a failure gate
+    - event-history-roadmap.md was reconciled on 2026-08-12
+  result: C2 is implemented locally with the selected non-blocking GitHub Actions summary/warning plus JSON-artifact channel. The canonical roadmap and operator workflow were reconciled on 2026-08-12; external Actions execution remains outside this review.
+
+resolved_findings:
+  - id: DOC-ARCH-001
+    level: SMELL
+    axis: ARCH
+    status: resolved
+    target: ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/event-history-roadmap.md:3
+    problem: The roadmap states that C2 is pending, while repository code, its workflow, and directed C2 tests implement the documented alarm channel.
+    fix: Mark C2 implemented and verified locally, record the chosen channel as an Actions warning/summary plus 30-day JSON artifact, and remove the pre-implementation decision gate.
+    cost_of_deferring: Roadmap-driven planning will incorrectly report C2 as the next phase and may duplicate completed work.
+    evidence:
+      - commit e13300cd
+      - scripts/sync-calendar-events.mjs:529
+      - .github/workflows/sync-calendar.yml:41
+      - tests/event-history-sync-contract.test.mjs:179
+      - corepack pnpm exec node --test tests/event-history-sync-contract.test.mjs
+    introduced_in: REV-2026-08-11-01
+    resolution:
+      resolved_at: 2026-08-12
+      resolved_ref: documentation worktree
+      checks:
+        - event-history-roadmap.md records C2 as implemented and verified locally
+        - calendar-sync.md records the selected alarm channel and operator workflow
+
+stale_coverage_notices:
+  - id: STALE-2026-08-12-01
+    targets:
+      - src/app/components/EventPage.tsx
+      - src/app/components/CalendarSection.tsx
+      - src/app/components/calendar/CalendarEventCard.tsx
+      - src/app/components/GallerySection.tsx
+      - src/app/components/HistoricalEventGallery.tsx
+      - src/app/components/Lightbox.tsx
+      - scripts/sync-calendar-events.mjs
+      - scripts/sync-event-galleries.mjs
+      - scripts/correct-calendar-history.mjs
+      - scripts/correct-calendar-history-range.mjs
+      - related workflows, directed tests, and visual baselines
+    reason: Changes committed on 2026-08-12 alter historical-gallery publication, correction workflow, event actions, calendar-card sharing, lightbox presentation, and approved visual snapshots after the prior recorded baselines.
+    status: stale_pending_targeted_review
+    limitation: Documentation reconciliation is not a technical or visual verification of these changes.
 
 design_source_status:
   status: obsolete_pending_recreation

@@ -1,4 +1,4 @@
-import { Check, Info, MapPin, Share2 } from "lucide-react";
+import { Info, MapPin } from "lucide-react";
 import { Link } from "react-router";
 import type { CalendarEvent } from "../../types";
 import {
@@ -16,14 +16,10 @@ import { useLanguage } from "../../config/i18n";
 
 interface CalendarEventCardProps {
   event: CalendarEvent;
-  isShareCopied: boolean;
-  onShare: (event: CalendarEvent) => void;
 }
 
 export function CalendarEventCard({
   event,
-  isShareCopied,
-  onShare,
 }: CalendarEventCardProps) {
   const { language, copy } = useLanguage();
   const { startDateLabel, endDateLabel, endDateValue } =
@@ -81,28 +77,11 @@ export function CalendarEventCard({
         <Link
           to={getEventPath(event, language)}
           aria-label={`${copy.calendar.viewDetailsLabel} ${event.title}`}
-          className={`pointer-events-auto inline-flex min-h-11 cursor-pointer items-center justify-center rounded-full px-3 py-1 text-sm font-semibold transition hover:border-site-action hover:bg-site-media lg:min-h-8 ${actionControlSurfaceClass} ${focusRingClass}`}
+          className={`pointer-events-auto inline-flex min-h-11 cursor-pointer items-center justify-center rounded-full border border-site-action bg-site-action px-3 py-1 text-sm font-semibold text-site-on-dark transition-colors hover:bg-site-action-hover lg:min-h-8 ${focusRingClass}`}
         >
           <Info className="mr-1.5 size-4" />
           {copy.common.eventDetails}
         </Link>
-        <button
-          type="button"
-          aria-label={
-            isShareCopied
-              ? `${copy.calendar.copiedLabel} ${event.title} ${copy.calendar.copiedLabelSuffix}`
-              : `${copy.calendar.shareLabel} ${event.title} ${copy.calendar.shareLabelSuffix}`
-          }
-          title={isShareCopied ? copy.common.linkCopied : copy.common.shareEvent}
-          onClick={() => onShare(event)}
-          className={`pointer-events-auto flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors hover:border-site-action hover:bg-site-media lg:size-8 ${actionControlSurfaceClass} ${focusRingClass}`}
-        >
-          {isShareCopied ? (
-            <Check className="size-4" aria-hidden="true" />
-          ) : (
-            <Share2 className="size-4" aria-hidden="true" />
-          )}
-        </button>
       </div>
     </li>
   );
