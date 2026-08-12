@@ -349,11 +349,11 @@ function getRouteImageUrl(meta: RouteMeta) {
 
 function getRouteImageMetadata(meta: RouteMeta) {
   return {
-    url: getRouteImageUrl(meta),
-    alt: meta.imageAlt || DEFAULT_SOCIAL_IMAGE_ALT,
-    width: meta.imageWidth || DEFAULT_SOCIAL_IMAGE_WIDTH,
-    height: meta.imageHeight || DEFAULT_SOCIAL_IMAGE_HEIGHT,
-    type: meta.imageType || "image/png",
+    url: absoluteUrl(DATA.defaultImage),
+    alt: DEFAULT_SOCIAL_IMAGE_ALT,
+    width: DEFAULT_SOCIAL_IMAGE_WIDTH,
+    height: DEFAULT_SOCIAL_IMAGE_HEIGHT,
+    type: "image/png",
   };
 }
 
