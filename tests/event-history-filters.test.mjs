@@ -15,17 +15,17 @@ const events = [
   { id: "seminar", date: "2025-01-10", eventType: "seminario" },
 ];
 
-test("orders archive events chronologically descending", () => {
+test("orders archive events chronologically ascending", () => {
   assert.deepEqual(
     filterAndSortArchiveEvents(events, {}).map(({ id }) => id),
-    ["tournament", "exam", "seminar", "no-gallery"],
+    ["no-gallery", "seminar", "exam", "tournament"],
   );
 });
 
 test("filters by year and derives descending year options", () => {
   assert.deepEqual(
     filterAndSortArchiveEvents(events, { year: "2025" }).map(({ id }) => id),
-    ["tournament", "exam", "seminar"],
+    ["seminar", "exam", "tournament"],
   );
   assert.deepEqual(getArchiveYears(events), ["2025", "2024"]);
 });
