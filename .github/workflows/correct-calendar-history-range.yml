@@ -1,28 +1,45 @@
-name: Sync calendar events
+name: Apply approved historical calendar range
 
 on:
-  schedule:
-    - cron: "0 9 * * *"
   workflow_dispatch:
+    inputs:
+      report_run_id:
+        description: Run ID that produced the approved historical changes report
+        required: true
+        type: string
+      from:
+        description: Inclusive first historical event date (YYYY-MM-DD)
+        required: true
+        type: string
+      to:
+        description: Inclusive last historical event date (YYYY-MM-DD)
+        required: true
+        type: string
 
 permissions:
+  actions: read
   contents: write
 
 concurrency:
-  group: sync-calendar-events
+  group: correct-calendar-history-range
   cancel-in-progress: false
 
 jobs:
-  sync-calendar:
-    name: Sync Google Calendar into site data
+  correct-history:
+    name: Apply approved historical range
     runs-on: ubuntu-latest
-    env:
-      CALENDAR_ICS_URL: ${{ secrets.CALENDAR_ICS_URL }}
-      CALENDAR_TIME_ZONE: America/Costa_Rica
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+
+      - name: Download approved historical changes report
+        uses: actions/download-artifact@v5
+        with:
+          name: calendar-historical-changes
+          run-id: ${{ inputs.report_run_id }}
+          github-token: ${{ github.token }}
+          path: .
 
       - name: Enable Corepack
         run: corepack enable
@@ -35,18 +52,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Sync calendar events
-        run: pnpm run sync:calendar
-        env:
-          HISTORICAL_CHANGES_REPORT_PATH: ${{ runner.temp }}/calendar-historical-changes.json
-
-      - name: Upload historical changes report
-        uses: actions/upload-artifact@v5
-        with:
-          name: calendar-historical-changes
-          path: ${{ runner.temp }}/calendar-historical-changes.json
-          if-no-files-found: error
-          retention-days: 30
+      - name: Apply approved historical range
+        run: pnpm run correct:calendar-history-range -- --report calendar-historical-changes.json --from "${{ inputs.from }}" --to "${{ inputs.to }}"
 
       - name: Typecheck
         run: pnpm run typecheck
@@ -66,25 +73,19 @@ jobs:
       - name: Browser tests
         run: pnpm run test:e2e
 
-      - name: Commit calendar changes
+      - name: Commit approved historical range
         run: |
           sync_paths=(
             src/app/data/calendarEvents.ts
             src/app/data/calendarEventRegistry.json
-            src/app/data/eventGalleries.ts
-            src/app/data/eventGalleryState.json
           )
-          if [[ -d public/images/events ]] || git ls-files --error-unmatch public/images/events >/dev/null 2>&1; then
-            sync_paths+=(public/images/events)
-          fi
-
           if [[ -z "$(git status --porcelain -- "${sync_paths[@]}")" ]]; then
-            echo "No calendar changes to commit."
+            echo "No approved historical changes to commit."
             exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A -- "${sync_paths[@]}"
-          git commit -m "chore: sync calendar events"
+          git commit -m "chore: correct historical calendar range"
           git push

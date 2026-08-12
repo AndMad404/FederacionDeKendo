@@ -293,7 +293,7 @@ test("C2: synchronization writes a private-safe report without changing frozen p
 
 test("C2: workflow uploads the structured report without issue permissions or failure gates", async () => {
   const workflow = await readFile(path.resolve(".github/workflows/sync-calendar.yml"), "utf8");
-  assert.match(workflow, /actions\/upload-artifact@v4/);
+  assert.match(workflow, /actions\/upload-artifact@v5/);
   assert.match(workflow, /calendar-historical-changes\.json/);
   assert.doesNotMatch(workflow, /issues:\s*write|exit\s+1/);
 });

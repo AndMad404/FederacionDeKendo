@@ -90,43 +90,70 @@ function assertUniqueSlugs(events) {
   }
 }
 
-export async function applyHistoricalCorrection(options) {
-  const { registryPath, outputPath, reportPath, sourceId, publishedFingerprint, proposalFingerprint, fields } = options;
-  validateArguments(options);
+export async function applyHistoricalCorrections({
+  registryPath,
+  outputPath,
+  reportPath,
+  corrections,
+}) {
+  if (!Array.isArray(corrections) || corrections.length === 0) {
+    throw new Error("At least one historical correction is required.");
+  }
+  if (new Set(corrections.map(({ sourceId }) => sourceId)).size !== corrections.length) {
+    throw new Error("Historical corrections must not repeat an event.");
+  }
   const [registryText, reportText] = await Promise.all([readFile(registryPath, "utf8"), readFile(reportPath, "utf8")]);
   const registry = JSON.parse(registryText);
   const report = JSON.parse(reportText);
   if (registry.version !== 3 || !Array.isArray(registry.events)) throw new Error("Unsupported calendar event registry.");
   validateReport(report);
-  const matchingEvents = registry.events.filter((event) => event.sourceId === sourceId);
-  const matchingChanges = report.historicalChanges.filter((change) => change.sourceId === sourceId);
-  if (matchingEvents.length !== 1 || matchingChanges.length !== 1) throw new Error("Event or proposal is missing or ambiguous.");
-  const event = matchingEvents[0];
-  const change = matchingChanges[0];
-  if (event.historical !== true) throw new Error("Event is not historical.");
-  const localPublishedFingerprint = fingerprintHistoricalSnapshot(event);
-  if (localPublishedFingerprint !== publishedFingerprint || change.publishedFingerprint !== localPublishedFingerprint) throw new Error("Published historical fingerprint is stale.");
-  const localProposalFingerprint = fingerprintHistoricalProposal(sourceId, change.differences);
-  if (localProposalFingerprint !== proposalFingerprint || change.proposalFingerprint !== localProposalFingerprint) throw new Error("Proposal fingerprint is stale.");
-  if (change.differences.some(({ type }) => type === "desaparecido_del_feed")) throw new Error("A feed disappearance has no applicable field values.");
-  const differenceByField = new Map(change.differences.map((difference) => [difference.field, difference]));
-  for (const field of fields) {
-    if (!HISTORICAL_COMPARISON_FIELDS.includes(field)) throw new Error(`Field is not allowed: ${field}.`);
-    if (!differenceByField.has(field)) throw new Error(`Field is not present in the report: ${field}.`);
+  const reportBySourceId = new Map(report.historicalChanges.map((change) => [change.sourceId, change]));
+  const correctedBySourceId = new Map();
+  const results = [];
+  for (const correction of corrections) {
+    const { sourceId, publishedFingerprint, proposalFingerprint, fields } = correction;
+    validateArguments(correction);
+    const matchingEvents = registry.events.filter((candidate) => candidate.sourceId === sourceId);
+    const change = reportBySourceId.get(sourceId);
+    if (matchingEvents.length !== 1 || !change) throw new Error("Event or proposal is missing or ambiguous.");
+    const [event] = matchingEvents;
+    if (event.historical !== true) throw new Error("Event is not historical.");
+    const localPublishedFingerprint = fingerprintHistoricalSnapshot(event);
+    if (localPublishedFingerprint !== publishedFingerprint || change.publishedFingerprint !== localPublishedFingerprint) throw new Error("Published historical fingerprint is stale.");
+    const localProposalFingerprint = fingerprintHistoricalProposal(sourceId, change.differences);
+    if (localProposalFingerprint !== proposalFingerprint || change.proposalFingerprint !== localProposalFingerprint) throw new Error("Proposal fingerprint is stale.");
+    if (change.differences.some(({ type }) => type === "desaparecido_del_feed")) throw new Error("A feed disappearance has no applicable field values.");
+    const differenceByField = new Map(change.differences.map((difference) => [difference.field, difference]));
+    for (const field of fields) {
+      if (!HISTORICAL_COMPARISON_FIELDS.includes(field)) throw new Error(`Field is not allowed: ${field}.`);
+      if (!differenceByField.has(field)) throw new Error(`Field is not present in the report: ${field}.`);
+    }
+    const acceptedFields = HISTORICAL_COMPARISON_FIELDS.filter((field) => fields.includes(field));
+    const corrected = structuredClone(event);
+    for (const field of acceptedFields) {
+      const difference = differenceByField.get(field);
+      if (field === "slug" && difference.type !== "eliminado" && difference.proposed !== corrected.slug) corrected.aliases = [...new Set([...(corrected.aliases ?? []), corrected.slug])];
+      if (difference.type === "eliminado") delete corrected[field];
+      else corrected[field] = difference.proposed;
+    }
+    correctedBySourceId.set(sourceId, corrected);
+    results.push({ sourceId, publishedFingerprint, proposalFingerprint, acceptedFields });
   }
-  const acceptedFields = HISTORICAL_COMPARISON_FIELDS.filter((field) => fields.includes(field));
-  const corrected = structuredClone(event);
-  for (const field of acceptedFields) {
-    const difference = differenceByField.get(field);
-    if (field === "slug" && difference.type !== "eliminado" && difference.proposed !== corrected.slug) corrected.aliases = [...new Set([...(corrected.aliases ?? []), corrected.slug])];
-    if (difference.type === "eliminado") delete corrected[field];
-    else corrected[field] = difference.proposed;
-  }
-  const events = registry.events.map((candidate) => candidate.sourceId === sourceId ? corrected : candidate);
+  const events = registry.events.map((candidate) => correctedBySourceId.get(candidate.sourceId) ?? candidate);
   assertUniqueSlugs(events);
   const correctedRegistry = { version: 3, events };
   await writeAtomically([[registryPath, `${JSON.stringify(correctedRegistry, null, 2)}\n`], [outputPath, serializeCalendarEvents(events)]]);
-  return { sourceId, publishedFingerprint, proposalFingerprint, acceptedFields };
+  return results;
+}
+
+export async function applyHistoricalCorrection(options) {
+  const [result] = await applyHistoricalCorrections({
+    registryPath: options.registryPath,
+    outputPath: options.outputPath,
+    reportPath: options.reportPath,
+    corrections: [options],
+  });
+  return result;
 }
 
 function parseCliArguments(args) {

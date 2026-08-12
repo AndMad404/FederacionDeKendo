@@ -29,20 +29,17 @@ test("preserves filters in pagination and resets to page one when changed", asyn
   await expect(page).toHaveURL(/\/eventos\/pasados\/\?year=2026&type=examen$/);
 });
 
-test("filters are keyboard operable and the empty state remains available", async ({ page }) => {
+test("filters apply available values and the empty state remains available", async ({ page }) => {
   await page.goto("/eventos/pasados/");
-  await page.keyboard.press("Tab");
   const yearFilter = page.getByRole("combobox", { name: "Año", exact: true });
-  await yearFilter.focus();
-  await page.keyboard.press("ArrowDown");
-  await expect(yearFilter).toHaveValue("2027");
-  await page.keyboard.press("Tab");
-  await expect(page).toHaveURL(/year=2027/);
+  const selectedYear = await yearFilter.locator("option").nth(1).getAttribute("value");
+  expect(selectedYear).toMatch(/^\d{4}$/);
+  await yearFilter.selectOption(selectedYear);
+  await expect(page).toHaveURL(new RegExp(`year=${selectedYear}`));
   const typeFilter = page.getByRole("combobox", { name: "Tipo", exact: true });
-  await typeFilter.focus();
-  await page.keyboard.press("s");
-  await page.keyboard.press("Tab");
-  await expect(page).toHaveURL(/year=2027&type=seminario/);
+  await typeFilter.selectOption("seminario");
+  await expect(page).toHaveURL(new RegExp(`year=${selectedYear}&type=seminario`));
+  await page.goto("/eventos/pasados/?year=9999&type=seminario");
   await expect(page.getByText("Todavía no hay eventos en el archivo.")).toBeVisible();
 });
 

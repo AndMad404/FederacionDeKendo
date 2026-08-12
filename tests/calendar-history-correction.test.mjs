@@ -9,6 +9,7 @@ import {
   fingerprintHistoricalProposal,
   fingerprintHistoricalSnapshot,
 } from "../scripts/correct-calendar-history.mjs";
+import { applyHistoricalCorrectionsByDateRange } from "../scripts/correct-calendar-history-range.mjs";
 import {
   detectHistoricalChanges,
   mergeRegistry,
@@ -91,6 +92,87 @@ test("C3 accepts multiple fields in canonical order and updates both artifacts c
     const registry = JSON.parse(await readFile(files.registryPath, "utf8"));
     assert.equal(await readFile(files.outputPath, "utf8"), serializeCalendarEvents(registry.events));
   } finally { await rm(files.directory, { recursive: true, force: true }); }
+});
+
+test("range correction accepts every reported field for historical events inside its inclusive dates", async () => {
+  const files = await fixture();
+  try {
+    const results = await applyHistoricalCorrectionsByDateRange({
+      registryPath: files.registryPath,
+      outputPath: files.outputPath,
+      reportPath: files.reportPath,
+      from: "2026-01-10",
+      to: "2026-01-10",
+    });
+    assert.equal(results.length, 1);
+    const registry = JSON.parse(await readFile(files.registryPath, "utf8"));
+    assert.deepEqual(registry.events[0], {
+      ...proposed,
+      aliases: ["2026-01-10-anterior", published.slug],
+    });
+    assert.deepEqual(registry.events[1], files.other);
+  } finally { await rm(files.directory, { recursive: true, force: true }); }
+});
+
+test("range correction rejects an empty or reversed range without changing published files", async () => {
+  const files = await fixture();
+  try {
+    const before = await Promise.all([readFile(files.registryPath), readFile(files.outputPath)]);
+    await assert.rejects(applyHistoricalCorrectionsByDateRange({
+      registryPath: files.registryPath,
+      outputPath: files.outputPath,
+      reportPath: files.reportPath,
+      from: "2026-01-11",
+      to: "2026-01-10",
+    }));
+    await assert.rejects(applyHistoricalCorrectionsByDateRange({
+      registryPath: files.registryPath,
+      outputPath: files.outputPath,
+      reportPath: files.reportPath,
+      from: "2026-02-01",
+      to: "2026-02-02",
+    }));
+    const after = await Promise.all([readFile(files.registryPath), readFile(files.outputPath)]);
+    assert.deepEqual(after, before);
+  } finally { await rm(files.directory, { recursive: true, force: true }); }
+});
+
+test("range correction validates every selected proposal before writing any event", async () => {
+  const files = await fixture();
+  try {
+    const secondProposal = { ...files.other, title: "Other corrected" };
+    const report = detectHistoricalChanges(
+      { version: 3, events: [published, files.other] },
+      [
+        { ...proposed, historical: undefined, aliases: undefined },
+        { ...secondProposal, historical: undefined },
+      ],
+      new Date("2026-03-01T00:00:00.000Z"),
+    );
+    report.historicalChanges.find(({ sourceId }) => sourceId === files.other.sourceId).proposalFingerprint = "0".repeat(64);
+    await writeFile(files.reportPath, `${JSON.stringify(report, null, 2)}\n`);
+    const before = await Promise.all([readFile(files.registryPath), readFile(files.outputPath)]);
+    await assert.rejects(applyHistoricalCorrectionsByDateRange({
+      registryPath: files.registryPath,
+      outputPath: files.outputPath,
+      reportPath: files.reportPath,
+      from: "2025-01-01",
+      to: "2026-01-10",
+    }));
+    const after = await Promise.all([readFile(files.registryPath), readFile(files.outputPath)]);
+    assert.deepEqual(after, before);
+  } finally { await rm(files.directory, { recursive: true, force: true }); }
+});
+
+test("range workflow requires an approved report run and an inclusive date range", async () => {
+  const workflow = await readFile(path.resolve(".github/workflows/correct-calendar-history-range.yml"), "utf8");
+  assert.match(workflow, /workflow_dispatch/);
+  assert.match(workflow, /report_run_id:/);
+  assert.match(workflow, /from:/);
+  assert.match(workflow, /to:/);
+  assert.match(workflow, /actions\/download-artifact@v5/);
+  assert.match(workflow, /correct:calendar-history-range/);
+  assert.doesNotMatch(workflow, /issues:\s*write/);
 });
 
 test("C3 preserves the old slug as an alias", async () => {
