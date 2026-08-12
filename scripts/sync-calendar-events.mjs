@@ -807,11 +807,7 @@ export async function synchronizeCalendar({
         event.endDate && !event.startTime && !event.endTime
           ? toIsoDate(addDays(createLocalDate(event.endDate), -1))
           : event.endDate ?? event.date;
-      return (
-        event.historical === true ||
-        calculateGalleryCheckAt(lastEventDate, event.timeZone).getTime() <=
-          now.getTime()
-      );
+      return calculateGalleryCheckAt(lastEventDate, event.timeZone).getTime() <= now.getTime();
     })
     .map((event) => ({
       slug: event.slug,

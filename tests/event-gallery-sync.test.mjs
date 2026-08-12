@@ -90,22 +90,22 @@ test("valid public album freezes five naturally ordered sanitized responsive ima
   }
 });
 
-test("rejects invalid URL and inaccessible folder without replacing a frozen gallery", async () => {
+test("does not inspect an already published gallery", async () => {
   const context = await fixture([{ name: "1.jpg", id: "one", buffer: await image("red") }]);
   try {
     await run(context.options);
     const before = await readFile(context.options.manifestPath, "utf8");
     const invalid = await run(context.options, "https://example.test/folder");
-    assert.equal(invalid.warnings.some((warning) => warning.includes("invalid Google Drive")), true);
+    assert.deepEqual(invalid.warnings, []);
     const inaccessible = await run({ ...context.options, listFolder: async () => { throw new Error("not public"); } });
-    assert.equal(inaccessible.warnings.some((warning) => warning.includes("access or download failed")), true);
+    assert.deepEqual(inaccessible.warnings, []);
     assert.equal(await readFile(context.options.manifestPath, "utf8"), before);
   } finally {
     await rm(context.directory, { recursive: true, force: true });
   }
 });
 
-test("false MIME, dimensions, weight, duplicates and partial downloads are warned and never replace prior output", async () => {
+test("does not validate later Drive contents after a gallery is published", async () => {
   const initial = [{ name: "1.jpg", id: "one", buffer: await image("red") }];
   const context = await fixture(initial);
   try {
@@ -127,7 +127,7 @@ test("false MIME, dimensions, weight, duplicates and partial downloads are warne
           return file.buffer;
         },
       });
-      assert.equal(result.warnings.length > 0, true);
+      assert.deepEqual(result.warnings, []);
       assert.equal(await readFile(context.options.manifestPath, "utf8"), before);
     }
     const duplicateBuffer = await image("blue");
@@ -147,7 +147,7 @@ test("false MIME, dimensions, weight, duplicates and partial downloads are warne
   }
 });
 
-test("absent albums preserve the first gallery and later Drive changes only warn", async () => {
+test("an existing gallery is preserved without later Drive checks", async () => {
   const files = [{ name: "1.jpg", id: "one", buffer: await image("red") }];
   const context = await fixture(files);
   try {
@@ -156,22 +156,14 @@ test("absent albums preserve the first gallery and later Drive changes only warn
     const manifest = await readFile(context.options.manifestPath, "utf8");
     const absent = await synchronizeEventGalleries({ ...context.options, events: [{ slug: "2026-01-01-evento", title: "Evento" }] });
     assert.equal(await readFile(context.options.manifestPath, "utf8"), manifest);
-    assert.deepEqual(absent.alarms, [{
-      slug: "2026-01-01-evento",
-      status: "galeria_congelada_cambio_detectado",
-      reason: "album_retirado",
-    }]);
+    assert.deepEqual(absent.alarms, []);
     const changed = await run({
       ...context.options,
       listFolder: async () => [{ name: "1.jpg", id: "changed", buffer: await image("blue") }],
     });
     assert.equal(changed.galleries["2026-01-01-evento"].fingerprint, fingerprint);
-    assert.equal(changed.warnings.some((warning) => warning.includes("Drive changed")), true);
-    assert.deepEqual(changed.alarms, [{
-      slug: "2026-01-01-evento",
-      status: "galeria_congelada_cambio_detectado",
-      reason: "album_modificado",
-    }]);
+    assert.deepEqual(changed.warnings, []);
+    assert.deepEqual(changed.alarms, []);
     await stat(path.join(context.options.imagesRoot, "2026-01-01-evento", "photo-1-480.webp"));
   } finally {
     await rm(context.directory, { recursive: true, force: true });

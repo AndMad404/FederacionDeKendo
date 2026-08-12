@@ -344,7 +344,7 @@ test("Given the first valid album, When galleries synchronize, Then it is publis
   }
 });
 
-test("Given a frozen gallery, When Drive changes, Then the gallery stays intact and a reproducible warning is emitted", async () => {
+test("Given a frozen gallery, When Drive changes, Then the site does not inspect it again", async () => {
   const context = await galleryFixture();
   const event = { ...historicalSnapshot, albumUrl: "https://drive.google.com/drive/folders/approved" };
   try {
@@ -366,7 +366,7 @@ test("Given a frozen gallery, When Drive changes, Then the gallery stays intact 
     });
     assert.equal(await readFile(context.options.manifestPath, "utf8"), manifest);
     assert.equal(changed.galleries[event.slug].fingerprint, first.galleries[event.slug].fingerprint);
-    assert.deepEqual(changed.warnings, [`${event.slug}: Drive changed; frozen gallery preserved.`]);
+    assert.deepEqual(changed.warnings, []);
   } finally {
     await rm(context.directory, { recursive: true, force: true });
   }

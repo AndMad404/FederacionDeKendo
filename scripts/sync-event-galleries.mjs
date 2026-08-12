@@ -210,6 +210,7 @@ export async function synchronizeEventGalleries({
       continue;
     }
     const frozen = stateFrozen ?? manifestFrozen;
+    if (frozen) continue;
     if (!event.albumUrl) {
       alarms.push({
         slug: event.slug,
