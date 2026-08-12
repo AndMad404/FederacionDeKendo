@@ -63,15 +63,17 @@ representativa estable. Agregar otro evento no crea nuevos baselines.
 
 ## Revision visual manual
 
-Las 28 capturas existentes se ejecutan por separado en Windows:
+Las 32 capturas existentes se ejecutan por separado en Windows. Cubren siete
+tipos de pagina en cuatro viewports mas el estado abierto del lightbox de la
+galeria principal en esos mismos cuatro viewports:
 
 ```powershell
 pnpm run test:visual
 ```
 
-Esta suite contiene siete tipos de pagina por cuatro viewports. Se mantiene
-fuera del CI predeterminado porque la rasterizacion de fuentes e imagenes
-difiere entre Windows y Ubuntu.
+Esta suite contiene siete tipos de pagina por cuatro viewports y cuatro
+capturas adicionales del lightbox. Se mantiene fuera del CI predeterminado
+porque la rasterizacion de fuentes e imagenes difiere entre Windows y Ubuntu.
 
 Un cambio intencional, como modificar una transparencia, debe hacer fallar la
 captura afectada. El flujo correcto es:
@@ -86,9 +88,11 @@ captura afectada. El flujo correcto es:
 pnpm run test:visual -- --grep "home matches" --update-snapshots
 ```
 
-Nunca se regeneran baselines solo para convertir una falla en verde. Un evento
-nuevo puede cambiar el contenido visible de Inicio o Calendario; eso requiere
-revision, pero no autoriza reemplazar automaticamente la captura.
+Nunca se regeneran baselines solo para convertir una falla en verde. Los
+baselines actualizados el 2026-08-12 corresponden a cambios visuales
+autorizados de CTA, galeria, miniaturas y lightbox; un evento nuevo puede
+cambiar el contenido visible de Inicio o Calendario, pero no autoriza
+reemplazar automaticamente la captura.
 
 ## Cambios de espaciado
 
