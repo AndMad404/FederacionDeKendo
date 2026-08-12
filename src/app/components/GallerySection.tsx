@@ -17,6 +17,7 @@ export function GallerySection() {
   const { index, prev, next, goTo } = useCarousel(images.length);
   const {
     closeLightbox,
+    lightboxIndex,
     lightboxImage,
     openLightbox,
     showNext,
@@ -71,10 +72,13 @@ export function GallerySection() {
         <Suspense fallback={null}>
           <Lightbox
             image={lightboxImage}
+            index={lightboxIndex}
+            total={images.length}
             triggerRef={triggerRef}
             onClose={closeLightbox}
             onPrev={showPrev}
             onNext={showNext}
+            showDetails
           />
         </Suspense>
       )}

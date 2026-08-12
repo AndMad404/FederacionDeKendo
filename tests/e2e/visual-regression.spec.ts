@@ -97,5 +97,14 @@ for (const viewport of APPROVED_VIEWPORTS) {
         );
       });
     }
+
+    test("gallery lightbox details match their approved design", async ({ page }) => {
+      await prepareApprovedPage(page, "/galeria/");
+      await page.locator(".gallery-featured-frame > button").click();
+
+      const dialog = page.getByRole("dialog");
+      await expect(dialog).toBeVisible();
+      await expect(dialog).toHaveScreenshot(`gallery-lightbox-${viewport.name}.png`);
+    });
   });
 }

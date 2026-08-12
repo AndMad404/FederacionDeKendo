@@ -12,6 +12,9 @@ export const panelSurfaceClass =
 export const mediaCaptionSurfaceClass =
   "bg-gradient-to-r from-site-navy via-site-navy/95 to-site-navy/75 text-site-on-dark";
 
+export const galleryThumbnailActiveClass =
+  "border-b-4 border-b-site-accent";
+
 export const primaryButtonClass =
   "inline-flex min-h-11 items-center justify-center rounded-lg bg-site-action px-5 py-2 font-bold text-site-on-dark shadow-sm transition-colors hover:bg-site-accent";
 

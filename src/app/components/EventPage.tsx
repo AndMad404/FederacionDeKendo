@@ -176,16 +176,16 @@ export function EventPage() {
                 {isPast ? (
                   <>
                     <Link
-                      to={english ? "/en/calendar/" : "/calendario/"}
-                      className={`${primaryButtonClass} ${focusRingClass}`}
-                    >
-                      {copy.archive.upcomingEvents}
-                    </Link>
-                    <Link
                       to={english ? "/en/events/past/" : "/eventos/pasados/"}
                       className={`${secondaryButtonClass} ${focusRingClass}`}
                     >
                       {copy.event.viewArchive}
+                    </Link>
+                    <Link
+                      to={english ? "/en/calendar/" : "/calendario/"}
+                      className={`${primaryButtonClass} ${focusRingClass}`}
+                    >
+                      {copy.archive.upcomingEvents}
                     </Link>
                   </>
                 ) : null}
@@ -193,7 +193,7 @@ export function EventPage() {
                   <button
                     type="button"
                     onClick={() => void handleShare()}
-                    className={`${primaryButtonClass} ${focusRingClass}`}
+                    className={`${secondaryButtonClass} ${focusRingClass}`}
                   >
                     {copied ? (
                       <Check className="mr-2 size-4" aria-hidden="true" />
@@ -206,7 +206,7 @@ export function EventPage() {
                 {!isPast ? (
                   <Link
                     to={english ? "/en/calendar/" : "/calendario/"}
-                    className={`${secondaryButtonClass} ${focusRingClass}`}
+                    className={`${primaryButtonClass} ${focusRingClass}`}
                   >
                     {copy.event.backToCalendar}
                   </Link>

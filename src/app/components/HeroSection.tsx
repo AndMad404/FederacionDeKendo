@@ -58,13 +58,13 @@ function HeroBanner() {
           <div className="flex flex-col justify-center gap-3 sm:flex-row land-sm:mt-5 land-sm:justify-start land-tall:justify-start">
             <Link
               to={copy.nav.links[3].path}
-              className={`${primaryButtonClass} ${focusRingClass}`}
+              className={`${secondaryButtonClass} ${focusRingClass}`}
             >
               {copy.home.dojos}
             </Link>
             <Link
               to={copy.nav.links[1].path}
-              className={`${secondaryButtonClass} ${focusRingClass}`}
+              className={`${primaryButtonClass} ${focusRingClass}`}
             >
               {copy.home.events}
             </Link>

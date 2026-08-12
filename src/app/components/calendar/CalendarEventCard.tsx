@@ -77,7 +77,7 @@ export function CalendarEventCard({
         <Link
           to={getEventPath(event, language)}
           aria-label={`${copy.calendar.viewDetailsLabel} ${event.title}`}
-          className={`pointer-events-auto inline-flex min-h-11 cursor-pointer items-center justify-center rounded-full px-3 py-1 text-sm font-semibold transition hover:border-site-action hover:bg-site-media lg:min-h-8 ${actionControlSurfaceClass} ${focusRingClass}`}
+          className={`pointer-events-auto inline-flex min-h-11 cursor-pointer items-center justify-center rounded-full border border-site-action bg-site-action px-3 py-1 text-sm font-semibold text-site-on-dark transition-colors hover:bg-site-action-hover lg:min-h-8 ${focusRingClass}`}
         >
           <Info className="mr-1.5 size-4" />
           {copy.common.eventDetails}

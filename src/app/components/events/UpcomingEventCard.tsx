@@ -13,6 +13,9 @@ import { useLanguage } from "../../config/i18n";
 const actionClass =
   `inline-flex min-h-11 min-w-0 items-center justify-center rounded-lg px-3 py-1.5 text-center text-sm font-semibold leading-tight transition-colors hover:border-site-action hover:bg-site-media lg:min-h-8 lg:px-2.5 lg:py-1 ${actionControlSurfaceClass}`;
 
+const eventDetailsClass =
+  "inline-flex min-h-11 min-w-0 items-center justify-center rounded-lg border border-site-action bg-site-action px-3 py-1.5 text-center text-sm font-semibold leading-tight text-site-on-dark transition-colors hover:bg-site-action-hover lg:min-h-8 lg:px-2.5 lg:py-1";
+
 function getEventVisibilityClass(index: number) {
   if (index === 2) return "land-sm:hidden";
   if (index === 3) return "hidden lg:flex land-sm:hidden land-tall:flex";
@@ -97,7 +100,7 @@ export function UpcomingEventCard({
       <Link
         to={getEventPath(event, language)}
         aria-label={`${copy.event.viewDetailsLabel} ${event.title}`}
-        className={`col-start-2 row-start-2 justify-self-end ${actionClass} ${focusRingClass}`}
+        className={`col-start-2 row-start-2 justify-self-end ${eventDetailsClass} ${focusRingClass}`}
       >
         {copy.common.eventDetails}
       </Link>
