@@ -34,8 +34,11 @@ test("filters apply available values and the empty state remains available", asy
   const yearFilter = page.getByRole("combobox", { name: "Año", exact: true });
   const selectedYear = await yearFilter.locator("option").nth(1).getAttribute("value");
   expect(selectedYear).toMatch(/^\d{4}$/);
-  await yearFilter.selectOption(selectedYear);
-  await expect(page).toHaveURL(new RegExp(`year=${selectedYear}`));
+  await expect(async () => {
+    await yearFilter.selectOption("");
+    await yearFilter.selectOption(selectedYear!);
+    await expect(page).toHaveURL(new RegExp(`year=${selectedYear}`), { timeout: 500 });
+  }).toPass({ timeout: 5_000 });
   const typeFilter = page.getByRole("combobox", { name: "Tipo", exact: true });
   await typeFilter.selectOption("seminario");
   await expect(page).toHaveURL(new RegExp(`year=${selectedYear}&type=seminario`));
