@@ -50,10 +50,13 @@ async function readJson(filePath, fallback) {
   }
 }
 
-function extractDriveFiles(html) {
+export function extractDriveFiles(html) {
   const match = /window\['_DRIVE_ivd'\]\s*=\s*'((?:\\.|[^'])+)'/.exec(html);
   if (!match) throw new Error("Google Drive folder is not publicly readable.");
-  const decoded = JSON.parse(`"${match[1].replace(/"/g, '\\"')}"`);
+  const serialized = match[1]
+    .replace(/\\x([\dA-Fa-f]{2})/g, "\\u00$1")
+    .replace(/"/g, '\\"');
+  const decoded = JSON.parse(`"${serialized}"`);
   const rows = JSON.parse(decoded);
   const files = [];
   const visit = (value) => {

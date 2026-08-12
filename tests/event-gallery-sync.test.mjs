@@ -7,6 +7,7 @@ import sharp from "sharp";
 
 import {
   EVENT_GALLERY_LIMITS,
+  extractDriveFiles,
   getDriveFolderId,
   synchronizeEventGalleries,
 } from "../scripts/sync-event-galleries.mjs";
@@ -41,6 +42,18 @@ test("uses approved input and 4K limits", () => {
   assert.equal(EVENT_GALLERY_LIMITS.maxLongEdge, 3840);
   assert.equal(EVENT_GALLERY_LIMITS.maxPixels, 3840 * 2160);
   assert.equal(getDriveFolderId("https://example.test/folder"), undefined);
+});
+
+test("reads public Drive folder indexes encoded with hexadecimal JavaScript escapes", () => {
+  const rows = [[["image-id", null, "photo.jpg", "image/jpeg"]]];
+  const encoded = [...JSON.stringify(rows)]
+    .map((character) => `\\x${character.charCodeAt(0).toString(16).padStart(2, "0")}`)
+    .join("");
+
+  assert.deepEqual(
+    extractDriveFiles(`window['_DRIVE_ivd'] = '${encoded}'`),
+    [{ id: "image-id", name: "photo.jpg" }],
+  );
 });
 
 test("accepts the minimum dimensions independently of orientation", async () => {
