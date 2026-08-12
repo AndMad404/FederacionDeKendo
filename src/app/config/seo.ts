@@ -353,7 +353,7 @@ function getRouteImageMetadata(meta: RouteMeta) {
     alt: DEFAULT_SOCIAL_IMAGE_ALT,
     width: DEFAULT_SOCIAL_IMAGE_WIDTH,
     height: DEFAULT_SOCIAL_IMAGE_HEIGHT,
-    type: "image/png",
+    type: "image/jpeg",
   };
 }
 
