@@ -3,13 +3,16 @@
   "events": [
     {
       "sourceId": "7bd8989c63db48fab752ce0f",
-      "slug": "2026-05-02-federacion-examen",
+      "slug": "2026-05-02-examen",
       "title": "Examen",
       "date": "2026-05-02",
       "timeZone": "America/Costa_Rica",
-      "archiveEligibleAt": "2026-05-05T06:00:00.000Z",
+      "archiveEligibleAt": "2026-05-04T06:00:00.000Z",
       "eventType": "examen",
-      "historical": true
+      "historical": true,
+      "aliases": [
+        "2026-05-02-federacion-examen"
+      ]
     },
     {
       "sourceId": "462f5f7da99a1d17474471bd",
@@ -18,19 +21,22 @@
       "date": "2026-05-29",
       "timeZone": "America/Costa_Rica",
       "endDate": "2026-06-01",
-      "archiveEligibleAt": "2026-06-03T06:00:00.000Z",
+      "archiveEligibleAt": "2026-06-02T06:00:00.000Z",
       "eventType": "seminario",
       "historical": true
     },
     {
       "sourceId": "9c63151cacb01bef733c39cb",
-      "slug": "2026-05-30-federacion-seminario-y-reunion",
+      "slug": "2026-05-30-seminario",
       "title": "Seminario",
       "date": "2026-05-30",
       "timeZone": "America/Costa_Rica",
-      "archiveEligibleAt": "2026-06-02T06:00:00.000Z",
+      "archiveEligibleAt": "2026-06-01T06:00:00.000Z",
       "eventType": "seminario",
-      "historical": true
+      "historical": true,
+      "aliases": [
+        "2026-05-30-federacion-seminario-y-reunion"
+      ]
     },
     {
       "sourceId": "89d31aa2d6937a78b1866283",

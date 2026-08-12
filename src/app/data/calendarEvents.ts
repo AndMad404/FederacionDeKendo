@@ -3,8 +3,9 @@ import type { CalendarEvent } from "../types";
 // Auto-generated from Google Calendar. Do not edit manually.
 export const CALENDAR_EVENTS: CalendarEvent[] = [
   {
-    id: "2026-05-02-federacion-examen",
-    archiveEligibleAt: "2026-05-05T06:00:00.000Z",
+    id: "2026-05-02-examen",
+    aliases: ["2026-05-02-federacion-examen"],
+    archiveEligibleAt: "2026-05-04T06:00:00.000Z",
     title: "Examen",
     date: "2026-05-02",
     eventType: "examen",
@@ -12,7 +13,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2026-05-29-clak-seminario-instructores-chile",
-    archiveEligibleAt: "2026-06-03T06:00:00.000Z",
+    archiveEligibleAt: "2026-06-02T06:00:00.000Z",
     title: "CLAK Seminario Instructores CHILE",
     date: "2026-05-29",
     endDate: "2026-06-01",
@@ -20,8 +21,9 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
     timeZone: "America/Costa_Rica"
   },
   {
-    id: "2026-05-30-federacion-seminario-y-reunion",
-    archiveEligibleAt: "2026-06-02T06:00:00.000Z",
+    id: "2026-05-30-seminario",
+    aliases: ["2026-05-30-federacion-seminario-y-reunion"],
+    archiveEligibleAt: "2026-06-01T06:00:00.000Z",
     title: "Seminario",
     date: "2026-05-30",
     eventType: "seminario",
