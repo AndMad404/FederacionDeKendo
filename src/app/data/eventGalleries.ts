@@ -11,4 +11,46 @@ export interface EventGalleryImage {
 
 export interface EventGallery { fingerprint: string; images: EventGalleryImage[] }
 
-export const EVENT_GALLERIES: Record<string, EventGallery> = {};
+export const EVENT_GALLERIES: Record<string, EventGallery> = {
+  "2026-08-08-examen": {
+    "fingerprint": "2164e8b1aa9e2137057d27be603d707fb25d0c2b8c31e5ed1be3912763284fe8",
+    "images": [
+      {
+        "order": 1,
+        "alt": "Examen - foto 1",
+        "width": 1280,
+        "height": 720,
+        "src": "/images/events/2026-08-08-examen/photo-1-1280.webp",
+        "srcSet": {
+          "webp": "/images/events/2026-08-08-examen/photo-1-480.webp 480w, /images/events/2026-08-08-examen/photo-1-960.webp 960w, /images/events/2026-08-08-examen/photo-1-1280.webp 1280w",
+          "avif": "/images/events/2026-08-08-examen/photo-1-480.avif 480w, /images/events/2026-08-08-examen/photo-1-960.avif 960w, /images/events/2026-08-08-examen/photo-1-1280.avif 1280w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 2,
+        "alt": "Examen - foto 2",
+        "width": 1600,
+        "height": 1200,
+        "src": "/images/events/2026-08-08-examen/photo-2-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/2026-08-08-examen/photo-2-480.webp 480w, /images/events/2026-08-08-examen/photo-2-960.webp 960w, /images/events/2026-08-08-examen/photo-2-1600.webp 1600w",
+          "avif": "/images/events/2026-08-08-examen/photo-2-480.avif 480w, /images/events/2026-08-08-examen/photo-2-960.avif 960w, /images/events/2026-08-08-examen/photo-2-1600.avif 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 3,
+        "alt": "Examen - foto 3",
+        "width": 1600,
+        "height": 901,
+        "src": "/images/events/2026-08-08-examen/photo-3-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/2026-08-08-examen/photo-3-480.webp 480w, /images/events/2026-08-08-examen/photo-3-960.webp 960w, /images/events/2026-08-08-examen/photo-3-1600.webp 1600w",
+          "avif": "/images/events/2026-08-08-examen/photo-3-480.avif 480w, /images/events/2026-08-08-examen/photo-3-960.avif 960w, /images/events/2026-08-08-examen/photo-3-1600.avif 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      }
+    ]
+  }
+};
