@@ -98,8 +98,8 @@ export function filterAndSortArchiveEvents(events, filters) {
     .filter((event) => !normalized.type || event.eventType === normalized.type)
     .sort(
       (a, b) =>
-        new Date(`${a.date}T${a.startTime ?? "00:00"}`).getTime() -
-        new Date(`${b.date}T${b.startTime ?? "00:00"}`).getTime(),
+        new Date(`${b.date}T${b.startTime ?? "00:00"}`).getTime() -
+        new Date(`${a.date}T${a.startTime ?? "00:00"}`).getTime(),
     );
 }
 

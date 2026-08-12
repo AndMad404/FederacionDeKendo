@@ -31,7 +31,6 @@ const draftPrefix = "[BORRADOR]";
 const inferredEventTypes = [
   ["torneo", /(?:^|\s)torneos?(?:$|\s)/],
   ["examen", /(?:^|\s)examen(?:es)?(?:$|\s)/],
-  ["seminario", /(?:^|\s)seminarios?(?:$|\s)/],
 ];
 const googleDriveFolderUrl = /^https:\/\/drive\.google\.com\/drive\/folders\/[A-Za-z0-9_-]+(?:[/?#].*)?$/;
 const embeddedGoogleDriveFolderUrl = /https:\/\/drive\.google\.com\/drive\/folders\/[A-Za-z0-9_-]+(?:[/?#][^\s]*)?/g;
@@ -317,12 +316,11 @@ function parseTechnicalDescription(description, title) {
   };
 }
 
-function inferEventType(title, warnings) {
+function inferEventType(title) {
   const normalizedTitle = slugify(title).replace(/-/g, " ");
   const inferred = inferredEventTypes.find(([, pattern]) => pattern.test(normalizedTitle));
   if (inferred) return inferred[0];
-  warnings.push(`${title} has no controlled event type; using evento.`);
-  return "evento";
+  return "seminario";
 }
 
 function getOrganizer(property) {
@@ -398,7 +396,7 @@ export function parseCalendarEvent(properties, warnings = []) {
   const optionalProperties = {
     location: properties.get("LOCATION")?.value,
     summary: description.publicDescription,
-    eventType: inferEventType(title, warnings),
+    eventType: inferEventType(title),
     organizer: getOrganizer(properties.get("ORGANIZER")),
     infoUrl: properties.get("URL")?.value,
   };
