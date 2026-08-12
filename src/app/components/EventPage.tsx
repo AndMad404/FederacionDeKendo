@@ -97,10 +97,9 @@ export function EventPage() {
           }}
         />
 
-        <div className="relative z-20 -mt-11 flex min-h-0 flex-1 items-start justify-center px-3 pb-0 pt-3 sm:-mt-13 sm:px-4 sm:pb-0 sm:pt-4 tall-md:p-4 land-sm:px-3 land-sm:pb-0 land-sm:pt-3 land-compact:-mt-8">
-          <article
-            className={`flex w-full max-w-5xl flex-col gap-4 p-4 md:p-5 land-sm:gap-2 land-sm:p-3 ${panelSurfaceClass}`}
-          >
+        <div className="relative z-20 -mt-11 flex min-h-0 flex-1 items-start justify-center px-3 pb-0 pt-3 sm:-mt-13 sm:px-4 sm:pb-0 sm:pt-4 tall-md:p-4 page-fit:absolute page-fit:inset-0 page-fit:mt-0 page-fit:items-start page-fit:px-4 page-fit:pb-0 page-fit:pt-20 land-sm:px-3 land-sm:pb-0 land-sm:pt-3 land-compact:-mt-8">
+          <div className="flex w-full max-w-5xl flex-col gap-4 page-fit:h-full page-fit:min-h-0 page-fit:gap-2 land-sm:gap-2">
+            <article className={`grid gap-4 p-4 md:p-5 page-fit:shrink-0 land-sm:gap-2 land-sm:p-3 ${panelSurfaceClass}`}>
             <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(16rem,0.8fr)] land-sm:gap-2">
               <div className="min-w-0">
                 <p className="text-sm font-bold uppercase tracking-wider text-site-accent">
@@ -198,8 +197,9 @@ export function EventPage() {
                 </div>
               </aside>
             </div>
-            {isPast ? <HistoricalEventGallery eventId={event.id} eventTitle={eventTitle} /> : null}
           </article>
+            {isPast ? <HistoricalEventGallery eventId={event.id} eventTitle={eventTitle} /> : null}
+          </div>
         </div>
     </section>
   );

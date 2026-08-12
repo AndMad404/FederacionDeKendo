@@ -816,6 +816,7 @@ export async function synchronizeCalendar({
     .map((event) => ({
       slug: event.slug,
       title: event.title,
+      date: event.date,
       albumUrl: getPrivateAlbumUrl(currentBySourceId.get(event.sourceId)),
     }));
   let galleryResult;

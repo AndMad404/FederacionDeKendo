@@ -1,12 +1,10 @@
-import { useCallback, useEffect, useRef, type RefObject } from "react";
+import { useCallback, useRef, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import type { GalleryImage } from "../types";
 import { useModalBehavior } from "../hooks/useModalBehavior";
 import { usePinchZoom } from "../hooks/usePinchZoom";
 import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
 import { useTransientDirectionFeedback } from "../hooks/useTransientDirectionFeedback";
-import { getGalleryDisplayText } from "./gallery/galleryText";
-import { panelSurfaceClass } from "../styles/shared";
 import {
   ModalCloseButton,
   NavigationArrowButton,
@@ -14,10 +12,9 @@ import {
 import { useLanguage } from "../config/i18n";
 
 const LIGHTBOX_IMAGE_SIZES = "(max-width: 640px) 92vw, 75vw";
+
 interface LightboxProps {
   image: GalleryImage;
-  index: number;
-  total: number;
   triggerRef: RefObject<HTMLElement | null>;
   onClose: () => void;
   onPrev: () => void;
@@ -26,8 +23,6 @@ interface LightboxProps {
 
 export function Lightbox({
   image,
-  index,
-  total,
   triggerRef,
   onClose,
   onPrev,
@@ -35,13 +30,10 @@ export function Lightbox({
 }: LightboxProps) {
   const { copy } = useLanguage();
   const closeBtnRef = useRef<HTMLButtonElement>(null);
-  const descriptionRef = useRef<HTMLParagraphElement>(null);
   const {
     activeDirection: activeArrow,
     showDirection: showArrowFeedback,
   } = useTransientDirectionFeedback();
-  const positionLabel = `${index + 1} / ${total}`;
-  const { displayTitle, displayTag, displayDescription } = getGalleryDisplayText(image);
 
   const handlePrev = useCallback(() => {
     showArrowFeedback("left");
@@ -79,39 +71,6 @@ export function Lightbox({
     onKeyDown: handleDialogKeyDown,
   });
 
-  useEffect(() => {
-    if (!import.meta.env.DEV || !image.description) return;
-
-    const descriptionElement = descriptionRef.current;
-    if (!descriptionElement) return;
-
-    const sourceDescription = image.description.trim();
-    const exceedsCharacterLimit = sourceDescription !== displayDescription;
-    let hasWarned = false;
-
-    const warnIfDescriptionIsTruncated = () => {
-      const isVisuallyClipped =
-        descriptionElement.scrollHeight > descriptionElement.clientHeight + 1 ||
-        descriptionElement.scrollWidth > descriptionElement.clientWidth + 1;
-
-      if (!hasWarned && (exceedsCharacterLimit || isVisuallyClipped)) {
-        console.warn(
-          `[Galería] La descripción de la imagen ${image.id} tiene ${sourceDescription.length} caracteres y no se muestra completa en el lightbox.`,
-        );
-        hasWarned = true;
-      }
-    };
-
-    const animationFrame = requestAnimationFrame(warnIfDescriptionIsTruncated);
-    const resizeObserver = new ResizeObserver(warnIfDescriptionIsTruncated);
-    resizeObserver.observe(descriptionElement);
-
-    return () => {
-      cancelAnimationFrame(animationFrame);
-      resizeObserver.disconnect();
-    };
-  }, [displayDescription, image.description, image.id]);
-
   return createPortal(
     <div
       className="fixed inset-0 z-50 flex touch-manipulation items-center justify-center bg-site-navy/90 p-4 land-sm:p-2"
@@ -121,44 +80,28 @@ export function Lightbox({
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
-        aria-labelledby="lightbox-title"
-        aria-describedby={displayDescription ? "lightbox-description" : undefined}
-        className="relative flex max-h-[calc(100svh-2rem)] w-full max-w-5xl touch-pan-y flex-col items-center gap-[10px] text-site-on-dark sm:gap-3 land-sm:h-[calc(100svh-1rem)] land-sm:max-h-none land-sm:max-w-[calc(100vw-2rem)] land-sm:gap-0"
+        aria-label={image.alt}
+        className="relative flex max-h-[calc(100svh-2rem)] w-full max-w-5xl touch-pan-y flex-col items-center text-site-on-dark land-sm:h-[calc(100svh-1rem)] land-sm:max-h-none land-sm:max-w-[calc(100vw-2rem)]"
         onPointerDown={(event) => {
           event.stopPropagation();
           const startedPinch = pinchZoomHandlers.onPointerDown(event);
-          if (startedPinch) {
-            swipeHandlers.onPointerCancel(event);
-          } else {
-            swipeHandlers.onPointerDown(event);
-          }
+          if (startedPinch) swipeHandlers.onPointerCancel(event);
+          else swipeHandlers.onPointerDown(event);
         }}
-        onPointerMove={(event) => {
-          pinchZoomHandlers.onPointerMove(event);
-        }}
+        onPointerMove={pinchZoomHandlers.onPointerMove}
         onPointerUp={(event) => {
           const didPinch = pinchZoomHandlers.onPointerUp(event);
-          if (didPinch) {
-            swipeHandlers.onPointerCancel(event);
-          } else {
-            swipeHandlers.onPointerUp(event);
-          }
+          if (didPinch) swipeHandlers.onPointerCancel(event);
+          else swipeHandlers.onPointerUp(event);
         }}
         onPointerCancel={(event) => {
           pinchZoomHandlers.onPointerCancel(event);
           swipeHandlers.onPointerCancel(event);
         }}
       >
-        <ModalCloseButton
-          ref={closeBtnRef}
-          label={copy.gallery.close}
-          onClick={onClose}
-        />
+        <ModalCloseButton ref={closeBtnRef} label={copy.gallery.close} onClick={onClose} />
 
-        <div
-          data-lightbox-image
-          className="flex h-[min(54svh,32rem)] min-h-0 w-full touch-none items-end justify-center overflow-hidden rounded-xl bg-site-navy sm:h-[min(68svh,36rem)] land-sm:h-full land-sm:flex-none"
-        >
+        <div data-lightbox-image className="flex h-[min(54svh,32rem)] min-h-0 w-full touch-none items-end justify-center overflow-hidden rounded-xl bg-site-navy sm:h-[min(68svh,36rem)] land-sm:h-full land-sm:flex-none">
           <img
             src={image.src}
             srcSet={image.srcSet}
@@ -168,60 +111,13 @@ export function Lightbox({
             height={image.height}
             decoding="async"
             className="block h-auto max-h-full w-auto max-w-full rounded-xl object-contain lg:h-full lg:w-full lg:max-w-none lg:object-cover land-sm:h-full land-sm:max-h-none land-sm:w-full land-sm:max-w-none land-sm:object-cover"
-            style={{
-              transform: `scale(${scale})`,
-              transformOrigin,
-            }}
+            style={{ transform: `scale(${scale})`, transformOrigin }}
           />
         </div>
 
-        <div className="grid w-full max-w-[22rem] grid-cols-[auto_auto] items-center justify-between gap-x-[min(75%,calc(100%_-_5.5rem))] gap-y-[10px] sm:max-w-[calc(100vw-4rem)] sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:justify-around sm:gap-x-4 sm:gap-y-3 lg:absolute lg:inset-0 lg:z-10 lg:block lg:max-w-none land-sm:absolute land-sm:inset-0 land-sm:z-10 land-sm:block land-sm:max-w-none">
-          <NavigationArrowButton
-            direction="previous"
-            label={copy.gallery.previousImage}
-            isActive={activeArrow === "left"}
-            onClick={(event) => {
-              event.stopPropagation();
-              handlePrev();
-            }}
-            className="justify-self-end sm:justify-self-center lg:absolute lg:left-3 lg:top-1/2 lg:-translate-y-1/2 land-sm:absolute land-sm:left-3 land-sm:top-1/2 land-sm:-translate-y-1/2"
-          />
-
-          <div className={`col-span-2 row-start-2 grid h-[9.5rem] w-full min-w-0 max-w-full grid-rows-[auto_auto_minmax(0,1fr)_auto] items-center overflow-hidden px-4 py-3 text-center sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:max-w-none sm:items-center sm:px-5 sm:py-4 lg:absolute lg:bottom-3 lg:left-1/2 lg:h-28 lg:w-[min(36rem,calc(100%_-_6rem))] lg:-translate-x-1/2 lg:grid-cols-[minmax(0,1fr)_auto] lg:grid-rows-[auto_auto] lg:gap-x-4 lg:gap-y-1 lg:px-3 lg:py-2 lg:text-left land-sm:absolute land-sm:bottom-3 land-sm:left-1/2 land-sm:h-24 land-sm:w-[min(30rem,calc(100%_-_6rem))] land-sm:-translate-x-1/2 land-sm:grid-cols-[minmax(0,1fr)_auto] land-sm:grid-rows-[auto_auto] land-sm:gap-x-4 land-sm:gap-y-1 land-sm:px-3 land-sm:py-2 land-sm:text-left ${panelSurfaceClass}`}>
-            <h2
-              id="lightbox-title"
-              className="line-clamp-2 text-xl font-bold leading-tight land-sm:col-start-1 land-sm:row-start-1 land-sm:text-base"
-            >
-              {displayTitle}
-            </h2>
-            <p className="truncate pt-1 text-sm font-bold uppercase text-site-accent land-sm:col-start-2 land-sm:row-start-1 land-sm:justify-self-end land-sm:pt-0 land-sm:text-right land-sm:text-[10px]">
-              {displayTag}
-            </p>
-            {displayDescription && (
-              <div id="lightbox-description" className="min-h-0 land-sm:col-start-1 land-sm:row-start-2">
-                <p
-                  ref={descriptionRef}
-                  className="line-clamp-3 text-sm leading-snug text-site-muted land-sm:line-clamp-2 land-sm:text-[10px] land-sm:leading-tight"
-                >
-                  {displayDescription}
-                </p>
-              </div>
-            )}
-            <p className="text-end text-xs land-sm:col-start-2 land-sm:row-start-2 land-sm:justify-self-end land-sm:self-end land-sm:text-[10px]">
-              {positionLabel}
-            </p>
-          </div>
-
-          <NavigationArrowButton
-            direction="next"
-            label={copy.gallery.nextImage}
-            isActive={activeArrow === "right"}
-            onClick={(event) => {
-              event.stopPropagation();
-              handleNext();
-            }}
-            className="justify-self-start sm:col-start-3 sm:justify-self-center lg:absolute lg:right-3 lg:top-1/2 lg:-translate-y-1/2 land-sm:absolute land-sm:right-3 land-sm:top-1/2 land-sm:-translate-y-1/2"
-          />
+        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-between px-3">
+          <NavigationArrowButton direction="previous" label={copy.gallery.previousImage} isActive={activeArrow === "left"} onClick={(event) => { event.stopPropagation(); handlePrev(); }} className="pointer-events-auto" />
+          <NavigationArrowButton direction="next" label={copy.gallery.nextImage} isActive={activeArrow === "right"} onClick={(event) => { event.stopPropagation(); handleNext(); }} className="pointer-events-auto" />
         </div>
       </div>
     </div>,

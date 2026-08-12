@@ -289,7 +289,7 @@ export async function synchronizeEventGalleries({
         const publicBase = `/images/events/${event.slug}/`;
         images.push({
           order: index + 1,
-          alt: `${event.title} - foto ${index + 1}`,
+          alt: `Federaciones de Asociaciones de Kendo - ${event.title} ${event.date}`,
           width: largest.width,
           height: largest.height,
           src: `${publicBase}${baseName}-${largest.width}.webp`,

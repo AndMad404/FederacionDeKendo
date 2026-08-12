@@ -17,7 +17,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
     "images": [
       {
         "order": 1,
-        "alt": "Examen - foto 1",
+        "alt": "Federaciones de Asociaciones de Kendo - Examen 2026-08-08",
         "width": 1280,
         "height": 720,
         "src": "/images/events/2026-08-08-examen/photo-1-1280.webp",
@@ -29,7 +29,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
       },
       {
         "order": 2,
-        "alt": "Examen - foto 2",
+        "alt": "Federaciones de Asociaciones de Kendo - Examen 2026-08-08",
         "width": 1600,
         "height": 1200,
         "src": "/images/events/2026-08-08-examen/photo-2-1600.webp",
@@ -41,7 +41,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
       },
       {
         "order": 3,
-        "alt": "Examen - foto 3",
+        "alt": "Federaciones de Asociaciones de Kendo - Examen 2026-08-08",
         "width": 1600,
         "height": 901,
         "src": "/images/events/2026-08-08-examen/photo-3-1600.webp",

@@ -32,7 +32,7 @@ async function fixture(files) {
 async function run(options, albumUrl = "https://drive.google.com/drive/folders/publicAlbum") {
   return synchronizeEventGalleries({
     ...options,
-    events: [{ slug: "2026-01-01-evento", title: "Evento", albumUrl }],
+    events: [{ slug: "2026-01-01-evento", title: "Evento", date: "2026-01-01", albumUrl }],
   });
 }
 
@@ -78,7 +78,7 @@ test("valid public album freezes five naturally ordered sanitized responsive ima
     const manifest = await readFile(context.options.manifestPath, "utf8");
     assert.match(manifest, /photo-1-480\.webp 480w/);
     assert.match(manifest, /photo-1-480\.avif 480w/);
-    assert.match(manifest, /Evento - foto 5/);
+    assert.match(manifest, /Federaciones de Asociaciones de Kendo - Evento 2026-01-01/);
     assert.equal(/drive\.google|publicAlbum|private-/.test(manifest), false);
     const firstPath = path.join(context.options.imagesRoot, "2026-01-01-evento", "photo-1-480.webp");
     const firstBuffer = await readFile(firstPath);

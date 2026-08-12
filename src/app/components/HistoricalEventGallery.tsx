@@ -3,6 +3,7 @@ import type { MouseEvent } from "react";
 import { EVENT_GALLERIES } from "../data/eventGalleries";
 import { useCarousel } from "../hooks/useCarousel";
 import { useGalleryLightbox } from "../hooks/useGalleryLightbox";
+import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
 import { focusRingClass } from "../styles/shared";
 import type { GalleryImage } from "../types";
 import { NavigationArrowButton } from "./ui/ModalControls";
@@ -36,28 +37,40 @@ export function HistoricalEventGallery({ eventId, eventTitle }: HistoricalEventG
     }));
   }, [eventId, eventTitle]);
   const { index, prev, next, goTo } = useCarousel(images.length);
-  const { closeLightbox, lightboxIndex, lightboxImage, openLightbox, showNext, showPrev, triggerRef } = useGalleryLightbox(images);
+  const { closeLightbox, lightboxImage, openLightbox, showNext, showPrev, triggerRef } = useGalleryLightbox(images);
+  const { consumeSwipe, swipeHandlers } = useSwipeNavigation({
+    onSwipeLeft: next,
+    onSwipeRight: prev,
+    allowInteractiveStart: true,
+    preventDefaultOnSwipe: true,
+  });
 
   if (!images.length) return null;
   const featured = images[index];
-  const openFeatured = (event: MouseEvent<HTMLButtonElement>) => openLightbox(featured.id, event);
+  const openFeatured = (event: MouseEvent<HTMLButtonElement>) => {
+    if (consumeSwipe()) {
+      event.preventDefault();
+      return;
+    }
+    openLightbox(featured.id, event);
+  };
 
   return (
-    <section aria-label={`Fotografías del evento ${eventTitle}`} className="mt-4 grid gap-2">
-      <figure className="relative h-[clamp(11rem,28vw,12.5rem)] overflow-hidden rounded-xl bg-site-media">
+    <section aria-label={`Fotografías del evento ${eventTitle}`} className="mt-0 grid gap-2 page-fit:min-h-0 page-fit:flex-1">
+      <figure className="group relative h-[clamp(11rem,28vw,12.5rem)] cursor-pointer overflow-hidden rounded-xl bg-site-media page-fit:h-auto page-fit:min-h-0 page-fit:flex-1">
         <picture>
           <source srcSet={EVENT_GALLERIES[eventId].images[index].srcSet.avif} sizes={featured.sizes} type="image/avif" />
-          <img src={featured.src} srcSet={featured.srcSet} sizes={featured.sizes} alt={featured.alt} width={featured.width} height={featured.height} loading="lazy" decoding="async" className="h-full w-full object-cover" />
+          <img src={featured.src} srcSet={featured.srcSet} sizes={featured.sizes} alt={featured.alt} width={featured.width} height={featured.height} loading="lazy" decoding="async" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
         </picture>
-        <button type="button" aria-label={`Abrir ${featured.alt}`} onClick={openFeatured} className={`absolute inset-0 ${focusRingClass}`}>
+        <button type="button" aria-label={`Abrir ${featured.alt}`} onClick={openFeatured} className={`absolute inset-0 touch-pan-y cursor-pointer ${focusRingClass}`} {...swipeHandlers}>
           <span className="sr-only">Abrir fotografía</span>
         </button>
         {images.length > 1 ? <div className="pointer-events-none absolute inset-0 flex items-center justify-between px-2"><NavigationArrowButton direction="previous" label="Fotografía anterior" onClick={(event) => { event.stopPropagation(); prev(); }} className="pointer-events-auto" /><NavigationArrowButton direction="next" label="Fotografía siguiente" onClick={(event) => { event.stopPropagation(); next(); }} className="pointer-events-auto" /></div> : null}
       </figure>
-      {images.length > 1 ? <div role="group" aria-label="Seleccionar fotografía" className="grid h-14 grid-flow-col auto-cols-[17%] gap-2 overflow-x-auto sm:h-16 md:h-20">
-        {images.map((image, imageIndex) => <button key={image.id} type="button" aria-label={`Ver ${image.alt}`} aria-current={imageIndex === index ? "true" : undefined} onClick={() => goTo(imageIndex)} className={`overflow-hidden rounded-lg border-2 ${imageIndex === index ? "border-site-accent" : "border-transparent"} ${focusRingClass}`}><img src={image.thumbnailSrc} srcSet={image.thumbnailSrcSet} sizes="80px" alt="" width={image.thumbnailWidth} height={image.thumbnailHeight} loading="lazy" decoding="async" className="h-full w-full object-cover" /></button>)}
+      {images.length > 1 ? <div role="group" aria-label="Seleccionar fotografía" className="grid h-14 grid-flow-col auto-cols-[17%] justify-center gap-2 overflow-x-auto page-fit:h-14 page-fit:shrink-0 sm:h-16 md:h-20">
+        {images.map((image, imageIndex) => <button key={image.id} type="button" aria-label={`Ver ${image.alt}`} aria-current={imageIndex === index ? "true" : undefined} onClick={() => goTo(imageIndex)} className={`group cursor-pointer overflow-hidden rounded-lg border-2 ${imageIndex === index ? "border-site-accent" : "border-transparent"} ${focusRingClass}`}><img src={image.thumbnailSrc} srcSet={image.thumbnailSrcSet} sizes="80px" alt="" width={image.thumbnailWidth} height={image.thumbnailHeight} loading="lazy" decoding="async" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" /></button>)}
       </div> : null}
-      {lightboxImage ? <Suspense fallback={null}><Lightbox image={lightboxImage} index={lightboxIndex} total={images.length} triggerRef={triggerRef} onClose={closeLightbox} onPrev={showPrev} onNext={showNext} /></Suspense> : null}
+      {lightboxImage ? <Suspense fallback={null}><Lightbox image={lightboxImage} triggerRef={triggerRef} onClose={closeLightbox} onPrev={showPrev} onNext={showNext} /></Suspense> : null}
     </section>
   );
 }
