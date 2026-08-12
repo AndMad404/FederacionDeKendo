@@ -85,7 +85,7 @@ test("rejects invalid URL and inaccessible folder without replacing a frozen gal
     const invalid = await run(context.options, "https://example.test/folder");
     assert.equal(invalid.warnings.some((warning) => warning.includes("invalid Google Drive")), true);
     const inaccessible = await run({ ...context.options, listFolder: async () => { throw new Error("not public"); } });
-    assert.equal(inaccessible.warnings.some((warning) => warning.includes("not public")), true);
+    assert.equal(inaccessible.warnings.some((warning) => warning.includes("access or download failed")), true);
     assert.equal(await readFile(context.options.manifestPath, "utf8"), before);
   } finally {
     await rm(context.directory, { recursive: true, force: true });
@@ -141,15 +141,44 @@ test("absent albums preserve the first gallery and later Drive changes only warn
     const first = await run(context.options);
     const fingerprint = first.galleries["2026-01-01-evento"].fingerprint;
     const manifest = await readFile(context.options.manifestPath, "utf8");
-    await synchronizeEventGalleries({ ...context.options, events: [{ slug: "2026-01-01-evento", title: "Evento" }] });
+    const absent = await synchronizeEventGalleries({ ...context.options, events: [{ slug: "2026-01-01-evento", title: "Evento" }] });
     assert.equal(await readFile(context.options.manifestPath, "utf8"), manifest);
+    assert.deepEqual(absent.alarms, [{
+      slug: "2026-01-01-evento",
+      status: "galeria_congelada_cambio_detectado",
+      reason: "album_retirado",
+    }]);
     const changed = await run({
       ...context.options,
       listFolder: async () => [{ name: "1.jpg", id: "changed", buffer: await image("blue") }],
     });
     assert.equal(changed.galleries["2026-01-01-evento"].fingerprint, fingerprint);
     assert.equal(changed.warnings.some((warning) => warning.includes("Drive changed")), true);
+    assert.deepEqual(changed.alarms, [{
+      slug: "2026-01-01-evento",
+      status: "galeria_congelada_cambio_detectado",
+      reason: "album_modificado",
+    }]);
     await stat(path.join(context.options.imagesRoot, "2026-01-01-evento", "photo-1-480.webp"));
+  } finally {
+    await rm(context.directory, { recursive: true, force: true });
+  }
+});
+
+test("reports an unpublished album without inventing a frozen gallery", async () => {
+  const context = await fixture([]);
+  try {
+    const result = await synchronizeEventGalleries({
+      ...context.options,
+      events: [{ slug: "2026-01-01-evento", title: "Evento" }],
+    });
+    assert.deepEqual(result.alarms, [{
+      slug: "2026-01-01-evento",
+      status: "album_aun_no_publicado",
+      reason: "album_ausente",
+    }]);
+    await assert.rejects(stat(context.options.manifestPath), /ENOENT/);
+    await assert.rejects(stat(context.options.statePath), /ENOENT/);
   } finally {
     await rm(context.directory, { recursive: true, force: true });
   }

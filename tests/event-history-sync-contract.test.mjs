@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -369,5 +369,42 @@ test("Given a frozen gallery, When Drive changes, Then the gallery stays intact 
     assert.deepEqual(changed.warnings, [`${event.slug}: Drive changed; frozen gallery preserved.`]);
   } finally {
     await rm(context.directory, { recursive: true, force: true });
+  }
+});
+
+test("C4: Calendar and a first gallery publication leave no mixed artifacts when staging calendar output fails", async () => {
+  const directory = await mkdtemp(path.join(os.tmpdir(), "fak-c4-atomic-"));
+  const sourcePath = path.join(directory, "calendar.ics");
+  const blockedParent = path.join(directory, "blocked");
+  const galleryOptions = {
+    manifestPath: path.join(directory, "eventGalleries.ts"),
+    statePath: path.join(directory, "eventGalleryState.json"),
+    imagesRoot: path.join(directory, "images"),
+    listFolder: async () => [{ id: "private-id", name: "1.jpg" }],
+  };
+  try {
+    await writeFile(blockedParent, "not a directory");
+    await writeFile(sourcePath, [
+      "BEGIN:VCALENDAR", "BEGIN:VEVENT", "UID:c4@example.test",
+      "DTSTART;VALUE=DATE:20260110", "SUMMARY:C4 event",
+      "DESCRIPTION:Public text\\n---\\nALBUM_FOTOS: https://drive.google.com/drive/folders/approved",
+      "END:VEVENT", "END:VCALENDAR", "",
+    ].join("\r\n"));
+    galleryOptions.downloadFile = async () => sharp({
+      create: { width: 640, height: 480, channels: 3, background: "red" },
+    }).jpeg().toBuffer();
+    await assert.rejects(synchronizeCalendar({
+      source: sourcePath,
+      registryPath: path.join(directory, "registry.json"),
+      outputPath: path.join(blockedParent, "calendarEvents.ts"),
+      now: new Date("2026-03-01T00:00:00.000Z"),
+      galleryOptions,
+    }));
+    await assert.rejects(stat(galleryOptions.manifestPath), /ENOENT/);
+    await assert.rejects(stat(galleryOptions.statePath), /ENOENT/);
+    await assert.rejects(stat(galleryOptions.imagesRoot), /ENOENT/);
+    await assert.rejects(stat(path.join(directory, "registry.json")), /ENOENT/);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
   }
 });

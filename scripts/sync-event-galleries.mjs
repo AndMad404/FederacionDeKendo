@@ -137,7 +137,7 @@ function serializeManifest(galleries) {
     `export const EVENT_GALLERIES: Record<string, EventGallery> = ${JSON.stringify(galleries, null, 2)};\n`;
 }
 
-async function replaceTransaction(entries) {
+export async function replaceTransaction(entries) {
   const backups = [];
   const published = [];
   try {
@@ -154,6 +154,7 @@ async function replaceTransaction(entries) {
     }
     await Promise.all(backups.map(({ backup }) => rm(backup, { recursive: true, force: true })));
   } catch (error) {
+    await Promise.all(entries.map(({ staged }) => rm(staged, { recursive: true, force: true })));
     await Promise.all(published.map((target) => rm(target, { recursive: true, force: true })));
     await Promise.all(backups.map(({ target, backup }) => rename(backup, target)));
     throw error;
@@ -167,8 +168,10 @@ export async function synchronizeEventGalleries({
   imagesRoot = path.join(ROOT, "public/images/events"),
   listFolder = listPublicDriveFolder,
   downloadFile = downloadDriveFile,
+  deferPublish = false,
 } = {}) {
   const warnings = [];
+  const alarms = [];
   const previousState = await readJson(statePath, { version: 1, galleries: {} });
   let previousGalleries = {};
   try {
@@ -180,6 +183,7 @@ export async function synchronizeEventGalleries({
   }
   const nextState = structuredClone(previousState);
   const nextGalleries = structuredClone(previousGalleries);
+  let hasNewGallery = false;
   const stage = `${imagesRoot}.${process.pid}.stage`;
   await rm(stage, { recursive: true, force: true });
   await mkdir(path.dirname(stage), { recursive: true });
@@ -191,10 +195,33 @@ export async function synchronizeEventGalleries({
   }
 
   for (const event of events ?? []) {
-    const frozen = previousState.galleries?.[event.slug];
-    if (!event.albumUrl) continue;
+    const stateFrozen = previousState.galleries?.[event.slug];
+    const manifestFrozen = previousGalleries[event.slug];
+    if (stateFrozen && manifestFrozen && stateFrozen.fingerprint !== manifestFrozen.fingerprint) {
+      warnings.push(`${event.slug}: gallery state is inconsistent; published gallery preserved.`);
+      alarms.push({
+        slug: event.slug,
+        status: "galeria_congelada_cambio_detectado",
+        reason: "estado_incompatible",
+      });
+      continue;
+    }
+    const frozen = stateFrozen ?? manifestFrozen;
+    if (!event.albumUrl) {
+      alarms.push({
+        slug: event.slug,
+        status: frozen ? "galeria_congelada_cambio_detectado" : "album_aun_no_publicado",
+        reason: frozen ? "album_retirado" : "album_ausente",
+      });
+      continue;
+    }
     if (!getDriveFolderId(event.albumUrl)) {
       warnings.push(`${event.slug}: invalid Google Drive folder URL.`);
+      alarms.push({
+        slug: event.slug,
+        status: frozen ? "galeria_congelada_cambio_detectado" : "album_aun_no_publicado",
+        reason: "album_invalido",
+      });
       continue;
     }
     try {
@@ -207,7 +234,7 @@ export async function synchronizeEventGalleries({
           const buffer = await downloadFile(file);
           const inspected = await inspectImage(buffer, file.name);
           if (seen.has(inspected.pixelHash)) {
-            warnings.push(`${event.slug}: duplicate ignored (${file.name}).`);
+            warnings.push(`${event.slug}: duplicate ignored.`);
             continue;
           }
           seen.add(inspected.pixelHash);
@@ -219,13 +246,29 @@ export async function synchronizeEventGalleries({
       }
       if (valid.length === 0 || (invalidFile && valid.length < 5)) {
         warnings.push(`${event.slug}: partial or invalid import; previous gallery preserved.`);
+        alarms.push({
+          slug: event.slug,
+          status: frozen ? "galeria_congelada_cambio_detectado" : "album_aun_no_publicado",
+          reason: "importacion_invalida",
+        });
         continue;
       }
       if (valid.length > 5) warnings.push(`${event.slug}: additional files ignored.`);
       const selected = valid.slice(0, 5);
       const fingerprint = digest(selected.map((item) => `${item.file.name}:${item.pixelHash}`).join("\n"));
       if (frozen) {
-        if (frozen.fingerprint !== fingerprint) warnings.push(`${event.slug}: Drive changed; frozen gallery preserved.`);
+        if (!stateFrozen) {
+          nextState.galleries[event.slug] = { fingerprint: frozen.fingerprint };
+          hasNewGallery = true;
+        }
+        if (frozen.fingerprint !== fingerprint) {
+          warnings.push(`${event.slug}: Drive changed; frozen gallery preserved.`);
+          alarms.push({
+            slug: event.slug,
+            status: "galeria_congelada_cambio_detectado",
+            reason: "album_modificado",
+          });
+        }
         continue;
       }
       const eventDirectory = path.join(stage, event.slug);
@@ -256,9 +299,20 @@ export async function synchronizeEventGalleries({
       }
       nextGalleries[event.slug] = { fingerprint, images };
       nextState.galleries[event.slug] = { fingerprint };
+      hasNewGallery = true;
     } catch (error) {
-      warnings.push(`${event.slug}: ${error.message}; previous gallery preserved.`);
+      warnings.push(`${event.slug}: gallery access or download failed; previous gallery preserved.`);
+      alarms.push({
+        slug: event.slug,
+        status: frozen ? "galeria_congelada_cambio_detectado" : "album_aun_no_publicado",
+        reason: "acceso_o_descarga_fallida",
+      });
     }
+  }
+
+  if (!hasNewGallery) {
+    await rm(stage, { recursive: true, force: true });
+    return { galleries: nextGalleries, state: nextState, warnings, alarms };
   }
 
   const manifestStage = `${manifestPath}.${process.pid}.stage`;
@@ -266,10 +320,11 @@ export async function synchronizeEventGalleries({
   await mkdir(path.dirname(manifestStage), { recursive: true });
   await writeFile(manifestStage, serializeManifest(nextGalleries));
   await writeFile(stateStage, `${JSON.stringify(nextState, null, 2)}\n`);
-  await replaceTransaction([
+  const publication = [
     { target: imagesRoot, staged: stage },
     { target: manifestPath, staged: manifestStage },
     { target: statePath, staged: stateStage },
-  ]);
-  return { galleries: nextGalleries, state: nextState, warnings };
+  ];
+  if (!deferPublish) await replaceTransaction(publication);
+  return { galleries: nextGalleries, state: nextState, warnings, alarms, publication };
 }

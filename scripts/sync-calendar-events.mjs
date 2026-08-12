@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { appendFile, mkdir, readFile, rename, unlink, writeFile } from "node:fs/promises";
+import { appendFile, mkdir, readFile, rename, rm, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import {
@@ -8,7 +8,7 @@ import {
   getArchiveEligibleAt,
   isArchiveEligible,
 } from "../src/app/utils/eventArchive.js";
-import { synchronizeEventGalleries } from "./sync-event-galleries.mjs";
+import { replaceTransaction, synchronizeEventGalleries } from "./sync-event-galleries.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "..");
@@ -702,6 +702,13 @@ export async function writeAtomically(files) {
   }
 }
 
+async function stageTextFile(filePath, contents) {
+  await mkdir(path.dirname(filePath), { recursive: true });
+  const staged = `${filePath}.${process.pid}.stage`;
+  await writeFile(staged, contents, "utf8");
+  return { target: filePath, staged };
+}
+
 function escapeActionText(value) {
   return String(value)
     .replace(/[\u0000-\u001f\u007f]/g, " ")
@@ -725,12 +732,14 @@ export async function writeActionSummary(
 ) {
   if (!summaryPath) return;
   const historicalChanges = historicalReport?.historicalChanges ?? [];
+  const galleryChanges = historicalReport?.galleryChanges ?? [];
   const lines = [
     "## Calendar synchronization",
     "",
     `Published events: ${eventCount}`,
     `Operational warnings: ${warnings.length}`,
     `Historical events requiring confirmation: ${historicalChanges.length}`,
+    `Gallery states requiring attention: ${galleryChanges.length}`,
     "",
     "### Operational warnings",
     "",
@@ -753,6 +762,12 @@ export async function writeActionSummary(
           ),
           "",
         ])
+      : ["None."]),
+    "",
+    "### Gallery states requiring attention",
+    "",
+    ...(galleryChanges.length
+      ? galleryChanges.map((change) => `- ${escapeActionText(change.slug)}: ${escapeActionText(change.status)} (${escapeActionText(change.reason)})`)
       : ["None."]),
     "",
   ];
@@ -783,6 +798,7 @@ export async function synchronizeCalendar({
     detectHistoricalChanges(previousRegistry, parsed, now),
     [source, process.env.CALENDAR_ICS_URL],
   );
+  historicalReport.galleryChanges = [];
   const registry = mergeRegistry(previousRegistry, parsed, now);
 
   const galleryEvents = registry.events
@@ -803,17 +819,29 @@ export async function synchronizeCalendar({
       albumUrl: getPrivateAlbumUrl(currentBySourceId.get(event.sourceId)),
     }));
   let galleryResult;
-  if (galleryEvents.some((event) => event.albumUrl) || galleryOptions?.force) {
+  if (galleryEvents.length || galleryOptions?.force) {
     galleryResult = await synchronizeEventGalleries({
       events: galleryEvents,
       ...galleryOptions,
+      deferPublish: true,
     });
     warnings.push(...galleryResult.warnings);
+    historicalReport.galleryChanges = galleryResult.alarms;
   }
 
-  await writeAtomically([
-    [registryPath, `${JSON.stringify(registry, null, 2)}\n`],
-    [outputPath, serializeCalendarEvents(registry.events)],
+  let calendarPublication;
+  try {
+    calendarPublication = await Promise.all([
+      stageTextFile(registryPath, `${JSON.stringify(registry, null, 2)}\n`),
+      stageTextFile(outputPath, serializeCalendarEvents(registry.events)),
+    ]);
+  } catch (error) {
+    await Promise.all((galleryResult?.publication ?? []).map(({ staged }) => rm(staged, { recursive: true, force: true })));
+    throw error;
+  }
+  await replaceTransaction([
+    ...(galleryResult?.publication ?? []),
+    ...calendarPublication,
   ]);
   await writeHistoricalChangesReport(
     historicalReport,
