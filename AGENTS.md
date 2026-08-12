@@ -86,13 +86,16 @@ If a request mixes review and implementation, review first, then ask or infer wh
 ## Project-Specific Context
 
 - `src/app/App.tsx` is the route shell for `/`, `/calendario`, `/galeria`, and `/afiliados`.
-- At the reference desktop viewport (1366x768), every route must keep the
+- At the reference desktop viewport (1366x768), bounded routes must keep the
   navbar, main content, and footer within the visible viewport. Neither the
   document nor the route's primary section may require vertical scrolling.
   Lists with variable content must use a bounded presentation such as
   pagination, filtering, or another explicit navigation pattern instead of
-  adding desktop scroll. This rule does not prohibit the documented mobile,
-  tablet, or landscape scrolling behavior.
+  adding desktop scroll. Event-detail routes (`/eventos/<slug>/` and
+  `/en/events/<slug>/`) are the explicit exception: their descriptions and
+  optional historical galleries use normal document scrolling so all
+  editorial content remains visible and reachable. This rule does not prohibit
+  the documented mobile, tablet, or landscape scrolling behavior.
 - `src/app/config/seo-data.json` is the central source for route titles, descriptions, SEO text, locale/language, and organization metadata.
 - `src/app/config/seo.ts` and `scripts/generate-route-html.mjs` emit runtime and generated metadata from the SEO config.
 - `pnpm run build` also runs `postbuild`, generating route HTML under `dist/`.

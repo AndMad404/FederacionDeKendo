@@ -82,7 +82,8 @@ the approved application design:
 
 - It discovers every generated `dist/**/index.html` route automatically and
   enforces the strict 1366x768 shell, overflow, heading-boundary, footer, and
-  no-scroll rules on each route.
+  no-scroll rules on bounded routes. Event-detail routes instead enforce
+  normal document flow with no clipped content or nested vertical scrolling.
 - One representative of every page design (`home`, `calendar`, `gallery`,
   `affiliates`, `event`, `pastEvents`, and `notFound`) is checked at 360x800,
   390x844, 768x1024, and 1366x768.
@@ -143,7 +144,7 @@ Preferred viewport matrix:
 - 768x1024
 - 1366x768
 
-At 1366x768, verify for every route that:
+At 1366x768, verify for every bounded route that:
 
 - The navbar, main content, and footer are visible in the same viewport.
 - `document.documentElement.scrollHeight` equals its `clientHeight`.
@@ -153,6 +154,13 @@ At 1366x768, verify for every route that:
   interaction rather than desktop vertical scrolling.
 - Any primary surface marked with `data-page-content-boundary` begins at or
   below the bottom edge of the route `h1`.
+
+For event-detail routes at 1366x768, verify instead that:
+
+- The document owns any required vertical overflow.
+- The event surface does not clip its description or optional gallery.
+- No nested vertical scroll container is introduced.
+- The footer remains reachable after the complete event content.
 
 For landscape-specific issues, do not treat scaled portrait behavior as proof.
 

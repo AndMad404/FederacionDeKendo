@@ -229,13 +229,18 @@ for (const viewport of viewports) {
           sectionClientHeight:
             document.querySelector("main > section")?.clientHeight ?? 0,
         }));
-        expect(dimensions.scrollHeight).toBeLessThanOrEqual(
-          dimensions.innerHeight + 1,
-        );
         expect(dimensions.sectionScrollHeight).toBeLessThanOrEqual(
           dimensions.sectionClientHeight + 1,
         );
-        await expect(page.locator("footer")).toBeVisible();
+        if (route === HISTORICAL_EVENT_PATH) {
+          await page.locator("footer").scrollIntoViewIfNeeded();
+          await expect(page.locator("footer")).toBeVisible();
+        } else {
+          expect(dimensions.scrollHeight).toBeLessThanOrEqual(
+            dimensions.innerHeight + 1,
+          );
+          await expect(page.locator("footer")).toBeVisible();
+        }
       }
     }
   });
