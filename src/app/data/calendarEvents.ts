@@ -52,11 +52,11 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
     timeZone: "America/Costa_Rica"
   },
   {
-    id: "2026-09-11-gasshuku-monteverde",
-    archiveEligibleAt: "2026-09-14T06:00:00.000Z",
+    id: "2026-09-12-gasshuku-monteverde",
+    archiveEligibleAt: "2026-09-15T06:00:00.000Z",
     title: "Gasshuku Monteverde",
-    date: "2026-09-11",
-    endDate: "2026-09-13",
+    date: "2026-09-12",
+    endDate: "2026-09-14",
     location: "El Establo Mountain Hotel, Provincia de Puntarenas, Monteverde, Costa Rica",
     summary: "Entrenamientos intensivos de protocolo, técnica y combate.",
     eventType: "evento",
