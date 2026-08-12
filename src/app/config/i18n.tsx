@@ -184,6 +184,7 @@ const COPY = {
       viewArchive: "Ver antiguos eventos",
       directions: "Cómo llegar",
       viewDetailsLabel: "Consultar detalles del evento",
+      addToCalendar: "Agregar al calendario",
       audienceNotice: "Actividad abierta al público como espectador. La participación está reservada a miembros habilitados. El ingreso está sujeto a capacidad, normas del recinto y condiciones de seguridad.",
     },
     archive: {
@@ -312,6 +313,7 @@ const COPY = {
       viewArchive: "View past events",
       directions: "Directions",
       viewDetailsLabel: "View details for",
+      addToCalendar: "Add to calendar",
       audienceNotice: "The public may attend as spectators. Participation is reserved for eligible members. Admission is subject to venue capacity, rules, and safety requirements.",
     },
     archive: {

@@ -1,5 +1,6 @@
 import {
   CalendarDays,
+  CalendarPlus,
   Check,
   Clock,
   MapPin,
@@ -19,6 +20,7 @@ import { getEventEndDate } from "../utils/calendarEvents";
 import {
   formatEventTime,
   getEventDateLabel,
+  getGoogleCalendarUrl,
   getEventLocationName,
   getLocationMapUrl,
 } from "../utils/calendarEventPresentation";
@@ -173,6 +175,17 @@ export function EventPage() {
                       {copy.event.viewArchive}
                     </Link>
                   </>
+                ) : null}
+                {!isPast ? (
+                  <a
+                    href={getGoogleCalendarUrl(event)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`${secondaryButtonClass} ${focusRingClass}`}
+                  >
+                    <CalendarPlus className="mr-2 size-4" aria-hidden="true" />
+                    {copy.event.addToCalendar}
+                  </a>
                 ) : null}
                 <button
                   type="button"

@@ -43,6 +43,22 @@ test("calendar cards link to the canonical event page", async ({ page }) => {
   await expect(page).toHaveURL(new RegExp(`${path}$`));
 });
 
+test("scheduled event pages offer an add-to-calendar button", async ({
+  page,
+}) => {
+  const { path, title } = await discoverUpcomingEvent(page);
+  await page.goto(path);
+
+  const addToCalendar = page.getByRole("link", {
+    name: "Agregar al calendario",
+  });
+  await expect(addToCalendar).toBeVisible();
+  await expect(addToCalendar).toHaveAttribute("target", "_blank");
+  const href = await addToCalendar.getAttribute("href");
+  expect(href).toBeTruthy();
+  expect(new URL(href!).searchParams.get("text")).toBe(title);
+});
+
 test("accepts only current canonical event routes", async ({ page }) => {
   await page.goto("/eventos/examen-2026-08-08/");
   await expect(page.getByText(/página que buscas no existe/i)).toBeVisible();
@@ -109,6 +125,9 @@ test("uses injected time for the 48-hour calendar transition into event history"
 
   await page.goto(HISTORICAL_EVENT_PATH);
   await expect(page.getByText("Actividad finalizada")).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Agregar al calendario" }),
+  ).toHaveCount(0);
 });
 
 test("renders the historical archive and a custom not-found view", async ({
