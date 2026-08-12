@@ -41,7 +41,8 @@ export async function applyHistoricalCorrectionsByDateRange({
   });
 }
 
-function parseCliArguments(args) {
+export function parseCliArguments(args) {
+  if (args[0] === "--") args = args.slice(1);
   const allowed = new Set(["--report", "--from", "--to"]);
   const parsed = {};
   for (let index = 0; index < args.length; index += 2) {
