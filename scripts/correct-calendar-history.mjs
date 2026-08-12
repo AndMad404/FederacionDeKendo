@@ -46,8 +46,16 @@ function assertExactKeys(value, keys, label) {
 }
 
 function validateReport(report) {
-  assertExactKeys(report, ["version", "historicalChanges"], "Report");
-  if (report.version !== 2 || !Array.isArray(report.historicalChanges)) throw new Error("Unsupported historical changes report.");
+  assertExactKeys(report, ["version", "historicalChanges", "galleryChanges"], "Report");
+  if (
+    report.version !== 2 ||
+    !Array.isArray(report.historicalChanges) ||
+    !Array.isArray(report.galleryChanges)
+  ) throw new Error("Unsupported historical changes report.");
+  for (const [index, change] of report.galleryChanges.entries()) {
+    assertExactKeys(change, ["slug", "status", "reason"], `Gallery change ${index}`);
+    Object.values(change).forEach(assertSafeReportValue);
+  }
   const seenSourceIds = new Set();
   for (const [index, change] of report.historicalChanges.entries()) {
     assertExactKeys(change, ["sourceId", "publicIdentity", "differences", "publishedFingerprint", "proposalFingerprint"], `Report change ${index}`);

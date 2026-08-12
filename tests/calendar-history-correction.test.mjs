@@ -42,11 +42,14 @@ const proposed = {
 };
 
 function createReport(current = proposed) {
-  return detectHistoricalChanges(
+  return {
+    ...detectHistoricalChanges(
     { version: 3, events: [structuredClone(published)] },
     [{ ...current, historical: undefined, aliases: undefined }],
     new Date("2026-03-01T00:00:00.000Z"),
-  );
+    ),
+    galleryChanges: [],
+  };
 }
 
 async function fixture(report = createReport()) {
@@ -144,14 +147,17 @@ test("range correction validates every selected proposal before writing any even
   const files = await fixture();
   try {
     const secondProposal = { ...files.other, title: "Other corrected" };
-    const report = detectHistoricalChanges(
-      { version: 3, events: [published, files.other] },
-      [
-        { ...proposed, historical: undefined, aliases: undefined },
-        { ...secondProposal, historical: undefined },
-      ],
-      new Date("2026-03-01T00:00:00.000Z"),
-    );
+    const report = {
+      ...detectHistoricalChanges(
+        { version: 3, events: [published, files.other] },
+        [
+          { ...proposed, historical: undefined, aliases: undefined },
+          { ...secondProposal, historical: undefined },
+        ],
+        new Date("2026-03-01T00:00:00.000Z"),
+      ),
+      galleryChanges: [],
+    };
     report.historicalChanges.find(({ sourceId }) => sourceId === files.other.sourceId).proposalFingerprint = "0".repeat(64);
     await writeFile(files.reportPath, `${JSON.stringify(report, null, 2)}\n`);
     const before = await Promise.all([readFile(files.registryPath), readFile(files.outputPath)]);
@@ -190,6 +196,26 @@ test("range CLI accepts pnpm arguments with or without a literal separator", () 
   assert.deepEqual(parseCliArguments(["--", ...args]), expected);
 });
 
+test("range correction accepts the synchronization artifact with gallery alarms without applying them", async () => {
+  const report = createReport();
+  report.galleryChanges = [{
+    slug: published.slug,
+    status: "galeria_congelada_cambio_detectado",
+    reason: "album_modificado",
+  }];
+  const files = await fixture(report);
+  try {
+    const results = await applyHistoricalCorrectionsByDateRange({
+      registryPath: files.registryPath,
+      outputPath: files.outputPath,
+      reportPath: files.reportPath,
+      from: published.date,
+      to: published.date,
+    });
+    assert.equal(results.length, 1);
+  } finally { await rm(files.directory, { recursive: true, force: true }); }
+});
+
 test("C3 preserves the old slug as an alias", async () => {
   const files = await fixture();
   try {
@@ -220,9 +246,12 @@ for (const [name, overrides, fields = ["title"]] of [
 }
 
 test("C3 rejects disappeared_del_feed and emits no private values", async () => {
-  const report = detectHistoricalChanges(
-    { version: 3, events: [published] }, [], new Date("2026-03-01T00:00:00.000Z"),
-  );
+  const report = {
+    ...detectHistoricalChanges(
+      { version: 3, events: [published] }, [], new Date("2026-03-01T00:00:00.000Z"),
+    ),
+    galleryChanges: [],
+  };
   const files = await fixture(report);
   try {
     const serialized = JSON.stringify(report);
