@@ -2,7 +2,7 @@
 
 ```yaml
 schema_version: 2
-last_updated: 2026-08-10
+last_updated: 2026-08-11
 contract: .agents/review-contract.md
 
 state_rules:
@@ -11,6 +11,55 @@ state_rules:
   - A reviewed target is not automatically verified.
   - Changed targets make prior coverage stale until re-reviewed.
   - Legacy claims without reproducible evidence are historical, not current coverage.
+
+latest_c2_alarm_review:
+  id: REV-2026-08-11-01
+  requested_scope: Review the pending Phase C2 historical-calendar alarm.
+  actual_scope:
+    targets:
+      - scripts/sync-calendar-events.mjs
+      - .github/workflows/sync-calendar.yml
+      - tests/event-history-sync-contract.test.mjs
+      - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/event-history-roadmap.md
+    axes: [ARCH]
+    included:
+      - deterministic historical-change detection
+      - immutability of historical snapshots
+      - private-data redaction
+      - GitHub Actions alarm channel and structured artifact
+      - alignment of the canonical roadmap status with repository evidence
+    excluded:
+      - implementation changes
+      - external GitHub Actions execution
+      - visual UI, gallery-pipeline, correction-operation, and deployment review
+  baseline:
+    commit: 2555735b
+    worktree: clean
+  confirmed_findings:
+    - DOC-ARCH-001
+  evidence:
+    - corepack pnpm exec node --test tests/event-history-sync-contract.test.mjs passed 15 tests
+    - scripts/sync-calendar-events.mjs exports detectHistoricalChanges, redacts report values, writes the report, and emits an Actions warning and summary
+    - .github/workflows/sync-calendar.yml uploads calendar-historical-changes.json for 30 days without issue permissions or a failure gate
+    - event-history-roadmap.md still labels C2 pending despite commit e13300cd and the verified implementation
+  result: C2 is implemented locally with the selected non-blocking GitHub Actions summary/warning plus JSON-artifact channel. The remaining work is to reconcile its canonical roadmap status and document the operator workflow when the owner authorizes that documentation update.
+
+open_findings:
+  - id: DOC-ARCH-001
+    level: SMELL
+    axis: ARCH
+    status: open
+    target: ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/event-history-roadmap.md:3
+    problem: The roadmap states that C2 is pending, while repository code, its workflow, and directed C2 tests implement the documented alarm channel.
+    fix: Mark C2 implemented and verified locally, record the chosen channel as an Actions warning/summary plus 30-day JSON artifact, and remove the pre-implementation decision gate.
+    cost_of_deferring: Roadmap-driven planning will incorrectly report C2 as the next phase and may duplicate completed work.
+    evidence:
+      - commit e13300cd
+      - scripts/sync-calendar-events.mjs:529
+      - .github/workflows/sync-calendar.yml:41
+      - tests/event-history-sync-contract.test.mjs:179
+      - corepack pnpm exec node --test tests/event-history-sync-contract.test.mjs
+    introduced_in: REV-2026-08-11-01
 
 design_source_status:
   status: obsolete_pending_recreation
