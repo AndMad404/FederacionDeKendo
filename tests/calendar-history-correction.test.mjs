@@ -9,7 +9,10 @@ import {
   fingerprintHistoricalProposal,
   fingerprintHistoricalSnapshot,
 } from "../scripts/correct-calendar-history.mjs";
-import { applyHistoricalCorrectionsByDateRange } from "../scripts/correct-calendar-history-range.mjs";
+import {
+  applyHistoricalCorrectionsByDateRange,
+  parseCliArguments,
+} from "../scripts/correct-calendar-history-range.mjs";
 import {
   detectHistoricalChanges,
   mergeRegistry,
@@ -172,7 +175,19 @@ test("range workflow requires an approved report run and an inclusive date range
   assert.match(workflow, /to:/);
   assert.match(workflow, /actions\/download-artifact@v5/);
   assert.match(workflow, /correct:calendar-history-range/);
+  assert.doesNotMatch(workflow, /correct:calendar-history-range -- --report/);
   assert.doesNotMatch(workflow, /issues:\s*write/);
+});
+
+test("range CLI accepts pnpm arguments with or without a literal separator", () => {
+  const expected = { from: "2026-05-02", to: "2026-08-08" };
+  const args = [
+    "--report", "calendar-historical-changes.json",
+    "--from", expected.from,
+    "--to", expected.to,
+  ];
+  assert.deepEqual(parseCliArguments(args), expected);
+  assert.deepEqual(parseCliArguments(["--", ...args]), expected);
 });
 
 test("C3 preserves the old slug as an alias", async () => {
