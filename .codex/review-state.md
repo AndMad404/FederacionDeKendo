@@ -2,7 +2,7 @@
 
 ```yaml
 schema_version: 2
-last_updated: 2026-08-12
+last_updated: 2026-08-13
 contract: .agents/review-contract.md
 
 state_rules:
@@ -2816,7 +2816,7 @@ latest_spa_mobile_review:
     - id: CRIT-RESP-001
       level: CRITICAL
       axis: RESPONSIVE
-      status: resolved
+      status: accepted_owner_policy
       target: 768x641 Calendar and Affiliates route content
       problem: At exactly 768x641 the tall-md fixed-viewport mode activates, the document cannot scroll, and interactive Calendar and Affiliates content extends below overflow-hidden route containers without another reachable scroll owner.
       fix: Do not select an implementation until the owner understands and approves a content-reachability contract; then ensure overflowing content has one explicit reachable scroll owner while preserving the separately approved 1366x768 composition.
@@ -3196,5 +3196,108 @@ latest_home_tablet_frame_fix:
     - a temporary zero-tolerance comparison found 3040 residual changed pixels; inspected diff attributed the remaining material region to the owner-approved ES/EN navbar addition
     - no screenshot baseline was regenerated
   result: Home again presents navbar, 348px hero, all three visible event cards, and footer inside the 768x1024 frame; mobile and 1366x768 remain baseline-matching.
+
+latest_event_seo_review:
+  id: REV-2026-08-13-01
+  requested_scope: Assess SEO for upcoming and past events.
+  actual_scope:
+    targets:
+      - src/app/config/events.ts
+      - src/app/config/seo.ts
+      - src/app/utils/eventRoutes.ts
+      - src/app/utils/eventArchive.js
+      - src/app/components/PastEventsSection.tsx
+      - scripts/generate-route-html.mjs
+      - generated event and archive HTML plus sitemap
+    axes: [SEO]
+    included:
+      - indexability, canonical URLs, hreflang, sitemap, event structured data
+      - server-rendered historical archive content
+    excluded:
+      - production deployment configuration and search-console coverage
+      - keyword research, backlinks, performance, and visual presentation
+  baseline:
+    commit: 1dbec00d
+    worktree: clean before review-state update
+    fingerprints:
+      events.ts: 6053F2452EF4DD51D164688E6F44DE8CA3597CD41A74C80A6AC578FAF669E395
+      seo.ts: 806129991AB0AEA573750447EB692C3CD10E39F9D2375D180E10617541F4DC38
+      eventRoutes.ts: EEBCE353B54638F1DC4E4A3AACF5C1AB9D9446617A075FAE6C7BCAEC8400F7DE
+      PastEventsSection.tsx: 7F2A4F7792BF4E5F88C04CEDF3600CCDBF5B416852BD7115C1171905DBD9C147
+  confirmed_findings: [STR-SEO-006, STR-SEO-007, SMELL-SEO-006, SMELL-SEO-007]
+  findings:
+    - id: STR-SEO-006
+      level: STRUCTURAL
+      axis: SEO
+      status: resolved
+      target: src/app/config/seo.ts:157-160; src/app/config/events.ts:1
+      problem: SITE_INDEXING_ENABLED and EVENT_INDEXING_ENABLED are false, so every event, calendar, and archive page emits noindex,nofollow; the sitemap is empty and no JSON-LD is emitted.
+      fix: Enable public indexing only after confirming the canonical domain and launch policy, then make the event-level index policy explicit for upcoming and historical details.
+      cost_of_deferring: Search engines are instructed not to index any event URL, so the event content cannot obtain organic visibility.
+      evidence:
+        - corepack pnpm run build
+        - corepack pnpm run test:generated passed 5 tests
+        - dist/eventos/2026-09-12-gasshuku-monteverde/index.html:26
+        - dist/eventos/pasados/index.html:20
+        - dist/sitemap.xml contains no url entries
+      resolution:
+        resolved_at: 2026-08-13
+        resolved_ref: owner direction
+        checks:
+          - all generated routes emit noindex, nofollow
+          - sitemap contains no URL entries
+          - generated output tests passed
+    - id: STR-SEO-007
+      level: STRUCTURAL
+      axis: SEO
+      status: resolved
+      target: src/app/components/PastEventsSection.tsx:30-34
+      problem: The archive obtains historical events only after useEffect sets now; static SSR output has an empty archive and no links to historical detail pages.
+      fix: Supply a deterministic server render time or precompute archive content during static generation, while preserving client freshness after hydration.
+      cost_of_deferring: Even after indexing is enabled, crawlers that use the generated HTML will not discover archive entries from the archive page.
+      evidence:
+        - corepack pnpm run build
+        - dist/eventos/pasados/index.html SSR body says Todavia no hay eventos en el archivo
+        - getPastEvents defaults to a real current date when invoked by getRouteManifest in src/app/config/seo.ts:250-268
+      resolution:
+        resolved_at: 2026-08-13
+        resolved_ref: worktree
+        checks:
+          - generated archive HTML contains historical event links
+          - generated output tests passed
+    - id: SMELL-SEO-006
+      level: SMELL
+      axis: SEO
+      status: resolved
+      target: src/app/config/seo.ts:391-426
+      problem: The future Event JSON-LD is prepared only for events with location and assigns EventScheduled without considering a historical event state.
+      fix: When indexing is approved, emit a complete Event entity for eligible published events and use EventCompleted for past events.
+      cost_of_deferring: Rich-result eligibility and schema accuracy will be inconsistent across the archive after indexing is enabled.
+      evidence:
+        - src/app/config/seo.ts:391-426
+      resolution:
+        resolved_at: 2026-08-13
+        resolved_ref: worktree
+        checks:
+          - generated historical event JSON-LD uses EventCompleted
+          - generated output tests passed
+    - id: SMELL-SEO-007
+      level: SMELL
+      axis: SEO
+      status: deferred_presidency_authority
+      target: src/app/config/seo.ts:300
+      problem: Detail-page titles use only the event name, so recurring events such as Examen generate identical HTML titles across different dates.
+      fix: Include the event date or year in the detail-page title while retaining the concise visible h1.
+      cost_of_deferring: Search results and social previews cannot clearly distinguish recurring editions of the same event.
+      evidence:
+        - dist/eventos/2026-08-08-examen/index.html title is Examen | Federacion de Asociaciones de Kendo
+        - dist/eventos/2027-01-30-examen/index.html has the same title
+  evidence:
+    - attempted production URL inspection was blocked by the browsing safety gate; no claim about deployed headers or deployed HTML is made
+    - canonical and reciprocal hreflang tags are present in generated Spanish and English event and archive pages
+    - event title and meta description are generated from localized event data
+  result: The owner-required global noindex policy is active for all routes. The archive now retains server-rendered historical links for a future approved indexing phase; titles remain unchanged under Presidency authority.
+  pending: Production deployment and Search Console indexing coverage were not reviewed.
+  next: Do not enable indexing until the owner explicitly authorizes it.
 
 ```

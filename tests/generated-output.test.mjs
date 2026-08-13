@@ -6,7 +6,7 @@ async function readDist(relativePath) {
   return readFile(new URL(`../dist/${relativePath}`, import.meta.url), "utf8");
 }
 
-test("generates event HTML with canonical and no structured data while it remains unapproved", async () => {
+test("generates event HTML with canonical and no structured data while indexing is paused", async () => {
   const complete = await readDist("eventos/2026-08-08-examen/index.html");
   const incomplete = await readDist(
     "eventos/2026-10-10-clak-1er-panamericano-brasil/index.html",
@@ -22,7 +22,7 @@ test("generates event HTML with canonical and no structured data while it remain
   assert.doesNotMatch(incomplete, /application\/ld\+json/);
 });
 
-test("keeps every generated route noindex, structured-data-free, and sitemap-free while indexing is disabled", async () => {
+test("keeps every generated route noindex, structured-data-free, and sitemap-free while indexing is paused", async () => {
   const sitemap = await readDist("sitemap.xml");
   const home = await readDist("index.html");
   const calendar = await readDist("calendario/index.html");
@@ -35,7 +35,7 @@ test("keeps every generated route noindex, structured-data-free, and sitemap-fre
   assert.doesNotMatch(calendar, /application\/ld\+json/);
 });
 
-test("keeps both calendar views noindex and structured-data-free until explicit approval", async () => {
+test("keeps both calendar archive views noindex and structured-data-free", async () => {
   const pastEvents = await readDist("eventos/pasados/index.html");
   const englishPastEvents = await readDist("en/events/past/index.html");
 
@@ -48,7 +48,7 @@ test("keeps both calendar views noindex and structured-data-free until explicit 
 test("generates the archive route", async () => {
   const archive = await readDist("eventos/pasados/index.html");
   assert.match(archive, /Eventos pasados/);
-  assert.match(archive, /Página (?:<!-- -->)?1(?:<!-- -->)? de (?:<!-- -->)?1/);
+  assert.match(archive, /href="\/eventos\/2026-08-08-examen\/"/);
 });
 
 test("generates localized English routes with reciprocal language metadata", async () => {

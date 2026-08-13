@@ -13,6 +13,7 @@ import {
 } from "../utils/eventRoutes";
 import { getLanguageFromPathname, type Language } from "./i18n";
 import { getLocalizedEvent } from "../utils/localizedEvents";
+import { getEventEndDate } from "../utils/calendarEvents";
 import type { RouteComponent } from "./routeTypes";
 
 export type { RouteComponent } from "./routeTypes";
@@ -390,7 +391,7 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
     ROUTE_STRUCTURED_DATA_BUILDERS[meta.component]?.(meta, canonicalUrl) ?? [];
   if (meta.component === "event" && meta.eventId) {
     const event = CALENDAR_EVENTS.find((candidate) => candidate.id === meta.eventId);
-    if (event?.location) {
+    if (event) {
       const localizedEvent = getLocalizedEvent(event, meta.language);
       const startDate = event.startTime
         ? `${event.date}T${event.startTime}:00-06:00`
@@ -409,17 +410,24 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
         description: localizedEvent.summary || meta.description,
         startDate,
         ...(endDate ? { endDate } : {}),
-        eventStatus: "https://schema.org/EventScheduled",
+        eventStatus:
+          getEventEndDate(event).getTime() < Date.now()
+            ? "https://schema.org/EventCompleted"
+            : "https://schema.org/EventScheduled",
         eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
-        location: {
-          "@type": "Place",
-          name: event.location.split(",", 1)[0].trim(),
-          address: {
-            "@type": "PostalAddress",
-            streetAddress: event.location,
-            addressCountry: "CR",
-          },
-        },
+        ...(event.location
+          ? {
+              location: {
+                "@type": "Place",
+                name: event.location.split(",", 1)[0].trim(),
+                address: {
+                  "@type": "PostalAddress",
+                  streetAddress: event.location,
+                  addressCountry: "CR",
+                },
+              },
+            }
+          : {}),
         image: [image.url],
         url: canonicalUrl,
       });
@@ -482,7 +490,7 @@ export function getRouteSeoPayload(meta: RouteMeta): RouteSeoPayload {
     description: meta.description || DEFAULT_SITE_DESCRIPTION,
     robots: noindex ? "noindex, nofollow" : "index, follow",
     canonicalUrl:
-      noindex && SITE_INDEXING_ENABLED && !meta.canonicalWhileNoindex
+      noindex && Boolean(meta.noindex) && !meta.canonicalWhileNoindex
         ? null
         : getCanonicalUrl(meta),
     siteName: SITE_NAME,

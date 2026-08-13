@@ -28,10 +28,10 @@ export function PastEventsSection() {
   const { language, copy } = useLanguage();
   const { pathname, search } = useLocation();
   const navigate = useNavigate();
-  const [now, setNow] = useState<Date>();
+  const [now, setNow] = useState(() => new Date());
   useEffect(() => setNow(new Date()), []);
   const requestedPage = getArchivePageFromPathname(pathname) ?? 1;
-  const historicalEvents = now ? getPastEvents(now) : [];
+  const historicalEvents = getPastEvents(now);
   const searchParams = new URLSearchParams(search);
   const filters = normalizeArchiveFilters({
     year: searchParams.get("year") ?? undefined,
