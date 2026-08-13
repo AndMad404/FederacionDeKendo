@@ -50,13 +50,51 @@ test("scheduled event pages offer an add-to-calendar button", async ({
   await page.goto(path);
 
   const addToCalendar = page.getByRole("link", {
-    name: "Agregar al calendario",
+    name: "Añade a tu calendario",
   });
   await expect(addToCalendar).toBeVisible();
   await expect(addToCalendar).toHaveAttribute("target", "_blank");
   const href = await addToCalendar.getAttribute("href");
   expect(href).toBeTruthy();
   expect(new URL(href!).searchParams.get("text")).toBe(title);
+});
+
+test("mobile portrait centers the calendar action and removes the description margin", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const { path } = await discoverUpcomingEvent(page);
+  await page.goto(path);
+
+  const addToCalendar = page.getByRole("link", {
+    name: "Añade a tu calendario",
+  });
+  const description = page.getByRole("heading", {
+    name: "Descripción",
+    level: 2,
+  });
+
+  await expect(addToCalendar).toBeVisible();
+  await expect(description).toBeVisible();
+
+  const calendarAction = await addToCalendar.evaluate((link) => {
+    const styles = getComputedStyle(link.parentElement!);
+    return {
+      marginTop: styles.marginTop,
+      marginBottom: styles.marginBottom,
+      justifyContent: styles.justifyContent,
+    };
+  });
+  const descriptionSection = await description.evaluate((heading) =>
+    getComputedStyle(heading.parentElement!).marginTop,
+  );
+
+  expect(calendarAction).toEqual({
+    marginTop: "10px",
+    marginBottom: "10px",
+    justifyContent: "center",
+  });
+  expect(descriptionSection).toBe("0px");
 });
 
 test("accepts only current canonical event routes", async ({ page }) => {
@@ -126,7 +164,7 @@ test("uses injected time for the 48-hour calendar transition into event history"
   await page.goto(HISTORICAL_EVENT_PATH);
   await expect(page.getByText("Actividad finalizada")).toBeVisible();
   await expect(
-    page.getByRole("link", { name: "Agregar al calendario" }),
+    page.getByRole("link", { name: "Añade a tu calendario" }),
   ).toHaveCount(0);
 });
 

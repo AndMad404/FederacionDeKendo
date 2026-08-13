@@ -148,7 +148,7 @@ export function EventPage() {
                   </div>
                 </div>
                 {!isPast ? (
-                  <div className="flex items-center">
+                  <div className="my-2.5 flex items-center justify-center md:my-0 md:justify-start land-sm:my-0 land-sm:justify-start">
                     <a
                       href={getGoogleCalendarUrl(event)}
                       target="_blank"
@@ -162,7 +162,7 @@ export function EventPage() {
                 ) : null}
               </dl>
 
-              <div className="mt-4">
+              <div className="mt-0 md:mt-4 land-sm:mt-4">
                 <h2 className="font-bold">{copy.event.description}</h2>
                 <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-site-muted">
                   {event.summary ?? copy.common.informationPending}
