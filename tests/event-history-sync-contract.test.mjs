@@ -240,6 +240,12 @@ test("C2: keep operational warnings separate and neutralize Calendar markup in t
     );
     const summary = await readFile(summaryPath, "utf8");
     assert.match(summary, /### Operational warnings/);
+    assert.match(summary, /Events in preparation: 0/);
+    assert.match(summary, /Archived events: 0/);
+    assert.match(summary, /Event types inferred from titles: 0/);
+    assert.match(summary, /Galleries imported this run: 0/);
+    assert.match(summary, /Frozen galleries: 0/);
+    assert.match(summary, /Drive changes detected: 0/);
     assert.match(summary, /### Historical changes requiring confirmation/);
     assert.doesNotMatch(summary, /<details>|<script>|\n::error::/);
   } finally {

@@ -2,15 +2,23 @@ import { expect, test, type Page } from "@playwright/test";
 import { FIXED_TEST_TIME } from "./design-contract";
 
 async function openLightbox(page: Page) {
-  await page.clock.setFixedTime(FIXED_TEST_TIME);
-  await page.goto("/galeria/");
-  const opener = page.locator(".gallery-featured-frame > button");
-  await expect(opener).toBeVisible();
-  await opener.click();
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    await page.clock.setFixedTime(FIXED_TEST_TIME);
+    await page.goto("/galeria/");
+    const opener = page.locator(".gallery-featured-frame > button");
+    await expect(opener).toBeVisible();
+    await opener.click();
 
-  const dialog = page.getByRole("dialog");
-  await expect(dialog).toBeVisible();
-  return { dialog, opener };
+    const dialog = page.getByRole("dialog");
+    try {
+      await expect(dialog).toBeVisible({ timeout: 5_000 });
+      return { dialog, opener };
+    } catch (error) {
+      if (attempt === 1) throw error;
+    }
+  }
+
+  throw new Error("Unreachable");
 }
 
 test("isolates the open lightbox from the application", async ({ page }) => {

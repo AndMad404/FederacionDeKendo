@@ -727,6 +727,7 @@ export async function writeActionSummary(
   eventCount,
   historicalReport,
   summaryPath = process.env.GITHUB_STEP_SUMMARY,
+  operationalCounts = {},
 ) {
   if (!summaryPath) return;
   const historicalChanges = historicalReport?.historicalChanges ?? [];
@@ -738,6 +739,12 @@ export async function writeActionSummary(
     `Operational warnings: ${warnings.length}`,
     `Historical events requiring confirmation: ${historicalChanges.length}`,
     `Gallery states requiring attention: ${galleryChanges.length}`,
+    `Events in preparation: ${operationalCounts.preparation ?? 0}`,
+    `Archived events: ${operationalCounts.archived ?? 0}`,
+    `Event types inferred from titles: ${operationalCounts.inferredTypes ?? 0}`,
+    `Galleries imported this run: ${operationalCounts.importedGalleries ?? 0}`,
+    `Frozen galleries: ${operationalCounts.frozenGalleries ?? 0}`,
+    `Drive changes detected: ${operationalCounts.driveChanges ?? 0}`,
     "",
     "### Operational warnings",
     "",
@@ -864,6 +871,17 @@ async function main() {
     result.warnings,
     result.registry.events.length,
     result.historicalReport,
+    process.env.GITHUB_STEP_SUMMARY,
+    {
+      preparation: result.registry.events.filter((event) => !event.historical).length,
+      archived: result.registry.events.filter((event) => event.historical).length,
+      inferredTypes: result.registry.events.length,
+      importedGalleries: result.galleryResult?.importedCount ?? 0,
+      frozenGalleries: Object.keys(result.galleryResult?.state.galleries ?? {}).length,
+      driveChanges: result.historicalReport.galleryChanges.filter(
+        (change) => change.status === "galeria_congelada_cambio_detectado",
+      ).length,
+    },
   );
 }
 

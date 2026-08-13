@@ -153,6 +153,9 @@ assertSeoData(seoData);
 const DATA: SeoData = seoData as SeoData;
 
 const SITE_URL = DATA.siteUrl.replace(/\/$/, "");
+// Public indexing remains paused until the owner separately approves the
+// canonical domain, legal identity, and launch policy.
+const SITE_INDEXING_ENABLED = false;
 const SITE_NAME = DATA.siteName;
 const DEFAULT_SITE_DESCRIPTION = DATA.defaultDescription;
 const DEFAULT_SOCIAL_IMAGE_ALT = DATA.defaultImageAlt;
@@ -466,14 +469,16 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
 }
 
 export function getRouteSeoPayload(meta: RouteMeta): RouteSeoPayload {
-  const noindex = Boolean(meta.noindex);
+  const noindex = !SITE_INDEXING_ENABLED || Boolean(meta.noindex);
 
   return {
     title: meta.title,
     description: meta.description || DEFAULT_SITE_DESCRIPTION,
     robots: noindex ? "noindex, nofollow" : "index, follow",
     canonicalUrl:
-      noindex && !meta.canonicalWhileNoindex ? null : getCanonicalUrl(meta),
+      noindex && SITE_INDEXING_ENABLED && !meta.canonicalWhileNoindex
+        ? null
+        : getCanonicalUrl(meta),
     siteName: SITE_NAME,
     locale: meta.locale,
     image: getRouteImageMetadata(meta),

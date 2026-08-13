@@ -187,6 +187,7 @@ export async function synchronizeEventGalleries({
   const nextState = structuredClone(previousState);
   const nextGalleries = structuredClone(previousGalleries);
   let hasNewGallery = false;
+  let importedCount = 0;
   const stage = `${imagesRoot}.${process.pid}.stage`;
   await rm(stage, { recursive: true, force: true });
   await mkdir(path.dirname(stage), { recursive: true });
@@ -304,6 +305,7 @@ export async function synchronizeEventGalleries({
       nextGalleries[event.slug] = { fingerprint, images };
       nextState.galleries[event.slug] = { fingerprint };
       hasNewGallery = true;
+      importedCount += 1;
     } catch (error) {
       warnings.push(`${event.slug}: gallery access or download failed; previous gallery preserved.`);
       alarms.push({
@@ -316,7 +318,7 @@ export async function synchronizeEventGalleries({
 
   if (!hasNewGallery) {
     await rm(stage, { recursive: true, force: true });
-    return { galleries: nextGalleries, state: nextState, warnings, alarms };
+    return { galleries: nextGalleries, state: nextState, warnings, alarms, importedCount };
   }
 
   const manifestStage = `${manifestPath}.${process.pid}.stage`;
@@ -330,5 +332,5 @@ export async function synchronizeEventGalleries({
     { target: statePath, staged: stateStage },
   ];
   if (!deferPublish) await replaceTransaction(publication);
-  return { galleries: nextGalleries, state: nextState, warnings, alarms, publication };
+  return { galleries: nextGalleries, state: nextState, warnings, alarms, publication, importedCount };
 }

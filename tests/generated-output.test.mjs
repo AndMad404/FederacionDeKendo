@@ -22,10 +22,16 @@ test("generates event HTML with canonical, noindex and valid conditional Event J
   assert.doesNotMatch(incomplete, /"@type":"Event"/);
 });
 
-test("excludes event routes from sitemap while indexing is disabled", async () => {
+test("keeps every generated route noindex and sitemap-free while indexing is disabled", async () => {
   const sitemap = await readDist("sitemap.xml");
+  const home = await readDist("index.html");
+  const calendar = await readDist("calendario/index.html");
   assert.doesNotMatch(sitemap, /\/eventos\//);
-  assert.match(sitemap, /\/calendario\//);
+  assert.doesNotMatch(sitemap, /<loc>/);
+  assert.match(home, /name="robots" content="noindex, nofollow"/);
+  assert.match(calendar, /name="robots" content="noindex, nofollow"/);
+  assert.match(home, /rel="canonical" href="https:\/\/fak-kendo\.pages\.dev\/"/);
+  assert.match(home, /application\/ld\+json/);
 });
 
 test("generates the archive route", async () => {
@@ -52,6 +58,5 @@ test("generates localized English routes with reciprocal language metadata", asy
   );
   assert.match(event, /<h1[^>]*>Examination<\/h1>/);
   assert.match(event, /Examinations from 8th to 2nd kyu/);
-  assert.match(sitemap, /<loc>https:\/\/fak-kendo\.pages\.dev\/en\/<\/loc>/);
-  assert.match(sitemap, /<loc>https:\/\/fak-kendo\.pages\.dev\/en\/gallery\/<\/loc>/);
+  assert.doesNotMatch(sitemap, /<loc>/);
 });
