@@ -60,7 +60,7 @@ export function calculateArchiveEligibleAt(
   lastEventDate,
   timeZone = ARCHIVE_TIME_ZONE,
 ) {
-  return localMidnightToInstant(addCalendarDays(lastEventDate, 1), timeZone);
+  return localMidnightToInstant(addCalendarDays(lastEventDate, 2), timeZone);
 }
 
 export function calculateGalleryCheckAt(

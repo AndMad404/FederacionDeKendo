@@ -208,32 +208,32 @@ test("Given a version 2 historical event, When the registry migrates, Then its e
   assert.equal(event.slug, "2025-12-31-examen");
   assert.equal(event.title, "Examen original");
   assert.equal(event.date, "2025-12-31");
-  assert.equal(event.archiveEligibleAt, "2026-01-01T06:00:00.000Z");
+  assert.equal(event.archiveEligibleAt, "2026-01-02T06:00:00.000Z");
   assert.equal(event.historical, true);
 });
 
-test("Given an event at month end, When the 24-hour calendar checkpoint arrives, Then it is eligible", () => {
+test("Given an event at month end, When the 48-hour calendar checkpoint arrives, Then it is eligible", () => {
   assert.equal(
     calculateArchiveEligibleAt("2026-01-31").toISOString(),
-    "2026-02-01T06:00:00.000Z",
+    "2026-02-02T06:00:00.000Z",
   );
 });
 
-test("Given an event at year end, When the 24-hour calendar checkpoint arrives, Then eligibility crosses the year", () => {
+test("Given an event at year end, When the 48-hour calendar checkpoint arrives, Then eligibility crosses the year", () => {
   assert.equal(
     calculateArchiveEligibleAt("2026-12-31").toISOString(),
-    "2027-01-01T06:00:00.000Z",
+    "2027-01-02T06:00:00.000Z",
   );
 });
 
 test("Given foreign daylight-saving dates, When eligibility is calculated, Then Costa Rica midnight stays stable", () => {
   assert.equal(
     calculateArchiveEligibleAt("2026-03-08").toISOString(),
-    "2026-03-09T06:00:00.000Z",
+    "2026-03-10T06:00:00.000Z",
   );
   assert.equal(
     calculateArchiveEligibleAt("2026-11-01").toISOString(),
-    "2026-11-02T06:00:00.000Z",
+    "2026-11-03T06:00:00.000Z",
   );
 });
 
@@ -259,8 +259,8 @@ test("Given timed and all-day events, When parsed, Then eligibility uses the las
     "END:VCALENDAR",
   ].join("\n"))[0]);
 
-  assert.equal(timed.archiveEligibleAt, "2026-08-09T06:00:00.000Z");
-  assert.equal(allDay.archiveEligibleAt, "2026-08-09T06:00:00.000Z");
+  assert.equal(timed.archiveEligibleAt, "2026-08-10T06:00:00.000Z");
+  assert.equal(allDay.archiveEligibleAt, "2026-08-10T06:00:00.000Z");
 });
 
 test("removes missing future events and retains an individually missing historical event as inactive", () => {
@@ -399,7 +399,7 @@ test("phase 2 normalizes public descriptions and event types without publishing 
       source: fileURLToPath(phase2FixturePath),
       outputPath,
       registryPath,
-      now: new Date("2026-08-09T12:00:00Z"),
+      now: new Date("2026-08-10T12:00:00Z"),
       galleryOptions: {
         manifestPath: galleryManifestPath,
         statePath: galleryStatePath,
