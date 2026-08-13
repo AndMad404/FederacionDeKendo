@@ -43,7 +43,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2026-08-22-3er-torneo",
-    archiveEligibleAt: "2026-08-24T06:00:00.000Z",
+    archiveEligibleAt: "2026-08-23T06:00:00.000Z",
     title: "3er Torneo",
     date: "2026-08-22",
     startTime: "13:00",
@@ -55,27 +55,27 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2026-09-12-gasshuku-monteverde",
-    archiveEligibleAt: "2026-09-15T06:00:00.000Z",
+    archiveEligibleAt: "2026-09-14T06:00:00.000Z",
     title: "Gasshuku Monteverde",
     date: "2026-09-12",
     endDate: "2026-09-14",
     location: "El Establo Mountain Hotel, Provincia de Puntarenas, Monteverde, Costa Rica",
     summary: "La participación incluye:\n\n* Transporte ida y vuelta\n* Almuerzo primer día\n* Desayuno del segundo día\n* Habitación compartida\n* Acceso a las instalaciones y senderos del hotel\n* Uso de los salones de entrenamiento\n* Experiencia intensiva de entrenamiento a cargo de senséis de alto nivel\n\nEste encuentro guiado por cuatro senséis japoneses de alto rango nace con el propósito de vivir el kendo más allá del entrenamiento habitual: compartir dos días de disciplina, convivencia y aprendizaje.\n\nEl Gasshuku se desarrollará en el Establo Mountain Hotel, Monteverde. Sus instalaciones y salones de madera ofrecerán un espacio para entrenar, alejarnos por unos días de la rutina y disfrutar de una experiencia diferente alrededor del kendo.",
-    eventType: "evento",
+    eventType: "seminario",
     timeZone: "America/Costa_Rica"
   },
   {
     id: "2026-10-10-clak-1er-panamericano-brasil",
-    archiveEligibleAt: "2026-10-13T06:00:00.000Z",
+    archiveEligibleAt: "2026-10-12T06:00:00.000Z",
     title: "CLAK 1er Panamericano BRASIL",
     date: "2026-10-10",
     endDate: "2026-10-12",
-    eventType: "evento",
+    eventType: "seminario",
     timeZone: "America/Costa_Rica"
   },
   {
     id: "2026-10-31-examen",
-    archiveEligibleAt: "2026-11-02T06:00:00.000Z",
+    archiveEligibleAt: "2026-11-01T06:00:00.000Z",
     title: "Examen",
     date: "2026-10-31",
     startTime: "13:00",
@@ -87,7 +87,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2026-11-21-panama-torneo-por-equipos",
-    archiveEligibleAt: "2026-11-23T06:00:00.000Z",
+    archiveEligibleAt: "2026-11-22T06:00:00.000Z",
     title: "PANAMA Torneo por Equipos",
     date: "2026-11-21",
     summary: "Torneo por Equipos en Panamá. Invitación de Shinsei Panamá.",
@@ -96,7 +96,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2026-12-12-4to-torneo",
-    archiveEligibleAt: "2026-12-14T06:00:00.000Z",
+    archiveEligibleAt: "2026-12-13T06:00:00.000Z",
     title: "4to Torneo",
     date: "2026-12-12",
     startTime: "13:00",
@@ -108,7 +108,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2027-01-30-examen",
-    archiveEligibleAt: "2027-02-01T06:00:00.000Z",
+    archiveEligibleAt: "2027-01-31T06:00:00.000Z",
     title: "Examen",
     date: "2027-01-30",
     startTime: "13:00",
@@ -120,7 +120,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2027-04-03-5to-torneo",
-    archiveEligibleAt: "2027-04-05T06:00:00.000Z",
+    archiveEligibleAt: "2027-04-04T06:00:00.000Z",
     title: "5to Torneo",
     date: "2027-04-03",
     startTime: "13:00",
@@ -132,7 +132,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2027-05-01-examen",
-    archiveEligibleAt: "2027-05-03T06:00:00.000Z",
+    archiveEligibleAt: "2027-05-02T06:00:00.000Z",
     title: "Examen",
     date: "2027-05-01",
     startTime: "13:00",
@@ -144,7 +144,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2027-07-31-examen",
-    archiveEligibleAt: "2027-08-02T06:00:00.000Z",
+    archiveEligibleAt: "2027-08-01T06:00:00.000Z",
     title: "Examen",
     date: "2027-07-31",
     startTime: "13:00",
@@ -156,7 +156,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2027-08-14-6to-torneo",
-    archiveEligibleAt: "2027-08-16T06:00:00.000Z",
+    archiveEligibleAt: "2027-08-15T06:00:00.000Z",
     title: "6to Torneo",
     date: "2027-08-14",
     startTime: "13:00",
@@ -168,7 +168,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2027-10-30-examen",
-    archiveEligibleAt: "2027-11-01T06:00:00.000Z",
+    archiveEligibleAt: "2027-10-31T06:00:00.000Z",
     title: "Examen",
     date: "2027-10-30",
     startTime: "13:00",
@@ -180,7 +180,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2027-12-11-7mo-torneo",
-    archiveEligibleAt: "2027-12-13T06:00:00.000Z",
+    archiveEligibleAt: "2027-12-12T06:00:00.000Z",
     title: "7mo Torneo",
     date: "2027-12-11",
     startTime: "13:00",
