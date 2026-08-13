@@ -61,6 +61,8 @@ export interface RouteMeta {
   preloadImage?: PreloadImage;
   eventId?: string;
   archivePage?: number;
+  /** Whether this route is approved for public indexing after site launch. */
+  indexable?: boolean;
   canonicalWhileNoindex?: boolean;
   suppressStructuredData?: boolean;
   /** true para rutas que no deben indexarse (ej. 404). No aparecen en ROUTE_META. */
@@ -227,6 +229,7 @@ function createNotFoundMeta(language: Language): RouteMeta {
     imageHeight: DATA.defaultImageHeight,
     imageType: "image/png",
     schemaType: "WebPage",
+    indexable: false,
     noindex: true,
     suppressStructuredData: true,
   };
@@ -302,6 +305,7 @@ function createEventRouteMeta(
     imageHeight: calendarMeta.imageHeight,
     imageType: calendarMeta.imageType,
     schemaType: "WebPage",
+    indexable: EVENT_INDEXING_ENABLED,
     noindex: !EVENT_INDEXING_ENABLED,
     canonicalWhileNoindex: true,
   };
@@ -329,7 +333,8 @@ function createArchiveRouteMeta(page: number, language: Language = "es"): RouteM
     imageHeight: calendarMeta.imageHeight,
     imageType: calendarMeta.imageType,
     schemaType: "CollectionPage",
-    noindex: !EVENT_INDEXING_ENABLED,
+    indexable: false,
+    noindex: false,
     canonicalWhileNoindex: true,
   };
 }
@@ -469,7 +474,8 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
 }
 
 export function getRouteSeoPayload(meta: RouteMeta): RouteSeoPayload {
-  const noindex = !SITE_INDEXING_ENABLED || Boolean(meta.noindex);
+  const noindex =
+    !SITE_INDEXING_ENABLED || !meta.indexable || Boolean(meta.noindex);
 
   return {
     title: meta.title,
@@ -482,7 +488,7 @@ export function getRouteSeoPayload(meta: RouteMeta): RouteSeoPayload {
     siteName: SITE_NAME,
     locale: meta.locale,
     image: getRouteImageMetadata(meta),
-    structuredData: getRouteStructuredData(meta),
+    structuredData: noindex ? null : getRouteStructuredData(meta),
     preloadImage: meta.preloadImage,
   };
 }

@@ -6,7 +6,7 @@ async function readDist(relativePath) {
   return readFile(new URL(`../dist/${relativePath}`, import.meta.url), "utf8");
 }
 
-test("generates event HTML with canonical, noindex and valid conditional Event JSON-LD", async () => {
+test("generates event HTML with canonical and no structured data while it remains unapproved", async () => {
   const complete = await readDist("eventos/2026-08-08-examen/index.html");
   const incomplete = await readDist(
     "eventos/2026-10-10-clak-1er-panamericano-brasil/index.html",
@@ -18,11 +18,11 @@ test("generates event HTML with canonical, noindex and valid conditional Event J
     complete,
     /rel="canonical" href="https:\/\/fak-kendo\.pages\.dev\/eventos\/2026-08-08-examen\/"/,
   );
-  assert.match(complete, /"@type":"Event"/);
-  assert.doesNotMatch(incomplete, /"@type":"Event"/);
+  assert.doesNotMatch(complete, /application\/ld\+json/);
+  assert.doesNotMatch(incomplete, /application\/ld\+json/);
 });
 
-test("keeps every generated route noindex and sitemap-free while indexing is disabled", async () => {
+test("keeps every generated route noindex, structured-data-free, and sitemap-free while indexing is disabled", async () => {
   const sitemap = await readDist("sitemap.xml");
   const home = await readDist("index.html");
   const calendar = await readDist("calendario/index.html");
@@ -31,7 +31,18 @@ test("keeps every generated route noindex and sitemap-free while indexing is dis
   assert.match(home, /name="robots" content="noindex, nofollow"/);
   assert.match(calendar, /name="robots" content="noindex, nofollow"/);
   assert.match(home, /rel="canonical" href="https:\/\/fak-kendo\.pages\.dev\/"/);
-  assert.match(home, /application\/ld\+json/);
+  assert.doesNotMatch(home, /application\/ld\+json/);
+  assert.doesNotMatch(calendar, /application\/ld\+json/);
+});
+
+test("keeps both calendar views noindex and structured-data-free until explicit approval", async () => {
+  const pastEvents = await readDist("eventos/pasados/index.html");
+  const englishPastEvents = await readDist("en/events/past/index.html");
+
+  for (const html of [pastEvents, englishPastEvents]) {
+    assert.match(html, /name="robots" content="noindex, nofollow"/);
+    assert.doesNotMatch(html, /application\/ld\+json/);
+  }
 });
 
 test("generates the archive route", async () => {
