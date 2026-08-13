@@ -8,6 +8,10 @@ import {
   getArchiveEligibleAt,
   isArchiveEligible,
 } from "../src/app/utils/eventArchive.js";
+import {
+  addCalendarDays,
+  getCalendarDateTimeSortKey,
+} from "../src/app/utils/calendarDate.js";
 import { replaceTransaction, synchronizeEventGalleries } from "./sync-event-galleries.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -238,22 +242,6 @@ function parseIcsDate(property) {
   };
 }
 
-function createLocalDate(date, time = "00:00") {
-  const [year, month, day] = date.split("-").map(Number);
-  const [hours, minutes] = time.split(":").map(Number);
-  return new Date(year, month - 1, day, hours, minutes);
-}
-
-function addDays(date, days) {
-  const result = new Date(date);
-  result.setDate(result.getDate() + days);
-  return result;
-}
-
-function toIsoDate(date) {
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-}
-
 function slugify(value) {
   return value
     .normalize("NFD")
@@ -376,7 +364,7 @@ export function parseCalendarEvent(properties, warnings = []) {
   if (!start.isDateOnly && start.time) event.startTime = start.time;
   if (end) {
     if (start.isDateOnly && end.isDateOnly) {
-      const defaultEnd = toIsoDate(addDays(createLocalDate(start.date), 1));
+      const defaultEnd = addCalendarDays(start.date, 1);
       if (end.date !== defaultEnd) event.endDate = end.date;
     } else {
       if (end.date !== start.date) event.endDate = end.date;
@@ -386,7 +374,7 @@ export function parseCalendarEvent(properties, warnings = []) {
 
   const lastEventDate =
     start.isDateOnly && end?.isDateOnly
-      ? toIsoDate(addDays(createLocalDate(end.date), -1))
+      ? addCalendarDays(end.date, -1)
       : end?.date ?? start.date;
   event.archiveEligibleAt = calculateArchiveEligibleAt(
     lastEventDate,
@@ -486,8 +474,8 @@ export function mergeRegistry(
   assertUniqueCurrentSlugs(merged);
   merged.sort(
     (a, b) =>
-      createLocalDate(a.date, a.startTime).getTime() -
-      createLocalDate(b.date, b.startTime).getTime(),
+      getCalendarDateTimeSortKey(a.date, a.startTime) -
+      getCalendarDateTimeSortKey(b.date, b.startTime),
   );
   return { version: 3, events: merged };
 }
@@ -810,7 +798,7 @@ export async function synchronizeCalendar({
     .filter((event) => {
       const lastEventDate =
         event.endDate && !event.startTime && !event.endTime
-          ? toIsoDate(addDays(createLocalDate(event.endDate), -1))
+          ? addCalendarDays(event.endDate, -1)
           : event.endDate ?? event.date;
       return calculateGalleryCheckAt(lastEventDate, event.timeZone).getTime() <= now.getTime();
     })

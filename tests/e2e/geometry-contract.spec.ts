@@ -249,7 +249,11 @@ for (const viewport of APPROVED_VIEWPORTS) {
             };
           });
           expectCssPixels(styles.marginTop, SHELL_CONTRACT.routeSurfaceMarginBlock, "route surface top margin");
-          expectCssPixels(styles.marginBottom, SHELL_CONTRACT.routeSurfaceMarginBlock, "route surface bottom margin");
+          expectCssPixels(
+            styles.marginBottom,
+            approvedPage.design === "event" ? 0 : SHELL_CONTRACT.routeSurfaceMarginBlock,
+            "route surface bottom margin",
+          );
           expectCssPixels(styles.borderRadius, SHELL_CONTRACT.routeSurfaceRadius, "route surface radius");
         }
 
@@ -282,6 +286,22 @@ for (const viewport of APPROVED_VIEWPORTS) {
             boundaryBox.y,
             "declared content must begin at or below the approved heading boundary",
           ).toBeGreaterThanOrEqual(headingBox.y + headingBox.height - 1);
+        }
+
+        if (approvedPage.design === "gallery") {
+          const thumbnailStrip = page.locator("main [role='group'][aria-label]").first();
+          const thumbnail = thumbnailStrip.getByRole("button").first();
+          const thumbnailGeometry = await thumbnail.evaluate((element) => {
+            const rect = element.getBoundingClientRect();
+            return { width: rect.width, height: rect.height };
+          });
+          if (viewport.width < 640) {
+            expect(thumbnailGeometry.width).toBeGreaterThan(thumbnailGeometry.height);
+          }
+          expect(
+            await thumbnailStrip.locator("xpath=..").locator("[class*='bg-gradient']").count(),
+            "thumbnail strip must not have lateral gradient overlays",
+          ).toBe(0);
         }
       });
     }

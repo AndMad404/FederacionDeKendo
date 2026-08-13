@@ -3,7 +3,7 @@ import type { GalleryImage } from "../../types";
 import { useLanguage } from "../../config/i18n";
 import { focusRingClass, galleryThumbnailActiveClass } from "../../styles/shared";
 
-const THUMBNAIL_SIZES = "(min-width: 768px) 168px, 17vw";
+const THUMBNAIL_SIZES = "(min-width: 768px) 168px, 22vw";
 
 interface ThumbnailProps {
   image: GalleryImage;
@@ -123,7 +123,7 @@ export function GalleryThumbnails({
         ref={stripRef}
         role="group"
         aria-label={copy.gallery.thumbnails}
-        className="grid h-14 w-full touch-manipulation scroll-smooth grid-flow-col auto-cols-[17%] gap-1.5 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden motion-reduce:scroll-auto sm:h-16 sm:auto-cols-[calc((100%_-_2.5rem)_/_6)] sm:gap-2 md:h-20"
+        className="grid h-14 w-full touch-manipulation scroll-smooth grid-flow-col auto-cols-[22%] gap-1.5 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden motion-reduce:scroll-auto sm:h-16 sm:auto-cols-[calc((100%_-_2.5rem)_/_6)] sm:gap-2 md:h-20"
       >
         {images.map((image, index) => (
           <Thumbnail
@@ -137,18 +137,6 @@ export function GalleryThumbnails({
           />
         ))}
       </div>
-      {overflowState.canScrollLeft ? (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-site-canvas to-transparent"
-        />
-      ) : null}
-      {overflowState.canScrollRight ? (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-site-canvas to-transparent"
-        />
-      ) : null}
     </div>
   );
 }

@@ -196,6 +196,35 @@ for (const viewport of [
 
     const gallery = page.getByRole("region", { name: "Fotografías del evento Examen" });
     await expect(gallery).toBeVisible();
+    const featuredImage = gallery.locator("figure");
+    const thumbnails = gallery.getByRole("group", { name: "Seleccionar fotografía" });
+    const footer = page.locator("footer");
+    const geometry = await page.evaluate(() => {
+      const gallery = document.querySelector<HTMLElement>('section[aria-label="Fotografías del evento Examen"]');
+      const figure = gallery?.querySelector<HTMLElement>("figure");
+      const thumbnails = gallery?.querySelector<HTMLElement>('[role="group"]');
+      const event = document.querySelector<HTMLElement>('section[aria-labelledby="event-page-title"]');
+      const footer = document.querySelector<HTMLElement>("footer");
+      const thumb = thumbnails?.querySelector<HTMLElement>("button");
+      return {
+        galleryWidth: gallery?.getBoundingClientRect().width ?? 0,
+        figureWidth: figure?.getBoundingClientRect().width ?? 0,
+        eventWidth: event?.getBoundingClientRect().width ?? 0,
+        thumbnailWidth: thumb?.getBoundingClientRect().width ?? 0,
+        thumbnailHeight: thumb?.getBoundingClientRect().height ?? 0,
+        footerGap: footer && thumbnails
+          ? footer.getBoundingClientRect().top - thumbnails.getBoundingClientRect().bottom
+          : 0,
+      };
+    });
+    expect(geometry.figureWidth).toBeCloseTo(geometry.galleryWidth, 0);
+    expect(geometry.footerGap).toBeCloseTo(10, 0);
+    if (viewport.width < 640) {
+      expect(geometry.figureWidth).toBeCloseTo(geometry.eventWidth, 0);
+      expect(geometry.thumbnailWidth).toBeGreaterThan(geometry.thumbnailHeight);
+    }
+    await expect(featuredImage).toBeVisible();
+    await expect(thumbnails).toBeVisible();
     await expect(gallery.locator("img[alt]")).toHaveCount(4);
     await expect(gallery.getByRole("img", { name: "Fotografía 1 del evento Examen" })).toBeVisible();
     await expect(gallery.locator('img[alt=""]')).toHaveCount(3);

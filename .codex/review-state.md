@@ -3394,4 +3394,42 @@ latest_calendar_timezone_and_localization_review:
   pending: The unrelated pre-existing end-to-end failure in events.spec.ts for the 48-hour archive transition remains outside this change.
   next: Reconcile the archive-transition test with the current archive behavior in a separate targeted task.
 
+latest_calendar_date_helper_followup:
+  id: FIX-2026-08-13-05
+  requested_scope: Implement and document the confirmed calendar data/generator follow-up.
+  actual_scope:
+    targets:
+      - src/app/utils/calendarDate.js
+      - src/app/utils/calendarEvents.ts
+      - scripts/sync-calendar-events.mjs
+      - tests/calendar-sync.test.mjs
+      - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/calendar-sync.md
+      - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/architecture.md
+    axes: [ARCH]
+    excluded:
+      - public event data changes
+      - visual presentation
+      - archive policy and external synchronization execution
+  implementation:
+    - Extracted ISO calendar-day arithmetic and deterministic local date/time sort keys into calendarDate.js, importable by both the application and the Node sync script.
+    - Replaced the sync script's host-local Date construction and addDays helpers with the shared functions.
+    - Retained event instant conversion in calendarEvents.ts, where event.timeZone is required to answer whether an event has ended.
+  resolved_findings:
+    - id: SMELL-ARCH-013
+      level: SMELL
+      axis: ARCH
+      status: resolved
+      target: src/app/utils/calendarDate.js
+      problem: Calendar-day addition and chronological sorting had independent application/script implementations, so a later date-logic change could diverge between generated data and runtime behavior.
+      fix: Share pure ISO-date helpers; calendar-day arithmetic and wall-clock sorting do not consult the runner or visitor time zone.
+      checks:
+        - corepack pnpm exec node --test tests/calendar-sync.test.mjs passed 19 tests
+        - corepack pnpm run typecheck passed
+        - corepack pnpm run build passed, including SSR and generated route HTML
+        - git diff --check passed
+  documented:
+    - calendar-sync.md distinguishes host-independent calendar arithmetic from event.timeZone instant conversion.
+    - architecture.md records the shared calendar-date boundary and its consumers.
+  result: The previous time-zone and ordinal findings remain closed by their existing directed browser tests; the remaining date-helper duplication is now removed and documented.
+
 ```

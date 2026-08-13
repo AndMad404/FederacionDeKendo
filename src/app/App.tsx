@@ -89,7 +89,9 @@ function AppShell({
 
       <main
         id="main-content"
-        className={`px-2.5 pt-[calc(4rem_+_10px)] land-sm:pt-[calc(3rem_+_6px)] tall-md:flex-1 ${
+        className={`px-2.5 pt-[calc(4rem_+_10px)] land-sm:pt-[calc(3rem_+_6px)] ${
+          routeComponent === "event" ? "" : "tall-md:flex-1"
+        } ${
           allowsDesktopContainment
             ? "page-fit:min-h-0 page-fit:overflow-hidden"
             : ""

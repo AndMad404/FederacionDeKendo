@@ -53,12 +53,12 @@ const SHARED_SPACING: Partial<Record<PageDesign, ComponentSpacingContract>> = {
   },
   event: {
     selector: "main > section article",
-    paddingTop: 16,
-    paddingRight: 16,
-    paddingBottom: 16,
-    paddingLeft: 16,
-    rowGap: 16,
-    columnGap: 16,
+    paddingTop: 12,
+    paddingRight: 20,
+    paddingBottom: 12,
+    paddingLeft: 20,
+    rowGap: 12,
+    columnGap: 12,
   },
   pastEvents: {
     selector: "main > section > div:last-child > div",
@@ -125,16 +125,6 @@ export function getComponentSpacingContract(
 
   if (design === "gallery" && viewportWidth >= 640) {
     return { ...shared, paddingRight: 80, paddingLeft: 80 };
-  }
-
-  if (design === "event" && viewportWidth >= 768) {
-    return {
-      ...shared,
-      paddingTop: 20,
-      paddingRight: 20,
-      paddingBottom: 20,
-      paddingLeft: 20,
-    };
   }
 
   return shared;

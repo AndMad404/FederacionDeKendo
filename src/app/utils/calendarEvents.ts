@@ -1,4 +1,5 @@
 import type { CalendarEvent } from "../types";
+import { addCalendarDays } from "./calendarDate.js";
 
 export interface UpcomingEventGroup {
   monthKey: string;
@@ -63,13 +64,6 @@ function createEventDate(
 
 function addHours(date: Date, hours: number) {
   return new Date(date.getTime() + hours * 60 * 60 * 1000);
-}
-
-function addCalendarDays(date: string, days: number) {
-  const { year, month, day } = parseDateParts(date);
-  const nextDate = new Date(Date.UTC(year, month - 1, day + days));
-
-  return nextDate.toISOString().slice(0, 10);
 }
 
 function getEventStartDate(event: CalendarEvent) {

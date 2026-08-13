@@ -76,7 +76,7 @@ export function EventPage() {
   return (
     <section
       aria-labelledby="event-page-title"
-      className="relative my-2 flex w-full flex-col overflow-hidden rounded-xl bg-site-canvas"
+      className="relative mb-0 mt-2 flex w-full flex-col overflow-hidden rounded-xl bg-site-canvas"
     >
       <MediaPageBanner
         className="relative z-10 min-h-28 shrink-0 overflow-hidden land-compact:min-h-20"
@@ -101,17 +101,17 @@ export function EventPage() {
         }}
       />
 
-      <div className="relative z-20 -mt-11 flex items-start justify-center px-3 pb-0 pt-3 sm:-mt-13 sm:px-4 sm:pb-0 sm:pt-4 tall-md:p-4 land-sm:px-3 land-sm:pb-0 land-sm:pt-3 land-compact:-mt-8">
-        <div className="flex w-full max-w-5xl flex-col gap-4 land-sm:gap-2">
+      <div className="relative z-20 -mt-11 grid w-full justify-items-stretch gap-3 px-3 pb-2.5 pt-3 sm:-mt-13 sm:px-4 sm:pb-2.5 sm:pt-4 tall-md:px-4 tall-md:py-4 tall-md:pb-2.5 land-sm:gap-2 land-sm:px-3 land-sm:pb-2.5 land-sm:pt-3 land-compact:-mt-8">
+        <div className="mx-auto grid w-full max-w-5xl gap-3 land-sm:gap-2">
           <article
-            className={`grid gap-4 p-4 md:p-5 land-sm:gap-2 land-sm:p-3 ${panelSurfaceClass}`}
+            className={`grid gap-3 px-5 py-3 md:px-5 md:py-3 land-sm:gap-2 land-sm:p-3 ${panelSurfaceClass}`}
           >
-            <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(16rem,0.8fr)] land-sm:gap-2">
-              <div className="min-w-0">
+            <div className="grid gap-x-4 gap-y-2.5 md:grid-cols-[minmax(0,1fr)_minmax(16rem,0.8fr)] land-sm:gap-2">
+              <div className="grid min-w-0 content-start gap-3 land-sm:gap-2">
                 <p className="text-sm font-bold uppercase tracking-wider text-site-accent">
                   {isPast ? copy.event.completed : copy.event.scheduled}
                 </p>
-                <dl className="mt-3 grid gap-2 text-sm md:grid-cols-2">
+                <dl className="grid gap-2 text-sm md:grid-cols-2">
                   <div className="flex items-center gap-2">
                     <CalendarDays
                       className="size-5 shrink-0 text-site-accent-soft"
@@ -176,15 +176,15 @@ export function EventPage() {
                   ) : null}
                 </dl>
 
-                <div className="mt-0 md:mt-4 land-sm:mt-4">
+                <div className="grid gap-1">
                   <h2 className="font-bold">{copy.event.description}</h2>
-                  <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-site-muted">
+                  <p className="whitespace-pre-line text-sm leading-relaxed text-site-muted">
                     {event.summary ?? copy.common.informationPending}
                   </p>
                 </div>
               </div>
 
-              <aside className="flex self-center flex-col justify-between gap-4 rounded-xl bg-site-media p-4">
+              <aside className="grid self-center gap-3 rounded-xl bg-site-media p-4 land-sm:gap-2">
                 {!isPast ? (
                   <p className="text-sm leading-relaxed">
                     {copy.event.audienceNotice}

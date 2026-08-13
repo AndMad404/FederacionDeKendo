@@ -14,6 +14,10 @@ import {
   synchronizeCalendar,
 } from "../scripts/sync-calendar-events.mjs";
 import { calculateArchiveEligibleAt } from "../src/app/utils/eventArchive.js";
+import {
+  addCalendarDays,
+  getCalendarDateTimeSortKey,
+} from "../src/app/utils/calendarDate.js";
 
 const fixturePath = new URL("./fixtures/calendar-events.ics", import.meta.url);
 const phase2FixturePath = new URL(
@@ -56,6 +60,15 @@ async function runSynchronization({
   });
   return { ...result, outputPath, registryPath };
 }
+
+test("calendar date helpers cross month and year boundaries independently of the runner zone", () => {
+  assert.equal(addCalendarDays("2026-01-31", 1), "2026-02-01");
+  assert.equal(addCalendarDays("2026-01-01", -1), "2025-12-31");
+  assert.ok(
+    getCalendarDateTimeSortKey("2026-08-08", "09:00") <
+      getCalendarDateTimeSortKey("2026-08-08", "10:00"),
+  );
+});
 
 test("creates the same opaque 24-character sourceId for the same UID", async () => {
   const [properties] = parseVEvents(await readFile(fixturePath, "utf8"));
