@@ -70,7 +70,8 @@ Al final corre los checks relevantes de .agents/verification.md.
 ```text
 Implementa unicamente la Fase [numero] de [roadmap].
 
-Lee AGENTS.md, el roadmap y los contratos aplicables. Usa docs/index.md para
+Lee AGENTS.md, el roadmap y los contratos aplicables. Usa
+../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/index.md para
 seleccionar el contexto documental minimo; no cargues fases posteriores.
 
 Alcance:

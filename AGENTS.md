@@ -50,8 +50,10 @@ If a request mixes review and implementation, review first, then ask or infer wh
   merely because they belong to the same feature.
 - Start each phase from its canonical roadmap or backlog entry instead of
   repeating the full project history in the task prompt.
-- Read only the documentation routed by `docs/index.md` plus the source files
-  required by the current phase. Do not preload later-phase context.
+- Read only the documentation routed by
+  `../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/index.md` plus the
+  source files required by the current phase. Do not preload later-phase
+  context.
 - Use a fresh task when the primary responsibility changes, such as moving
   from tests to synchronization, images, filters, or UI. Keep the current task
   for direct fixes to the phase being implemented.
@@ -71,9 +73,10 @@ If a request mixes review and implementation, review first, then ask or infer wh
 - Extended project documentation is stored outside this runtime repository at
   `../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/` in the owner's
   local workspace.
-- Start documentation work with `docs/index.md` in that private project. Use
-  its routing table to select the smallest relevant document set; do not read
-  the full documentation tree by default.
+- Start documentation work with
+  `../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/index.md`. Use its
+  routing table to select the smallest relevant document set; do not read the
+  full documentation tree by default.
 - For architecture, ADR, backlog, calendar-operation, or historical-document
   work, read the relevant file from that location when it is available.
 - Never make application code, build scripts, tests, deployment, or workflows
