@@ -5,7 +5,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: "2026-05-02-examen",
     aliases: ["2026-05-02-federacion-examen"],
-    archiveEligibleAt: "2026-05-04T06:00:00.000Z",
+    archiveEligibleAt: "2026-05-03T06:00:00.000Z",
     title: "Examen",
     date: "2026-05-02",
     eventType: "examen",
@@ -13,7 +13,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2026-05-29-clak-seminario-instructores-chile",
-    archiveEligibleAt: "2026-06-02T06:00:00.000Z",
+    archiveEligibleAt: "2026-06-01T06:00:00.000Z",
     title: "CLAK Seminario Instructores CHILE",
     date: "2026-05-29",
     endDate: "2026-06-01",
@@ -23,7 +23,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: "2026-05-30-seminario",
     aliases: ["2026-05-30-federacion-seminario-y-reunion"],
-    archiveEligibleAt: "2026-06-01T06:00:00.000Z",
+    archiveEligibleAt: "2026-05-31T06:00:00.000Z",
     title: "Seminario",
     date: "2026-05-30",
     eventType: "seminario",
@@ -31,7 +31,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2026-08-08-examen",
-    archiveEligibleAt: "2026-08-10T06:00:00.000Z",
+    archiveEligibleAt: "2026-08-09T06:00:00.000Z",
     title: "Examen",
     date: "2026-08-08",
     startTime: "13:00",
