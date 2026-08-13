@@ -415,9 +415,9 @@ test("phase 2 normalizes public descriptions and event types without publishing 
 
     assert.equal(byTitle.get("Torneo futuro").historical, undefined);
     assert.equal(byTitle.get("Examen en preparación").historical, true);
-    assert.equal(
-      result.galleryResult.state.galleries["2026-08-08-examen-en-preparacion"],
-      undefined,
+    assert.match(
+      result.galleryResult.state.galleries["2026-08-08-examen-en-preparacion"].fingerprint,
+      /^[a-f0-9]{64}$/,
     );
     assert.equal(byTitle.get("Seminario histórico").historical, true);
     assert.equal(
