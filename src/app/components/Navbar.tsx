@@ -95,7 +95,12 @@ export function Navbar() {
           type="button"
           aria-expanded={calendarOpen}
           aria-controls={mobile ? "mobile-calendar-menu" : "desktop-calendar-menu"}
-          onClick={() => setCalendarOpen((value) => !value)}
+          onFocus={mobile ? undefined : () => setCalendarOpen(true)}
+          onClick={() =>
+            mobile
+              ? setCalendarOpen((value) => !value)
+              : setCalendarOpen(true)
+          }
           className={`inline-flex min-h-11 items-center justify-center gap-1 ${navLinkClass({ isActive: calendarActive })}`}
         >
           {copy.nav.links[1].label}
