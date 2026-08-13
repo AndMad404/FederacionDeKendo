@@ -10,18 +10,20 @@ const SUMMARY_TRANSLATIONS: Record<string, string> = {
     "Team tournament in Panama, hosted by Shinsei Panama.",
 };
 
-function translateTitle(title: string) {
-  return title
-    .replace("FEDERACIÓN  : Examen", "FEDERATION: Examination")
-    .replace("FEDERACIÓN : Seminario y Reunión", "FEDERATION: Seminar and Meeting")
-    .replace("Seminario Instructores", "Instructor Seminar")
-    .replace("1er Panamericano", "1st Pan American Championship")
-    .replace("Torneo por Equipos", "Team Tournament")
-    .replace(/^Examen$/, "Examination")
-    .replace(/^(\d+)(?:er|to|mo) Torneo$/, (_, number: string) =>
-      `${number}${number === "3" ? "rd" : "th"} Tournament`,
-    );
-}
+const TITLE_TRANSLATIONS: Record<string, string> = {
+  "FEDERACIÓN  : Examen": "FEDERATION: Examination",
+  "FEDERACIÓN : Seminario y Reunión": "FEDERATION: Seminar and Meeting",
+  "CLAK Seminario Instructores CHILE": "CLAK Instructor Seminar CHILE",
+  "CLAK 1er Panamericano BRASIL": "CLAK 1st Pan American Championship BRASIL",
+  "PANAMA Torneo por Equipos": "PANAMA Team Tournament",
+  Examen: "Examination",
+  Seminario: "Seminar",
+  "3er Torneo": "3rd Tournament",
+  "4to Torneo": "4th Tournament",
+  "5to Torneo": "5th Tournament",
+  "6to Torneo": "6th Tournament",
+  "7mo Torneo": "7th Tournament",
+};
 
 export function getLocalizedEvent(
   event: CalendarEvent,
@@ -30,7 +32,7 @@ export function getLocalizedEvent(
   if (language === "es") return event;
   return {
     ...event,
-    title: translateTitle(event.title),
+    title: TITLE_TRANSLATIONS[event.title] ?? event.title,
     summary: event.summary
       ? SUMMARY_TRANSLATIONS[event.summary] ?? event.summary
       : undefined,

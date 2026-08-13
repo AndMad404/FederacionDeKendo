@@ -411,7 +411,7 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
         startDate,
         ...(endDate ? { endDate } : {}),
         eventStatus:
-          getEventEndDate(event).getTime() < Date.now()
+          getEventEndDate(event).getTime() <= Date.now()
             ? "https://schema.org/EventCompleted"
             : "https://schema.org/EventScheduled",
         eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",

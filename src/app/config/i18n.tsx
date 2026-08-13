@@ -93,10 +93,10 @@ const COPY = {
       upcomingEvents: "Próximos eventos",
       pastEvents: "Eventos pasados",
       links: [
-        { path: "/", label: "Inicio" },
-        { path: "/calendario/", label: "Calendario" },
-        { path: "/galeria/", label: "Galería" },
-        { path: "/afiliados/", label: "Afiliados" },
+        { id: "home", path: "/", label: "Inicio" },
+        { id: "calendar", path: "/calendario/", label: "Calendario" },
+        { id: "gallery", path: "/galeria/", label: "Galería" },
+        { id: "affiliates", path: "/afiliados/", label: "Afiliados" },
       ],
     },
     shell: {
@@ -222,10 +222,10 @@ const COPY = {
       upcomingEvents: "Upcoming events",
       pastEvents: "Past events",
       links: [
-        { path: "/en/", label: "Home" },
-        { path: "/en/calendar/", label: "Calendar" },
-        { path: "/en/gallery/", label: "Gallery" },
-        { path: "/en/affiliates/", label: "Affiliates" },
+        { id: "home", path: "/en/", label: "Home" },
+        { id: "calendar", path: "/en/calendar/", label: "Calendar" },
+        { id: "gallery", path: "/en/gallery/", label: "Gallery" },
+        { id: "affiliates", path: "/en/affiliates/", label: "Affiliates" },
       ],
     },
     shell: {

@@ -2841,7 +2841,7 @@ latest_spa_mobile_review:
     - id: STR-ARCH-013
       level: STRUCTURAL
       axis: ARCH
-      status: open
+      status: resolved
       target: custom responsive variants and route-level component utility chains
       problem: Layout policy is distributed across width, height, and orientation variants inside individual components, including intersecting overrides whose source-order behavior has already caused a regression.
       fix: Define a small documented responsive composition contract and reuse non-visual shell primitives or named class sets for viewport ownership, banners, panels, and compact landscape behavior.
@@ -3299,5 +3299,99 @@ latest_event_seo_review:
   result: The owner-required global noindex policy is active for all routes. The archive now retains server-rendered historical links for a future approved indexing phase; titles remain unchanged under Presidency authority.
   pending: Production deployment and Search Console indexing coverage were not reviewed.
   next: Do not enable indexing until the owner explicitly authorizes it.
+
+latest_calendar_timezone_and_localization_review:
+  id: REV-2026-08-13-02
+  requested_scope: Validate the reported calendar-status and event-title-localization findings.
+  actual_scope:
+    targets:
+      - src/app/utils/calendarEvents.ts
+      - src/app/utils/eventArchive.js
+      - src/app/utils/calendarEventPresentation.ts
+      - src/app/utils/localizedEvents.ts
+      - src/app/types.ts
+      - direct callers in EventPage.tsx and seo.ts
+    axes: [ARCH]
+    included:
+      - event-end instant construction and its time-zone source
+      - archive eligibility comparison
+      - English event-title translation lookup and ordinal grammar
+    excluded:
+      - implementation changes
+      - visual presentation
+      - calendar synchronization, historical-route behavior, and non-title localization
+  baseline:
+    commit: 9fd8331d
+    worktree: dirty
+    limitation: eventArchive.js and EventPage.tsx contain unrelated route-worktree changes; evidence below is from their current contents.
+  confirmed_findings:
+    - STR-ARCH-017
+    - SMELL-ARCH-012
+    - STR-ARCH-018
+  findings:
+    - id: STR-ARCH-017
+      level: STRUCTURAL
+      axis: ARCH
+      status: resolved
+      target: src/app/utils/calendarEvents.ts:20-58
+      problem: Event start and end instants are constructed in the executing environment's local time zone rather than event.timeZone, so upcoming, detail, and Event JSON-LD completion decisions vary by visitor or build-host time zone.
+      fix: Convert the event's date and time to an instant using event.timeZone, preserving the existing all-day end-date semantics, and cover offset-boundary cases with directed tests.
+      cost_of_deferring: The public status of an event can disagree with the Costa Rica-anchored archive eligibility around date boundaries.
+      evidence:
+        - src/app/utils/calendarEvents.ts:20-68
+        - src/app/types.ts:38-57
+        - src/app/utils/eventArchive.js:22-71
+        - src/app/components/EventPage.tsx:58
+        - src/app/config/seo.ts:414
+      resolution:
+        resolved_at: 2026-08-13
+        resolved_ref: worktree
+        checks:
+          - calendarEvents.ts derives timed and all-day end instants from event.timeZone, defaulting to America/Costa_Rica
+          - EventPage, upcoming-event filtering, and Event JSON-LD transition at the same inclusive end instant
+          - corepack pnpm run typecheck passed
+          - corepack pnpm run build passed, including SSR and generated route HTML
+          - playwright test tests/e2e/calendar-timezone-localization.spec.ts passed 3 tests
+    - id: SMELL-ARCH-012
+      level: SMELL
+      axis: ARCH
+      status: resolved
+      target: src/app/utils/localizedEvents.ts:13-23
+      problem: Title translations use sequential exact string replacements while summaries use a lookup dictionary with a fallback; whitespace-sensitive literals make title localization silently brittle when source calendar text changes.
+      fix: Use a title Record<string, string> for known source titles, retaining the original title as the fallback; keep any intentionally general ordinal translation as a separately tested rule.
+      cost_of_deferring: Small upstream copy changes can expose Spanish event titles in English pages without an error.
+      evidence:
+        - src/app/utils/localizedEvents.ts:4-35
+        - src/app/data/calendarEvents.ts:9-184
+      resolution:
+        resolved_at: 2026-08-13
+        resolved_ref: worktree
+        checks:
+          - localizedEvents.ts uses TITLE_TRANSLATIONS with the original title as fallback
+          - playwright test tests/e2e/calendar-timezone-localization.spec.ts verifies a published title translation
+    - id: STR-ARCH-018
+      level: STRUCTURAL
+      axis: ARCH
+      status: resolved
+      target: src/app/utils/localizedEvents.ts:21-22
+      problem: The ordinal title rule maps only 3 to rd and maps 1 and 2 to th, producing grammatically incorrect English titles such as 1th and 2th Tournament.
+      fix: Implement the correct ordinal rules (including 11th, 12th, and 13th) or enumerate the published title translations in the title lookup.
+      cost_of_deferring: Public English event copy is visibly incorrect for affected tournament titles.
+      evidence:
+        - src/app/utils/localizedEvents.ts:21-22
+      resolution:
+        resolved_at: 2026-08-13
+        resolved_ref: worktree
+        checks:
+          - published tournament titles are explicit dictionary entries with correct English ordinals
+          - playwright test tests/e2e/calendar-timezone-localization.spec.ts verifies 3er Torneo becomes 3rd Tournament
+  evidence:
+    - Get-Content .agents/review-contract.md
+    - rg -n -C 4 "createLocalDate|getEventEndDate|archiveEligibleAt|translateTitle|SUMMARY_TRANSLATIONS|Torneo" src scripts
+    - git status --short showed a dirty worktree before review
+    - no directed tests presently match calendarEvents.ts or localizedEvents.ts
+  result: All three reported findings were resolved in the worktree. Event completion is now stable across visitor zones and uses an inclusive end instant consistent with archive eligibility; title localization is dictionary-backed with a safe fallback.
+  pending: The unrelated pre-existing end-to-end failure in events.spec.ts for the 48-hour archive transition remains outside this change.
+  next: Reconcile the archive-transition test with the current archive behavior in a separate targeted task.
 
 ```

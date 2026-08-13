@@ -1,3 +1,5 @@
+import { getArchivePagePath } from "./eventArchiveRoutes.js";
+
 const ARCHIVE_TIME_ZONE = "America/Costa_Rica";
 const ARCHIVE_EVENT_TYPES = new Set([
   "torneo",
@@ -111,14 +113,7 @@ export function getArchiveYears(events) {
 
 export function buildArchiveUrl(page, language = "es", filters = {}) {
   const normalized = normalizeArchiveFilters(filters);
-  const basePath =
-    language === "en"
-      ? page <= 1
-        ? "/en/events/past/"
-        : `/en/events/past/page/${page}/`
-      : page <= 1
-        ? "/eventos/pasados/"
-        : `/eventos/pasados/pagina/${page}/`;
+  const basePath = getArchivePagePath(page, language);
   const search = new URLSearchParams(normalized).toString();
   return search ? `${basePath}?${search}` : basePath;
 }

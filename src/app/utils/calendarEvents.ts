@@ -5,6 +5,8 @@ export interface UpcomingEventGroup {
   events: CalendarEvent[];
 }
 
+const DEFAULT_EVENT_TIME_ZONE = "America/Costa_Rica";
+
 function parseDateParts(date: string) {
   const [year, month, day] = date.split("-").map(Number);
 
@@ -17,45 +19,77 @@ function parseTimeParts(time: string) {
   return { hours, minutes };
 }
 
-function createLocalDate(date: string, time = "00:00") {
-  const { year, month, day } = parseDateParts(date);
-  const { hours, minutes } = parseTimeParts(time);
+function getTimeZoneOffsetMilliseconds(date: Date, timeZone: string) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(date);
+  const values = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+  const representedAsUtc = Date.UTC(
+    Number(values.year),
+    Number(values.month) - 1,
+    Number(values.day),
+    Number(values.hour),
+    Number(values.minute),
+    Number(values.second),
+  );
 
-  return new Date(year, month - 1, day, hours, minutes);
+  return representedAsUtc - date.getTime();
 }
 
-function addDays(date: Date, days: number) {
-  const nextDate = new Date(date);
-  nextDate.setDate(nextDate.getDate() + days);
+function createEventDate(
+  date: string,
+  time = "00:00",
+  timeZone = DEFAULT_EVENT_TIME_ZONE,
+) {
+  const { year, month, day } = parseDateParts(date);
+  const { hours, minutes } = parseTimeParts(time);
+  const approximate = new Date(Date.UTC(year, month - 1, day, hours, minutes));
+  const firstOffset = getTimeZoneOffsetMilliseconds(approximate, timeZone);
+  let instant = new Date(approximate.getTime() - firstOffset);
+  const finalOffset = getTimeZoneOffsetMilliseconds(instant, timeZone);
+  if (finalOffset !== firstOffset) {
+    instant = new Date(approximate.getTime() - finalOffset);
+  }
 
-  return nextDate;
+  return instant;
 }
 
 function addHours(date: Date, hours: number) {
-  const nextDate = new Date(date);
-  nextDate.setHours(nextDate.getHours() + hours);
+  return new Date(date.getTime() + hours * 60 * 60 * 1000);
+}
 
-  return nextDate;
+function addCalendarDays(date: string, days: number) {
+  const { year, month, day } = parseDateParts(date);
+  const nextDate = new Date(Date.UTC(year, month - 1, day + days));
+
+  return nextDate.toISOString().slice(0, 10);
 }
 
 function getEventStartDate(event: CalendarEvent) {
-  return createLocalDate(event.date, event.startTime);
+  return createEventDate(event.date, event.startTime, event.timeZone);
 }
 
 export function getEventEndDate(event: CalendarEvent) {
   if (event.endDate) {
-    return createLocalDate(event.endDate, event.endTime);
+    return createEventDate(event.endDate, event.endTime, event.timeZone);
   }
 
   if (event.endTime) {
-    return createLocalDate(event.date, event.endTime);
+    return createEventDate(event.date, event.endTime, event.timeZone);
   }
 
   if (event.startTime) {
     return addHours(getEventStartDate(event), 1);
   }
 
-  return addDays(createLocalDate(event.date), 1);
+  return createEventDate(addCalendarDays(event.date, 1), undefined, event.timeZone);
 }
 
 export function getUpcomingEvents(
@@ -64,7 +98,7 @@ export function getUpcomingEvents(
   max = 4,
 ) {
   return [...events]
-    .filter((event) => getEventEndDate(event) >= now)
+    .filter((event) => getEventEndDate(event) > now)
     .sort((a, b) => getEventStartDate(a).getTime() - getEventStartDate(b).getTime())
     .slice(0, max);
 }
