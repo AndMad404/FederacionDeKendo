@@ -65,7 +65,9 @@ export type IconKey =
 export interface InfoItem {
   icon: IconKey;
   label: string;
+  labelTranslationKey?: "email" | "phone";
   value: string;
+  valueTranslationKey?: "viewLocation";
   href: string;
 }
 

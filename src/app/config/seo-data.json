@@ -63,15 +63,15 @@
       "component": "gallery",
       "title": "Galería | Federación de Asociaciones de Kendo",
       "description": "Galería oficial de la comunidad, entrenamientos y actividades de kendo.",
-      "image": "/images/gallery/kendo-gallery-01.jpg?v=20260704-0200",
+      "image": "/images/gallery/kendo-gallery-01.jpg?v=e592b98bba85",
       "imageAlt": "Practicantes de kendo sentados en seiza con sus shinai alineados en el dojo",
       "imageWidth": 1474,
       "imageHeight": 737,
       "imageType": "image/jpeg",
       "preloadImage": {
-        "href": "/images/gallery/kendo-gallery-01.webp?v=20260704-0200",
+        "href": "/images/gallery/kendo-gallery-01.webp?v=87b071d14740",
         "type": "image/webp",
-        "srcSet": "/images/gallery/thumbs/kendo-gallery-01-480.webp?v=20260704-0200 480w, /images/gallery/kendo-gallery-01.webp?v=20260704-0200 1474w",
+        "srcSet": "/images/gallery/thumbs/kendo-gallery-01-480.webp?v=d73cc4a3541f 480w, /images/gallery/kendo-gallery-01.webp?v=87b071d14740 1474w",
         "sizes": "100vw"
       },
       "schemaType": "CollectionPage"
@@ -117,8 +117,8 @@
       "path": "/en/gallery/", "language": "en", "locale": "en_US", "alternatePath": "/galeria/", "component": "gallery",
       "title": "Gallery | Federation of Kendo Associations",
       "description": "Official gallery of Costa Rica's kendo community, training sessions, and activities.",
-      "image": "/images/gallery/kendo-gallery-01.jpg?v=20260704-0200", "imageAlt": "Kendo practitioners seated in seiza with their shinai aligned in the dojo", "imageWidth": 1474, "imageHeight": 737, "imageType": "image/jpeg",
-      "preloadImage": { "href": "/images/gallery/kendo-gallery-01.webp?v=20260704-0200", "type": "image/webp", "srcSet": "/images/gallery/thumbs/kendo-gallery-01-480.webp?v=20260704-0200 480w, /images/gallery/kendo-gallery-01.webp?v=20260704-0200 1474w", "sizes": "100vw" },
+      "image": "/images/gallery/kendo-gallery-01.jpg?v=e592b98bba85", "imageAlt": "Kendo practitioners seated in seiza with their shinai aligned in the dojo", "imageWidth": 1474, "imageHeight": 737, "imageType": "image/jpeg",
+      "preloadImage": { "href": "/images/gallery/kendo-gallery-01.webp?v=87b071d14740", "type": "image/webp", "srcSet": "/images/gallery/thumbs/kendo-gallery-01-480.webp?v=d73cc4a3541f 480w, /images/gallery/kendo-gallery-01.webp?v=87b071d14740 1474w", "sizes": "100vw" },
       "schemaType": "CollectionPage"
     },
     "/en/affiliates/": {

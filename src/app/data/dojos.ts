@@ -8,12 +8,14 @@ const DOJOS: DojoData[] = [
       {
         icon: "mail",
         label: "Correo",
+        labelTranslationKey: "email",
         value: "kendokokenchiai@gmail.com",
         href: "mailto:kendokokenchiai@gmail.com",
       },
       {
         icon: "phone",
         label: "Teléfono",
+        labelTranslationKey: "phone",
         value: "+506 8869 9205",
         href: "tel:+50688699205",
       },
@@ -27,12 +29,14 @@ const DOJOS: DojoData[] = [
         icon: "mapPin",
         label: "Moravia / Guadalupe",
         value: "Ver ubicación",
+        valueTranslationKey: "viewLocation",
         href: "https://maps.app.goo.gl/WeVxr3pNL7N2hkos5",
       },
       {
         icon: "mapPin",
         label: "Curridabat",
         value: "Ver ubicación",
+        valueTranslationKey: "viewLocation",
         href: "https://maps.app.goo.gl/jKnHfSwpWiobTCkN6",
       },
     ],
@@ -55,12 +59,14 @@ const DOJOS: DojoData[] = [
       {
         icon: "mail",
         label: "Correo",
+        labelTranslationKey: "email",
         value: "herediakendoclub@gmail.com",
         href: "mailto:herediakendoclub@gmail.com",
       },
       {
         icon: "phone",
         label: "Teléfono",
+        labelTranslationKey: "phone",
         value: "+506 6005 9090",
         href: "tel:+50660059090",
       },
@@ -74,6 +80,7 @@ const DOJOS: DojoData[] = [
         icon: "mapPin",
         label: "Colegio Europeo",
         value: "Ver ubicación",
+        valueTranslationKey: "viewLocation",
         href: "https://waze.com/ul/hd1u0y5tcp",
       },
     ],
@@ -100,10 +107,10 @@ const DOJOS: DojoData[] = [
 export function getDojos(language: Language) {
   if (language === "es") return DOJOS;
 
-  const labelMap: Record<string, string> = {
-    Correo: "Email",
-    "Teléfono": "Phone",
-    "Ver ubicación": "View location",
+  const infoTranslations = {
+    email: "Email",
+    phone: "Phone",
+    viewLocation: "View location",
   };
   const dayMap: Record<string, string> = {
     "Lunes, Miércoles y Viernes": "Monday, Wednesday, and Friday",
@@ -116,8 +123,12 @@ export function getDojos(language: Language) {
     ...dojo,
     info: dojo.info.map((item) => ({
       ...item,
-      label: labelMap[item.label] ?? item.label,
-      value: labelMap[item.value] ?? item.value,
+      label: item.labelTranslationKey
+        ? infoTranslations[item.labelTranslationKey]
+        : item.label,
+      value: item.valueTranslationKey
+        ? infoTranslations[item.valueTranslationKey]
+        : item.value,
     })),
     schedule: dojo.schedule.map((slot) => ({
       ...slot,

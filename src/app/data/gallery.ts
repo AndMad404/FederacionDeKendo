@@ -1,10 +1,22 @@
 import type { GalleryImage } from "../types";
 import type { Language } from "../config/i18n";
+import assetHashes from "./gallery-asset-hashes.json";
 
-const assetVersion = "v=20260704-0200";
-const versioned = (path: string) => `${path}?${assetVersion}`;
+type GalleryImageName =
+  | "kendo-gallery-01"
+  | "kendo-gallery-02"
+  | "kendo-gallery-03"
+  | "kendo-gallery-04"
+  | "kendo-gallery-05"
+  | "kendo-gallery-06"
+  | "kendo-gallery-07"
+  | "kendo-gallery-08";
 
-const thumbnailSrcSet = (imageName: string) =>
+function versioned(path: keyof typeof assetHashes) {
+  return `${path}?v=${assetHashes[path]}`;
+}
+
+const thumbnailSrcSet = (imageName: GalleryImageName) =>
   `${versioned(`/images/gallery/thumbs/${imageName}-160.webp`)} 160w, ${versioned(`/images/gallery/thumbs/${imageName}-320.webp`)} 320w`;
 
 export const GALLERY_IMAGES: GalleryImage[] = [
