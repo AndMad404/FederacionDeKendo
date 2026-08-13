@@ -6,7 +6,7 @@ import {
   MapPin,
   Share2,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router";
 import { useLanguage } from "../config/i18n";
 import { getLocalizedEvent } from "../utils/localizedEvents";
@@ -49,11 +49,13 @@ export function EventPage() {
   const location = useLocation();
   const sourceEvent = findEventByPathname(location.pathname);
   const [copied, setCopied] = useState(false);
+  const [now, setNow] = useState<Date>();
+  useEffect(() => setNow(new Date()), []);
 
   if (!sourceEvent) return null;
   const event = getLocalizedEvent(sourceEvent, language);
 
-  const isPast = getEventEndDate(event).getTime() < Date.now();
+  const isPast = now ? getEventEndDate(event).getTime() < now.getTime() : false;
   const locationUrl = event.location
     ? getLocationMapUrl(event.location)
     : undefined;

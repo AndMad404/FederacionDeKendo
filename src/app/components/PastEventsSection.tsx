@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { PAST_EVENTS_PAGE_SIZE } from "../config/events";
 import {
@@ -27,8 +28,10 @@ export function PastEventsSection() {
   const { language, copy } = useLanguage();
   const { pathname, search } = useLocation();
   const navigate = useNavigate();
+  const [now, setNow] = useState<Date>();
+  useEffect(() => setNow(new Date()), []);
   const requestedPage = getArchivePageFromPathname(pathname) ?? 1;
-  const historicalEvents = getPastEvents();
+  const historicalEvents = now ? getPastEvents(now) : [];
   const searchParams = new URLSearchParams(search);
   const filters = normalizeArchiveFilters({
     year: searchParams.get("year") ?? undefined,
