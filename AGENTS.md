@@ -117,6 +117,31 @@ compact, and revalidate it if it:
 Compare the result with the canonical compact recipe. Remove every instruction
 that does not change what the agent must do, must not do, must verify, or must
 report. Do not deliver a prompt until it passes this gate.
+
+### Human Decision Ownership and Approval
+
+Treat a missing decision as a human block when answers would materially change
+architecture, permissions, external services, credentials, persistence,
+security, operational policy, notification channels, business decisions, or a
+contract. Advance only to that point, report the block and minimal alternative,
+then wait for owner approval. Resolve ambiguity from source-of-truth documents,
+code, and maps without asking the owner. Before finalizing a prompt, ask one
+concise owner question only when the missing requirement is not derivable and
+would materially change the implementation or reserve a decision to the owner.
+
+### Executable Prompt Governance
+
+Classify each phase-prompt instruction explicitly as one of: verifiable
+invariant, human decision, scope limit, verification, or final report. Do not
+use one category to imply another.
+
+Critical instructions must state an observable condition or a clear human
+escalation point. Prefer a condition such as "the same revision and cause do
+not create a second notification" over an untestable quality preference.
+
+Run two separate pre-delivery gates: compactness and executability. The latter
+fails if a critical rule lacks an observable behavior or a clear human
+escalation path. Regenerate the prompt until both gates pass.
 - Use a fresh task when the primary responsibility changes, such as moving
   from tests to synchronization, images, filters, or UI. Keep the current task
   for direct fixes to the phase being implemented.

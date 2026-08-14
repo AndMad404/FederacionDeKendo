@@ -503,7 +503,11 @@ test("F4: pending revisions emit one redacted actionable notification per eviden
     new Date("2026-03-01T00:00:00.000Z"),
   ).events.find(({ sourceId }) => sourceId === historicalSnapshot.sourceId);
   pending.pendingRevision.evidence.published.infoUrl = "https://drive.google.com/drive/folders/private-folder";
-  const report = createCalendarNotifications({ version: 4, events: [pending, structuredClone(pending)] });
+  const execution = { origin: "github_actions", runId: "123", attempt: "2", trigger: "schedule" };
+  const report = createCalendarNotifications(
+    { version: 4, events: [pending, structuredClone(pending)] },
+    execution,
+  );
 
   assert.equal(report.version, 1);
   assert.equal(report.notifications.length, 1);
@@ -512,6 +516,7 @@ test("F4: pending revisions emit one redacted actionable notification per eviden
   assert.equal(notification.temporality, "historico");
   assert.equal(notification.fingerprints.revisionId, pending.pendingRevision.id);
   assert.equal(notification.fingerprints.evidenceFingerprint, pending.pendingRevision.evidence.fingerprint);
+  assert.deepEqual(notification.execution, execution);
   assert.match(notification.actionRequired, /Revisar/);
   assert.doesNotMatch(JSON.stringify(notification), /drive\.google\.com|private-folder/);
 });
@@ -533,11 +538,15 @@ test("F4: source, parser, mass-disappearance, and verification failures have saf
   const directory = await mkdtemp(path.join(os.tmpdir(), "fak-f4-summary-"));
   try {
     const summaryPath = path.join(directory, "summary.md");
-    await writeCalendarNotificationsSummary(createCalendarFailureNotification(
+    const failure = createCalendarFailureNotification(
       new Error("Calendar request failed: https://calendar.example.test/private.ics?token=secret"),
-    ), summaryPath);
+      { origin: "github_actions", runId: "456", attempt: "1", trigger: "workflow_dispatch" },
+    );
+    await writeCalendarNotificationsSummary(failure, summaryPath);
     const summary = await readFile(summaryPath, "utf8");
     assert.doesNotMatch(summary, /private\.ics|token=secret/);
+    assert.match(summary, /run 456/);
+    assert.match(summary, /Before \(redacted\): null/);
   } finally {
     await rm(directory, { recursive: true, force: true });
   }

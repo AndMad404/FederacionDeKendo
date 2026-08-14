@@ -818,6 +818,24 @@ function redactNotificationValue(value) {
   return redactEvidenceValue(value).replace(/(?:webcal:|https?):\/\/[^\s<>)\]]+/gi, "[redacted]");
 }
 
+function getNotificationExecution(environment = process.env) {
+  const runId = /^\d+$/.test(environment.GITHUB_RUN_ID ?? "")
+    ? environment.GITHUB_RUN_ID
+    : null;
+  const attempt = /^\d+$/.test(environment.GITHUB_RUN_ATTEMPT ?? "")
+    ? environment.GITHUB_RUN_ATTEMPT
+    : null;
+  const trigger = ["schedule", "workflow_dispatch"].includes(environment.GITHUB_EVENT_NAME)
+    ? environment.GITHUB_EVENT_NAME
+    : null;
+  return {
+    origin: runId ? "github_actions" : "local",
+    runId,
+    attempt,
+    trigger,
+  };
+}
+
 const pendingNotificationDetails = {
   future_missing: {
     cause: "El evento futuro ya no aparece en la fuente.",
@@ -833,7 +851,7 @@ const pendingNotificationDetails = {
   },
 };
 
-export function createCalendarNotifications(registry) {
+export function createCalendarNotifications(registry, execution = getNotificationExecution()) {
   const notifications = new Map();
   for (const event of registry.events ?? []) {
     if (event.editorialState !== "pendiente" || !event.pendingRevision) continue;
@@ -853,6 +871,7 @@ export function createCalendarNotifications(registry) {
       actionRequired: details.actionRequired,
       before: redactNotificationValue(revision.evidence?.published ?? null),
       after: redactNotificationValue(revision.proposed ?? revision.evidence?.lastReceived ?? null),
+      execution,
       fingerprints: {
         revisionId: revision.id,
         evidenceFingerprint: revision.evidence?.fingerprint ?? null,
@@ -862,7 +881,7 @@ export function createCalendarNotifications(registry) {
   return { version: 1, notifications: [...notifications.values()].sort((a, b) => a.id.localeCompare(b.id)) };
 }
 
-export function createCalendarFailureNotification(error) {
+export function createCalendarFailureNotification(error, execution = getNotificationExecution()) {
   const message = redactNotificationValue(error instanceof Error ? error.message : String(error));
   const normalized = String(message).toLowerCase();
   const kind = normalized.includes("mass calendar disappearance")
@@ -889,6 +908,7 @@ export function createCalendarFailureNotification(error) {
       actionRequired,
       before: null,
       after: null,
+      execution,
       fingerprints: { revisionId: null, evidenceFingerprint: null, failureFingerprint: id },
     }],
   };
@@ -1116,6 +1136,9 @@ export async function writeCalendarNotificationsSummary(
           `Temporality: ${escapeActionText(notification.temporality)}`,
           `Cause: ${escapeActionText(notification.cause)}`,
           `Required action: ${escapeActionText(notification.actionRequired)}`,
+          `Execution: ${escapeActionText(notification.execution?.origin ?? "unknown")} run ${escapeActionText(notification.execution?.runId ?? "not available")} (attempt ${escapeActionText(notification.execution?.attempt ?? "not available")}, trigger ${escapeActionText(notification.execution?.trigger ?? "not available")})`,
+          `Before (redacted): ${escapeActionText(JSON.stringify(notification.before))}`,
+          `After (redacted): ${escapeActionText(JSON.stringify(notification.after))}`,
           `Notification fingerprint: \`${escapeActionText(notification.id)}\``,
           "",
         ])
