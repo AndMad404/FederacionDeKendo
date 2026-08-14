@@ -58,9 +58,10 @@ function validateReport(report) {
   }
   const seenSourceIds = new Set();
   for (const [index, change] of report.historicalChanges.entries()) {
-    assertExactKeys(change, ["sourceId", "publicIdentity", "differences", "publishedFingerprint", "proposalFingerprint"], `Report change ${index}`);
+    assertExactKeys(change, ["sourceId", "publicIdentity", "differences", "publishedFingerprint", "proposalFingerprint", "revisionId", "evidenceFingerprint"], `Report change ${index}`);
     if (!safeIdentifierPattern.test(change.sourceId) || seenSourceIds.has(change.sourceId)) throw new Error("Report contains an invalid or ambiguous sourceId.");
     seenSourceIds.add(change.sourceId);
+    if (!fingerprintPattern.test(change.revisionId) || !fingerprintPattern.test(change.evidenceFingerprint)) throw new Error("Report contains an invalid evidence fingerprint.");
     assertExactKeys(change.publicIdentity, ["slug", "title", "date"], "Public identity");
     Object.values(change.publicIdentity).forEach(assertSafeReportValue);
     if (!Array.isArray(change.differences) || change.differences.length === 0) throw new Error("Report change must contain differences.");
@@ -113,7 +114,7 @@ export async function applyHistoricalCorrections({
   const [registryText, reportText] = await Promise.all([readFile(registryPath, "utf8"), readFile(reportPath, "utf8")]);
   const registry = JSON.parse(registryText);
   const report = JSON.parse(reportText);
-  if (registry.version !== 3 || !Array.isArray(registry.events)) throw new Error("Unsupported calendar event registry.");
+  if (![3, 4].includes(registry.version) || !Array.isArray(registry.events)) throw new Error("Unsupported calendar event registry.");
   validateReport(report);
   const reportBySourceId = new Map(report.historicalChanges.map((change) => [change.sourceId, change]));
   const correctedBySourceId = new Map();
@@ -149,7 +150,7 @@ export async function applyHistoricalCorrections({
   }
   const events = registry.events.map((candidate) => correctedBySourceId.get(candidate.sourceId) ?? candidate);
   assertUniqueSlugs(events);
-  const correctedRegistry = { version: 3, events };
+  const correctedRegistry = { version: registry.version, events };
   await writeAtomically([[registryPath, `${JSON.stringify(correctedRegistry, null, 2)}\n`], [outputPath, serializeCalendarEvents(events)]]);
   return results;
 }

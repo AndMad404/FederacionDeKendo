@@ -497,7 +497,7 @@ export function mergeRegistry(
         const { pendingRevision, ...restored } = published;
         return { ...restored, editorialState: "publicado" };
       }
-      return createPendingRevision(published, currentEvent, "historical_change");
+      return createPendingRevision(published, currentEvent, "historical_change", now, previousEvent.pendingRevision);
     }
 
     return {
@@ -526,6 +526,8 @@ export function mergeRegistry(
         event.historical === true || isArchiveEligible(event, now)
           ? "historical_missing"
           : "future_missing",
+        now,
+        event.pendingRevision,
       );
     });
   const merged = [...reconciledCurrentEvents, ...retainedEvents];
@@ -545,14 +547,72 @@ function editorialRevisionId(event, reason) {
   );
 }
 
-function createPendingRevision(publishedEvent, proposedEvent, reason) {
+const evidenceFields = ["sourceId", ...HISTORICAL_COMPARISON_FIELDS, "aliases", "historical"];
+
+function redactEvidenceValue(value) {
+  if (Array.isArray(value)) return value.map(redactEvidenceValue);
+  if (value && typeof value === "object") {
+    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, redactEvidenceValue(item)]));
+  }
+  if (typeof value !== "string") return value;
+  return value
+    .replace(driveUrl, "[redacted]")
+    .replace(/(?:webcal:|https?):\/\/[^\s<>)\]]+\.ics(?:[?#][^\s<>)\]]*)?/gi, "[redacted]");
+}
+
+function evidenceSnapshot(event) {
+  if (!event) return null;
+  return Object.fromEntries(
+    evidenceFields
+      .filter((field) => event[field] !== undefined)
+      .map((field) => [field, redactEvidenceValue(structuredClone(event[field]))]),
+  );
+}
+
+export function fingerprintEditorialEvidence({ sourceId, revisionId, reason, published, proposed }) {
+  return fingerprintOrderedFields(
+    { sourceId, revisionId, reason, published, proposed },
+    ["sourceId", "revisionId", "reason", "published", "proposed"],
+  );
+}
+
+function createPendingRevision(publishedEvent, proposedEvent, reason, now = new Date(), previousRevision) {
+  const id = editorialRevisionId(proposedEvent, reason);
+  const observedAt = now.toISOString();
+  const published = evidenceSnapshot(publishedEvent);
+  const proposed = evidenceSnapshot(proposedEvent);
+  const firstDetectedAt = previousRevision?.id === id
+    ? previousRevision.evidence?.firstDetectedAt ?? observedAt
+    : observedAt;
+  const lastReceived = proposed ?? previousRevision?.evidence?.lastReceived ?? null;
+  const missingAt = proposed === null
+    ? previousRevision?.evidence?.missingAt ?? observedAt
+    : null;
+  const evidence = {
+    sourceId: publishedEvent.sourceId,
+    firstDetectedAt,
+    lastObservedAt: observedAt,
+    missingAt,
+    lastReceived,
+    published,
+  };
   return {
     ...publishedEvent,
     editorialState: "pendiente",
     pendingRevision: {
-      id: editorialRevisionId(proposedEvent, reason),
+      id,
       reason,
-      proposed: proposedEvent ?? null,
+      proposed,
+      evidence: {
+        ...evidence,
+        fingerprint: fingerprintEditorialEvidence({
+          sourceId: evidence.sourceId,
+          revisionId: id,
+          reason,
+          published: evidence.published,
+          proposed: evidence.lastReceived,
+        }),
+      },
     },
   };
 }
@@ -565,11 +625,31 @@ export function decidePendingDeletion(event, decision) {
     throw new Error("The editorial decision is stale for the pending revision.");
   }
   if (decision.action === "approve_deletion") {
-    return { ...event, editorialState: "eliminado" };
+    return {
+      ...event,
+      editorialState: "eliminado",
+      editorialDecision: {
+        revisionId: event.pendingRevision.id,
+        action: decision.action,
+        decidedAt: decision.decidedAt ?? new Date().toISOString(),
+        ...(decision.reason ? { reason: redactEvidenceValue(decision.reason) } : {}),
+        evidenceFingerprint: event.pendingRevision.evidence?.fingerprint,
+      },
+    };
   }
   if (decision.action === "reject_deletion") {
     const { pendingRevision, ...published } = event;
-    return { ...published, editorialState: "publicado" };
+    return {
+      ...published,
+      editorialState: "publicado",
+      editorialDecision: {
+        revisionId: pendingRevision.id,
+        action: decision.action,
+        decidedAt: decision.decidedAt ?? new Date().toISOString(),
+        ...(decision.reason ? { reason: redactEvidenceValue(decision.reason) } : {}),
+        evidenceFingerprint: pendingRevision.evidence?.fingerprint,
+      },
+    };
   }
   throw new Error("Unsupported editorial decision.");
 }
@@ -655,6 +735,16 @@ export function detectHistoricalChanges(previousRegistry, currentEvents, now = n
           differences,
         ),
       };
+      const reason = currentEvent ? "historical_change" : "historical_missing";
+      const revisionId = editorialRevisionId(currentEvent, reason);
+      change.revisionId = revisionId;
+      change.evidenceFingerprint = fingerprintEditorialEvidence({
+        sourceId: publishedEvent.sourceId,
+        revisionId,
+        reason,
+        published: evidenceSnapshot(publishedEvent),
+        proposed: evidenceSnapshot(currentEvent),
+      });
       changes.push(change);
     }
   }

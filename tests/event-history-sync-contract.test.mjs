@@ -41,7 +41,7 @@ const REGISTRY_EVENT_FIELDS = [
   "archiveEligibleAt",
   "historical",
   "editorialState",
-  "pendingRevision",
+  "pendingRevision", "editorialDecision",
   ...PUBLIC_EVENT_FIELDS.filter((field) => !["id", "aliases", "archiveEligibleAt"].includes(field)),
 ];
 
@@ -102,7 +102,7 @@ function merge(previousEvent, currentEvents = [changedCalendarEvent]) {
 
 test("inventories every field persisted in the registry and public event model", () => {
   assert.deepEqual(REGISTRY_EVENT_FIELDS, [
-    "sourceId", "slug", "aliases", "archiveEligibleAt", "historical", "editorialState", "pendingRevision", "title",
+    "sourceId", "slug", "aliases", "archiveEligibleAt", "historical", "editorialState", "pendingRevision", "editorialDecision", "title",
     "date", "endDate", "startTime", "endTime", "location", "summary",
     "eventType", "organizer", "infoUrl", "timeZone",
   ]);
@@ -125,11 +125,7 @@ test("Given one historical event disappears, When another remains in the feed, T
     {
       ...historicalSnapshot,
       editorialState: "pendiente",
-      pendingRevision: {
-        id: result.events.find(({ sourceId }) => sourceId === historicalSnapshot.sourceId).pendingRevision.id,
-        reason: "historical_missing",
-        proposed: null,
-      },
+      pendingRevision: result.events.find(({ sourceId }) => sourceId === historicalSnapshot.sourceId).pendingRevision,
     },
   );
   assert.equal(serializeCalendarEvents(result.events).includes(historicalSnapshot.slug), true);
@@ -233,6 +229,44 @@ test("F1: approvals, rejections, stale decisions, reappearances, and removed rec
     () => mergeRegistry({ version: 4, events: [] }, [historicalSnapshot, { ...historicalSnapshot }]),
     /Duplicate calendar canonical slug/,
   );
+});
+
+test("F3: pending revisions retain deterministic, redacted evidence across observations", () => {
+  const changed = {
+    ...historicalSnapshot,
+    title: "Propuesta con enlace privado",
+    infoUrl: "https://drive.google.com/drive/folders/private-folder",
+    summary: "Fuente privada https://calendar.example.test/private.ics?token=secret",
+  };
+  const firstAt = new Date("2026-03-01T00:00:00.000Z");
+  const first = mergeRegistry({ version: 4, events: [historicalSnapshot] }, [changed], firstAt).events[0];
+  const second = mergeRegistry({ version: 4, events: [first] }, [changed], new Date("2026-03-02T00:00:00.000Z")).events[0];
+
+  assert.equal(first.pendingRevision.evidence.sourceId, historicalSnapshot.sourceId);
+  assert.equal(first.pendingRevision.evidence.firstDetectedAt, "2026-03-01T00:00:00.000Z");
+  assert.equal(second.pendingRevision.evidence.firstDetectedAt, first.pendingRevision.evidence.firstDetectedAt);
+  assert.equal(second.pendingRevision.evidence.lastObservedAt, "2026-03-02T00:00:00.000Z");
+  assert.equal(first.pendingRevision.evidence.fingerprint, second.pendingRevision.evidence.fingerprint);
+  assert.equal(first.pendingRevision.evidence.lastReceived.infoUrl, "[redacted]");
+  assert.doesNotMatch(JSON.stringify(second.pendingRevision.evidence), /drive\.google\.com|private-folder|private\.ics|token=secret/);
+});
+
+test("F3: a deletion decision retains the linked pending evidence", () => {
+  const pending = mergeRegistry(
+    { version: 4, events: [historicalSnapshot, { ...historicalSnapshot, sourceId: "present-source", slug: "2026-01-11-present", aliases: undefined }] },
+    [{ ...historicalSnapshot, sourceId: "present-source", slug: "2026-01-11-present", aliases: undefined }],
+    new Date("2026-03-01T00:00:00.000Z"),
+  ).events.find(({ sourceId }) => sourceId === historicalSnapshot.sourceId);
+  const removed = decidePendingDeletion(pending, {
+    action: "approve_deletion",
+    revisionId: pending.pendingRevision.id,
+    decidedAt: "2026-03-03T00:00:00.000Z",
+    reason: "Retirado por Presidencia",
+  });
+  assert.equal(removed.editorialDecision.revisionId, pending.pendingRevision.id);
+  assert.equal(removed.editorialDecision.evidenceFingerprint, pending.pendingRevision.evidence.fingerprint);
+  assert.equal(removed.editorialDecision.decidedAt, "2026-03-03T00:00:00.000Z");
+  assert.equal(serializeCalendarEvents([removed]).includes(removed.slug), false);
 });
 
 test("C2: report deterministic field changes without mutating the historical snapshot", () => {

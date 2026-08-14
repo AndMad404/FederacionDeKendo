@@ -100,6 +100,30 @@ test("C3 accepts multiple fields in canonical order and updates both artifacts c
   } finally { await rm(files.directory, { recursive: true, force: true }); }
 });
 
+test("F3: a v4 correction preserves evidence fields and the registry version", async () => {
+  const files = await fixture();
+  try {
+    const v4 = {
+      version: 4,
+      events: [{
+        ...published,
+        editorialState: "publicado",
+        editorialDecision: {
+          revisionId: "a".repeat(64),
+          action: "reject_deletion",
+          decidedAt: "2026-03-01T00:00:00.000Z",
+          evidenceFingerprint: "b".repeat(64),
+        },
+      }, files.other],
+    };
+    await writeFile(files.registryPath, `${JSON.stringify(v4, null, 2)}\n`);
+    await run(files, ["title"]);
+    const registry = JSON.parse(await readFile(files.registryPath, "utf8"));
+    assert.equal(registry.version, 4);
+    assert.deepEqual(registry.events[0].editorialDecision, v4.events[0].editorialDecision);
+  } finally { await rm(files.directory, { recursive: true, force: true }); }
+});
+
 test("range correction accepts every reported field for historical events inside its inclusive dates", async () => {
   const files = await fixture();
   try {
