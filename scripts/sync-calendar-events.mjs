@@ -1259,7 +1259,7 @@ function escapeActionText(value) {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/([\\`*_{}\[\]()#+.!|~-])/g, "\\$1");
+    .replace(/([\\`*_{[\]}()#+.!|~-])/g, "\\$1");
 }
 
 export async function writeHistoricalChangesReport(report, reportPath) {

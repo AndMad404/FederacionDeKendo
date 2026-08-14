@@ -13,9 +13,10 @@ import {
 } from "../scripts/sync-event-galleries.mjs";
 
 async function image(color, width = 640, height = 480, format = "jpeg") {
-  return sharp({ create: { width, height, channels: 3, background: color } })
-    [format]()
-    .toBuffer();
+  const pipeline = sharp({
+    create: { width, height, channels: 3, background: color },
+  });
+  return pipeline[format]().toBuffer();
 }
 
 async function fixture(files) {

@@ -359,7 +359,7 @@ function getRouteImageUrl(meta: RouteMeta) {
   return absoluteUrl(meta.image || DATA.defaultImage);
 }
 
-function getRouteImageMetadata(meta: RouteMeta) {
+function getRouteImageMetadata() {
   return {
     url: absoluteUrl(DATA.defaultImage),
     alt: DEFAULT_SOCIAL_IMAGE_ALT,
@@ -389,7 +389,7 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
     organizationData.areaServed = DATA.organization.areaServed;
   }
 
-  const image = getRouteImageMetadata(meta);
+  const image = getRouteImageMetadata();
   const routeEntities =
     ROUTE_STRUCTURED_DATA_BUILDERS[meta.component]?.(meta, canonicalUrl) ?? [];
   if (meta.component === "event" && meta.eventId) {
@@ -500,7 +500,7 @@ export function getRouteSeoPayload(meta: RouteMeta): RouteSeoPayload {
         : getCanonicalUrl(meta),
     siteName: SITE_NAME,
     locale: meta.locale,
-    image: getRouteImageMetadata(meta),
+    image: getRouteImageMetadata(),
     structuredData: noindex ? null : getRouteStructuredData(meta),
     preloadImage: meta.preloadImage,
   };

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import type { GalleryImage } from "../../types";
 import { useLanguage } from "../../config/i18n";
 import {
@@ -59,41 +59,6 @@ export function GalleryThumbnails({
   const stripRef = useRef<HTMLDivElement | null>(null);
   const buttonRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const previousActiveIndexRef = useRef(activeIndex);
-  const [overflowState, setOverflowState] = useState({
-    canScrollLeft: false,
-    canScrollRight: false,
-  });
-
-  useEffect(() => {
-    const strip = stripRef.current;
-    if (!strip) return;
-
-    const updateOverflowState = () => {
-      const nextState = {
-        canScrollLeft: strip.scrollLeft > 1,
-        canScrollRight:
-          Math.ceil(strip.scrollLeft + strip.clientWidth) <
-          strip.scrollWidth - 1,
-      };
-
-      setOverflowState((currentState) =>
-        currentState.canScrollLeft === nextState.canScrollLeft &&
-        currentState.canScrollRight === nextState.canScrollRight
-          ? currentState
-          : nextState,
-      );
-    };
-
-    updateOverflowState();
-    strip.addEventListener("scroll", updateOverflowState, { passive: true });
-    window.addEventListener("resize", updateOverflowState);
-
-    return () => {
-      strip.removeEventListener("scroll", updateOverflowState);
-      window.removeEventListener("resize", updateOverflowState);
-    };
-  }, [images.length]);
-
   useEffect(() => {
     const strip = stripRef.current;
     const activeButton = buttonRefs.current[activeIndex];

@@ -14,9 +14,9 @@ const headers = await readFile("public/_headers", "utf8");
 test("every gallery image has complete English copy", () => {
   const sourceImages = gallerySource
     .split("const ENGLISH_GALLERY_COPY")[0]
-    .match(/^    id: (\d+),$/gm)
+    .match(/^ {4}id: (\d+),$/gm)
     .map((match) => Number(match.match(/\d+/)[0]));
-  const translatedImages = [...gallerySource.matchAll(/^  (\d+): \{/gm)].map(
+  const translatedImages = [...gallerySource.matchAll(/^ {2}(\d+): \{/gm)].map(
     ([, id]) => Number(id),
   );
 

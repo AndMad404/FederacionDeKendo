@@ -366,7 +366,7 @@ export async function synchronizeEventGalleries({
       nextState.galleries[event.slug] = { fingerprint };
       hasNewGallery = true;
       importedCount += 1;
-    } catch (error) {
+    } catch {
       warnings.push(
         `${event.slug}: gallery access or download failed; previous gallery preserved.`,
       );

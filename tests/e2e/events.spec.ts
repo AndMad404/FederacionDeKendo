@@ -222,7 +222,6 @@ for (const viewport of [
     const thumbnails = gallery.getByRole("group", {
       name: "Seleccionar fotografía",
     });
-    const footer = page.locator("footer");
     const geometry = await page.evaluate(() => {
       const gallery = document.querySelector<HTMLElement>(
         'section[aria-label="Fotografías del evento Examen"]',
