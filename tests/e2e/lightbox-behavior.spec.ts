@@ -25,7 +25,10 @@ test("isolates the open lightbox from the application", async ({ page }) => {
   const { dialog } = await openLightbox(page);
 
   await expect(dialog).toHaveAttribute("aria-labelledby", "lightbox-title");
-  await expect(dialog).toHaveAttribute("aria-describedby", "lightbox-description");
+  await expect(dialog).toHaveAttribute(
+    "aria-describedby",
+    "lightbox-description",
+  );
   await expect(dialog.locator("#lightbox-title")).toBeVisible();
   await expect(dialog.locator("#lightbox-description")).toBeVisible();
   await expect(dialog.getByText(/^1 \/ \d+$/)).toBeVisible();
@@ -37,9 +40,13 @@ test("isolates the open lightbox from the application", async ({ page }) => {
     backgroundTarget?.focus();
 
     return {
-      dialogIsOutsideRoot: Boolean(root && openDialog && !root.contains(openDialog)),
+      dialogIsOutsideRoot: Boolean(
+        root && openDialog && !root.contains(openDialog),
+      ),
       rootIsInert: root?.inert ?? false,
-      focusStayedInDialog: Boolean(openDialog?.contains(document.activeElement)),
+      focusStayedInDialog: Boolean(
+        openDialog?.contains(document.activeElement),
+      ),
     };
   });
 
@@ -54,7 +61,9 @@ test("isolates the open lightbox from the application", async ({ page }) => {
     await expect
       .poll(() =>
         page.evaluate(() =>
-          document.querySelector('[role="dialog"]')?.contains(document.activeElement),
+          document
+            .querySelector('[role="dialog"]')
+            ?.contains(document.activeElement),
         ),
       )
       .toBe(true);
@@ -63,17 +72,33 @@ test("isolates the open lightbox from the application", async ({ page }) => {
   await expect(dialog).toBeVisible();
 });
 
-test("restores the application after closing the lightbox", async ({ page }) => {
+test("restores the application after closing the lightbox", async ({
+  page,
+}) => {
   const { dialog, opener } = await openLightbox(page);
-  await expect.poll(() => page.evaluate(() => document.documentElement.style.overflow)).toBe("hidden");
-  await expect.poll(() => page.evaluate(() => document.body.style.overflow)).toBe("hidden");
+  await expect
+    .poll(() => page.evaluate(() => document.documentElement.style.overflow))
+    .toBe("hidden");
+  await expect
+    .poll(() => page.evaluate(() => document.body.style.overflow))
+    .toBe("hidden");
 
   await page.keyboard.press("Escape");
 
   await expect(dialog).toBeHidden();
-  await expect.poll(() => page.evaluate(() => document.querySelector("#root")?.hasAttribute("inert"))).toBe(false);
-  await expect.poll(() => page.evaluate(() => document.documentElement.style.overflow)).toBe("");
-  await expect.poll(() => page.evaluate(() => document.body.style.overflow)).toBe("");
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        document.querySelector("#root")?.hasAttribute("inert"),
+      ),
+    )
+    .toBe(false);
+  await expect
+    .poll(() => page.evaluate(() => document.documentElement.style.overflow))
+    .toBe("");
+  await expect
+    .poll(() => page.evaluate(() => document.body.style.overflow))
+    .toBe("");
   await expect(opener).toBeFocused();
 });
 
@@ -84,11 +109,19 @@ test("cleans up isolation after backdrop closure", async ({ page }) => {
   await backdrop.click({ position: { x: 1, y: 1 } });
 
   await expect(dialog).toBeHidden();
-  await expect.poll(() => page.evaluate(() => document.querySelector("#root")?.hasAttribute("inert"))).toBe(false);
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        document.querySelector("#root")?.hasAttribute("inert"),
+      ),
+    )
+    .toBe(false);
   await expect(opener).toBeFocused();
 });
 
-test("cleans up isolation when the gallery route unmounts", async ({ page }) => {
+test("cleans up isolation when the gallery route unmounts", async ({
+  page,
+}) => {
   const { dialog } = await openLightbox(page);
 
   await page.evaluate(() => {
@@ -98,7 +131,17 @@ test("cleans up isolation when the gallery route unmounts", async ({ page }) => 
 
   await expect(dialog).toBeHidden();
   await expect(page.locator("main h1")).toBeVisible();
-  await expect.poll(() => page.evaluate(() => document.querySelector("#root")?.hasAttribute("inert"))).toBe(false);
-  await expect.poll(() => page.evaluate(() => document.documentElement.style.overflow)).toBe("");
-  await expect.poll(() => page.evaluate(() => document.body.style.overflow)).toBe("");
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        document.querySelector("#root")?.hasAttribute("inert"),
+      ),
+    )
+    .toBe(false);
+  await expect
+    .poll(() => page.evaluate(() => document.documentElement.style.overflow))
+    .toBe("");
+  await expect
+    .poll(() => page.evaluate(() => document.body.style.overflow))
+    .toBe("");
 });

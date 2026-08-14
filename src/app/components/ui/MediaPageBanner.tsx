@@ -62,14 +62,14 @@ export function MediaPageBanner({
       />
       <div
         className={`relative z-10 flex flex-col items-center justify-start px-4 pt-4 text-center text-site-on-dark ${
-          adaptiveHeight
-            ? "min-h-28 pb-8 land-compact:min-h-20"
-            : "h-full"
+          adaptiveHeight ? "min-h-28 pb-8 land-compact:min-h-20" : "h-full"
         }`}
       >
         <PageTitle
           id={titleId}
-          className={allowTitleWrap ? "max-w-full break-words line-clamp-2" : ""}
+          className={
+            allowTitleWrap ? "max-w-full break-words line-clamp-2" : ""
+          }
           allowWrap={allowTitleWrap}
           tone="media"
           density="flush"

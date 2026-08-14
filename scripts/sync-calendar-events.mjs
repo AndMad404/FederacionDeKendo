@@ -1,5 +1,13 @@
 import { createHash } from "node:crypto";
-import { appendFile, mkdir, readFile, rename, rm, unlink, writeFile } from "node:fs/promises";
+import {
+  appendFile,
+  mkdir,
+  readFile,
+  rename,
+  rm,
+  unlink,
+  writeFile,
+} from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import {
@@ -12,7 +20,10 @@ import {
   addCalendarDays,
   getCalendarDateTimeSortKey,
 } from "../src/app/utils/calendarDate.js";
-import { replaceTransaction, synchronizeEventGalleries } from "./sync-event-galleries.mjs";
+import {
+  replaceTransaction,
+  synchronizeEventGalleries,
+} from "./sync-event-galleries.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "..");
@@ -36,8 +47,10 @@ const inferredEventTypes = [
   ["torneo", /(?:^|\s)torneos?(?:$|\s)/],
   ["examen", /(?:^|\s)examen(?:es)?(?:$|\s)/],
 ];
-const googleDriveFolderUrl = /^https:\/\/drive\.google\.com\/drive\/folders\/[A-Za-z0-9_-]+(?:[/?#].*)?$/;
-const embeddedGoogleDriveFolderUrl = /https:\/\/drive\.google\.com\/drive\/folders\/[A-Za-z0-9_-]+(?:[/?#][^\s]*)?/g;
+const googleDriveFolderUrl =
+  /^https:\/\/drive\.google\.com\/drive\/folders\/[A-Za-z0-9_-]+(?:[/?#].*)?$/;
+const embeddedGoogleDriveFolderUrl =
+  /https:\/\/drive\.google\.com\/drive\/folders\/[A-Za-z0-9_-]+(?:[/?#][^\s]*)?/g;
 const albumUrlSymbol = Symbol("privateAlbumUrl");
 export const MASS_DISAPPEARANCE_MINIMUM = 2;
 export const MASS_DISAPPEARANCE_RATIO = 0.5;
@@ -70,7 +83,8 @@ export const HISTORICAL_SNAPSHOT_FIELDS = [
   ),
 ];
 
-const driveUrl = /https?:\/\/(?:[A-Za-z0-9-]+\.)?drive\.google\.com\/[^\s<>)\]]+/gi;
+const driveUrl =
+  /https?:\/\/(?:[A-Za-z0-9-]+\.)?drive\.google\.com\/[^\s<>)\]]+/gi;
 
 export function getPrivateAlbumUrl(event) {
   return event?.[albumUrlSymbol];
@@ -130,7 +144,9 @@ function parseIcsProperty(line) {
 
 export function parseVEvents(icsText) {
   if (!/BEGIN:VCALENDAR/.test(icsText) || !/END:VCALENDAR/.test(icsText)) {
-    throw new Error("Invalid iCalendar feed: VCALENDAR boundaries are missing.");
+    throw new Error(
+      "Invalid iCalendar feed: VCALENDAR boundaries are missing.",
+    );
   }
 
   const events = [];
@@ -200,7 +216,9 @@ function formatDateTimeInZone(date, timeZone) {
     minute: "2-digit",
     hourCycle: "h23",
   }).formatToParts(date);
-  const value = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  const value = Object.fromEntries(
+    parts.map((part) => [part.type, part.value]),
+  );
   return {
     date: `${value.year}-${value.month}-${value.day}`,
     time: `${value.hour}:${value.minute}`,
@@ -227,7 +245,13 @@ function parseIcsDate(property) {
   const parts = parseBasicDateTime(property.rawValue);
   if (/Z$/i.test(property.rawValue)) {
     const utcDate = new Date(
-      Date.UTC(parts.year, parts.month - 1, parts.day, parts.hours, parts.minutes),
+      Date.UTC(
+        parts.year,
+        parts.month - 1,
+        parts.day,
+        parts.hours,
+        parts.minutes,
+      ),
     );
     return {
       ...formatDateTimeInZone(utcDate, defaultTimeZone),
@@ -267,14 +291,19 @@ function parseTechnicalDescription(description, title) {
 
   const lines = description.replace(/\r\n?/g, "\n").split("\n");
   const separatorIndex = lines.findLastIndex((line) => /^---\s*$/.test(line));
-  const publicLines = separatorIndex === -1 ? lines : lines.slice(0, separatorIndex);
+  const publicLines =
+    separatorIndex === -1 ? lines : lines.slice(0, separatorIndex);
 
   const metadata = new Map();
-  for (const line of separatorIndex === -1 ? [] : lines.slice(separatorIndex + 1)) {
+  for (const line of separatorIndex === -1
+    ? []
+    : lines.slice(separatorIndex + 1)) {
     if (!line.trim()) continue;
     const match = /^([A-Z_]+)\s*:\s*(.+)$/.exec(line.trim());
     if (!match || !["TIPO_EVENTO", "ALBUM_FOTOS"].includes(match[1])) {
-      throw new Error(`Invalid technical metadata for ${title}: ${line.trim()}`);
+      throw new Error(
+        `Invalid technical metadata for ${title}: ${line.trim()}`,
+      );
     }
     if (metadata.has(match[1])) {
       throw new Error(`Duplicate technical metadata ${match[1]} for ${title}.`);
@@ -297,7 +326,9 @@ function parseTechnicalDescription(description, title) {
       }
       albumUrl = match;
     }
-    return matches.reduce((text, match) => text.replace(match, ""), line).trimEnd();
+    return matches
+      .reduce((text, match) => text.replace(match, ""), line)
+      .trimEnd();
   });
 
   return {
@@ -308,7 +339,9 @@ function parseTechnicalDescription(description, title) {
 
 function inferEventType(title) {
   const normalizedTitle = slugify(title).replace(/-/g, " ");
-  const inferred = inferredEventTypes.find(([, pattern]) => pattern.test(normalizedTitle));
+  const inferred = inferredEventTypes.find(([, pattern]) =>
+    pattern.test(normalizedTitle),
+  );
   if (inferred) return inferred[0];
   return "seminario";
 }
@@ -323,11 +356,15 @@ function getOrganizer(property) {
 export function parseCalendarEvent(properties, warnings = []) {
   const rawTitle = properties.get("SUMMARY")?.value;
   if (rawTitle?.toUpperCase().startsWith(draftPrefix)) {
-    warnings.push(`Draft omitted: ${rawTitle.slice(draftPrefix.length).trim() || "(untitled)"}`);
+    warnings.push(
+      `Draft omitted: ${rawTitle.slice(draftPrefix.length).trim() || "(untitled)"}`,
+    );
     return undefined;
   }
   if (properties.has("RRULE")) {
-    warnings.push(`Recurring event omitted: ${rawTitle || "(untitled)"}. Create individual events instead.`);
+    warnings.push(
+      `Recurring event omitted: ${rawTitle || "(untitled)"}. Create individual events instead.`,
+    );
     return undefined;
   }
   if (properties.get("STATUS")?.value === "CANCELLED") {
@@ -342,10 +379,10 @@ export function parseCalendarEvent(properties, warnings = []) {
     !start && "date",
   ].filter(Boolean);
   if (!uid || missingRequired.length) {
-    const reason = !uid
-      ? "UID"
-      : missingRequired.join(" and ");
-    warnings.push(`Event omitted because required ${reason} is missing: ${rawTitle || "(untitled)"}`);
+    const reason = !uid ? "UID" : missingRequired.join(" and ");
+    warnings.push(
+      `Event omitted because required ${reason} is missing: ${rawTitle || "(untitled)"}`,
+    );
     return undefined;
   }
 
@@ -377,7 +414,7 @@ export function parseCalendarEvent(properties, warnings = []) {
   const lastEventDate =
     start.isDateOnly && end?.isDateOnly
       ? addCalendarDays(end.date, -1)
-      : end?.date ?? start.date;
+      : (end?.date ?? start.date);
   event.archiveEligibleAt = calculateArchiveEligibleAt(
     lastEventDate,
     defaultTimeZone,
@@ -397,7 +434,9 @@ export function parseCalendarEvent(properties, warnings = []) {
     ),
   );
   if (description.albumUrl) {
-    Object.defineProperty(event, albumUrlSymbol, { value: description.albumUrl });
+    Object.defineProperty(event, albumUrlSymbol, {
+      value: description.albumUrl,
+    });
   }
 
   return event;
@@ -409,9 +448,10 @@ function assertUniqueCurrentSlugs(events) {
     for (const slug of [event.slug, ...(event.aliases ?? [])]) {
       const previousOwner = ownerBySlug.get(slug);
       if (previousOwner) {
-        const label = slug === event.slug
-          ? "Duplicate calendar canonical slug"
-          : "Duplicate calendar canonical slug or alias";
+        const label =
+          slug === event.slug
+            ? "Duplicate calendar canonical slug"
+            : "Duplicate calendar canonical slug or alias";
         throw new Error(
           `${label}: ${slug} (${previousOwner} and ${event.sourceId}).`,
         );
@@ -423,7 +463,9 @@ function assertUniqueCurrentSlugs(events) {
 
 export function assertSafeCalendarInput(previousRegistry, parsedEvents) {
   if (parsedEvents.length === 0) {
-    throw new Error("Calendar feed contains no valid events; no files were changed.");
+    throw new Error(
+      "Calendar feed contains no valid events; no files were changed.",
+    );
   }
 
   const currentSourceIds = new Set();
@@ -461,12 +503,16 @@ export function mergeRegistry(
   const historicalEvents = (previousRegistry.events ?? []).filter(
     (event) => event.historical === true || isArchiveEligible(event, now),
   );
-  const currentSourceIds = new Set(currentEvents.map((event) => event.sourceId));
+  const currentSourceIds = new Set(
+    currentEvents.map((event) => event.sourceId),
+  );
   if (
     historicalEvents.length > 0 &&
     historicalEvents.every((event) => !currentSourceIds.has(event.sourceId))
   ) {
-    throw new Error("All historical events disappeared from the Calendar feed; no files were changed.");
+    throw new Error(
+      "All historical events disappeared from the Calendar feed; no files were changed.",
+    );
   }
   const previousBySourceId = new Map(
     (previousRegistry.events ?? []).map((event) => [event.sourceId, event]),
@@ -491,13 +537,21 @@ export function mergeRegistry(
     if (wasHistorical) {
       const published = freezeHistoricalSnapshot(previousEvent);
       const matchesPublished = HISTORICAL_COMPARISON_FIELDS.every(
-        (field) => JSON.stringify(published[field]) === JSON.stringify(currentEvent[field]),
+        (field) =>
+          JSON.stringify(published[field]) ===
+          JSON.stringify(currentEvent[field]),
       );
       if (matchesPublished) {
         const { pendingRevision, ...restored } = published;
         return { ...restored, editorialState: "publicado" };
       }
-      return createPendingRevision(published, currentEvent, "historical_change", now, previousEvent.pendingRevision);
+      return createPendingRevision(
+        published,
+        currentEvent,
+        "historical_change",
+        now,
+        previousEvent.pendingRevision,
+      );
     }
 
     return {
@@ -507,17 +561,18 @@ export function mergeRegistry(
       ...(aliases?.length ? { aliases } : {}),
     };
   });
-  const reconciledSourceIds = new Set(reconciledCurrentEvents.map((event) => event.sourceId));
+  const reconciledSourceIds = new Set(
+    reconciledCurrentEvents.map((event) => event.sourceId),
+  );
   const retainedEvents = (previousRegistry.events ?? [])
-    .filter(
-      (event) =>
-        !reconciledSourceIds.has(event.sourceId),
-    )
+    .filter((event) => !reconciledSourceIds.has(event.sourceId))
     .map((event) => {
       const { inactive, ...legacyCompatibleEvent } = event;
-      const published = legacyCompatibleEvent.historical === true || isArchiveEligible(legacyCompatibleEvent, now)
-        ? freezeHistoricalSnapshot(legacyCompatibleEvent)
-        : legacyCompatibleEvent;
+      const published =
+        legacyCompatibleEvent.historical === true ||
+        isArchiveEligible(legacyCompatibleEvent, now)
+          ? freezeHistoricalSnapshot(legacyCompatibleEvent)
+          : legacyCompatibleEvent;
       if (event.editorialState === "eliminado") return published;
       if (event.editorialState === "pendiente") return published;
       return createPendingRevision(
@@ -541,23 +596,37 @@ export function mergeRegistry(
 }
 
 function editorialRevisionId(event, reason) {
-  return fingerprintOrderedFields(
-    { reason, ...(event ?? {}) },
-    ["reason", "sourceId", ...HISTORICAL_COMPARISON_FIELDS],
-  );
+  return fingerprintOrderedFields({ reason, ...(event ?? {}) }, [
+    "reason",
+    "sourceId",
+    ...HISTORICAL_COMPARISON_FIELDS,
+  ]);
 }
 
-const evidenceFields = ["sourceId", ...HISTORICAL_COMPARISON_FIELDS, "aliases", "historical"];
+const evidenceFields = [
+  "sourceId",
+  ...HISTORICAL_COMPARISON_FIELDS,
+  "aliases",
+  "historical",
+];
 
 function redactEvidenceValue(value) {
   if (Array.isArray(value)) return value.map(redactEvidenceValue);
   if (value && typeof value === "object") {
-    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, redactEvidenceValue(item)]));
+    return Object.fromEntries(
+      Object.entries(value).map(([key, item]) => [
+        key,
+        redactEvidenceValue(item),
+      ]),
+    );
   }
   if (typeof value !== "string") return value;
   return value
     .replace(driveUrl, "[redacted]")
-    .replace(/(?:webcal:|https?):\/\/[^\s<>)\]]+\.ics(?:[?#][^\s<>)\]]*)?/gi, "[redacted]");
+    .replace(
+      /(?:webcal:|https?):\/\/[^\s<>)\]]+\.ics(?:[?#][^\s<>)\]]*)?/gi,
+      "[redacted]",
+    );
 }
 
 function evidenceSnapshot(event) {
@@ -565,29 +634,47 @@ function evidenceSnapshot(event) {
   return Object.fromEntries(
     evidenceFields
       .filter((field) => event[field] !== undefined)
-      .map((field) => [field, redactEvidenceValue(structuredClone(event[field]))]),
+      .map((field) => [
+        field,
+        redactEvidenceValue(structuredClone(event[field])),
+      ]),
   );
 }
 
-export function fingerprintEditorialEvidence({ sourceId, revisionId, reason, published, proposed }) {
+export function fingerprintEditorialEvidence({
+  sourceId,
+  revisionId,
+  reason,
+  published,
+  proposed,
+}) {
   return fingerprintOrderedFields(
     { sourceId, revisionId, reason, published, proposed },
     ["sourceId", "revisionId", "reason", "published", "proposed"],
   );
 }
 
-function createPendingRevision(publishedEvent, proposedEvent, reason, now = new Date(), previousRevision) {
+function createPendingRevision(
+  publishedEvent,
+  proposedEvent,
+  reason,
+  now = new Date(),
+  previousRevision,
+) {
   const id = editorialRevisionId(proposedEvent, reason);
   const observedAt = now.toISOString();
   const published = evidenceSnapshot(publishedEvent);
   const proposed = evidenceSnapshot(proposedEvent);
-  const firstDetectedAt = previousRevision?.id === id
-    ? previousRevision.evidence?.firstDetectedAt ?? observedAt
-    : observedAt;
-  const lastReceived = proposed ?? previousRevision?.evidence?.lastReceived ?? null;
-  const missingAt = proposed === null
-    ? previousRevision?.evidence?.missingAt ?? observedAt
-    : null;
+  const firstDetectedAt =
+    previousRevision?.id === id
+      ? (previousRevision.evidence?.firstDetectedAt ?? observedAt)
+      : observedAt;
+  const lastReceived =
+    proposed ?? previousRevision?.evidence?.lastReceived ?? null;
+  const missingAt =
+    proposed === null
+      ? (previousRevision?.evidence?.missingAt ?? observedAt)
+      : null;
   const evidence = {
     sourceId: publishedEvent.sourceId,
     firstDetectedAt,
@@ -623,10 +710,14 @@ function createPendingRevision(publishedEvent, proposedEvent, reason, now = new 
 
 export function decidePendingDeletion(event, decision) {
   if (event.editorialState !== "pendiente") {
-    throw new Error("Only a pending editorial revision can receive a deletion decision.");
+    throw new Error(
+      "Only a pending editorial revision can receive a deletion decision.",
+    );
   }
   if (event.pendingRevision?.id !== decision.revisionId) {
-    throw new Error("The editorial decision is stale for the pending revision.");
+    throw new Error(
+      "The editorial decision is stale for the pending revision.",
+    );
   }
   if (decision.action === "approve_deletion") {
     return {
@@ -636,9 +727,13 @@ export function decidePendingDeletion(event, decision) {
         revisionId: event.pendingRevision.id,
         action: decision.action,
         decidedAt: decision.decidedAt ?? new Date().toISOString(),
-        ...(decision.reason ? { reason: redactEvidenceValue(decision.reason) } : {}),
+        ...(decision.reason
+          ? { reason: redactEvidenceValue(decision.reason) }
+          : {}),
         evidenceFingerprint: event.pendingRevision.evidence?.fingerprint,
-        ...(decision.decisionRecordId ? { decisionRecordId: decision.decisionRecordId } : {}),
+        ...(decision.decisionRecordId
+          ? { decisionRecordId: decision.decisionRecordId }
+          : {}),
         ...(decision.actorRole ? { actorRole: decision.actorRole } : {}),
       },
     };
@@ -652,9 +747,13 @@ export function decidePendingDeletion(event, decision) {
         revisionId: pendingRevision.id,
         action: decision.action,
         decidedAt: decision.decidedAt ?? new Date().toISOString(),
-        ...(decision.reason ? { reason: redactEvidenceValue(decision.reason) } : {}),
+        ...(decision.reason
+          ? { reason: redactEvidenceValue(decision.reason) }
+          : {}),
         evidenceFingerprint: pendingRevision.evidence?.fingerprint,
-        ...(decision.decisionRecordId ? { decisionRecordId: decision.decisionRecordId } : {}),
+        ...(decision.decisionRecordId
+          ? { decisionRecordId: decision.decisionRecordId }
+          : {}),
         ...(decision.actorRole ? { actorRole: decision.actorRole } : {}),
       },
     };
@@ -663,8 +762,12 @@ export function decidePendingDeletion(event, decision) {
 }
 
 function requireDecisionRecord(decision) {
-  if (!/^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$/.test(decision.decisionRecordId ?? "")) {
-    throw new Error("A non-sensitive human decision record identifier is required.");
+  if (
+    !/^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$/.test(decision.decisionRecordId ?? "")
+  ) {
+    throw new Error(
+      "A non-sensitive human decision record identifier is required.",
+    );
   }
 }
 
@@ -672,23 +775,36 @@ function requireDecisionRecord(decision) {
 // helper above remains available to describe the v4 state machine in isolation.
 export function applyEditorialDecision(registry, decision) {
   if (registry?.version !== 4 || !Array.isArray(registry.events)) {
-    throw new Error("Editorial decisions require a current v4 calendar registry.");
+    throw new Error(
+      "Editorial decisions require a current v4 calendar registry.",
+    );
   }
   requireDecisionRecord(decision);
-  const index = registry.events.findIndex((event) => event.sourceId === decision.sourceId);
-  if (index === -1) throw new Error("The editorial decision source identity is stale.");
+  const index = registry.events.findIndex(
+    (event) => event.sourceId === decision.sourceId,
+  );
+  if (index === -1)
+    throw new Error("The editorial decision source identity is stale.");
 
   const event = registry.events[index];
   if (event.editorialState !== "pendiente" || !event.pendingRevision) {
-    throw new Error("The editorial decision no longer targets a pending revision.");
+    throw new Error(
+      "The editorial decision no longer targets a pending revision.",
+    );
   }
   if (
     event.pendingRevision.id !== decision.revisionId ||
     event.pendingRevision.evidence?.fingerprint !== decision.evidenceFingerprint
   ) {
-    throw new Error("The editorial decision is stale for the current revision evidence.");
+    throw new Error(
+      "The editorial decision is stale for the current revision evidence.",
+    );
   }
-  if (decision.action === "approve_deletion" && event.historical !== true && decision.actorRole !== "presidencia") {
+  if (
+    decision.action === "approve_deletion" &&
+    event.historical !== true &&
+    decision.actorRole !== "presidencia"
+  ) {
     throw new Error("Only Presidencia can approve deletion of a future event.");
   }
   if (event.historical === true && !decision.decisionRecordId) {
@@ -705,7 +821,10 @@ function canonicalValue(value) {
 }
 
 export function fingerprintOrderedFields(value, fields) {
-  const canonical = fields.map((field) => [field, canonicalValue(value[field])]);
+  const canonical = fields.map((field) => [
+    field,
+    canonicalValue(value[field]),
+  ]);
   return createHash("sha256").update(JSON.stringify(canonical)).digest("hex");
 }
 
@@ -714,13 +833,15 @@ export function fingerprintHistoricalSnapshot(event) {
 }
 
 export function fingerprintHistoricalProposal(sourceId, differences) {
-  const byField = new Map(differences.map((difference) => [difference.field, difference]));
-  const canonical = HISTORICAL_COMPARISON_FIELDS
-    .filter((field) => byField.has(field))
-    .map((field) => {
-      const difference = byField.get(field);
-      return [field, difference.type, canonicalValue(difference.proposed)];
-    });
+  const byField = new Map(
+    differences.map((difference) => [difference.field, difference]),
+  );
+  const canonical = HISTORICAL_COMPARISON_FIELDS.filter((field) =>
+    byField.has(field),
+  ).map((field) => {
+    const difference = byField.get(field);
+    return [field, difference.type, canonicalValue(difference.proposed)];
+  });
   return createHash("sha256")
     .update(JSON.stringify([sourceId, canonical]))
     .digest("hex");
@@ -732,7 +853,11 @@ function reportValue(value) {
   return value;
 }
 
-export function detectHistoricalChanges(previousRegistry, currentEvents, now = new Date()) {
+export function detectHistoricalChanges(
+  previousRegistry,
+  currentEvents,
+  now = new Date(),
+) {
   const currentBySourceId = new Map(
     currentEvents.map((event) => [event.sourceId, event]),
   );
@@ -740,7 +865,8 @@ export function detectHistoricalChanges(previousRegistry, currentEvents, now = n
 
   for (const publishedEvent of previousRegistry.events ?? []) {
     const isHistorical =
-      publishedEvent.historical === true || isArchiveEligible(publishedEvent, now);
+      publishedEvent.historical === true ||
+      isArchiveEligible(publishedEvent, now);
     if (!isHistorical) continue;
 
     const currentEvent = currentBySourceId.get(publishedEvent.sourceId);
@@ -803,7 +929,9 @@ function redactReportSecrets(report, secrets) {
   const redact = (value) => {
     if (Array.isArray(value)) return value.map(redact);
     if (value && typeof value === "object") {
-      return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, redact(item)]));
+      return Object.fromEntries(
+        Object.entries(value).map(([key, item]) => [key, redact(item)]),
+      );
     }
     if (typeof value !== "string") return value;
     return secrets
@@ -816,10 +944,18 @@ function redactReportSecrets(report, secrets) {
 function redactNotificationValue(value) {
   if (Array.isArray(value)) return value.map(redactNotificationValue);
   if (value && typeof value === "object") {
-    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, redactNotificationValue(item)]));
+    return Object.fromEntries(
+      Object.entries(value).map(([key, item]) => [
+        key,
+        redactNotificationValue(item),
+      ]),
+    );
   }
   if (typeof value !== "string") return value;
-  return redactEvidenceValue(value).replace(/(?:webcal:|https?):\/\/[^\s<>)\]]+/gi, "[redacted]");
+  return redactEvidenceValue(value).replace(
+    /(?:webcal:|https?):\/\/[^\s<>)\]]+/gi,
+    "[redacted]",
+  );
 }
 
 function getNotificationExecution(environment = process.env) {
@@ -829,7 +965,9 @@ function getNotificationExecution(environment = process.env) {
   const attempt = /^\d+$/.test(environment.GITHUB_RUN_ATTEMPT ?? "")
     ? environment.GITHUB_RUN_ATTEMPT
     : null;
-  const trigger = ["schedule", "workflow_dispatch"].includes(environment.GITHUB_EVENT_NAME)
+  const trigger = ["schedule", "workflow_dispatch"].includes(
+    environment.GITHUB_EVENT_NAME,
+  )
     ? environment.GITHUB_EVENT_NAME
     : null;
   return {
@@ -843,39 +981,53 @@ function getNotificationExecution(environment = process.env) {
 const pendingNotificationDetails = {
   future_missing: {
     cause: "El evento futuro ya no aparece en la fuente.",
-    actionRequired: "Confirmar en Calendar si corresponde retirarlo; no se aplica ninguna decision automaticamente.",
+    actionRequired:
+      "Confirmar en Calendar si corresponde retirarlo; no se aplica ninguna decision automaticamente.",
   },
   historical_missing: {
     cause: "El evento historico ya no aparece en la fuente.",
-    actionRequired: "Revisar la ausencia y conservar la version publicada hasta una decision humana posterior.",
+    actionRequired:
+      "Revisar la ausencia y conservar la version publicada hasta una decision humana posterior.",
   },
   historical_change: {
     cause: "La fuente propone cambios a un evento historico publicado.",
-    actionRequired: "Revisar las diferencias antes de cualquier correccion humana posterior.",
+    actionRequired:
+      "Revisar las diferencias antes de cualquier correccion humana posterior.",
   },
 };
 
-export function createCalendarNotifications(registry, execution = getNotificationExecution()) {
+export function createCalendarNotifications(
+  registry,
+  execution = getNotificationExecution(),
+) {
   const notifications = new Map();
   for (const event of registry.events ?? []) {
-    if (event.editorialState !== "pendiente" || !event.pendingRevision) continue;
+    if (event.editorialState !== "pendiente" || !event.pendingRevision)
+      continue;
     const revision = event.pendingRevision;
     const id = revision.evidence?.fingerprint ?? revision.id;
     if (revision.notification?.evidenceFingerprint === id) continue;
     const details = pendingNotificationDetails[revision.reason] ?? {
       cause: "La fuente produjo una revision editorial pendiente.",
-      actionRequired: "Revisar la revision antes de aplicar cualquier decision humana posterior.",
+      actionRequired:
+        "Revisar la revision antes de aplicar cualquier decision humana posterior.",
     };
     if (notifications.has(id)) continue;
     notifications.set(id, {
       id,
       kind: "revision_pendiente",
-      identity: redactNotificationValue({ slug: event.slug, title: event.title, date: event.date }),
+      identity: redactNotificationValue({
+        slug: event.slug,
+        title: event.title,
+        date: event.date,
+      }),
       temporality: event.historical === true ? "historico" : "futuro",
       cause: details.cause,
       actionRequired: details.actionRequired,
       before: redactNotificationValue(revision.evidence?.published ?? null),
-      after: redactNotificationValue(revision.proposed ?? revision.evidence?.lastReceived ?? null),
+      after: redactNotificationValue(
+        revision.proposed ?? revision.evidence?.lastReceived ?? null,
+      ),
       execution,
       fingerprints: {
         revisionId: revision.id,
@@ -883,12 +1035,19 @@ export function createCalendarNotifications(registry, execution = getNotificatio
       },
     });
   }
-  return { version: 1, notifications: [...notifications.values()].sort((a, b) => a.id.localeCompare(b.id)) };
+  return {
+    version: 1,
+    notifications: [...notifications.values()].sort((a, b) =>
+      a.id.localeCompare(b.id),
+    ),
+  };
 }
 
 export function recordCalendarNotifications(registry, notificationReport) {
   const notificationIds = new Set(
-    (notificationReport?.notifications ?? []).map((notification) => notification.id),
+    (notificationReport?.notifications ?? []).map(
+      (notification) => notification.id,
+    ),
   );
   if (!notificationIds.size) return registry;
   return {
@@ -908,36 +1067,50 @@ export function recordCalendarNotifications(registry, notificationReport) {
   };
 }
 
-export function createCalendarFailureNotification(error, execution = getNotificationExecution()) {
-  const message = redactNotificationValue(error instanceof Error ? error.message : String(error));
+export function createCalendarFailureNotification(
+  error,
+  execution = getNotificationExecution(),
+) {
+  const message = redactNotificationValue(
+    error instanceof Error ? error.message : String(error),
+  );
   const normalized = String(message).toLowerCase();
   const kind = normalized.includes("mass calendar disappearance")
     ? "desaparicion_masiva"
     : normalized.includes("calendar request failed")
       ? "fuente_inaccesible"
-      : normalized.includes("icalendar") || normalized.includes("calendar feed") || normalized.includes("duplicate calendar")
+      : normalized.includes("icalendar") ||
+          normalized.includes("calendar feed") ||
+          normalized.includes("duplicate calendar")
         ? "parser_o_fuente_invalida"
         : "verificacion_fallida";
-  const actionRequired = kind === "desaparicion_masiva"
-    ? "Revisar la fuente antes de reintentar; el umbral bloqueo la publicacion y conserva el ultimo conjunto valido."
-    : kind === "verificacion_fallida"
-      ? "Corregir la verificacion fallida y reejecutar; no publicar ni aprobar cambios a partir de esta ejecucion."
-      : "Corregir la fuente o el formato y reejecutar; el ultimo conjunto valido permanece sin cambios.";
+  const actionRequired =
+    kind === "desaparicion_masiva"
+      ? "Revisar la fuente antes de reintentar; el umbral bloqueo la publicacion y conserva el ultimo conjunto valido."
+      : kind === "verificacion_fallida"
+        ? "Corregir la verificacion fallida y reejecutar; no publicar ni aprobar cambios a partir de esta ejecucion."
+        : "Corregir la fuente o el formato y reejecutar; el ultimo conjunto valido permanece sin cambios.";
   const id = fingerprintOrderedFields({ kind, message }, ["kind", "message"]);
   return {
     version: 1,
-    notifications: [{
-      id,
-      kind,
-      identity: null,
-      temporality: "ejecucion_actual",
-      cause: message,
-      actionRequired,
-      before: null,
-      after: null,
-      execution,
-      fingerprints: { revisionId: null, evidenceFingerprint: null, failureFingerprint: id },
-    }],
+    notifications: [
+      {
+        id,
+        kind,
+        identity: null,
+        temporality: "ejecucion_actual",
+        cause: message,
+        actionRequired,
+        before: null,
+        after: null,
+        execution,
+        fingerprints: {
+          revisionId: null,
+          evidenceFingerprint: null,
+          failureFingerprint: id,
+        },
+      },
+    ],
   };
 }
 
@@ -961,7 +1134,10 @@ function serializeCalendarEvent(event) {
     ["organizer", event.organizer],
     ["infoUrl", event.infoUrl],
     ["timeZone", event.timeZone],
-  ].filter(([, value]) => value !== undefined && (!Array.isArray(value) || value.length));
+  ].filter(
+    ([, value]) =>
+      value !== undefined && (!Array.isArray(value) || value.length),
+  );
   return [
     "  {",
     ...entries.map(([name, value], index) =>
@@ -976,7 +1152,12 @@ export function serializeCalendarEvents(events) {
 
 // Auto-generated from Google Calendar. Do not edit manually.
 export const CALENDAR_EVENTS: CalendarEvent[] = [
-${events.filter((event) => event.editorialState !== "eliminado" && event.inactive !== true).map(serializeCalendarEvent).join(",\n")}
+${events
+  .filter(
+    (event) => event.editorialState !== "eliminado" && event.inactive !== true,
+  )
+  .map(serializeCalendarEvent)
+  .join(",\n")}
 ];
 `;
 }
@@ -985,7 +1166,9 @@ async function readCalendarSource(source) {
   if (/^https?:\/\//i.test(source)) {
     const response = await fetch(source);
     if (!response.ok) {
-      throw new Error(`Calendar request failed: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Calendar request failed: ${response.status} ${response.statusText}`,
+      );
     }
     return response.text();
   }
@@ -995,7 +1178,10 @@ async function readCalendarSource(source) {
 async function readRegistry(registryPath) {
   try {
     const registry = JSON.parse(await readFile(registryPath, "utf8"));
-    if (![2, 3, 4].includes(registry.version) || !Array.isArray(registry.events)) {
+    if (
+      ![2, 3, 4].includes(registry.version) ||
+      !Array.isArray(registry.events)
+    ) {
       throw new Error("Unsupported calendar event registry.");
     }
     return registry;
@@ -1138,7 +1324,10 @@ export async function writeActionSummary(
     "### Gallery states requiring attention",
     "",
     ...(galleryChanges.length
-      ? galleryChanges.map((change) => `- ${escapeActionText(change.slug)}: ${escapeActionText(change.status)} (${escapeActionText(change.reason)})`)
+      ? galleryChanges.map(
+          (change) =>
+            `- ${escapeActionText(change.slug)}: ${escapeActionText(change.status)} (${escapeActionText(change.reason)})`,
+        )
       : ["None."]),
     "",
   ];
@@ -1194,7 +1383,9 @@ export async function synchronizeCalendar({
     .filter(Boolean);
   const previousRegistry = await readRegistry(registryPath);
   assertSafeCalendarInput(previousRegistry, parsed);
-  const currentBySourceId = new Map(parsed.map((event) => [event.sourceId, event]));
+  const currentBySourceId = new Map(
+    parsed.map((event) => [event.sourceId, event]),
+  );
   const historicalReport = redactReportSecrets(
     detectHistoricalChanges(previousRegistry, parsed, now),
     [source, process.env.CALENDAR_ICS_URL],
@@ -1207,8 +1398,11 @@ export async function synchronizeCalendar({
       const lastEventDate =
         event.endDate && !event.startTime && !event.endTime
           ? addCalendarDays(event.endDate, -1)
-          : event.endDate ?? event.date;
-      return calculateGalleryCheckAt(lastEventDate, event.timeZone).getTime() <= now.getTime();
+          : (event.endDate ?? event.date);
+      return (
+        calculateGalleryCheckAt(lastEventDate, event.timeZone).getTime() <=
+        now.getTime()
+      );
     })
     .map((event) => ({
       slug: event.slug,
@@ -1230,7 +1424,10 @@ export async function synchronizeCalendar({
   const notificationReport = createCalendarNotifications(registry);
   const notificationReportPath = process.env.CALENDAR_NOTIFICATIONS_REPORT_PATH;
   if (notificationReportPath) {
-    await writeCalendarNotificationsReport(notificationReport, notificationReportPath);
+    await writeCalendarNotificationsReport(
+      notificationReport,
+      notificationReportPath,
+    );
     registry = recordCalendarNotifications(registry, notificationReport);
   }
 
@@ -1241,7 +1438,11 @@ export async function synchronizeCalendar({
       stageTextFile(outputPath, serializeCalendarEvents(registry.events)),
     ]);
   } catch (error) {
-    await Promise.all((galleryResult?.publication ?? []).map(({ staged }) => rm(staged, { recursive: true, force: true })));
+    await Promise.all(
+      (galleryResult?.publication ?? []).map(({ staged }) =>
+        rm(staged, { recursive: true, force: true }),
+      ),
+    );
     throw error;
   }
   await replaceTransaction([
@@ -1252,7 +1453,13 @@ export async function synchronizeCalendar({
     historicalReport,
     process.env.HISTORICAL_CHANGES_REPORT_PATH,
   );
-  return { registry, galleryResult, warnings, historicalReport, notificationReport };
+  return {
+    registry,
+    galleryResult,
+    warnings,
+    historicalReport,
+    notificationReport,
+  };
 }
 
 async function main() {
@@ -1277,11 +1484,14 @@ async function main() {
     result.historicalReport,
     process.env.GITHUB_STEP_SUMMARY,
     {
-      preparation: result.registry.events.filter((event) => !event.historical).length,
-      archived: result.registry.events.filter((event) => event.historical).length,
+      preparation: result.registry.events.filter((event) => !event.historical)
+        .length,
+      archived: result.registry.events.filter((event) => event.historical)
+        .length,
       inferredTypes: result.registry.events.length,
       importedGalleries: result.galleryResult?.importedCount ?? 0,
-      frozenGalleries: Object.keys(result.galleryResult?.state.galleries ?? {}).length,
+      frozenGalleries: Object.keys(result.galleryResult?.state.galleries ?? {})
+        .length,
       driveChanges: result.historicalReport.galleryChanges.filter(
         (change) => change.status === "galeria_congelada_cambio_detectado",
       ).length,

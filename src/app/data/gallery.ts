@@ -167,14 +167,62 @@ const ENGLISH_GALLERY_COPY: Record<
   number,
   Pick<GalleryImage, "title" | "alt" | "tag" | "description">
 > = {
-  1: { title: "Practitioners in seiza", alt: "Kendo practitioners seated in seiza with their shinai aligned in the dojo", tag: "Reiho", description: "The seiza position marks the beginning and end of practice with respect, attention, and discipline." },
-  2: { title: "Armored practice", alt: "Kendo practitioners wearing bogu perform combat exercises in the dojo", tag: "Bogu geiko", description: "Practitioners wearing bogu apply distance, timing, and precision during controlled combat exercises." },
-  3: { title: "Armor", alt: "Kendo armor with men, kote, do, and tare prepared for training", tag: "Bogu", description: "A close look at the protective equipment used in kendo: men, kote, do, and tare ready for practice." },
-  4: { title: "Mixed-level training", alt: "Practitioners observe a kendo exercise performed in the center of the dojo", tag: "Mitori geiko", description: "Active observation helps practitioners learn rhythm, posture, and etiquette before entering combat." },
-  5: { title: "Uniform", alt: "A row of kendo practitioners seated in seiza on the dojo floor", tag: "Gi and Hakama", description: "The gi and hakama form the traditional uniform, prepared for orderly and safe movement." },
-  6: { title: "Kendo community", alt: "A group of kendo practitioners and companions gathered after a competition", tag: "Team and community", description: "The community grows by sharing training, mutual support, and moments outside the dojo." },
-  7: { title: "Kirikaeshi", alt: "Two kendo competitors exchange shinai strikes during a match", tag: "Technique", description: "Kirikaeshi develops repeated cuts, footwork, and breathing to strengthen core fundamentals." },
-  8: { title: "Competitive match", alt: "A kendo match in which one competitor advances to attack with the shinai", tag: "Shiai", description: "Shiai tests technique, decision-making, and respect within a competitive format." },
+  1: {
+    title: "Practitioners in seiza",
+    alt: "Kendo practitioners seated in seiza with their shinai aligned in the dojo",
+    tag: "Reiho",
+    description:
+      "The seiza position marks the beginning and end of practice with respect, attention, and discipline.",
+  },
+  2: {
+    title: "Armored practice",
+    alt: "Kendo practitioners wearing bogu perform combat exercises in the dojo",
+    tag: "Bogu geiko",
+    description:
+      "Practitioners wearing bogu apply distance, timing, and precision during controlled combat exercises.",
+  },
+  3: {
+    title: "Armor",
+    alt: "Kendo armor with men, kote, do, and tare prepared for training",
+    tag: "Bogu",
+    description:
+      "A close look at the protective equipment used in kendo: men, kote, do, and tare ready for practice.",
+  },
+  4: {
+    title: "Mixed-level training",
+    alt: "Practitioners observe a kendo exercise performed in the center of the dojo",
+    tag: "Mitori geiko",
+    description:
+      "Active observation helps practitioners learn rhythm, posture, and etiquette before entering combat.",
+  },
+  5: {
+    title: "Uniform",
+    alt: "A row of kendo practitioners seated in seiza on the dojo floor",
+    tag: "Gi and Hakama",
+    description:
+      "The gi and hakama form the traditional uniform, prepared for orderly and safe movement.",
+  },
+  6: {
+    title: "Kendo community",
+    alt: "A group of kendo practitioners and companions gathered after a competition",
+    tag: "Team and community",
+    description:
+      "The community grows by sharing training, mutual support, and moments outside the dojo.",
+  },
+  7: {
+    title: "Kirikaeshi",
+    alt: "Two kendo competitors exchange shinai strikes during a match",
+    tag: "Technique",
+    description:
+      "Kirikaeshi develops repeated cuts, footwork, and breathing to strengthen core fundamentals.",
+  },
+  8: {
+    title: "Competitive match",
+    alt: "A kendo match in which one competitor advances to attack with the shinai",
+    tag: "Shiai",
+    description:
+      "Shiai tests technique, decision-making, and respect within a competitive format.",
+  },
 };
 
 export function getGalleryImages(language: Language) {

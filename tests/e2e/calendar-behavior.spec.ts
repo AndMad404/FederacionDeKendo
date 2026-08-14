@@ -44,15 +44,21 @@ test("desktop calendar navigation advances and returns two months", async ({
   await page.setViewportSize({ width: 1366, height: 768 });
   await openCalendar(page);
 
-  await expect(page.getByText("Agosto — Septiembre 2026", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("Agosto — Septiembre 2026", { exact: true }),
+  ).toBeVisible();
   await page
     .getByRole("button", { name: "Ver los dos meses siguientes" })
     .click();
-  await expect(page.getByText("Octubre — Noviembre 2026", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("Octubre — Noviembre 2026", { exact: true }),
+  ).toBeVisible();
   await page
     .getByRole("button", { name: "Ver los dos meses anteriores" })
     .click();
-  await expect(page.getByText("Agosto — Septiembre 2026", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("Agosto — Septiembre 2026", { exact: true }),
+  ).toBeVisible();
 });
 
 test("touch swipe uses the same one-month navigation on mobile", async ({
@@ -68,10 +74,9 @@ test("touch swipe uses the same one-month navigation on mobile", async ({
 
   const session = await context.newCDPSession(page);
   const y = box!.y + box!.height / 2;
-  const septemberLabel = calendarNavigation(page).getByText(
-    "Septiembre 2026",
-    { exact: true },
-  );
+  const septemberLabel = calendarNavigation(page).getByText("Septiembre 2026", {
+    exact: true,
+  });
 
   for (let attempt = 0; attempt < 2; attempt += 1) {
     await session.send("Input.dispatchTouchEvent", {
@@ -109,9 +114,7 @@ test("changing months resets each month pagination", async ({ page }) => {
   await openCalendar(page, FIXED_PAGINATION_TIME);
 
   await expect(page.getByText("Página 1 de 2", { exact: true })).toBeVisible();
-  await page
-    .getByRole("button", { name: "Ver más eventos del mes" })
-    .click();
+  await page.getByRole("button", { name: "Ver más eventos del mes" }).click();
   await expect(page.getByText("Página 2 de 2", { exact: true })).toBeVisible();
 
   await page.getByRole("button", { name: "Ver mes siguiente" }).click();

@@ -13,7 +13,9 @@ function parseTimeParts(time = "00:00") {
  */
 export function addCalendarDays(date, days) {
   const { year, month, day } = parseDateParts(date);
-  return new Date(Date.UTC(year, month - 1, day + days)).toISOString().slice(0, 10);
+  return new Date(Date.UTC(year, month - 1, day + days))
+    .toISOString()
+    .slice(0, 10);
 }
 
 /**

@@ -55,7 +55,9 @@ export function EventPage() {
   if (!sourceEvent) return null;
   const event = getLocalizedEvent(sourceEvent, language);
 
-  const isPast = now ? getEventEndDate(event).getTime() <= now.getTime() : false;
+  const isPast = now
+    ? getEventEndDate(event).getTime() <= now.getTime()
+    : false;
   const locationUrl = event.location
     ? getLocationMapUrl(event.location)
     : undefined;

@@ -1,9 +1,4 @@
-import {
-  Suspense,
-  useEffect,
-  useRef,
-  type ComponentType,
-} from "react";
+import { Suspense, useEffect, useRef, type ComponentType } from "react";
 import { Route, Routes, useLocation } from "react-router";
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
@@ -109,7 +104,13 @@ function AppShell({
                 key={route.path}
                 path={route.path}
                 element={
-                  <Suspense fallback={<p className="sr-only" role="status">{copy.shell.loading}</p>}>
+                  <Suspense
+                    fallback={
+                      <p className="sr-only" role="status">
+                        {copy.shell.loading}
+                      </p>
+                    }
+                  >
                     <Component />
                   </Suspense>
                 }
@@ -119,7 +120,13 @@ function AppShell({
           <Route
             path="*"
             element={
-              <Suspense fallback={<p className="sr-only" role="status">{copy.shell.loading}</p>}>
+              <Suspense
+                fallback={
+                  <p className="sr-only" role="status">
+                    {copy.shell.loading}
+                  </p>
+                }
+              >
                 <NotFoundComponent />
               </Suspense>
             }
@@ -144,9 +151,12 @@ function ScrollToTop() {
     );
     previousPathname.current = pathname;
 
-    if (isInitialLoad || isEquivalentLanguageRoute || window.location.hash) return;
+    if (isInitialLoad || isEquivalentLanguageRoute || window.location.hash)
+      return;
 
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
   }, [pathname]);
 

@@ -120,22 +120,30 @@ for (const viewport of FLOW_VIEWPORTS) {
     test.use({ viewport });
 
     for (const route of REPRESENTATIVE_ROUTES) {
-      test(`${route.name} keeps all route content reachable`, async ({ page }) => {
+      test(`${route.name} keeps all route content reachable`, async ({
+        page,
+      }) => {
         await preparePage(page, route.path);
         const reachability = await getReachability(page);
 
-        expect.soft(
-          reachability.flowLockOwners,
-          "the page shell must remain in normal document flow at this viewport",
-        ).toEqual([]);
-        expect.soft(
-          reachability.internalVerticalScrollOwners,
-          "routes must not introduce nested vertical scroll owners",
-        ).toEqual([]);
-        expect.soft(
-          reachability.clippedContent,
-          "route content must not extend outside an overflow-hidden ancestor",
-        ).toEqual([]);
+        expect
+          .soft(
+            reachability.flowLockOwners,
+            "the page shell must remain in normal document flow at this viewport",
+          )
+          .toEqual([]);
+        expect
+          .soft(
+            reachability.internalVerticalScrollOwners,
+            "routes must not introduce nested vertical scroll owners",
+          )
+          .toEqual([]);
+        expect
+          .soft(
+            reachability.clippedContent,
+            "route content must not extend outside an overflow-hidden ancestor",
+          )
+          .toEqual([]);
         expect.soft(reachability.hasHorizontalOverflow).toBe(false);
       });
     }
@@ -147,7 +155,9 @@ for (const viewport of CONTAINED_VIEWPORTS) {
     test.use({ viewport });
 
     for (const route of REPRESENTATIVE_ROUTES) {
-      test(`${route.name} keeps all route content reachable`, async ({ page }) => {
+      test(`${route.name} keeps all route content reachable`, async ({
+        page,
+      }) => {
         await preparePage(page, route.path);
         const reachability = await getReachability(page);
 

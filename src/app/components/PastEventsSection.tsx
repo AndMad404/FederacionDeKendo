@@ -42,7 +42,10 @@ export function PastEventsSection() {
     language,
   );
   const years = getArchiveYears(historicalEvents);
-  const pageCount = Math.max(1, Math.ceil(events.length / PAST_EVENTS_PAGE_SIZE));
+  const pageCount = Math.max(
+    1,
+    Math.ceil(events.length / PAST_EVENTS_PAGE_SIZE),
+  );
   const page = Math.min(requestedPage, pageCount);
   const pageLabel = `${copy.archive.page} ${page} ${copy.archive.of} ${pageCount}`;
   const pageEvents = events.slice(
@@ -50,14 +53,12 @@ export function PastEventsSection() {
     page * PAST_EVENTS_PAGE_SIZE,
   );
   const calendarPath = language === "en" ? "/en/calendar/" : "/calendario/";
-  const eventTypes: ArchiveEventType[] = [
-    "torneo",
-    "examen",
-    "seminario",
-  ];
+  const eventTypes: ArchiveEventType[] = ["torneo", "examen", "seminario"];
 
   function changeFilter(name: "year" | "type", value: string) {
-    navigate(buildArchiveUrl(1, language, { ...filters, [name]: value || undefined }));
+    navigate(
+      buildArchiveUrl(1, language, { ...filters, [name]: value || undefined }),
+    );
   }
 
   return (
@@ -87,7 +88,9 @@ export function PastEventsSection() {
       />
 
       <div className="relative z-20 -mt-11 flex min-h-0 flex-1 items-start justify-center px-3 pb-0 pt-3 sm:-mt-13 sm:px-4 sm:pb-0 sm:pt-4 tall-md:p-4 land-sm:px-3 land-sm:pb-0 land-sm:pt-3 land-compact:-mt-8">
-        <div className={`flex w-full max-w-5xl flex-col gap-3 p-4 ${panelSurfaceClass}`}>
+        <div
+          className={`flex w-full max-w-5xl flex-col gap-3 p-4 ${panelSurfaceClass}`}
+        >
           <div className="grid grid-cols-2 items-end gap-3 md:mx-auto md:w-fit md:grid-cols-[auto_auto]">
             <Link
               to={calendarPath}
@@ -104,7 +107,11 @@ export function PastEventsSection() {
                 className={`min-h-11 w-full rounded-lg px-3 py-2 text-center text-sm ${focusRingClass} border border-site-border bg-site-surface text-site-action`}
               >
                 <option value="">{copy.archive.year}</option>
-                {years.map((year) => <option key={year} value={year}>{year}</option>)}
+                {years.map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
               </select>
             </label>
             <label className="relative min-w-0 text-xs font-bold text-site-muted">
@@ -116,7 +123,11 @@ export function PastEventsSection() {
                 className={`min-h-11 w-full rounded-lg px-3 py-2 text-center text-sm ${focusRingClass} border border-site-border bg-site-surface text-site-action`}
               >
                 <option value="">{copy.archive.eventType}</option>
-                {eventTypes.map((type) => <option key={type} value={type}>{copy.archive.types[type]}</option>)}
+                {eventTypes.map((type) => (
+                  <option key={type} value={type}>
+                    {copy.archive.types[type]}
+                  </option>
+                ))}
               </select>
             </label>
           </div>
@@ -164,9 +175,7 @@ export function PastEventsSection() {
                 {copy.archive.previous}
               </Link>
             ) : null}
-            <span className="text-sm font-semibold">
-              {pageLabel}
-            </span>
+            <span className="text-sm font-semibold">{pageLabel}</span>
             {page < pageCount ? (
               <Link
                 to={buildArchiveUrl(page + 1, language, filters)}

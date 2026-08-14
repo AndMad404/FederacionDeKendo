@@ -100,34 +100,62 @@ test("omits drafts and recurring events while allowing optional content to be ab
     .map((event) => parseCalendarEvent(event, warnings))
     .filter(Boolean);
 
-  assert.equal(events.some((event) => event.title.includes("BORRADOR")), false);
-  assert.equal(events.some((event) => event.title === "Entrenamiento semanal"), false);
-  assert.equal(events.some((event) => event.title === "Actividad sin detalles"), true);
-  assert.equal(warnings.some((warning) => warning.includes("Draft omitted")), true);
-  assert.equal(warnings.some((warning) => warning.includes("Recurring event omitted")), true);
-  assert.equal(warnings.some((warning) => /location|description|gallery|ubicación|descripción/i.test(warning)), false);
+  assert.equal(
+    events.some((event) => event.title.includes("BORRADOR")),
+    false,
+  );
+  assert.equal(
+    events.some((event) => event.title === "Entrenamiento semanal"),
+    false,
+  );
+  assert.equal(
+    events.some((event) => event.title === "Actividad sin detalles"),
+    true,
+  );
+  assert.equal(
+    warnings.some((warning) => warning.includes("Draft omitted")),
+    true,
+  );
+  assert.equal(
+    warnings.some((warning) => warning.includes("Recurring event omitted")),
+    true,
+  );
+  assert.equal(
+    warnings.some((warning) =>
+      /location|description|gallery|ubicación|descripción/i.test(warning),
+    ),
+    false,
+  );
 });
 
 test("omits an event and warns when title or date is missing", () => {
   const warnings = [];
-  const events = parseVEvents([
-    "BEGIN:VCALENDAR",
-    "BEGIN:VEVENT",
-    "UID:missing-title@example.test",
-    "DTSTART;VALUE=DATE:20260808",
-    "END:VEVENT",
-    "BEGIN:VEVENT",
-    "UID:missing-date@example.test",
-    "SUMMARY:Evento sin fecha",
-    "END:VEVENT",
-    "END:VCALENDAR",
-  ].join("\n"))
+  const events = parseVEvents(
+    [
+      "BEGIN:VCALENDAR",
+      "BEGIN:VEVENT",
+      "UID:missing-title@example.test",
+      "DTSTART;VALUE=DATE:20260808",
+      "END:VEVENT",
+      "BEGIN:VEVENT",
+      "UID:missing-date@example.test",
+      "SUMMARY:Evento sin fecha",
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ].join("\n"),
+  )
     .map((event) => parseCalendarEvent(event, warnings))
     .filter(Boolean);
 
   assert.deepEqual(events, []);
-  assert.equal(warnings.some((warning) => warning.includes("title")), true);
-  assert.equal(warnings.some((warning) => warning.includes("date")), true);
+  assert.equal(
+    warnings.some((warning) => warning.includes("title")),
+    true,
+  );
+  assert.equal(
+    warnings.some((warning) => warning.includes("date")),
+    true,
+  );
 });
 
 test("Given a pending event, When its title changes, Then its identity remains editable", () => {
@@ -151,7 +179,11 @@ test("Given a pending event, When its title changes, Then its identity remains e
     },
   ];
 
-  const [event] = mergeRegistry(previous, current, new Date("2026-07-01")).events;
+  const [event] = mergeRegistry(
+    previous,
+    current,
+    new Date("2026-07-01"),
+  ).events;
   assert.equal(event.slug, "2026-08-08-examen-nacional");
   assert.equal(event.title, "Examen nacional");
 });
@@ -181,7 +213,11 @@ test("Given a historical event, When Calendar changes its date and title, Then i
     },
   ];
 
-  const [event] = mergeRegistry(previous, current, new Date("2026-08-20T00:00:00Z")).events;
+  const [event] = mergeRegistry(
+    previous,
+    current,
+    new Date("2026-08-20T00:00:00Z"),
+  ).events;
   assert.equal(event.slug, "2026-08-08-examen");
   assert.equal(event.title, "Examen");
   assert.equal(event.date, "2026-08-08");
@@ -192,22 +228,30 @@ test("Given a historical event, When Calendar changes its date and title, Then i
 test("Given a version 2 historical event, When the registry migrates, Then its existing identity is frozen", () => {
   const previous = {
     version: 2,
-    events: [{
-      sourceId: "legacy-source",
-      slug: "2025-12-31-examen",
-      title: "Examen original",
-      date: "2025-12-31",
-    }],
+    events: [
+      {
+        sourceId: "legacy-source",
+        slug: "2025-12-31-examen",
+        title: "Examen original",
+        date: "2025-12-31",
+      },
+    ],
   };
-  const current = [{
-    sourceId: "legacy-source",
-    slug: "2026-01-10-examen-corregido",
-    title: "Examen corregido",
-    date: "2026-01-10",
-    archiveEligibleAt: "2026-01-13T06:00:00.000Z",
-  }];
+  const current = [
+    {
+      sourceId: "legacy-source",
+      slug: "2026-01-10-examen-corregido",
+      title: "Examen corregido",
+      date: "2026-01-10",
+      archiveEligibleAt: "2026-01-13T06:00:00.000Z",
+    },
+  ];
 
-  const [event] = mergeRegistry(previous, current, new Date("2026-02-01T00:00:00Z")).events;
+  const [event] = mergeRegistry(
+    previous,
+    current,
+    new Date("2026-02-01T00:00:00Z"),
+  ).events;
   assert.equal(event.slug, "2025-12-31-examen");
   assert.equal(event.title, "Examen original");
   assert.equal(event.date, "2025-12-31");
@@ -241,26 +285,34 @@ test("Given foreign daylight-saving dates, When eligibility is calculated, Then 
 });
 
 test("Given timed and all-day events, When parsed, Then eligibility uses the last local event day instead of its ending hour", () => {
-  const timed = parseCalendarEvent(parseVEvents([
-    "BEGIN:VCALENDAR",
-    "BEGIN:VEVENT",
-    "UID:timed@example.test",
-    "DTSTART;TZID=America/Costa_Rica:20260808T130000",
-    "DTEND;TZID=America/Costa_Rica:20260808T150000",
-    "SUMMARY:Timed",
-    "END:VEVENT",
-    "END:VCALENDAR",
-  ].join("\n"))[0]);
-  const allDay = parseCalendarEvent(parseVEvents([
-    "BEGIN:VCALENDAR",
-    "BEGIN:VEVENT",
-    "UID:all-day@example.test",
-    "DTSTART;VALUE=DATE:20260808",
-    "DTEND;VALUE=DATE:20260809",
-    "SUMMARY:All day",
-    "END:VEVENT",
-    "END:VCALENDAR",
-  ].join("\n"))[0]);
+  const timed = parseCalendarEvent(
+    parseVEvents(
+      [
+        "BEGIN:VCALENDAR",
+        "BEGIN:VEVENT",
+        "UID:timed@example.test",
+        "DTSTART;TZID=America/Costa_Rica:20260808T130000",
+        "DTEND;TZID=America/Costa_Rica:20260808T150000",
+        "SUMMARY:Timed",
+        "END:VEVENT",
+        "END:VCALENDAR",
+      ].join("\n"),
+    )[0],
+  );
+  const allDay = parseCalendarEvent(
+    parseVEvents(
+      [
+        "BEGIN:VCALENDAR",
+        "BEGIN:VEVENT",
+        "UID:all-day@example.test",
+        "DTSTART;VALUE=DATE:20260808",
+        "DTEND;VALUE=DATE:20260809",
+        "SUMMARY:All day",
+        "END:VEVENT",
+        "END:VCALENDAR",
+      ].join("\n"),
+    )[0],
+  );
 
   assert.equal(timed.archiveEligibleAt, "2026-08-10T06:00:00.000Z");
   assert.equal(allDay.archiveEligibleAt, "2026-08-10T06:00:00.000Z");
@@ -296,7 +348,10 @@ test("keeps missing events published as pending revisions until a human decision
     [previous.events[2]],
     new Date("2026-07-01"),
   );
-  assert.deepEqual(merged.events.map((event) => event.sourceId), ["past", "present-past", "future"]);
+  assert.deepEqual(
+    merged.events.map((event) => event.sourceId),
+    ["past", "present-past", "future"],
+  );
   assert.equal(merged.events[0].editorialState, "pendiente");
   assert.equal(merged.events[2].editorialState, "pendiente");
 });
@@ -338,10 +393,7 @@ test("a duplicate date and title aborts before either destination is published",
   const previousRegistry = '{"version":2,"events":[]}';
   await writeFile(
     sourcePath,
-    createIcs([
-      { uid: "first@example.test" },
-      { uid: "second@example.test" },
-    ]),
+    createIcs([{ uid: "first@example.test" }, { uid: "second@example.test" }]),
   );
   await writeFile(outputPath, "previous output");
   await writeFile(registryPath, previousRegistry);
@@ -427,7 +479,9 @@ test("the measured mass-disappearance threshold blocks publication while one abs
     () => assertSafeCalendarInput(previous, current),
     new RegExp(`2 of 4.*threshold 2`, "i"),
   );
-  assert.doesNotThrow(() => assertSafeCalendarInput(previous, previous.events.slice(0, 3)));
+  assert.doesNotThrow(() =>
+    assertSafeCalendarInput(previous, previous.events.slice(0, 3)),
+  );
   assert.equal(MASS_DISAPPEARANCE_MINIMUM, 2);
   assert.equal(MASS_DISAPPEARANCE_RATIO, 0.5);
 });
@@ -437,10 +491,13 @@ test("a duplicate source identity is rejected before registry or public output c
   const sourcePath = path.join(tempDirectory, "duplicate-source.ics");
   const outputPath = path.join(tempDirectory, "calendarEvents.ts");
   const registryPath = path.join(tempDirectory, "registry.json");
-  await writeFile(sourcePath, createIcs([
-    { uid: "same@example.test", title: "First" },
-    { uid: "same@example.test", title: "Second" },
-  ]));
+  await writeFile(
+    sourcePath,
+    createIcs([
+      { uid: "same@example.test", title: "First" },
+      { uid: "same@example.test", title: "Second" },
+    ]),
+  );
   await writeFile(outputPath, "previous output");
   await writeFile(registryPath, '{"version":4,"events":[]}');
 
@@ -450,7 +507,10 @@ test("a duplicate source identity is rejected before registry or public output c
       /Duplicate calendar source identity/,
     );
     assert.equal(await readFile(outputPath, "utf8"), "previous output");
-    assert.equal(await readFile(registryPath, "utf8"), '{"version":4,"events":[]}');
+    assert.equal(
+      await readFile(registryPath, "utf8"),
+      '{"version":4,"events":[]}',
+    );
   } finally {
     await rm(tempDirectory, { recursive: true, force: true });
   }
@@ -467,7 +527,9 @@ test("phase 2 normalizes public descriptions and event types without publishing 
   try {
     const galleryImage = await sharp({
       create: { width: 640, height: 480, channels: 3, background: "red" },
-    }).jpeg().toBuffer();
+    })
+      .jpeg()
+      .toBuffer();
     const result = await synchronizeCalendar({
       source: fileURLToPath(phase2FixturePath),
       outputPath,
@@ -484,12 +546,15 @@ test("phase 2 normalizes public descriptions and event types without publishing 
     const output = await readFile(outputPath, "utf8");
     const registry = await readFile(registryPath, "utf8");
     const galleryManifest = await readFile(galleryManifestPath, "utf8");
-    const byTitle = new Map(result.registry.events.map((event) => [event.title, event]));
+    const byTitle = new Map(
+      result.registry.events.map((event) => [event.title, event]),
+    );
 
     assert.equal(byTitle.get("Torneo futuro").historical, undefined);
     assert.equal(byTitle.get("Examen en preparación").historical, true);
     assert.match(
-      result.galleryResult.state.galleries["2026-08-08-examen-en-preparacion"].fingerprint,
+      result.galleryResult.state.galleries["2026-08-08-examen-en-preparacion"]
+        .fingerprint,
       /^[a-f0-9]{64}$/,
     );
     assert.equal(byTitle.get("Seminario histórico").historical, true);
@@ -499,15 +564,26 @@ test("phase 2 normalizes public descriptions and event types without publishing 
     );
     assert.equal(byTitle.get("Torneo sin álbum").eventType, "torneo");
     assert.equal(byTitle.get("Exámenes con álbum").eventType, "examen");
-    assert.equal(byTitle.get("Exámenes con álbum").summary, "Fotografías aprobadas.");
+    assert.equal(
+      byTitle.get("Exámenes con álbum").summary,
+      "Fotografías aprobadas.",
+    );
     assert.equal(byTitle.get("Gasshuku técnico").eventType, "seminario");
     assert.equal(byTitle.get("Encuentro federativo").eventType, "seminario");
-    assert.equal(result.warnings.some((warning) => warning.includes("controlled event type")), false);
+    assert.equal(
+      result.warnings.some((warning) =>
+        warning.includes("controlled event type"),
+      ),
+      false,
+    );
     assert.equal(output.includes("TIPO_EVENTO"), false);
     assert.equal(output.includes("ALBUM_FOTOS"), false);
     assert.equal(output.includes("drive.google.com"), false);
     assert.equal(registry.includes("drive.google.com"), false);
-    assert.equal(/drive\.google|phase2ValidAlbum|private-file-id/.test(galleryManifest), false);
+    assert.equal(
+      /drive\.google|phase2ValidAlbum|private-file-id/.test(galleryManifest),
+      false,
+    );
   } finally {
     await rm(tempDirectory, { recursive: true, force: true });
   }

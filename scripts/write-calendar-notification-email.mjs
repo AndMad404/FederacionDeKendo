@@ -2,7 +2,9 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 function singleLine(value) {
-  return String(value ?? "").replace(/[\r\n]+/g, " ").trim();
+  return String(value ?? "")
+    .replace(/[\r\n]+/g, " ")
+    .trim();
 }
 
 function formatNotification(notification) {
@@ -26,7 +28,9 @@ export function formatCalendarNotificationEmail(report, from, recipient) {
   const recipientAddress = singleLine(recipient);
   const isEmailAddress = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   if (!isEmailAddress(sender) || !isEmailAddress(recipientAddress)) {
-    throw new Error("Calendar notification sender and recipient must be valid email addresses.");
+    throw new Error(
+      "Calendar notification sender and recipient must be valid email addresses.",
+    );
   }
   return [
     `From: ${sender}`,
@@ -68,5 +72,7 @@ async function main() {
   await writeFile(process.env.GITHUB_OUTPUT, "send=true\n", "utf8");
 }
 
-const isDirectExecution = process.argv[1] && import.meta.url.endsWith(`/${path.basename(process.argv[1])}`);
+const isDirectExecution =
+  process.argv[1] &&
+  import.meta.url.endsWith(`/${path.basename(process.argv[1])}`);
 if (isDirectExecution) main();

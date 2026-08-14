@@ -116,7 +116,7 @@ export function getDojos(language: Language) {
     "Lunes, Miércoles y Viernes": "Monday, Wednesday, and Friday",
     "Martes y Jueves": "Tuesday and Thursday",
     Viernes: "Friday",
-    "Sábado": "Saturday",
+    Sábado: "Saturday",
   };
 
   return DOJOS.map((dojo) => ({

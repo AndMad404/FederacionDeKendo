@@ -10,6 +10,9 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Check formatting
+      shell: bash
+      run: pnpm run format:check
     - name: Typecheck
       shell: bash
       run: pnpm run typecheck

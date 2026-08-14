@@ -30,7 +30,10 @@ test("keeps every generated route noindex, structured-data-free, and sitemap-fre
   assert.doesNotMatch(sitemap, /<loc>/);
   assert.match(home, /name="robots" content="noindex, nofollow"/);
   assert.match(calendar, /name="robots" content="noindex, nofollow"/);
-  assert.match(home, /rel="canonical" href="https:\/\/fak-kendo\.pages\.dev\/"/);
+  assert.match(
+    home,
+    /rel="canonical" href="https:\/\/fak-kendo\.pages\.dev\/"/,
+  );
   assert.doesNotMatch(home, /application\/ld\+json/);
   assert.doesNotMatch(calendar, /application\/ld\+json/);
 });

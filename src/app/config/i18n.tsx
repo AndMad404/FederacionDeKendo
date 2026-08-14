@@ -5,7 +5,8 @@ export type Language = "es" | "en";
 const ENGLISH_PREFIX = "/en";
 
 export function getLanguageFromPathname(pathname: string): Language {
-  return pathname === ENGLISH_PREFIX || pathname.startsWith(`${ENGLISH_PREFIX}/`)
+  return pathname === ENGLISH_PREFIX ||
+    pathname.startsWith(`${ENGLISH_PREFIX}/`)
     ? "en"
     : "es";
 }
@@ -34,16 +35,12 @@ export function getLocalizedPath(pathname: string, language: Language) {
 
   const spanishEvent = normalized.match(/^\/eventos\/([^/]+)\/$/);
   if (spanishEvent) {
-    return language === "en"
-      ? `/en/events/${spanishEvent[1]}/`
-      : normalized;
+    return language === "en" ? `/en/events/${spanishEvent[1]}/` : normalized;
   }
 
   const englishEvent = normalized.match(/^\/en\/events\/([^/]+)\/$/);
   if (englishEvent && englishEvent[1] !== "past") {
-    return language === "es"
-      ? `/eventos/${englishEvent[1]}/`
-      : normalized;
+    return language === "es" ? `/eventos/${englishEvent[1]}/` : normalized;
   }
 
   const spanishArchivePage = normalized.match(
@@ -106,15 +103,18 @@ const COPY = {
     home: {
       title: "Federación de Asociaciones de Kendo",
       lead: "Una comunidad que aprende, entrena y crece unida a través del kendo en Costa Rica.",
-      description: "Encuentra un dojo afiliado o consulta nuestros próximos encuentros.",
+      description:
+        "Encuentra un dojo afiliado o consulta nuestros próximos encuentros.",
       dojos: "Encuentra un dojo",
       events: "Próximos eventos",
       upcoming: "Próximos encuentros",
-      heroAlt: "Grupo de practicantes de kendo reunidos después de una actividad",
+      heroAlt:
+        "Grupo de practicantes de kendo reunidos después de una actividad",
     },
     footer: {
       purposeTitle: "Propósito del",
-      purpose: "El concepto del Kendo es disciplinar el carácter humano a través de la aplicación de los principios de la Katana.",
+      purpose:
+        "El concepto del Kendo es disciplinar el carácter humano a través de la aplicación de los principios de la Katana.",
       contacts: "Contactos de la Federación",
       copyright: "© 2026 Federación de Asociaciones de Kendo.",
       rights: "Todos los derechos reservados.",
@@ -185,7 +185,8 @@ const COPY = {
       directions: "Cómo llegar",
       viewDetailsLabel: "Consultar detalles del evento",
       addToCalendar: "Añade a tu calendario",
-      audienceNotice: "Actividad abierta al público como espectador. La participación está reservada a miembros habilitados. El ingreso está sujeto a capacidad, normas del recinto y condiciones de seguridad.",
+      audienceNotice:
+        "Actividad abierta al público como espectador. La participación está reservada a miembros habilitados. El ingreso está sujeto a capacidad, normas del recinto y condiciones de seguridad.",
     },
     archive: {
       title: "Eventos pasados",
@@ -202,11 +203,17 @@ const COPY = {
       type: "Tipo",
       eventType: "Tipo de evento",
       all: "Todos",
-      types: { torneo: "Torneo", examen: "Examen", seminario: "Seminario", evento: "Evento" },
+      types: {
+        torneo: "Torneo",
+        examen: "Examen",
+        seminario: "Seminario",
+        evento: "Evento",
+      },
     },
     notFound: {
       title: "Página no encontrada",
-      description: "La página que buscas no existe o fue movida. Puedes continuar desde alguna de estas secciones.",
+      description:
+        "La página que buscas no existe o fue movida. Puedes continuar desde alguna de estas secciones.",
     },
   },
   en: {
@@ -243,7 +250,8 @@ const COPY = {
     },
     footer: {
       purposeTitle: "The purpose of",
-      purpose: "The concept of Kendo is to discipline the human character through the application of the principles of the Katana.",
+      purpose:
+        "The concept of Kendo is to discipline the human character through the application of the principles of the Katana.",
       contacts: "Federation contact",
       copyright: "© 2026 Federation of Kendo Associations.",
       rights: "All rights reserved.",
@@ -314,7 +322,8 @@ const COPY = {
       directions: "Directions",
       viewDetailsLabel: "View details for",
       addToCalendar: "Add to calendar",
-      audienceNotice: "The public may attend as spectators. Participation is reserved for eligible members. Admission is subject to venue capacity, rules, and safety requirements.",
+      audienceNotice:
+        "The public may attend as spectators. Participation is reserved for eligible members. Admission is subject to venue capacity, rules, and safety requirements.",
     },
     archive: {
       title: "Past events",
@@ -331,11 +340,17 @@ const COPY = {
       type: "Type",
       eventType: "Event type",
       all: "All",
-      types: { torneo: "Tournament", examen: "Examination", seminario: "Seminar", evento: "Event" },
+      types: {
+        torneo: "Tournament",
+        examen: "Examination",
+        seminario: "Seminar",
+        evento: "Event",
+      },
     },
     notFound: {
       title: "Page not found",
-      description: "The page you are looking for does not exist or has moved. You can continue from one of these sections.",
+      description:
+        "The page you are looking for does not exist or has moved. You can continue from one of these sections.",
     },
   },
 } as const;
@@ -370,6 +385,7 @@ export function LanguageProvider({
 
 export function useLanguage() {
   const context = useContext(LanguageContext);
-  if (!context) throw new Error("useLanguage must be used within LanguageProvider.");
+  if (!context)
+    throw new Error("useLanguage must be used within LanguageProvider.");
   return context;
 }

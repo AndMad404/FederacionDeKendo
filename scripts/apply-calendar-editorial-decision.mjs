@@ -18,10 +18,14 @@ async function main() {
       decisionRecordId: required("CALENDAR_DECISION_RECORD_ID"),
       actorRole: required("CALENDAR_DECISION_ACTOR_ROLE"),
       decidedAt: required("CALENDAR_DECISION_DECIDED_AT"),
-      ...(process.env.CALENDAR_DECISION_REASON ? { reason: process.env.CALENDAR_DECISION_REASON } : {}),
+      ...(process.env.CALENDAR_DECISION_REASON
+        ? { reason: process.env.CALENDAR_DECISION_REASON }
+        : {}),
     },
   });
-  console.log(`Applied recorded editorial decision to ${registry.events.length} event(s).`);
+  console.log(
+    `Applied recorded editorial decision to ${registry.events.length} event(s).`,
+  );
 }
 
 main().catch((error) => {

@@ -31,7 +31,9 @@ function getTimeZoneOffsetMilliseconds(date: Date, timeZone: string) {
     second: "2-digit",
     hourCycle: "h23",
   }).formatToParts(date);
-  const values = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+  const values = Object.fromEntries(
+    parts.map(({ type, value }) => [type, value]),
+  );
   const representedAsUtc = Date.UTC(
     Number(values.year),
     Number(values.month) - 1,
@@ -83,7 +85,11 @@ export function getEventEndDate(event: CalendarEvent) {
     return addHours(getEventStartDate(event), 1);
   }
 
-  return createEventDate(addCalendarDays(event.date, 1), undefined, event.timeZone);
+  return createEventDate(
+    addCalendarDays(event.date, 1),
+    undefined,
+    event.timeZone,
+  );
 }
 
 export function getUpcomingEvents(
@@ -93,7 +99,9 @@ export function getUpcomingEvents(
 ) {
   return [...events]
     .filter((event) => getEventEndDate(event) > now)
-    .sort((a, b) => getEventStartDate(a).getTime() - getEventStartDate(b).getTime())
+    .sort(
+      (a, b) => getEventStartDate(a).getTime() - getEventStartDate(b).getTime(),
+    )
     .slice(0, max);
 }
 

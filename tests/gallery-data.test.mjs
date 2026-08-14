@@ -17,7 +17,8 @@ test("every gallery image has complete English copy", () => {
     .match(/^    id: (\d+),$/gm)
     .map((match) => Number(match.match(/\d+/)[0]));
   const translatedImages = [...gallerySource.matchAll(/^  (\d+): \{/gm)].map(
-    ([, id]) => Number(id));
+    ([, id]) => Number(id),
+  );
 
   assert.deepEqual(translatedImages.sort(), sourceImages.sort());
 });
@@ -43,18 +44,26 @@ test("gallery SEO image and preload versions match their current assets", async 
 
   assert.match(
     seoData,
-    new RegExp(`/images/gallery/kendo-gallery-01\\.jpg\\?v=${await getHash("/images/gallery/kendo-gallery-01.jpg")}`),
+    new RegExp(
+      `/images/gallery/kendo-gallery-01\\.jpg\\?v=${await getHash("/images/gallery/kendo-gallery-01.jpg")}`,
+    ),
   );
   assert.match(
     seoData,
-    new RegExp(`/images/gallery/kendo-gallery-01\\.webp\\?v=${assetHashes["/images/gallery/kendo-gallery-01.webp"]}`),
+    new RegExp(
+      `/images/gallery/kendo-gallery-01\\.webp\\?v=${assetHashes["/images/gallery/kendo-gallery-01.webp"]}`,
+    ),
   );
   assert.match(
     seoData,
-    new RegExp(`/images/gallery/thumbs/kendo-gallery-01-480\\.webp\\?v=${assetHashes["/images/gallery/thumbs/kendo-gallery-01-480.webp"]}`),
+    new RegExp(
+      `/images/gallery/thumbs/kendo-gallery-01-480\\.webp\\?v=${assetHashes["/images/gallery/thumbs/kendo-gallery-01-480.webp"]}`,
+    ),
   );
   assert.match(
     headers,
-    new RegExp(`/images/gallery/kendo-gallery-01\\.webp\\?v=${assetHashes["/images/gallery/kendo-gallery-01.webp"]}`),
+    new RegExp(
+      `/images/gallery/kendo-gallery-01\\.webp\\?v=${assetHashes["/images/gallery/kendo-gallery-01.webp"]}`,
+    ),
   );
 });

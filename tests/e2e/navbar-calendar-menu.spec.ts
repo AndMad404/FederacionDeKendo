@@ -1,6 +1,8 @@
 import { expect, test } from "@playwright/test";
 
-test("calendar menu opens on hover and navigates to past events", async ({ page }) => {
+test("calendar menu opens on hover and navigates to past events", async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 1366, height: 768 });
   await page.goto("/calendario/");
 
@@ -30,7 +32,9 @@ test("calendar menu opens on hover and navigates to past events", async ({ page 
   await expect(calendarButton).toHaveClass(/border-site-accent/);
 });
 
-test("calendar menu opens on focus, closes with Escape and restores focus", async ({ page }) => {
+test("calendar menu opens on focus, closes with Escape and restores focus", async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 1366, height: 768 });
   await page.goto("/calendario/");
 
@@ -68,7 +72,9 @@ test("calendar menu closes on an outside click and keeps English destinations ac
   await expect(calendarButton).toHaveClass(/border-site-accent/);
 });
 
-test("calendar section expands inside the mobile navigation", async ({ page }) => {
+test("calendar section expands inside the mobile navigation", async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/calendario/");
 

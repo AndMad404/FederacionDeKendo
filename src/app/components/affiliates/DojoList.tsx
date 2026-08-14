@@ -9,9 +9,7 @@ interface DojoListProps {
 
 export function DojoList({ dojos, startIndex, language }: DojoListProps) {
   const desktopGridClass =
-    dojos.length === 1
-      ? "xl:mx-auto xl:max-w-3xl"
-      : "xl:grid-cols-2 xl:gap-8";
+    dojos.length === 1 ? "xl:mx-auto xl:max-w-3xl" : "xl:grid-cols-2 xl:gap-8";
 
   return (
     <div

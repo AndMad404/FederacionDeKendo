@@ -1,10 +1,7 @@
 import seoData from "./seo-data.json";
 import { GALLERY_IMAGES, getGalleryImages } from "../data/gallery";
 import { CALENDAR_EVENTS } from "../data/calendarEvents";
-import {
-  EVENT_INDEXING_ENABLED,
-  PAST_EVENTS_PAGE_SIZE,
-} from "./events";
+import { EVENT_INDEXING_ENABLED, PAST_EVENTS_PAGE_SIZE } from "./events";
 import {
   findEventByPathname,
   getArchivePagePath,
@@ -242,10 +239,13 @@ export function getRouteMeta(pathname: string) {
   if (configuredRoute) return configuredRoute;
 
   const event = findEventByPathname(normalizedPath);
-  if (event) return createEventRouteMeta(event, getLanguageFromPathname(pathname));
+  if (event)
+    return createEventRouteMeta(event, getLanguageFromPathname(pathname));
 
-  return getRouteManifest().find((route) => route.path === normalizedPath) ??
-    createNotFoundMeta(getLanguageFromPathname(pathname));
+  return (
+    getRouteManifest().find((route) => route.path === normalizedPath) ??
+    createNotFoundMeta(getLanguageFromPathname(pathname))
+  );
 }
 
 export function getRouteManifest() {
@@ -312,7 +312,10 @@ function createEventRouteMeta(
   };
 }
 
-function createArchiveRouteMeta(page: number, language: Language = "es"): RouteMeta {
+function createArchiveRouteMeta(
+  page: number,
+  language: Language = "es",
+): RouteMeta {
   const english = language === "en";
   const calendarMeta = CALENDAR_META[language];
   return {
@@ -390,7 +393,9 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
   const routeEntities =
     ROUTE_STRUCTURED_DATA_BUILDERS[meta.component]?.(meta, canonicalUrl) ?? [];
   if (meta.component === "event" && meta.eventId) {
-    const event = CALENDAR_EVENTS.find((candidate) => candidate.id === meta.eventId);
+    const event = CALENDAR_EVENTS.find(
+      (candidate) => candidate.id === meta.eventId,
+    );
     if (event) {
       const localizedEvent = getLocalizedEvent(event, meta.language);
       const startDate = event.startTime

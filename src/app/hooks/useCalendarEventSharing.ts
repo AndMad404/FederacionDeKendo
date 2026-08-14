@@ -35,10 +35,14 @@ export function useCalendarEventSharing(language: Language) {
 
       if (navigator.share) {
         try {
-          await navigator.share({ title: event.title, url: eventUrl.toString() });
+          await navigator.share({
+            title: event.title,
+            url: eventUrl.toString(),
+          });
           return;
         } catch (error) {
-          if (error instanceof DOMException && error.name === "AbortError") return;
+          if (error instanceof DOMException && error.name === "AbortError")
+            return;
         }
       }
 

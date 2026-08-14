@@ -30,6 +30,38 @@ Genera el build de produccion:
 pnpm run build
 ```
 
+## Calidad de codigo (adopcion gradual)
+
+La estandarizacion de calidad se incorporara en este orden, de menor a mayor
+esfuerzo. Cada etapa debe aprobarse y completarse de forma independiente antes
+de pasar a la siguiente:
+
+1. Prettier para formato reproducible, con comprobacion en CI y una lista de
+   archivos generados que no debe modificar. Esta etapa esta implementada.
+2. ESLint como comando `lint`, inicialmente con la configuracion base aprobada
+   para el proyecto.
+3. Reglas recomendadas de JavaScript y TypeScript, despues de revisar sus
+   hallazgos sobre el codigo actual y acordar cuales bloquearan CI.
+4. Reglas especificas de React, incluidas las reglas de hooks. Esta etapa queda
+   pendiente hasta que el propietario estudie el tema y apruebe su alcance.
+
+Prettier comprobara y formateara solo archivos fuente versionados. Directorios
+generados o transitorios como `dist/`, `dist-ssr/`, `node_modules/` y resultados
+de pruebas se excluiran para evitar cambios mecanicos que se regeneran en cada
+build o ejecucion de pruebas.
+
+Comprueba el formato sin modificar archivos:
+
+```bash
+pnpm run format:check
+```
+
+Aplica el formato a los archivos incluidos:
+
+```bash
+pnpm run format
+```
+
 ## Pruebas
 
 La suite predeterminada usa contratos funcionales, geometricos, responsive y

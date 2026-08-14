@@ -19,7 +19,10 @@ function getPageDesign(path: string): PageDesign {
   if (path === "/calendario/" || path === "/en/calendar/") return "calendar";
   if (path === "/galeria/" || path === "/en/gallery/") return "gallery";
   if (path === "/afiliados/" || path === "/en/affiliates/") return "affiliates";
-  if (path.startsWith("/eventos/pasados/") || path.startsWith("/en/events/past/")) {
+  if (
+    path.startsWith("/eventos/pasados/") ||
+    path.startsWith("/en/events/past/")
+  ) {
     return "pastEvents";
   }
   return "event";
@@ -31,14 +34,19 @@ const generatedRoutePaths = readdirSync(DIST_DIRECTORY, {
 })
   .filter((entry) => entry.isFile() && entry.name === "index.html")
   .map((entry) => {
-    const directory = relative(DIST_DIRECTORY, entry.parentPath).split(sep).join("/");
+    const directory = relative(DIST_DIRECTORY, entry.parentPath)
+      .split(sep)
+      .join("/");
     return directory ? `/${directory}/` : "/";
   })
   .sort();
 
 const approvedPages: ApprovedPage[] = [
   ...generatedRoutePaths.map((path) => ({
-    name: path === "/" ? "home" : path.replace(/^\//, "").replace(/\/$/, "").replaceAll("/", "-"),
+    name:
+      path === "/"
+        ? "home"
+        : path.replace(/^\//, "").replace(/\/$/, "").replaceAll("/", "-"),
     path,
     design: getPageDesign(path),
   })),
@@ -49,7 +57,8 @@ const representativePages = Array.from(
   approvedPages.reduce((pagesByDesign, page) => {
     const preferredPath = PREFERRED_REPRESENTATIVE_PATHS[page.design];
     const current = pagesByDesign.get(page.design);
-    if (!current || page.path === preferredPath) pagesByDesign.set(page.design, page);
+    if (!current || page.path === preferredPath)
+      pagesByDesign.set(page.design, page);
     return pagesByDesign;
   }, new Map<PageDesign, ApprovedPage>()),
   ([, page]) => page,
@@ -66,8 +75,12 @@ async function preparePage(page: Page, path: string) {
         image.complete
           ? Promise.resolve()
           : new Promise<void>((resolveImage) => {
-              image.addEventListener("load", () => resolveImage(), { once: true });
-              image.addEventListener("error", () => resolveImage(), { once: true });
+              image.addEventListener("load", () => resolveImage(), {
+                once: true,
+              });
+              image.addEventListener("error", () => resolveImage(), {
+                once: true,
+              });
             }),
       ),
     );
@@ -94,13 +107,18 @@ async function expectRelativeContent(page: Page) {
 
   const visibleLinkDestinations = await page
     .locator("main a:visible")
-    .evaluateAll((links) => links.map((link) => link.getAttribute("href")?.trim()));
+    .evaluateAll((links) =>
+      links.map((link) => link.getAttribute("href")?.trim()),
+    );
   for (const destination of visibleLinkDestinations) {
     expect(destination, "visible links must have a destination").toBeTruthy();
   }
 
   for (const image of await page.locator("main img").all()) {
-    expect((await image.getAttribute("src"))?.trim(), "images must have a source").toBeTruthy();
+    expect(
+      (await image.getAttribute("src"))?.trim(),
+      "images must have a source",
+    ).toBeTruthy();
     expect(
       await image.getAttribute("alt"),
       'images must declare alt, including alt="" when decorative',
@@ -127,12 +145,18 @@ async function expectInteractiveNames(page: Page) {
         .filter((control) => {
           const label = control.getAttribute("aria-label")?.trim();
           const text = control.textContent?.trim();
-          const imageAlt = control.querySelector("img")?.getAttribute("alt")?.trim();
+          const imageAlt = control
+            .querySelector("img")
+            ?.getAttribute("alt")
+            ?.trim();
           return !label && !text && !imageAlt;
         })
         .map((control) => control.outerHTML),
     );
-  expect(unnamedControls, "visible links and buttons must have an accessible name").toEqual([]);
+  expect(
+    unnamedControls,
+    "visible links and buttons must have an accessible name",
+  ).toEqual([]);
 }
 
 test.describe("all generated routes preserve the desktop shell contract", () => {
@@ -141,7 +165,9 @@ test.describe("all generated routes preserve the desktop shell contract", () => 
   for (const approvedPage of approvedPages) {
     if (approvedPage.design === "event") continue;
 
-    test(`${approvedPage.path} remains bounded and non-overlapping`, async ({ page }) => {
+    test(`${approvedPage.path} remains bounded and non-overlapping`, async ({
+      page,
+    }) => {
       await preparePage(page, approvedPage.path);
 
       const geometry = await page.evaluate(() => {
@@ -168,27 +194,48 @@ test.describe("all generated routes preserve the desktop shell contract", () => 
           mainPaddingLeft: Number.parseFloat(mainStyles?.paddingLeft ?? "0"),
           mainPaddingRight: Number.parseFloat(mainStyles?.paddingRight ?? "0"),
           navTop: nav?.getBoundingClientRect().top ?? -1,
-          footerBottom: footer?.getBoundingClientRect().bottom ?? Number.POSITIVE_INFINITY,
+          footerBottom:
+            footer?.getBoundingClientRect().bottom ?? Number.POSITIVE_INFINITY,
           headingTop: headingRect?.top ?? -1,
           headingBottom: headingRect?.bottom ?? Number.POSITIVE_INFINITY,
           headingClearsContent: Boolean(
-            headingRect && contentBoundaries.every((top) => top >= headingRect.bottom - 1),
+            headingRect &&
+            contentBoundaries.every((top) => top >= headingRect.bottom - 1),
           ),
           primaryClientHeight: primarySection?.clientHeight ?? 0,
-          primaryScrollHeight: primarySection?.scrollHeight ?? Number.POSITIVE_INFINITY,
+          primaryScrollHeight:
+            primarySection?.scrollHeight ?? Number.POSITIVE_INFINITY,
         };
       });
 
-      expect(geometry.document.scrollWidth).toBeLessThanOrEqual(geometry.document.clientWidth + 1);
-      expect(geometry.document.scrollHeight).toBeLessThanOrEqual(geometry.document.clientHeight + 1);
+      expect(geometry.document.scrollWidth).toBeLessThanOrEqual(
+        geometry.document.clientWidth + 1,
+      );
+      expect(geometry.document.scrollHeight).toBeLessThanOrEqual(
+        geometry.document.clientHeight + 1,
+      );
       expect(geometry.navTop).toBeGreaterThanOrEqual(0);
       expect(geometry.headingTop).toBeGreaterThanOrEqual(0);
-      expect(geometry.headingBottom).toBeLessThanOrEqual(SHELL_CONTRACT.desktopViewport.height);
-      expect(geometry.footerBottom).toBeLessThanOrEqual(SHELL_CONTRACT.desktopViewport.height + 1);
-      expect(geometry.primaryScrollHeight).toBeLessThanOrEqual(geometry.primaryClientHeight + 1);
+      expect(geometry.headingBottom).toBeLessThanOrEqual(
+        SHELL_CONTRACT.desktopViewport.height,
+      );
+      expect(geometry.footerBottom).toBeLessThanOrEqual(
+        SHELL_CONTRACT.desktopViewport.height + 1,
+      );
+      expect(geometry.primaryScrollHeight).toBeLessThanOrEqual(
+        geometry.primaryClientHeight + 1,
+      );
       expect(geometry.headingClearsContent).toBe(true);
-      expectCssPixels(geometry.mainPaddingLeft, SHELL_CONTRACT.mainPaddingInline, "main left padding");
-      expectCssPixels(geometry.mainPaddingRight, SHELL_CONTRACT.mainPaddingInline, "main right padding");
+      expectCssPixels(
+        geometry.mainPaddingLeft,
+        SHELL_CONTRACT.mainPaddingInline,
+        "main left padding",
+      );
+      expectCssPixels(
+        geometry.mainPaddingRight,
+        SHELL_CONTRACT.mainPaddingInline,
+        "main right padding",
+      );
     });
   }
 });
@@ -196,8 +243,12 @@ test.describe("all generated routes preserve the desktop shell contract", () => 
 test.describe("event details preserve desktop document flow", () => {
   test.use({ viewport: SHELL_CONTRACT.desktopViewport });
 
-  for (const approvedPage of approvedPages.filter((page) => page.design === "event")) {
-    test(`${approvedPage.path} keeps its content reachable`, async ({ page }) => {
+  for (const approvedPage of approvedPages.filter(
+    (page) => page.design === "event",
+  )) {
+    test(`${approvedPage.path} keeps its content reachable`, async ({
+      page,
+    }) => {
       await preparePage(page, approvedPage.path);
 
       const geometry = await page.evaluate(() => {
@@ -226,7 +277,9 @@ for (const viewport of APPROVED_VIEWPORTS) {
     test.use({ viewport });
 
     for (const approvedPage of representativePages) {
-      test(`${approvedPage.design} preserves content, spacing and accessibility`, async ({ page }) => {
+      test(`${approvedPage.design} preserves content, spacing and accessibility`, async ({
+        page,
+      }) => {
         await preparePage(page, approvedPage.path);
         await expectRelativeContent(page);
         await expectNoDuplicateIds(page);
@@ -234,12 +287,15 @@ for (const viewport of APPROVED_VIEWPORTS) {
 
         const mainBox = await getBox(page.locator("main"));
         expect(mainBox.x).toBeGreaterThanOrEqual(0);
-        expect(mainBox.x + mainBox.width).toBeLessThanOrEqual(viewport.width + 1);
+        expect(mainBox.x + mainBox.width).toBeLessThanOrEqual(
+          viewport.width + 1,
+        );
 
         if (approvedPage.design !== "notFound") {
-          const surface = approvedPage.design === "home"
-            ? page.locator("main > section > header")
-            : page.locator("main > section");
+          const surface =
+            approvedPage.design === "home"
+              ? page.locator("main > section > header")
+              : page.locator("main > section");
           const styles = await surface.evaluate((element) => {
             const computed = getComputedStyle(element);
             return {
@@ -248,39 +304,79 @@ for (const viewport of APPROVED_VIEWPORTS) {
               borderRadius: Number.parseFloat(computed.borderTopLeftRadius),
             };
           });
-          expectCssPixels(styles.marginTop, SHELL_CONTRACT.routeSurfaceMarginBlock, "route surface top margin");
+          expectCssPixels(
+            styles.marginTop,
+            SHELL_CONTRACT.routeSurfaceMarginBlock,
+            "route surface top margin",
+          );
           expectCssPixels(
             styles.marginBottom,
-            approvedPage.design === "event" ? 0 : SHELL_CONTRACT.routeSurfaceMarginBlock,
+            approvedPage.design === "event"
+              ? 0
+              : SHELL_CONTRACT.routeSurfaceMarginBlock,
             "route surface bottom margin",
           );
-          expectCssPixels(styles.borderRadius, SHELL_CONTRACT.routeSurfaceRadius, "route surface radius");
+          expectCssPixels(
+            styles.borderRadius,
+            SHELL_CONTRACT.routeSurfaceRadius,
+            "route surface radius",
+          );
         }
 
-        const spacing = getComponentSpacingContract(approvedPage.design, viewport.width);
+        const spacing = getComponentSpacingContract(
+          approvedPage.design,
+          viewport.width,
+        );
         if (spacing) {
-          const actual = await page.locator(spacing.selector).first().evaluate((element) => {
-            const computed = getComputedStyle(element);
-            return {
-              paddingTop: Number.parseFloat(computed.paddingTop),
-              paddingRight: Number.parseFloat(computed.paddingRight),
-              paddingBottom: Number.parseFloat(computed.paddingBottom),
-              paddingLeft: Number.parseFloat(computed.paddingLeft),
-              rowGap: Number.parseFloat(computed.rowGap),
-              columnGap: Number.parseFloat(computed.columnGap),
-            };
-          });
+          const actual = await page
+            .locator(spacing.selector)
+            .first()
+            .evaluate((element) => {
+              const computed = getComputedStyle(element);
+              return {
+                paddingTop: Number.parseFloat(computed.paddingTop),
+                paddingRight: Number.parseFloat(computed.paddingRight),
+                paddingBottom: Number.parseFloat(computed.paddingBottom),
+                paddingLeft: Number.parseFloat(computed.paddingLeft),
+                rowGap: Number.parseFloat(computed.rowGap),
+                columnGap: Number.parseFloat(computed.columnGap),
+              };
+            });
 
-          expectCssPixels(actual.paddingTop, spacing.paddingTop, "component top padding");
-          expectCssPixels(actual.paddingRight, spacing.paddingRight, "component right padding");
-          expectCssPixels(actual.paddingBottom, spacing.paddingBottom, "component bottom padding");
-          expectCssPixels(actual.paddingLeft, spacing.paddingLeft, "component left padding");
-          if (spacing.rowGap !== undefined) expectCssPixels(actual.rowGap, spacing.rowGap, "component row gap");
-          if (spacing.columnGap !== undefined) expectCssPixels(actual.columnGap, spacing.columnGap, "component column gap");
+          expectCssPixels(
+            actual.paddingTop,
+            spacing.paddingTop,
+            "component top padding",
+          );
+          expectCssPixels(
+            actual.paddingRight,
+            spacing.paddingRight,
+            "component right padding",
+          );
+          expectCssPixels(
+            actual.paddingBottom,
+            spacing.paddingBottom,
+            "component bottom padding",
+          );
+          expectCssPixels(
+            actual.paddingLeft,
+            spacing.paddingLeft,
+            "component left padding",
+          );
+          if (spacing.rowGap !== undefined)
+            expectCssPixels(actual.rowGap, spacing.rowGap, "component row gap");
+          if (spacing.columnGap !== undefined)
+            expectCssPixels(
+              actual.columnGap,
+              spacing.columnGap,
+              "component column gap",
+            );
         }
 
         const headingBox = await getBox(page.locator("main h1"));
-        for (const boundary of await page.locator("[data-page-content-boundary]").all()) {
+        for (const boundary of await page
+          .locator("[data-page-content-boundary]")
+          .all()) {
           const boundaryBox = await getBox(boundary);
           expect(
             boundaryBox.y,
@@ -289,17 +385,24 @@ for (const viewport of APPROVED_VIEWPORTS) {
         }
 
         if (approvedPage.design === "gallery") {
-          const thumbnailStrip = page.locator("main [role='group'][aria-label]").first();
+          const thumbnailStrip = page
+            .locator("main [role='group'][aria-label]")
+            .first();
           const thumbnail = thumbnailStrip.getByRole("button").first();
           const thumbnailGeometry = await thumbnail.evaluate((element) => {
             const rect = element.getBoundingClientRect();
             return { width: rect.width, height: rect.height };
           });
           if (viewport.width < 640) {
-            expect(thumbnailGeometry.width).toBeGreaterThan(thumbnailGeometry.height);
+            expect(thumbnailGeometry.width).toBeGreaterThan(
+              thumbnailGeometry.height,
+            );
           }
           expect(
-            await thumbnailStrip.locator("xpath=..").locator("[class*='bg-gradient']").count(),
+            await thumbnailStrip
+              .locator("xpath=..")
+              .locator("[class*='bg-gradient']")
+              .count(),
             "thumbnail strip must not have lateral gradient overlays",
           ).toBe(0);
         }

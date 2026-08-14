@@ -15,10 +15,20 @@ if (reportPath) {
   try {
     const existing = JSON.parse(await readFile(reportPath, "utf8"));
     if (existing.version === 1 && Array.isArray(existing.notifications)) {
-      const notifications = [...existing.notifications, ...failureReport.notifications];
+      const notifications = [
+        ...existing.notifications,
+        ...failureReport.notifications,
+      ];
       report = {
         version: 1,
-        notifications: [...new Map(notifications.map((notification) => [notification.id, notification])).values()],
+        notifications: [
+          ...new Map(
+            notifications.map((notification) => [
+              notification.id,
+              notification,
+            ]),
+          ).values(),
+        ],
       };
     }
   } catch (error) {

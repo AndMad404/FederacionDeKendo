@@ -34,11 +34,14 @@ export function getLocalizedEvent(
     ...event,
     title: TITLE_TRANSLATIONS[event.title] ?? event.title,
     summary: event.summary
-      ? SUMMARY_TRANSLATIONS[event.summary] ?? event.summary
+      ? (SUMMARY_TRANSLATIONS[event.summary] ?? event.summary)
       : undefined,
   };
 }
 
-export function getLocalizedEvents(events: CalendarEvent[], language: Language) {
+export function getLocalizedEvents(
+  events: CalendarEvent[],
+  language: Language,
+) {
   return events.map((event) => getLocalizedEvent(event, language));
 }

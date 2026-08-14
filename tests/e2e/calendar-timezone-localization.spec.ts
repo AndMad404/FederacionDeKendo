@@ -39,7 +39,9 @@ test("event completion uses the event time zone instead of the visitor time zone
   );
 });
 
-test("all-day events end at the next midnight in the event time zone", async ({ browser }) => {
+test("all-day events end at the next midnight in the event time zone", async ({
+  browser,
+}) => {
   await expectActivityStatusInTimeZone(
     browser,
     "Pacific/Kiritimati",
@@ -56,9 +58,13 @@ test("all-day events end at the next midnight in the event time zone", async ({ 
   );
 });
 
-test("known tournament titles use their English dictionary translations", async ({ page }) => {
+test("known tournament titles use their English dictionary translations", async ({
+  page,
+}) => {
   await page.clock.setFixedTime(new Date("2026-08-01T12:00:00.000Z"));
   await page.goto(TIMED_EVENT_PATH);
 
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("3rd Tournament");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "3rd Tournament",
+  );
 });

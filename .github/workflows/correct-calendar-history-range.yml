@@ -36,7 +36,7 @@ jobs:
       - name: Download approved historical changes report
         uses: actions/download-artifact@v5
         with:
-          name: calendar-historical-changes
+          name: calendar-notification-reports
           run-id: ${{ inputs.report_run_id }}
           github-token: ${{ github.token }}
           path: .

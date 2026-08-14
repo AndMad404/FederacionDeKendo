@@ -59,7 +59,9 @@ export function usePinchZoom(resetKey: number) {
     if (pointersRef.current.size !== 2) return false;
 
     const points = [...pointersRef.current.values()];
-    const imageFrame = target.closest("[data-lightbox-image]")?.getBoundingClientRect();
+    const imageFrame = target
+      .closest("[data-lightbox-image]")
+      ?.getBoundingClientRect();
 
     if (imageFrame) {
       const midpointX = (points[0].x + points[1].x) / 2;

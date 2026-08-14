@@ -15,9 +15,7 @@ export function NotFoundSection() {
         {copy.notFound.title}
       </PageTitle>
 
-      <p className="max-w-md leading-relaxed">
-        {copy.notFound.description}
-      </p>
+      <p className="max-w-md leading-relaxed">{copy.notFound.description}</p>
 
       <ul className="flex flex-wrap items-center justify-center gap-4">
         {links.map((link) => (

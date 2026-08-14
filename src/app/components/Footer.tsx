@@ -19,9 +19,7 @@ export function Footer() {
               KENDO
             </span>
           </h2>
-          <p className="leading-relaxed">
-            {copy.footer.purpose}
-          </p>
+          <p className="leading-relaxed">{copy.footer.purpose}</p>
         </section>
 
         <section

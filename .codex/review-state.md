@@ -2,8 +2,85 @@
 
 ```yaml
 schema_version: 2
-last_updated: 2026-08-13
+last_updated: 2026-08-14
 contract: .agents/review-contract.md
+
+latest_calendar_resilience_script_review:
+  id: REV-2026-08-14-01
+  requested_scope: Verify the script-backed identity and fingerprint checks plus the resilience behavior represented by the two calendar infrastructure diagrams.
+  actual_scope:
+    targets:
+      - scripts/sync-calendar-events.mjs
+      - scripts/apply-calendar-editorial-decision.mjs
+      - scripts/correct-calendar-history.mjs
+      - scripts/correct-calendar-history-range.mjs
+      - .github/workflows/sync-calendar.yml
+      - .github/workflows/apply-calendar-editorial-decision.yml
+      - .github/workflows/correct-calendar-history-range.yml
+      - tests/event-history-sync-contract.test.mjs
+      - tests/calendar-history-correction.test.mjs
+      - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/calendar-infrastructure-flows.md
+    axes: [ARCH]
+    included:
+      - exact decision identity, revision, and evidence checks
+      - historical range report and local-state fingerprint checks
+      - pending, published, and removed transitions for future and historical events
+      - mass-disappearance preservation and artifact handoff
+      - correspondence between the implemented behavior and both diagrams
+    excluded:
+      - external GitHub Actions and Cloudflare execution, UI, SEO, visual behavior, and implementation changes
+  baseline:
+    commit: f9cdfe61
+    worktree: clean before this review-state update
+  confirmed_findings:
+    - CRIT-ARCH-001
+    - DOC-ARCH-003
+  evidence:
+    - corepack pnpm exec node --test tests/event-history-sync-contract.test.mjs tests/calendar-history-correction.test.mjs passed 45 tests
+    - exact source, revision, and evidence comparison at scripts/sync-calendar-events.mjs:678-689
+    - historical snapshot and proposal comparisons at scripts/correct-calendar-history.mjs:125-139
+    - artifact upload/download names in .github/workflows/sync-calendar.yml and .github/workflows/correct-calendar-history-range.yml
+    - future replacement and rejected-deletion transitions at scripts/sync-calendar-events.mjs:479-508 and 646-660
+  result: Core pending/publicado/eliminado and fail-closed mass-disappearance behavior is implemented and covered by directed tests, but the historical correction artifact cannot currently be downloaded by its consumer workflow and the resilience diagram overstates revision/evidence retention for future edits and rejected deletions.
+
+latest_calendar_resilience_findings:
+  - id: CRIT-ARCH-001
+    level: CRITICAL
+    axis: ARCH
+    status: resolved
+    target: .github/workflows/correct-calendar-history-range.yml:39
+    problem: The correction workflow downloads artifact calendar-historical-changes, while synchronization uploads the report inside artifact calendar-notification-reports.
+    fix: Use one artifact name in both workflows and add a contract assertion for the producer-consumer name.
+    cost_of_deferring: Every approved historical range correction run fails before the correction script can execute.
+    evidence:
+      - .github/workflows/sync-calendar.yml:87
+      - .github/workflows/correct-calendar-history-range.yml:39
+    introduced_in: REV-2026-08-14-01
+    resolution:
+      resolved_at: 2026-08-14
+      resolved_ref: implementation worktree based on f9cdfe61
+      checks:
+        - corepack pnpm exec node --test tests/calendar-workflow-architecture.test.mjs passed 3 tests
+        - corepack pnpm run test:unit passed 91 tests
+        - git diff --check passed
+  - id: DOC-ARCH-003
+    level: STRUCTURAL
+    axis: ARCH
+    status: resolved
+    target: ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/calendar-infrastructure-flows.md:159
+    problem: The implemented-resilience diagram says applicable future edits retain the previous revision and all saved paths retain revision and evidence, but future edits replace the prior registry event and rejected deletion removes pendingRevision.
+    fix: Either narrow the diagram wording to the state actually retained or implement explicit prior-revision and evidence retention for those transitions.
+    cost_of_deferring: Operators and future phases may rely on an audit trail that the current registry does not preserve.
+    evidence:
+      - scripts/sync-calendar-events.mjs:479-508
+      - scripts/sync-calendar-events.mjs:646-660
+      - tests/event-history-sync-contract.test.mjs
+    introduced_in: REV-2026-08-14-01
+    resolution:
+      resolved_at: 2026-08-14
+      resolved_ref: documentation worktree
+      checks:
+        - calendar-infrastructure-flows.md distinguishes ordinary published updates from retained pending-revision evidence
 
 latest_calendar_flow_alignment_review:
   id: REV-2026-08-13-01

@@ -33,7 +33,10 @@ test("filters by year and derives descending year options", () => {
 for (const type of ["torneo", "examen", "seminario", "evento"]) {
   test(`filters the ${type} event type`, () => {
     assert.equal(filterAndSortArchiveEvents(events, { type }).length, 1);
-    assert.equal(filterAndSortArchiveEvents(events, { type })[0].eventType, type);
+    assert.equal(
+      filterAndSortArchiveEvents(events, { type })[0].eventType,
+      type,
+    );
   });
 }
 
@@ -71,5 +74,9 @@ test("builds equivalent localized URLs and preserves filters across pages", () =
 });
 
 test("events remain reachable regardless of gallery state", () => {
-  assert.ok(filterAndSortArchiveEvents(events, {}).some(({ id }) => id === "no-gallery"));
+  assert.ok(
+    filterAndSortArchiveEvents(events, {}).some(
+      ({ id }) => id === "no-gallery",
+    ),
+  );
 });

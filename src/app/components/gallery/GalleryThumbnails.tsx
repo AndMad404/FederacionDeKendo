@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import type { GalleryImage } from "../../types";
 import { useLanguage } from "../../config/i18n";
-import { focusRingClass, galleryThumbnailActiveClass } from "../../styles/shared";
+import {
+  focusRingClass,
+  galleryThumbnailActiveClass,
+} from "../../styles/shared";
 
 const THUMBNAIL_SIZES = "(min-width: 768px) 168px, 22vw";
 
@@ -69,7 +72,8 @@ export function GalleryThumbnails({
       const nextState = {
         canScrollLeft: strip.scrollLeft > 1,
         canScrollRight:
-          Math.ceil(strip.scrollLeft + strip.clientWidth) < strip.scrollWidth - 1,
+          Math.ceil(strip.scrollLeft + strip.clientWidth) <
+          strip.scrollWidth - 1,
       };
 
       setOverflowState((currentState) =>

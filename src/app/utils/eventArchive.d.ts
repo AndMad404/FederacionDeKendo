@@ -18,7 +18,16 @@ export function calculateGalleryCheckAt(
   lastEventDate: string,
   timeZone?: string,
 ): Date;
-export function normalizeArchiveFilters(filters: Record<string, string | undefined>): ArchiveFilters;
-export function filterAndSortArchiveEvents(events: CalendarEvent[], filters: ArchiveFilters | Record<string, string | undefined>): CalendarEvent[];
+export function normalizeArchiveFilters(
+  filters: Record<string, string | undefined>,
+): ArchiveFilters;
+export function filterAndSortArchiveEvents(
+  events: CalendarEvent[],
+  filters: ArchiveFilters | Record<string, string | undefined>,
+): CalendarEvent[];
 export function getArchiveYears(events: CalendarEvent[]): string[];
-export function buildArchiveUrl(page: number, language?: Language, filters?: ArchiveFilters): string;
+export function buildArchiveUrl(
+  page: number,
+  language?: Language,
+  filters?: ArchiveFilters,
+): string;

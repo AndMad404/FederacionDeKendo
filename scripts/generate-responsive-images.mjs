@@ -27,18 +27,16 @@ const jobs = [
     "kendo-gallery-05",
     "kendo-gallery-06",
     "kendo-gallery-07",
-  ].map(
-    (imageName) => ({
-      input: `public/images/gallery/${imageName}.jpg`,
-      quality: WEBP_QUALITY,
-      outputs: [
-        {
-          file: `public/images/gallery/${imageName}.webp`,
-          width: 1600,
-        },
-      ],
-    }),
-  ),
+  ].map((imageName) => ({
+    input: `public/images/gallery/${imageName}.jpg`,
+    quality: WEBP_QUALITY,
+    outputs: [
+      {
+        file: `public/images/gallery/${imageName}.webp`,
+        width: 1600,
+      },
+    ],
+  })),
   ...galleryImageNames.map((imageName) => ({
     input: `public/images/gallery/${imageName}.jpg`,
     quality: THUMBNAIL_WEBP_QUALITY,
@@ -110,7 +108,8 @@ function widthFromFilename(file) {
 for (const job of jobs) {
   for (const output of job.outputs) {
     const outputFile = typeof output === "string" ? output : output.file;
-    const width = typeof output === "string" ? widthFromFilename(output) : output.width;
+    const width =
+      typeof output === "string" ? widthFromFilename(output) : output.width;
     const extension = path.extname(outputFile);
 
     await mkdir(path.dirname(outputFile), { recursive: true });
@@ -138,6 +137,8 @@ for (const job of jobs) {
             .toFile(outputFile);
 
     const { size } = await stat(outputFile);
-    console.log(`${outputFile}: ${result.width}x${result.height}, ${size} bytes`);
+    console.log(
+      `${outputFile}: ${result.width}x${result.height}, ${size} bytes`,
+    );
   }
 }

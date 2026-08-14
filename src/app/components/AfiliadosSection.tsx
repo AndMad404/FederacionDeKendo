@@ -95,7 +95,11 @@ export function AfiliadosSection() {
             onPageChange={setPage}
             copy={copy}
           />
-          <DojoList dojos={visibleDojos} startIndex={startIndex} language={language} />
+          <DojoList
+            dojos={visibleDojos}
+            startIndex={startIndex}
+            language={language}
+          />
         </div>
       </div>
     </section>

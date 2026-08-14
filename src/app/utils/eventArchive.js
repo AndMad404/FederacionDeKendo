@@ -18,7 +18,11 @@ function parseDate(date) {
 function addCalendarDays(date, days) {
   const [year, month, day] = parseDate(date);
   const result = new Date(Date.UTC(year, month - 1, day + days));
-  return [result.getUTCFullYear(), result.getUTCMonth() + 1, result.getUTCDate()];
+  return [
+    result.getUTCFullYear(),
+    result.getUTCMonth() + 1,
+    result.getUTCDate(),
+  ];
 }
 
 function getTimeZoneOffsetMilliseconds(date, timeZone) {
@@ -32,7 +36,9 @@ function getTimeZoneOffsetMilliseconds(date, timeZone) {
     second: "2-digit",
     hourCycle: "h23",
   }).formatToParts(date);
-  const values = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+  const values = Object.fromEntries(
+    parts.map(({ type, value }) => [type, value]),
+  );
   const representedAsUtc = Date.UTC(
     Number(values.year),
     Number(values.month) - 1,
@@ -76,7 +82,7 @@ export function getArchiveEligibleAt(event) {
       ? addCalendarDays(event.endDate, -1)
           .map((part, index) => String(part).padStart(index === 0 ? 4 : 2, "0"))
           .join("-")
-      : event.endDate ?? event.date;
+      : (event.endDate ?? event.date);
   return event.archiveEligibleAt
     ? new Date(event.archiveEligibleAt)
     : calculateArchiveEligibleAt(fallbackLastEventDate, ARCHIVE_TIME_ZONE);
@@ -96,7 +102,10 @@ export function normalizeArchiveFilters(filters) {
 export function filterAndSortArchiveEvents(events, filters) {
   const normalized = normalizeArchiveFilters(filters);
   return [...events]
-    .filter((event) => !normalized.year || event.date.startsWith(`${normalized.year}-`))
+    .filter(
+      (event) =>
+        !normalized.year || event.date.startsWith(`${normalized.year}-`),
+    )
     .filter((event) => !normalized.type || event.eventType === normalized.type)
     .sort(
       (a, b) =>

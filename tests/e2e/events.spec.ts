@@ -9,7 +9,9 @@ async function discoverUpcomingEvent(page: Page) {
   await page.clock.setFixedTime(FIXED_UPCOMING_TIME);
   await page.goto("/calendario/");
 
-  const eventLink = page.getByRole("link", { name: /Ver detalles del evento/ }).first();
+  const eventLink = page
+    .getByRole("link", { name: /Ver detalles del evento/ })
+    .first();
   const path = await eventLink.getAttribute("href");
   expect(path).toMatch(/^\/eventos\/[^/]+\/$/);
 
@@ -26,7 +28,9 @@ test("opens a prerendered event route with temporary noindex metadata", async ({
   const { path, title } = await discoverUpcomingEvent(page);
   await page.goto(path);
 
-  await expect(page.getByRole("heading", { name: title, level: 1 })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: title, level: 1 }),
+  ).toBeVisible();
   await expect(page.getByText("Actividad programada")).toBeVisible();
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
     "content",
@@ -87,8 +91,8 @@ test("mobile portrait centers the calendar action and removes the description ma
       justifyContent: styles.justifyContent,
     };
   });
-  const descriptionSection = await description.evaluate((heading) =>
-    getComputedStyle(heading.parentElement!).marginTop,
+  const descriptionSection = await description.evaluate(
+    (heading) => getComputedStyle(heading.parentElement!).marginTop,
   );
 
   expect(calendarAction).toEqual({
@@ -110,7 +114,9 @@ test("accepts only current canonical event routes", async ({ page }) => {
   ).toBeVisible();
 });
 
-test("homepage event details link to the canonical event page", async ({ page }) => {
+test("homepage event details link to the canonical event page", async ({
+  page,
+}) => {
   await page.clock.setFixedTime(FIXED_UPCOMING_TIME);
   await page.goto("/");
 
@@ -139,7 +145,9 @@ test("shares the canonical page and displays the complete description", async ({
   await page.goto(path);
 
   await page.getByRole("button", { name: "Compartir evento" }).click();
-  await expect(page.getByRole("button", { name: "Enlace copiado" })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Enlace copiado" }),
+  ).toBeVisible();
   expect(await page.evaluate(() => navigator.clipboard.readText())).toContain(
     path,
   );
@@ -157,11 +165,15 @@ test("uses injected time for the 48-hour calendar transition into event history"
 }) => {
   await page.clock.setFixedTime(new Date("2026-08-09T23:59:59-06:00"));
   await page.goto("/eventos/pasados/");
-  await expect(page.locator(`a[href="${HISTORICAL_EVENT_PATH}"]`)).toHaveCount(0);
+  await expect(page.locator(`a[href="${HISTORICAL_EVENT_PATH}"]`)).toHaveCount(
+    0,
+  );
 
   await page.clock.setFixedTime(new Date("2026-08-10T00:00:00-06:00"));
   await page.reload();
-  await expect(page.locator(`a[href="${HISTORICAL_EVENT_PATH}"]`)).toBeVisible();
+  await expect(
+    page.locator(`a[href="${HISTORICAL_EVENT_PATH}"]`),
+  ).toBeVisible();
 
   await page.goto(HISTORICAL_EVENT_PATH);
   await expect(page.getByText("Actividad finalizada")).toBeVisible();
@@ -178,9 +190,15 @@ test("historical event details preserve complete information without a gallery m
 
   await expect(page.getByText("Actividad finalizada")).toBeVisible();
   await expect(page.getByText("3er Torneo", { exact: true })).toBeVisible();
-  await expect(page.getByText("Tamashii Martial Arts Pinares", { exact: false })).toBeVisible();
-  await expect(page.getByText("Categoría con Bogu y sin Bogu", { exact: false })).toBeVisible();
-  await expect(page.getByRole("region", { name: /Fotografías del evento/ })).toHaveCount(0);
+  await expect(
+    page.getByText("Tamashii Martial Arts Pinares", { exact: false }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Categoría con Bogu y sin Bogu", { exact: false }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("region", { name: /Fotografías del evento/ }),
+  ).toHaveCount(0);
 });
 
 for (const viewport of [
@@ -189,21 +207,31 @@ for (const viewport of [
   { width: 768, height: 1024 },
   { width: 1366, height: 768 },
 ]) {
-  test(`historical gallery is responsive and accessible at ${viewport.width}x${viewport.height}`, async ({ page }) => {
+  test(`historical gallery is responsive and accessible at ${viewport.width}x${viewport.height}`, async ({
+    page,
+  }) => {
     await page.setViewportSize(viewport);
     await page.clock.setFixedTime(FIXED_HISTORICAL_TIME);
     await page.goto(HISTORICAL_EVENT_PATH);
 
-    const gallery = page.getByRole("region", { name: "Fotografías del evento Examen" });
+    const gallery = page.getByRole("region", {
+      name: "Fotografías del evento Examen",
+    });
     await expect(gallery).toBeVisible();
     const featuredImage = gallery.locator("figure");
-    const thumbnails = gallery.getByRole("group", { name: "Seleccionar fotografía" });
+    const thumbnails = gallery.getByRole("group", {
+      name: "Seleccionar fotografía",
+    });
     const footer = page.locator("footer");
     const geometry = await page.evaluate(() => {
-      const gallery = document.querySelector<HTMLElement>('section[aria-label="Fotografías del evento Examen"]');
+      const gallery = document.querySelector<HTMLElement>(
+        'section[aria-label="Fotografías del evento Examen"]',
+      );
       const figure = gallery?.querySelector<HTMLElement>("figure");
       const thumbnails = gallery?.querySelector<HTMLElement>('[role="group"]');
-      const event = document.querySelector<HTMLElement>('section[aria-labelledby="event-page-title"]');
+      const event = document.querySelector<HTMLElement>(
+        'section[aria-labelledby="event-page-title"]',
+      );
       const footer = document.querySelector<HTMLElement>("footer");
       const thumb = thumbnails?.querySelector<HTMLElement>("button");
       return {
@@ -212,9 +240,11 @@ for (const viewport of [
         eventWidth: event?.getBoundingClientRect().width ?? 0,
         thumbnailWidth: thumb?.getBoundingClientRect().width ?? 0,
         thumbnailHeight: thumb?.getBoundingClientRect().height ?? 0,
-        footerGap: footer && thumbnails
-          ? footer.getBoundingClientRect().top - thumbnails.getBoundingClientRect().bottom
-          : 0,
+        footerGap:
+          footer && thumbnails
+            ? footer.getBoundingClientRect().top -
+              thumbnails.getBoundingClientRect().bottom
+            : 0,
       };
     });
     expect(geometry.figureWidth).toBeCloseTo(geometry.galleryWidth, 0);
@@ -226,23 +256,45 @@ for (const viewport of [
     await expect(featuredImage).toBeVisible();
     await expect(thumbnails).toBeVisible();
     await expect(gallery.locator("img[alt]")).toHaveCount(4);
-    await expect(gallery.getByRole("img", { name: "Fotografía 1 del evento Examen" })).toBeVisible();
+    await expect(
+      gallery.getByRole("img", { name: "Fotografía 1 del evento Examen" }),
+    ).toBeVisible();
     await expect(gallery.locator('img[alt=""]')).toHaveCount(3);
-    expect(await gallery.locator("img").evaluateAll((images) => images.every((image) => image.loading === "lazy"))).toBe(true);
+    expect(
+      await gallery
+        .locator("img")
+        .evaluateAll((images) =>
+          images.every((image) => image.loading === "lazy"),
+        ),
+    ).toBe(true);
 
     await gallery.getByRole("button", { name: "Fotografía siguiente" }).click();
-    await expect(gallery.getByRole("img", { name: "Fotografía 2 del evento Examen" })).toBeVisible();
+    await expect(
+      gallery.getByRole("img", { name: "Fotografía 2 del evento Examen" }),
+    ).toBeVisible();
 
-    const opener = gallery.getByRole("button", { name: "Abrir Fotografía 2 del evento Examen" });
+    const opener = gallery.getByRole("button", {
+      name: "Abrir Fotografía 2 del evento Examen",
+    });
     await opener.click();
     const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
     await expect(dialog).toHaveAccessibleName("Fotografía 2 del evento Examen");
-    await expect(dialog.getByRole("img", { name: "Fotografía 2 del evento Examen" })).toBeVisible();
-    await expect.poll(() => page.evaluate(() => document.querySelector<HTMLElement>("#root")?.inert)).toBe(true);
+    await expect(
+      dialog.getByRole("img", { name: "Fotografía 2 del evento Examen" }),
+    ).toBeVisible();
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () => document.querySelector<HTMLElement>("#root")?.inert,
+        ),
+      )
+      .toBe(true);
 
     await page.keyboard.press("ArrowRight");
-    await expect(dialog.getByRole("img", { name: "Fotografía 3 del evento Examen" })).toBeVisible();
+    await expect(
+      dialog.getByRole("img", { name: "Fotografía 3 del evento Examen" }),
+    ).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(dialog).toBeHidden();
     await expect(opener).toBeFocused();
@@ -266,33 +318,40 @@ test("renders the historical archive and a custom not-found view", async ({
   await expect(page.getByText(/página que buscas no existe/i)).toBeVisible();
 
   await page.goto("/en/events/missing-route/");
-  await expect(page.getByText(/page you are looking for does not exist/i)).toBeVisible();
+  await expect(
+    page.getByText(/page you are looking for does not exist/i),
+  ).toBeVisible();
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
   expect(consoleErrors).toEqual([]);
 });
 
-test("switches languages while preserving the current section", async ({ page }) => {
+test("switches languages while preserving the current section", async ({
+  page,
+}) => {
   await page.goto("/galeria/");
 
   await page.getByRole("link", { name: "View site in English" }).click();
   await expect(page).toHaveURL(/\/en\/gallery\/$/);
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
-  await expect(page.getByRole("heading", { name: "Kendo gallery", level: 1 })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Kendo gallery", level: 1 }),
+  ).toBeVisible();
 
   await page.getByRole("link", { name: "Ver sitio en español" }).click();
   await expect(page).toHaveURL(/\/galeria\/$/);
 });
 
-test("exposes the language selector inside the mobile menu", async ({ page }) => {
+test("exposes the language selector inside the mobile menu", async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/en/");
 
   await page.getByRole("button", { name: "Open menu" }).click();
   await expect(page.getByText("Language", { exact: true })).toBeVisible();
-  await expect(page.getByRole("link", { name: "View site in English" })).toHaveAttribute(
-    "aria-current",
-    "page",
-  );
+  await expect(
+    page.getByRole("link", { name: "View site in English" }),
+  ).toHaveAttribute("aria-current", "page");
 });
 
 test("preserves scroll position when switching languages", async ({ page }) => {
@@ -306,7 +365,10 @@ test("preserves scroll position when switching languages", async ({ page }) => {
   await expect(page).toHaveURL(/\/en\/$/);
   await page.waitForTimeout(350);
 
-  expect(await page.evaluate(() => window.scrollY)).toBeCloseTo(scrollBefore, 0);
+  expect(await page.evaluate(() => window.scrollY)).toBeCloseTo(
+    scrollBefore,
+    0,
+  );
 });
 
 const viewports = [
