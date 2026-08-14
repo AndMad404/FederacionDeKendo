@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "events": [
     {
       "sourceId": "7bd8989c63db48fab752ce0f",
@@ -12,7 +12,8 @@
       "historical": true,
       "aliases": [
         "2026-05-02-federacion-examen"
-      ]
+      ],
+      "editorialState": "publicado"
     },
     {
       "sourceId": "462f5f7da99a1d17474471bd",
@@ -23,7 +24,8 @@
       "endDate": "2026-06-01",
       "archiveEligibleAt": "2026-06-02T06:00:00.000Z",
       "eventType": "seminario",
-      "historical": true
+      "historical": true,
+      "editorialState": "publicado"
     },
     {
       "sourceId": "9c63151cacb01bef733c39cb",
@@ -36,7 +38,8 @@
       "historical": true,
       "aliases": [
         "2026-05-30-federacion-seminario-y-reunion"
-      ]
+      ],
+      "editorialState": "publicado"
     },
     {
       "sourceId": "89d31aa2d6937a78b1866283",
@@ -50,7 +53,8 @@
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
       "summary": "Exámenes de 8vo a 2do kyu",
       "eventType": "examen",
-      "historical": true
+      "historical": true,
+      "editorialState": "publicado"
     },
     {
       "sourceId": "72f0b1f2f02e0f5d73ae28ec",
@@ -63,7 +67,8 @@
       "archiveEligibleAt": "2026-08-24T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
       "summary": "- Categoría con Bogu y sin Bogu\n- Categoría por equipos",
-      "eventType": "torneo"
+      "eventType": "torneo",
+      "editorialState": "publicado"
     },
     {
       "sourceId": "45c4376b5e5e0fcf347835d0",
@@ -72,10 +77,11 @@
       "date": "2026-09-12",
       "timeZone": "America/Costa_Rica",
       "endDate": "2026-09-14",
-      "archiveEligibleAt": "2026-09-16T06:00:00.000Z",
+      "archiveEligibleAt": "2026-09-15T06:00:00.000Z",
       "location": "El Establo Mountain Hotel, Provincia de Puntarenas, Monteverde, Costa Rica",
       "summary": "La participación incluye:\n\n* Transporte ida y vuelta\n* Almuerzo primer día\n* Desayuno del segundo día\n* Habitación compartida\n* Acceso a las instalaciones y senderos del hotel\n* Uso de los salones de entrenamiento\n* Experiencia intensiva de entrenamiento a cargo de senséis de alto nivel\n\nEste encuentro guiado por cuatro senséis japoneses de alto rango nace con el propósito de vivir el kendo más allá del entrenamiento habitual: compartir dos días de disciplina, convivencia y aprendizaje.\n\nEl Gasshuku se desarrollará en el Establo Mountain Hotel, Monteverde. Sus instalaciones y salones de madera ofrecerán un espacio para entrenar, alejarnos por unos días de la rutina y disfrutar de una experiencia diferente alrededor del kendo.",
-      "eventType": "seminario"
+      "eventType": "seminario",
+      "editorialState": "publicado"
     },
     {
       "sourceId": "e25ca7168de483e195f1aaf1",
@@ -84,8 +90,9 @@
       "date": "2026-10-10",
       "timeZone": "America/Costa_Rica",
       "endDate": "2026-10-12",
-      "archiveEligibleAt": "2026-10-14T06:00:00.000Z",
-      "eventType": "seminario"
+      "archiveEligibleAt": "2026-10-13T06:00:00.000Z",
+      "eventType": "seminario",
+      "editorialState": "publicado"
     },
     {
       "sourceId": "56f8899c9ee30db7265945af",
@@ -98,7 +105,8 @@
       "archiveEligibleAt": "2026-11-02T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
       "summary": "Exámenes de 8vo a 2do kyu",
-      "eventType": "examen"
+      "eventType": "examen",
+      "editorialState": "publicado"
     },
     {
       "sourceId": "2d5bad84832b0a2be6193e52",
@@ -108,7 +116,8 @@
       "timeZone": "America/Costa_Rica",
       "archiveEligibleAt": "2026-11-23T06:00:00.000Z",
       "summary": "Torneo por Equipos en Panamá. Invitación de Shinsei Panamá.",
-      "eventType": "torneo"
+      "eventType": "torneo",
+      "editorialState": "publicado"
     },
     {
       "sourceId": "d5e995f4e75da854e455e4a5",
@@ -121,7 +130,8 @@
       "archiveEligibleAt": "2026-12-14T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
       "summary": "Categoría con Bogu y sin Bogu",
-      "eventType": "torneo"
+      "eventType": "torneo",
+      "editorialState": "publicado"
     },
     {
       "sourceId": "8f7f631510e2e2523d7345c1",
@@ -134,7 +144,8 @@
       "archiveEligibleAt": "2027-02-01T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
       "summary": "Exámenes de 8vo a 2do kyu",
-      "eventType": "examen"
+      "eventType": "examen",
+      "editorialState": "publicado"
     },
     {
       "sourceId": "325fa23572d746c098463cfc",
@@ -147,7 +158,8 @@
       "archiveEligibleAt": "2027-04-05T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
       "summary": "Categoría con Bogu y sin Bogu",
-      "eventType": "torneo"
+      "eventType": "torneo",
+      "editorialState": "publicado"
     },
     {
       "sourceId": "2c34e1accb679991a55100bb",
@@ -160,7 +172,8 @@
       "archiveEligibleAt": "2027-05-03T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
       "summary": "Exámenes de 8vo a 2do kyu",
-      "eventType": "examen"
+      "eventType": "examen",
+      "editorialState": "publicado"
     },
     {
       "sourceId": "1361a31e6ed86361f014c7c1",
@@ -173,7 +186,8 @@
       "archiveEligibleAt": "2027-08-02T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
       "summary": "Exámenes de 8vo a 2do kyu",
-      "eventType": "examen"
+      "eventType": "examen",
+      "editorialState": "publicado"
     },
     {
       "sourceId": "af94c6be4ebe10e334a37951",
@@ -186,7 +200,8 @@
       "archiveEligibleAt": "2027-08-16T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
       "summary": "Categoría con Bogu y sin Bogu",
-      "eventType": "torneo"
+      "eventType": "torneo",
+      "editorialState": "publicado"
     },
     {
       "sourceId": "2d0ecad0919db5dc75e39dd5",
@@ -199,7 +214,8 @@
       "archiveEligibleAt": "2027-11-01T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
       "summary": "Exámenes de 8vo a 2do kyu",
-      "eventType": "examen"
+      "eventType": "examen",
+      "editorialState": "publicado"
     },
     {
       "sourceId": "26e2ecffe893577fa8a242ec",
@@ -212,7 +228,8 @@
       "archiveEligibleAt": "2027-12-13T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
       "summary": "Categoría con Bogu y sin Bogu",
-      "eventType": "torneo"
+      "eventType": "torneo",
+      "editorialState": "publicado"
     }
   ]
 }
