@@ -5,6 +5,55 @@ schema_version: 2
 last_updated: 2026-08-13
 contract: .agents/review-contract.md
 
+latest_calendar_flow_alignment_review:
+  id: REV-2026-08-13-01
+  requested_scope: Determine whether recent repository changes alter the canonical calendar infrastructure flow diagram.
+  actual_scope:
+    targets:
+      - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/calendar-infrastructure-flows.md
+      - scripts/sync-calendar-events.mjs
+      - scripts/sync-event-galleries.mjs
+      - scripts/correct-calendar-history-range.mjs
+      - .github/workflows/sync-calendar.yml
+      - .github/workflows/correct-calendar-history-range.yml
+      - src/app/utils/eventArchive.js
+    axes: [ARCH]
+    included:
+      - triggers, source artifacts, decisions, publication paths, and gates represented by the current-flow diagram
+      - committed changes through 22c12617
+    excluded:
+      - visual UI behavior, SEO, non-calendar gallery asset hashing, external workflow execution, and changes to the objective diagram
+  baseline:
+    commit: 22c12617
+    worktree: clean
+  confirmed_findings:
+    - DOC-ARCH-002
+  evidence:
+    - calendar-infrastructure-flows.md current-flow Mermaid diagram
+    - .github/workflows/correct-calendar-history-range.yml
+    - scripts/correct-calendar-history-range.mjs
+    - git diff 2555735b..HEAD for calendar workflow and pipeline targets
+  result: The current-flow diagram is stale for the separately triggered, report-driven historical correction workflow. The 48-hour archive/gallery checkpoint changes a business timing rule but does not change the diagram topology.
+
+open_findings:
+  - id: DOC-ARCH-002
+    level: STRUCTURAL
+    axis: ARCH
+    status: resolved
+    target: ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/calendar-infrastructure-flows.md:19
+    problem: The current-flow diagram shows the retained historical-change report as terminal, but it omits the manual correction workflow that downloads that report, validates an approved date range, writes the registry and public event data, verifies, commits, and re-enters CI.
+    fix: Add a separate manual-trigger branch from the retained report to correct-calendar-history-range.yml, its validation/correction step, calendarEventRegistry.json and calendarEvents.ts, the existing verification gate, commit, and CI.
+    cost_of_deferring: Readers cannot trace the implemented human-approved correction path and may mistake the report for an informational dead end.
+    evidence:
+      - .github/workflows/correct-calendar-history-range.yml
+      - scripts/correct-calendar-history-range.mjs
+    introduced_in: REV-2026-08-13-01
+    resolution:
+      resolved_at: 2026-08-13
+      resolved_ref: documentation worktree
+      checks:
+        - calendar-infrastructure-flows.md includes the manual correction branch from the retained report through the existing verification and CI path
+
 state_rules:
   - Coverage is valid only for its recorded targets, axes, inclusions, and baseline.
   - An inspected target is not automatically reviewed.
