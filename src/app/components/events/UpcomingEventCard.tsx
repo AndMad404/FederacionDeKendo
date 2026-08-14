@@ -44,7 +44,7 @@ export function UpcomingEventCard({
 
   return (
     <li
-      className={`grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-2 rounded-xl border border-site-border bg-site-surface p-3 shadow-sm land-tall:flex land-tall:flex-col land-tall:justify-around land-tall:gap-2 land-tall:text-center lg:flex lg:flex-col lg:justify-around lg:gap-1.5 lg:p-2 lg:text-center ${getEventVisibilityClass(index)}`}
+      className={`grid grid-cols-2 items-center gap-x-3 gap-y-2 rounded-xl border border-site-border bg-site-surface p-3 shadow-sm land-tall:flex land-tall:flex-col land-tall:justify-around land-tall:gap-2 land-tall:text-center lg:flex lg:flex-col lg:justify-around lg:gap-1.5 lg:p-2 lg:text-center ${getEventVisibilityClass(index)}`}
     >
       <h3 className="col-start-2 row-start-1 min-w-0 text-right text-base font-bold leading-tight land-tall:text-center lg:text-center">
         {event.title}
@@ -78,7 +78,7 @@ export function UpcomingEventCard({
           rel="noopener noreferrer"
           aria-label={`${copy.calendar.openLocationLabel} ${event.title} ${copy.calendar.mapsPreposition} Google Maps`}
           aria-describedby={locationDescriptionId}
-          className={`col-start-1 row-start-2 justify-self-center ${actionClass} ${focusRingClass}`}
+          className={`col-start-1 row-start-2 w-full justify-self-center ${actionClass} ${focusRingClass}`}
         >
           <MapPin
             className="mr-1.5 size-3.5 shrink-0 text-site-accent"
@@ -91,7 +91,7 @@ export function UpcomingEventCard({
         </a>
       ) : (
         <span
-          className={`col-start-1 row-start-2 justify-self-center text-site-muted ${actionClass}`}
+          className={`col-start-1 row-start-2 w-full justify-self-center text-site-muted ${actionClass}`}
         >
           {copy.common.toBeConfirmed}
         </span>
@@ -100,7 +100,7 @@ export function UpcomingEventCard({
       <Link
         to={getEventPath(event, language)}
         aria-label={`${copy.event.viewDetailsLabel} ${event.title}`}
-        className={`col-start-2 row-start-2 justify-self-end ${eventDetailsClass} ${focusRingClass}`}
+        className={`col-start-2 row-start-2 w-full justify-self-end ${eventDetailsClass} ${focusRingClass}`}
       >
         {copy.common.eventDetails}
       </Link>
