@@ -55,7 +55,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2026-09-12-gasshuku-monteverde",
-    archiveEligibleAt: "2026-09-16T06:00:00.000Z",
+    archiveEligibleAt: "2026-09-15T06:00:00.000Z",
     title: "Gasshuku Monteverde",
     date: "2026-09-12",
     endDate: "2026-09-14",
@@ -66,7 +66,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2026-10-10-clak-1er-panamericano-brasil",
-    archiveEligibleAt: "2026-10-14T06:00:00.000Z",
+    archiveEligibleAt: "2026-10-13T06:00:00.000Z",
     title: "CLAK 1er Panamericano BRASIL",
     date: "2026-10-10",
     endDate: "2026-10-12",
