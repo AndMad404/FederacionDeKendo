@@ -39,6 +39,8 @@ const inferredEventTypes = [
 const googleDriveFolderUrl = /^https:\/\/drive\.google\.com\/drive\/folders\/[A-Za-z0-9_-]+(?:[/?#].*)?$/;
 const embeddedGoogleDriveFolderUrl = /https:\/\/drive\.google\.com\/drive\/folders\/[A-Za-z0-9_-]+(?:[/?#][^\s]*)?/g;
 const albumUrlSymbol = Symbol("privateAlbumUrl");
+export const MASS_DISAPPEARANCE_MINIMUM = 2;
+export const MASS_DISAPPEARANCE_RATIO = 0.5;
 
 export const HISTORICAL_COMPARISON_FIELDS = [
   "slug",
@@ -416,6 +418,36 @@ function assertUniqueCurrentSlugs(events) {
       }
       ownerBySlug.set(slug, event.sourceId);
     }
+  }
+}
+
+export function assertSafeCalendarInput(previousRegistry, parsedEvents) {
+  if (parsedEvents.length === 0) {
+    throw new Error("Calendar feed contains no valid events; no files were changed.");
+  }
+
+  const currentSourceIds = new Set();
+  for (const event of parsedEvents) {
+    if (currentSourceIds.has(event.sourceId)) {
+      throw new Error(`Duplicate calendar source identity: ${event.sourceId}.`);
+    }
+    currentSourceIds.add(event.sourceId);
+  }
+
+  const publishedEvents = (previousRegistry.events ?? []).filter(
+    (event) => event.editorialState !== "eliminado" && event.inactive !== true,
+  );
+  const disappeared = publishedEvents.filter(
+    (event) => !currentSourceIds.has(event.sourceId),
+  ).length;
+  const threshold = Math.max(
+    MASS_DISAPPEARANCE_MINIMUM,
+    Math.ceil(publishedEvents.length * MASS_DISAPPEARANCE_RATIO),
+  );
+  if (disappeared >= threshold) {
+    throw new Error(
+      `Mass calendar disappearance detected: ${disappeared} of ${publishedEvents.length} published events are absent (threshold ${threshold}); no files were changed.`,
+    );
   }
 }
 
@@ -847,8 +879,9 @@ export async function synchronizeCalendar({
   const parsed = parseVEvents(icsText)
     .map((properties) => parseCalendarEvent(properties, warnings))
     .filter(Boolean);
-  const currentBySourceId = new Map(parsed.map((event) => [event.sourceId, event]));
   const previousRegistry = await readRegistry(registryPath);
+  assertSafeCalendarInput(previousRegistry, parsed);
+  const currentBySourceId = new Map(parsed.map((event) => [event.sourceId, event]));
   const historicalReport = redactReportSecrets(
     detectHistoricalChanges(previousRegistry, parsed, now),
     [source, process.env.CALENDAR_ICS_URL],

@@ -7,7 +7,10 @@ import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 
 import {
+  assertSafeCalendarInput,
   createCanonicalSlug,
+  MASS_DISAPPEARANCE_MINIMUM,
+  MASS_DISAPPEARANCE_RATIO,
   mergeRegistry,
   parseCalendarEvent,
   parseVEvents,
@@ -379,6 +382,75 @@ test("an invalid feed leaves the last published files untouched", async () => {
       await readFile(registryPath, "utf8"),
       '{"version":2,"events":[]}',
     );
+  } finally {
+    await rm(tempDirectory, { recursive: true, force: true });
+  }
+});
+
+test("an empty or wholly omitted feed leaves the last published artifacts untouched", async () => {
+  const tempDirectory = await mkdtemp(path.join(os.tmpdir(), "fak-calendar-"));
+  const sourcePath = path.join(tempDirectory, "empty.ics");
+  const outputPath = path.join(tempDirectory, "calendarEvents.ts");
+  const registryPath = path.join(tempDirectory, "registry.json");
+  const previousOutput = "previous output";
+  const previousRegistry = '{"version":4,"events":[]}';
+  await writeFile(sourcePath, "BEGIN:VCALENDAR\r\nEND:VCALENDAR\r\n");
+  await writeFile(outputPath, previousOutput);
+  await writeFile(registryPath, previousRegistry);
+
+  try {
+    await assert.rejects(
+      synchronizeCalendar({ source: sourcePath, outputPath, registryPath }),
+      /contains no valid events/i,
+    );
+    assert.equal(await readFile(outputPath, "utf8"), previousOutput);
+    assert.equal(await readFile(registryPath, "utf8"), previousRegistry);
+  } finally {
+    await rm(tempDirectory, { recursive: true, force: true });
+  }
+});
+
+test("the measured mass-disappearance threshold blocks publication while one absence remains pending", () => {
+  const previous = {
+    version: 4,
+    events: Array.from({ length: 4 }, (_, index) => ({
+      sourceId: `source-${index}`,
+      slug: `2026-08-0${index + 1}-event`,
+      title: `Event ${index}`,
+      date: `2026-08-0${index + 1}`,
+      editorialState: "publicado",
+    })),
+  };
+  const current = previous.events.slice(0, 2);
+
+  assert.throws(
+    () => assertSafeCalendarInput(previous, current),
+    new RegExp(`2 of 4.*threshold 2`, "i"),
+  );
+  assert.doesNotThrow(() => assertSafeCalendarInput(previous, previous.events.slice(0, 3)));
+  assert.equal(MASS_DISAPPEARANCE_MINIMUM, 2);
+  assert.equal(MASS_DISAPPEARANCE_RATIO, 0.5);
+});
+
+test("a duplicate source identity is rejected before registry or public output can change", async () => {
+  const tempDirectory = await mkdtemp(path.join(os.tmpdir(), "fak-calendar-"));
+  const sourcePath = path.join(tempDirectory, "duplicate-source.ics");
+  const outputPath = path.join(tempDirectory, "calendarEvents.ts");
+  const registryPath = path.join(tempDirectory, "registry.json");
+  await writeFile(sourcePath, createIcs([
+    { uid: "same@example.test", title: "First" },
+    { uid: "same@example.test", title: "Second" },
+  ]));
+  await writeFile(outputPath, "previous output");
+  await writeFile(registryPath, '{"version":4,"events":[]}');
+
+  try {
+    await assert.rejects(
+      synchronizeCalendar({ source: sourcePath, outputPath, registryPath }),
+      /Duplicate calendar source identity/,
+    );
+    assert.equal(await readFile(outputPath, "utf8"), "previous output");
+    assert.equal(await readFile(registryPath, "utf8"), '{"version":4,"events":[]}');
   } finally {
     await rm(tempDirectory, { recursive: true, force: true });
   }
