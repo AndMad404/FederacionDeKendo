@@ -8,12 +8,17 @@ import sharp from "sharp";
 
 import {
   HISTORICAL_COMPARISON_FIELDS,
+  applyEditorialDecision,
+  applyEditorialDecisionToFiles,
+  createCalendarFailureNotification,
+  createCalendarNotifications,
   detectHistoricalChanges,
   decidePendingDeletion,
   mergeRegistry,
   serializeCalendarEvents,
   synchronizeCalendar,
   writeActionSummary,
+  writeCalendarNotificationsSummary,
 } from "../scripts/sync-calendar-events.mjs";
 import { synchronizeEventGalleries } from "../scripts/sync-event-galleries.mjs";
 
@@ -269,6 +274,101 @@ test("F3: a deletion decision retains the linked pending evidence", () => {
   assert.equal(serializeCalendarEvents([removed]).includes(removed.slug), false);
 });
 
+test("F5: only a recorded decision for the current revision and evidence can change publication", () => {
+  const pending = mergeRegistry(
+    { version: 4, events: [historicalSnapshot, { ...historicalSnapshot, sourceId: "present-source", slug: "2026-01-11-present", aliases: undefined }] },
+    [{ ...historicalSnapshot, sourceId: "present-source", slug: "2026-01-11-present", aliases: undefined }],
+    new Date("2026-03-01T00:00:00.000Z"),
+  ).events.find(({ sourceId }) => sourceId === historicalSnapshot.sourceId);
+  const decision = {
+    sourceId: pending.sourceId,
+    revisionId: pending.pendingRevision.id,
+    evidenceFingerprint: pending.pendingRevision.evidence.fingerprint,
+    action: "reject_deletion",
+    decisionRecordId: "presidencia-2026-03-03-01",
+    actorRole: "presidencia",
+    decidedAt: "2026-03-03T00:00:00.000Z",
+  };
+  const updated = applyEditorialDecision({ version: 4, events: [pending] }, decision);
+  assert.equal(updated.events[0].editorialState, "publicado");
+  assert.equal(updated.events[0].editorialDecision.decisionRecordId, decision.decisionRecordId);
+  assert.equal(updated.events[0].editorialDecision.evidenceFingerprint, decision.evidenceFingerprint);
+  assert.equal(serializeCalendarEvents(updated.events).includes(pending.slug), true);
+
+  assert.throws(
+    () => applyEditorialDecision({ version: 4, events: [pending] }, { ...decision, evidenceFingerprint: "stale" }),
+    /stale/,
+  );
+  assert.throws(
+    () => applyEditorialDecision({ version: 4, events: [pending] }, { ...decision, decisionRecordId: "" }),
+    /record identifier/,
+  );
+});
+
+test("F5: a future deletion is reserved for Presidencia and preserves its revision evidence", () => {
+  const future = { ...historicalSnapshot, historical: false, date: "2027-01-10", archiveEligibleAt: "2027-01-13T06:00:00.000Z" };
+  const pending = mergeRegistry(
+    { version: 4, events: [future, { ...future, sourceId: "present-source", slug: "2027-01-11-present", aliases: undefined }] },
+    [{ ...future, sourceId: "present-source", slug: "2027-01-11-present", aliases: undefined }],
+    new Date("2026-03-01T00:00:00.000Z"),
+  ).events.find(({ sourceId }) => sourceId === future.sourceId);
+  const decision = {
+    sourceId: pending.sourceId,
+    revisionId: pending.pendingRevision.id,
+    evidenceFingerprint: pending.pendingRevision.evidence.fingerprint,
+    action: "approve_deletion",
+    decisionRecordId: "presidencia-2026-03-03-02",
+    decidedAt: "2026-03-03T00:00:00.000Z",
+  };
+  assert.throws(
+    () => applyEditorialDecision({ version: 4, events: [pending] }, { ...decision, actorRole: "delegado" }),
+    /Only Presidencia/,
+  );
+  const updated = applyEditorialDecision({ version: 4, events: [pending] }, { ...decision, actorRole: "presidencia" });
+  assert.equal(updated.events[0].editorialState, "eliminado");
+  assert.equal(updated.events[0].pendingRevision.evidence.fingerprint, decision.evidenceFingerprint);
+  assert.equal(serializeCalendarEvents(updated.events).includes(pending.slug), false);
+});
+
+test("F5: a stale file-backed decision leaves the persisted registry and published output untouched", async () => {
+  const pending = mergeRegistry(
+    { version: 4, events: [historicalSnapshot, { ...historicalSnapshot, sourceId: "present-source", slug: "2026-01-11-present", aliases: undefined }] },
+    [{ ...historicalSnapshot, sourceId: "present-source", slug: "2026-01-11-present", aliases: undefined }],
+    new Date("2026-03-01T00:00:00.000Z"),
+  ).events.find(({ sourceId }) => sourceId === historicalSnapshot.sourceId);
+  const directory = await mkdtemp(path.join(os.tmpdir(), "fak-f5-decision-"));
+  const registryPath = path.join(directory, "calendarEventRegistry.json");
+  const outputPath = path.join(directory, "calendarEvents.ts");
+  const beforeRegistry = `${JSON.stringify({ version: 4, events: [pending] }, null, 2)}\n`;
+  const beforeOutput = serializeCalendarEvents([pending]);
+  await writeFile(registryPath, beforeRegistry);
+  await writeFile(outputPath, beforeOutput);
+  const decision = {
+    sourceId: pending.sourceId,
+    revisionId: pending.pendingRevision.id,
+    evidenceFingerprint: pending.pendingRevision.evidence.fingerprint,
+    action: "reject_deletion",
+    decisionRecordId: "presidencia-2026-03-03-03",
+    actorRole: "presidencia",
+    decidedAt: "2026-03-03T00:00:00.000Z",
+  };
+
+  try {
+    await assert.rejects(
+      applyEditorialDecisionToFiles({ registryPath, outputPath, decision: { ...decision, evidenceFingerprint: "stale" } }),
+      /stale/,
+    );
+    assert.equal(await readFile(registryPath, "utf8"), beforeRegistry);
+    assert.equal(await readFile(outputPath, "utf8"), beforeOutput);
+
+    await applyEditorialDecisionToFiles({ registryPath, outputPath, decision });
+    assert.equal(JSON.parse(await readFile(registryPath, "utf8")).events[0].editorialState, "publicado");
+    assert.equal((await readFile(outputPath, "utf8")).includes(pending.slug), true);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
 test("C2: report deterministic field changes without mutating the historical snapshot", () => {
   const registryBefore = JSON.stringify({ version: 3, events: [historicalSnapshot] });
   const report = detectHistoricalChanges(
@@ -394,6 +494,53 @@ test("C2: workflow uploads the structured report without issue permissions or fa
   assert.match(workflow, /actions\/upload-artifact@v5/);
   assert.match(workflow, /calendar-historical-changes\.json/);
   assert.doesNotMatch(workflow, /issues:\s*write|exit\s+1/);
+});
+
+test("F4: pending revisions emit one redacted actionable notification per evidence fingerprint", () => {
+  const pending = mergeRegistry(
+    { version: 4, events: [historicalSnapshot, { ...historicalSnapshot, sourceId: "present-source", slug: "2026-01-11-present", aliases: undefined }] },
+    [{ ...historicalSnapshot, sourceId: "present-source", slug: "2026-01-11-present", aliases: undefined }],
+    new Date("2026-03-01T00:00:00.000Z"),
+  ).events.find(({ sourceId }) => sourceId === historicalSnapshot.sourceId);
+  pending.pendingRevision.evidence.published.infoUrl = "https://drive.google.com/drive/folders/private-folder";
+  const report = createCalendarNotifications({ version: 4, events: [pending, structuredClone(pending)] });
+
+  assert.equal(report.version, 1);
+  assert.equal(report.notifications.length, 1);
+  const [notification] = report.notifications;
+  assert.equal(notification.kind, "revision_pendiente");
+  assert.equal(notification.temporality, "historico");
+  assert.equal(notification.fingerprints.revisionId, pending.pendingRevision.id);
+  assert.equal(notification.fingerprints.evidenceFingerprint, pending.pendingRevision.evidence.fingerprint);
+  assert.match(notification.actionRequired, /Revisar/);
+  assert.doesNotMatch(JSON.stringify(notification), /drive\.google\.com|private-folder/);
+});
+
+test("F4: source, parser, mass-disappearance, and verification failures have safe actionable notifications", async () => {
+  const cases = [
+    [new Error("Calendar request failed: 403 Forbidden"), "fuente_inaccesible"],
+    [new Error("Invalid iCalendar feed: VCALENDAR boundaries are missing."), "parser_o_fuente_invalida"],
+    [new Error("Mass calendar disappearance detected: 2 of 4 published events are absent (threshold 2); no files were changed."), "desaparicion_masiva"],
+    [new Error("Verification failed: typecheck."), "verificacion_fallida"],
+  ];
+  for (const [error, kind] of cases) {
+    const report = createCalendarFailureNotification(error);
+    assert.equal(report.notifications.length, 1);
+    assert.equal(report.notifications[0].kind, kind);
+    assert.match(report.notifications[0].actionRequired, /Revisar|Corregir/);
+  }
+
+  const directory = await mkdtemp(path.join(os.tmpdir(), "fak-f4-summary-"));
+  try {
+    const summaryPath = path.join(directory, "summary.md");
+    await writeCalendarNotificationsSummary(createCalendarFailureNotification(
+      new Error("Calendar request failed: https://calendar.example.test/private.ics?token=secret"),
+    ), summaryPath);
+    const summary = await readFile(summaryPath, "utf8");
+    assert.doesNotMatch(summary, /private\.ics|token=secret/);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
 });
 
 async function galleryFixture() {

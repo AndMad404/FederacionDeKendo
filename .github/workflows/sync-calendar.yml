@@ -36,17 +36,11 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Sync calendar events
+        id: sync
         run: pnpm run sync:calendar
         env:
           HISTORICAL_CHANGES_REPORT_PATH: ${{ runner.temp }}/calendar-historical-changes.json
-
-      - name: Upload historical changes report
-        uses: actions/upload-artifact@v5
-        with:
-          name: calendar-historical-changes
-          path: ${{ runner.temp }}/calendar-historical-changes.json
-          if-no-files-found: error
-          retention-days: 30
+          CALENDAR_NOTIFICATIONS_REPORT_PATH: ${{ runner.temp }}/calendar-notifications.json
 
       - name: Typecheck
         run: pnpm run typecheck
@@ -65,6 +59,24 @@ jobs:
 
       - name: Browser tests
         run: pnpm run test:e2e
+
+      - name: Emit verification failure notification
+        if: ${{ failure() && steps.sync.outcome == 'success' }}
+        run: node scripts/write-calendar-verification-notification.mjs
+        env:
+          CALENDAR_NOTIFICATIONS_REPORT_PATH: ${{ runner.temp }}/calendar-notifications.json
+          CALENDAR_FAILED_STEP: post-sync verification
+
+      - name: Upload calendar notification reports
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v5
+        with:
+          name: calendar-notification-reports
+          path: |
+            ${{ runner.temp }}/calendar-historical-changes.json
+            ${{ runner.temp }}/calendar-notifications.json
+          if-no-files-found: warn
+          retention-days: 30
 
       - name: Commit calendar changes
         run: |

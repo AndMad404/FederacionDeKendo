@@ -634,6 +634,8 @@ export function decidePendingDeletion(event, decision) {
         decidedAt: decision.decidedAt ?? new Date().toISOString(),
         ...(decision.reason ? { reason: redactEvidenceValue(decision.reason) } : {}),
         evidenceFingerprint: event.pendingRevision.evidence?.fingerprint,
+        ...(decision.decisionRecordId ? { decisionRecordId: decision.decisionRecordId } : {}),
+        ...(decision.actorRole ? { actorRole: decision.actorRole } : {}),
       },
     };
   }
@@ -648,10 +650,50 @@ export function decidePendingDeletion(event, decision) {
         decidedAt: decision.decidedAt ?? new Date().toISOString(),
         ...(decision.reason ? { reason: redactEvidenceValue(decision.reason) } : {}),
         evidenceFingerprint: pendingRevision.evidence?.fingerprint,
+        ...(decision.decisionRecordId ? { decisionRecordId: decision.decisionRecordId } : {}),
+        ...(decision.actorRole ? { actorRole: decision.actorRole } : {}),
       },
     };
   }
   throw new Error("Unsupported editorial decision.");
+}
+
+function requireDecisionRecord(decision) {
+  if (!/^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$/.test(decision.decisionRecordId ?? "")) {
+    throw new Error("A non-sensitive human decision record identifier is required.");
+  }
+}
+
+// This is the operational boundary for Phase 5.  The lower-level transition
+// helper above remains available to describe the v4 state machine in isolation.
+export function applyEditorialDecision(registry, decision) {
+  if (registry?.version !== 4 || !Array.isArray(registry.events)) {
+    throw new Error("Editorial decisions require a current v4 calendar registry.");
+  }
+  requireDecisionRecord(decision);
+  const index = registry.events.findIndex((event) => event.sourceId === decision.sourceId);
+  if (index === -1) throw new Error("The editorial decision source identity is stale.");
+
+  const event = registry.events[index];
+  if (event.editorialState !== "pendiente" || !event.pendingRevision) {
+    throw new Error("The editorial decision no longer targets a pending revision.");
+  }
+  if (
+    event.pendingRevision.id !== decision.revisionId ||
+    event.pendingRevision.evidence?.fingerprint !== decision.evidenceFingerprint
+  ) {
+    throw new Error("The editorial decision is stale for the current revision evidence.");
+  }
+  if (decision.action === "approve_deletion" && event.historical !== true && decision.actorRole !== "presidencia") {
+    throw new Error("Only Presidencia can approve deletion of a future event.");
+  }
+  if (event.historical === true && !decision.decisionRecordId) {
+    throw new Error("Historical revisions require a recorded human decision.");
+  }
+
+  const events = [...registry.events];
+  events[index] = decidePendingDeletion(event, decision);
+  return { ...registry, events };
 }
 
 function canonicalValue(value) {
@@ -767,6 +809,91 @@ function redactReportSecrets(report, secrets) {
   return redact(report);
 }
 
+function redactNotificationValue(value) {
+  if (Array.isArray(value)) return value.map(redactNotificationValue);
+  if (value && typeof value === "object") {
+    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, redactNotificationValue(item)]));
+  }
+  if (typeof value !== "string") return value;
+  return redactEvidenceValue(value).replace(/(?:webcal:|https?):\/\/[^\s<>)\]]+/gi, "[redacted]");
+}
+
+const pendingNotificationDetails = {
+  future_missing: {
+    cause: "El evento futuro ya no aparece en la fuente.",
+    actionRequired: "Confirmar en Calendar si corresponde retirarlo; no se aplica ninguna decision automaticamente.",
+  },
+  historical_missing: {
+    cause: "El evento historico ya no aparece en la fuente.",
+    actionRequired: "Revisar la ausencia y conservar la version publicada hasta una decision humana posterior.",
+  },
+  historical_change: {
+    cause: "La fuente propone cambios a un evento historico publicado.",
+    actionRequired: "Revisar las diferencias antes de cualquier correccion humana posterior.",
+  },
+};
+
+export function createCalendarNotifications(registry) {
+  const notifications = new Map();
+  for (const event of registry.events ?? []) {
+    if (event.editorialState !== "pendiente" || !event.pendingRevision) continue;
+    const revision = event.pendingRevision;
+    const details = pendingNotificationDetails[revision.reason] ?? {
+      cause: "La fuente produjo una revision editorial pendiente.",
+      actionRequired: "Revisar la revision antes de aplicar cualquier decision humana posterior.",
+    };
+    const id = revision.evidence?.fingerprint ?? revision.id;
+    if (notifications.has(id)) continue;
+    notifications.set(id, {
+      id,
+      kind: "revision_pendiente",
+      identity: redactNotificationValue({ slug: event.slug, title: event.title, date: event.date }),
+      temporality: event.historical === true ? "historico" : "futuro",
+      cause: details.cause,
+      actionRequired: details.actionRequired,
+      before: redactNotificationValue(revision.evidence?.published ?? null),
+      after: redactNotificationValue(revision.proposed ?? revision.evidence?.lastReceived ?? null),
+      fingerprints: {
+        revisionId: revision.id,
+        evidenceFingerprint: revision.evidence?.fingerprint ?? null,
+      },
+    });
+  }
+  return { version: 1, notifications: [...notifications.values()].sort((a, b) => a.id.localeCompare(b.id)) };
+}
+
+export function createCalendarFailureNotification(error) {
+  const message = redactNotificationValue(error instanceof Error ? error.message : String(error));
+  const normalized = String(message).toLowerCase();
+  const kind = normalized.includes("mass calendar disappearance")
+    ? "desaparicion_masiva"
+    : normalized.includes("calendar request failed")
+      ? "fuente_inaccesible"
+      : normalized.includes("icalendar") || normalized.includes("calendar feed") || normalized.includes("duplicate calendar")
+        ? "parser_o_fuente_invalida"
+        : "verificacion_fallida";
+  const actionRequired = kind === "desaparicion_masiva"
+    ? "Revisar la fuente antes de reintentar; el umbral bloqueo la publicacion y conserva el ultimo conjunto valido."
+    : kind === "verificacion_fallida"
+      ? "Corregir la verificacion fallida y reejecutar; no publicar ni aprobar cambios a partir de esta ejecucion."
+      : "Corregir la fuente o el formato y reejecutar; el ultimo conjunto valido permanece sin cambios.";
+  const id = fingerprintOrderedFields({ kind, message }, ["kind", "message"]);
+  return {
+    version: 1,
+    notifications: [{
+      id,
+      kind,
+      identity: null,
+      temporality: "ejecucion_actual",
+      cause: message,
+      actionRequired,
+      before: null,
+      after: null,
+      fingerprints: { revisionId: null, evidenceFingerprint: null, failureFingerprint: id },
+    }],
+  };
+}
+
 function serializeProperty(name, value, isLast) {
   return `    ${name}: ${JSON.stringify(value)}${isLast ? "" : ","}`;
 }
@@ -829,6 +956,20 @@ async function readRegistry(registryPath) {
     if (error?.code === "ENOENT") return { version: 3, events: [] };
     throw error;
   }
+}
+
+export async function applyEditorialDecisionToFiles({
+  registryPath = defaultRegistryPath,
+  outputPath = defaultOutputPath,
+  decision,
+} = {}) {
+  const registry = await readRegistry(registryPath);
+  const updatedRegistry = applyEditorialDecision(registry, decision);
+  await writeAtomically([
+    [registryPath, `${JSON.stringify(updatedRegistry, null, 2)}\n`],
+    [outputPath, serializeCalendarEvents(updatedRegistry.events)],
+  ]);
+  return updatedRegistry;
 }
 
 export async function writeAtomically(files) {
@@ -894,6 +1035,12 @@ export async function writeHistoricalChangesReport(report, reportPath) {
   await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
 }
 
+export async function writeCalendarNotificationsReport(report, reportPath) {
+  if (!reportPath) return;
+  await mkdir(path.dirname(reportPath), { recursive: true });
+  await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+}
+
 export async function writeActionSummary(
   warnings,
   eventCount,
@@ -947,6 +1094,32 @@ export async function writeActionSummary(
       ? galleryChanges.map((change) => `- ${escapeActionText(change.slug)}: ${escapeActionText(change.status)} (${escapeActionText(change.reason)})`)
       : ["None."]),
     "",
+  ];
+  await appendFile(summaryPath, lines.join("\n"), "utf8");
+}
+
+export async function writeCalendarNotificationsSummary(
+  notificationReport,
+  summaryPath = process.env.GITHUB_STEP_SUMMARY,
+) {
+  if (!summaryPath) return;
+  const notifications = notificationReport?.notifications ?? [];
+  const lines = [
+    "## Calendar actionable notifications",
+    "",
+    `Notifications: ${notifications.length}`,
+    "",
+    ...(notifications.length
+      ? notifications.flatMap((notification) => [
+          `### ${escapeActionText(notification.kind)}`,
+          `Identity: ${escapeActionText(notification.identity?.slug ?? "not applicable")}`,
+          `Temporality: ${escapeActionText(notification.temporality)}`,
+          `Cause: ${escapeActionText(notification.cause)}`,
+          `Required action: ${escapeActionText(notification.actionRequired)}`,
+          `Notification fingerprint: \`${escapeActionText(notification.id)}\``,
+          "",
+        ])
+      : ["None.", ""]),
   ];
   await appendFile(summaryPath, lines.join("\n"), "utf8");
 }
@@ -1022,7 +1195,12 @@ export async function synchronizeCalendar({
     historicalReport,
     process.env.HISTORICAL_CHANGES_REPORT_PATH,
   );
-  return { registry, galleryResult, warnings, historicalReport };
+  const notificationReport = createCalendarNotifications(registry);
+  await writeCalendarNotificationsReport(
+    notificationReport,
+    process.env.CALENDAR_NOTIFICATIONS_REPORT_PATH,
+  );
+  return { registry, galleryResult, warnings, historicalReport, notificationReport };
 }
 
 async function main() {
@@ -1040,6 +1218,7 @@ async function main() {
       `::warning title=Historical calendar changes::${result.historicalReport.historicalChanges.length} historical event(s) require confirmation.`,
     );
   }
+  await writeCalendarNotificationsSummary(result.notificationReport);
   await writeActionSummary(
     result.warnings,
     result.registry.events.length,
@@ -1063,7 +1242,13 @@ const isDirectExecution =
   import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
 
 if (isDirectExecution) {
-  main().catch((error) => {
+  main().catch(async (error) => {
+    const notificationReport = createCalendarFailureNotification(error);
+    await writeCalendarNotificationsReport(
+      notificationReport,
+      process.env.CALENDAR_NOTIFICATIONS_REPORT_PATH,
+    );
+    await writeCalendarNotificationsSummary(notificationReport);
     console.error(error);
     process.exitCode = 1;
   });

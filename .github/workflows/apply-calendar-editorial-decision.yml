@@ -1,0 +1,66 @@
+name: Apply recorded calendar editorial decision
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_id:
+        description: Source identity from the pending notification
+        required: true
+        type: string
+      revision_id:
+        description: Pending revision fingerprint
+        required: true
+        type: string
+      evidence_fingerprint:
+        description: Evidence fingerprint from the same pending notification
+        required: true
+        type: string
+      action:
+        description: Recorded decision
+        required: true
+        type: choice
+        options: [approve_deletion, reject_deletion]
+      decision_record_id:
+        description: Non-sensitive human decision record identifier
+        required: true
+        type: string
+      reason:
+        description: Optional public-safe rationale
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  apply-decision:
+    name: Apply Presidency's recorded decision
+    runs-on: ubuntu-latest
+    environment: presidencia
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - name: Apply exactly the notified revision
+        run: |
+          export CALENDAR_DECISION_DECIDED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          pnpm run apply:calendar-decision
+        env:
+          CALENDAR_DECISION_SOURCE_ID: ${{ inputs.source_id }}
+          CALENDAR_DECISION_REVISION_ID: ${{ inputs.revision_id }}
+          CALENDAR_DECISION_EVIDENCE_FINGERPRINT: ${{ inputs.evidence_fingerprint }}
+          CALENDAR_DECISION_ACTION: ${{ inputs.action }}
+          CALENDAR_DECISION_RECORD_ID: ${{ inputs.decision_record_id }}
+          CALENDAR_DECISION_REASON: ${{ inputs.reason }}
+          CALENDAR_DECISION_ACTOR_ROLE: presidencia
+      - name: Commit recorded decision
+        run: |
+          git add src/app/data/calendarEventRegistry.json src/app/data/calendarEvents.ts
+          git diff --cached --quiet && exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: apply calendar editorial decision"
+          git push
