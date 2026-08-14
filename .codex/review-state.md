@@ -3481,4 +3481,75 @@ latest_calendar_date_helper_followup:
     - architecture.md records the shared calendar-date boundary and its consumers.
   result: The previous time-zone and ordinal findings remain closed by their existing directed browser tests; the remaining date-helper duplication is now removed and documented.
 
+latest_calendar_phase6_review:
+  id: REV-2026-08-14-01
+  requested_scope: Determine whether Phase 6 of the calendar-resilience roadmap is implemented and identify anything omitted.
+  actual_scope:
+    targets:
+      - .github/actions/verify-site/action.yml
+      - .github/workflows/ci.yml
+      - .github/workflows/sync-calendar.yml
+      - .github/workflows/apply-calendar-editorial-decision.yml
+      - .github/workflows/correct-calendar-history-range.yml
+      - package.json
+      - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/calendar-resilience-roadmap.md
+      - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/calendar-sync.md
+      - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/technical-backlog.md
+    axes: [ARCH]
+    included:
+      - shared verification-gate implementation
+      - verification ordering before automated commits
+      - suppression of duplicate CI for bot-authored commits
+      - preservation of CI coverage for human pushes and pull requests
+      - documentation alignment and deployment-gate evidence
+    excluded:
+      - external GitHub Actions execution
+      - Cloudflare deployment configuration and runtime behavior
+      - visual, SEO, and calendar data behavior
+  baseline:
+    commit: 4a37a9f0
+    worktree: clean before review-state update
+  confirmed_findings:
+    - DOC-ARCH-003
+    - EXT-ARCH-001
+  findings:
+    - id: DOC-ARCH-003
+      level: STRUCTURAL
+      axis: ARCH
+      status: open
+      target: ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/calendar-resilience-roadmap.md:3; ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/calendar-sync.md:9
+      problem: The Phase 6 implementation in commit 4a37a9f0 is not recorded as completed; the roadmap and operator guide still say CI optimization is pending, and the technical backlog retains the same work as P1.
+      fix: Reconcile the three canonical planning/operation documents with the implemented shared verification gate, retaining only unresolved external deployment evidence as a follow-up.
+      cost_of_deferring: Planning reports a non-existent next implementation phase and can duplicate work.
+      evidence:
+        - commit 4a37a9f0
+        - .github/actions/verify-site/action.yml
+        - .github/workflows/ci.yml
+        - .github/workflows/sync-calendar.yml
+    - id: EXT-ARCH-001
+      level: STRUCTURAL
+      axis: ARCH
+      status: open
+      target: Cloudflare Pages and GitHub repository configuration outside the local repository
+      problem: The repository proves verification completes before each automatic commit and skips duplicate bot CI, but it cannot prove Cloudflare waits for GitHub Actions or consumes only verified artifacts.
+      fix: Inspect one automatic commit in GitHub Actions and its matching Cloudflare deployment timestamps/status, then record the observed publication contract; if Pages deploys directly from push, revise the Phase 6 exit criterion or configure an external gate.
+      cost_of_deferring: The roadmap cannot truthfully claim that deployment only consumes verified artifacts.
+      evidence:
+        - calendar-resilience-roadmap.md:275-286
+        - calendar-sync.md:407-411
+        - technical-backlog.md:22
+  verification:
+    - corepack pnpm run test:sync-directed passed
+    - corepack pnpm run test:unit:without-sync passed
+    - corepack pnpm run test:unit:without-history-correction passed
+    - corepack pnpm run typecheck passed
+    - corepack pnpm run build passed, including SSR and generated routes
+    - corepack pnpm run test:generated passed 5 tests
+    - corepack pnpm run test:e2e passed 207 tests
+  result: The repository implementation satisfies the internal CI-deduplication and human-push coverage portions of Phase 6. Completion of its deployment-artifact condition remains externally unverified, and documentation is stale.
+  pending:
+    - Verify the GitHub Actions-to-Cloudflare publication relationship for an automatic calendar commit.
+    - Reconcile the canonical roadmap, operator guide, and technical backlog after that evidence is recorded or the exit criterion is revised.
+  next: Inspect the external GitHub Actions and Cloudflare deployment records for one known automatic calendar commit.
+
 ```
