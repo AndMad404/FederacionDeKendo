@@ -55,23 +55,13 @@ jobs:
       - name: Apply approved historical range
         run: pnpm run correct:calendar-history-range --report calendar-historical-changes.json --from "${{ inputs.from }}" --to "${{ inputs.to }}"
 
-      - name: Typecheck
-        run: pnpm run typecheck
+      - name: Directed historical correction tests
+        run: node --test tests/calendar-history-correction.test.mjs
 
-      - name: Unit tests
-        run: pnpm run test:unit
-
-      - name: Build
-        run: pnpm run build
-
-      - name: Generated output tests
-        run: pnpm run test:generated
-
-      - name: Install Playwright Chromium
-        run: pnpm exec playwright install --with-deps chromium
-
-      - name: Browser tests
-        run: pnpm run test:e2e
+      - name: Verify generated site
+        uses: ./.github/actions/verify-site
+        with:
+          unit-command: pnpm run test:unit:without-history-correction
 
       - name: Commit approved historical range
         run: |

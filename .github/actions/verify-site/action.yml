@@ -1,0 +1,30 @@
+name: Verify site
+description: Run the shared site verification gate on the current workspace.
+
+inputs:
+  unit-command:
+    description: Command for the unit-test portion of this gate.
+    required: false
+    default: pnpm run test:unit
+
+runs:
+  using: composite
+  steps:
+    - name: Typecheck
+      shell: bash
+      run: pnpm run typecheck
+    - name: Unit tests
+      shell: bash
+      run: ${{ inputs.unit-command }}
+    - name: Build
+      shell: bash
+      run: pnpm run build
+    - name: Generated output tests
+      shell: bash
+      run: pnpm run test:generated
+    - name: Install Playwright Chromium
+      shell: bash
+      run: pnpm exec playwright install --with-deps chromium
+    - name: Browser tests
+      shell: bash
+      run: pnpm run test:e2e

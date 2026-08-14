@@ -42,23 +42,13 @@ jobs:
           HISTORICAL_CHANGES_REPORT_PATH: ${{ runner.temp }}/calendar-historical-changes.json
           CALENDAR_NOTIFICATIONS_REPORT_PATH: ${{ runner.temp }}/calendar-notifications.json
 
-      - name: Typecheck
-        run: pnpm run typecheck
+      - name: Directed synchronization tests
+        run: pnpm run test:sync-directed
 
-      - name: Unit tests
-        run: pnpm run test:unit
-
-      - name: Build
-        run: pnpm run build
-
-      - name: Generated output tests
-        run: pnpm run test:generated
-
-      - name: Install Playwright Chromium
-        run: pnpm exec playwright install --with-deps chromium
-
-      - name: Browser tests
-        run: pnpm run test:e2e
+      - name: Verify generated site
+        uses: ./.github/actions/verify-site
+        with:
+          unit-command: pnpm run test:unit:without-sync
 
       - name: Emit verification failure notification
         if: ${{ failure() && steps.sync.outcome == 'success' }}

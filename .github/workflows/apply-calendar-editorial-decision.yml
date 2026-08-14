@@ -56,6 +56,12 @@ jobs:
           CALENDAR_DECISION_RECORD_ID: ${{ inputs.decision_record_id }}
           CALENDAR_DECISION_REASON: ${{ inputs.reason }}
           CALENDAR_DECISION_ACTOR_ROLE: presidencia
+      - name: Directed synchronization tests
+        run: pnpm run test:sync-directed
+      - name: Verify generated site
+        uses: ./.github/actions/verify-site
+        with:
+          unit-command: pnpm run test:unit:without-sync
       - name: Commit recorded decision
         run: |
           git add src/app/data/calendarEventRegistry.json src/app/data/calendarEvents.ts
