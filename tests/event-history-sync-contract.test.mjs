@@ -12,6 +12,7 @@ import {
   applyEditorialDecisionToFiles,
   createCalendarFailureNotification,
   createCalendarNotifications,
+  recordCalendarNotifications,
   detectHistoricalChanges,
   decidePendingDeletion,
   mergeRegistry,
@@ -21,6 +22,7 @@ import {
   writeCalendarNotificationsSummary,
 } from "../scripts/sync-calendar-events.mjs";
 import { synchronizeEventGalleries } from "../scripts/sync-event-galleries.mjs";
+import { formatCalendarNotificationEmail } from "../scripts/write-calendar-notification-email.mjs";
 
 const PUBLIC_EVENT_FIELDS = [
   "id",
@@ -521,6 +523,30 @@ test("F4: pending revisions emit one redacted actionable notification per eviden
   assert.doesNotMatch(JSON.stringify(notification), /drive\.google\.com|private-folder/);
 });
 
+test("F4: an emitted pending revision is not notified again until its evidence changes", () => {
+  const pending = mergeRegistry(
+    {
+      version: 4,
+      events: [
+        historicalSnapshot,
+        { ...historicalSnapshot, sourceId: "present-source", slug: "2026-01-11-present", aliases: undefined },
+      ],
+    },
+    [{ ...historicalSnapshot, sourceId: "present-source", slug: "2026-01-11-present", aliases: undefined }],
+    new Date("2026-03-01T00:00:00.000Z"),
+  );
+  const firstReport = createCalendarNotifications(pending);
+  const recorded = recordCalendarNotifications(pending, firstReport);
+
+  assert.equal(firstReport.notifications.length, 1);
+  assert.equal(createCalendarNotifications(recorded).notifications.length, 0);
+
+  const revised = structuredClone(recorded);
+  revised.events.find(({ sourceId }) => sourceId === historicalSnapshot.sourceId)
+    .pendingRevision.evidence.fingerprint = "new-evidence-fingerprint";
+  assert.equal(createCalendarNotifications(revised).notifications.length, 1);
+});
+
 test("F4: source, parser, mass-disappearance, and verification failures have safe actionable notifications", async () => {
   const cases = [
     [new Error("Calendar request failed: 403 Forbidden"), "fuente_inaccesible"],
@@ -550,6 +576,18 @@ test("F4: source, parser, mass-disappearance, and verification failures have saf
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
+});
+
+test("F4: the Gmail delivery body contains only the redacted structured notification", () => {
+  const report = createCalendarFailureNotification(
+    new Error("Calendar request failed: https://calendar.example.test/private.ics?token=secret"),
+  );
+  const email = formatCalendarNotificationEmail(report, "alerts@example.test");
+
+  assert.match(email, /To: andresgmr1@gmail\.com/);
+  assert.match(email, /Accion requerida:/);
+  assert.doesNotMatch(email, /private\.ics|token=secret/);
+  assert.equal(formatCalendarNotificationEmail({ version: 1, notifications: [] }, "alerts@example.test"), null);
 });
 
 async function galleryFixture() {

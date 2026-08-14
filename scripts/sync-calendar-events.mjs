@@ -596,6 +596,13 @@ function createPendingRevision(publishedEvent, proposedEvent, reason, now = new 
     lastReceived,
     published,
   };
+  const fingerprint = fingerprintEditorialEvidence({
+    sourceId: evidence.sourceId,
+    revisionId: id,
+    reason,
+    published: evidence.published,
+    proposed: evidence.lastReceived,
+  });
   return {
     ...publishedEvent,
     editorialState: "pendiente",
@@ -605,14 +612,11 @@ function createPendingRevision(publishedEvent, proposedEvent, reason, now = new 
       proposed,
       evidence: {
         ...evidence,
-        fingerprint: fingerprintEditorialEvidence({
-          sourceId: evidence.sourceId,
-          revisionId: id,
-          reason,
-          published: evidence.published,
-          proposed: evidence.lastReceived,
-        }),
+        fingerprint,
       },
+      ...(previousRevision?.notification?.evidenceFingerprint === fingerprint
+        ? { notification: previousRevision.notification }
+        : {}),
     },
   };
 }
@@ -856,11 +860,12 @@ export function createCalendarNotifications(registry, execution = getNotificatio
   for (const event of registry.events ?? []) {
     if (event.editorialState !== "pendiente" || !event.pendingRevision) continue;
     const revision = event.pendingRevision;
+    const id = revision.evidence?.fingerprint ?? revision.id;
+    if (revision.notification?.evidenceFingerprint === id) continue;
     const details = pendingNotificationDetails[revision.reason] ?? {
       cause: "La fuente produjo una revision editorial pendiente.",
       actionRequired: "Revisar la revision antes de aplicar cualquier decision humana posterior.",
     };
-    const id = revision.evidence?.fingerprint ?? revision.id;
     if (notifications.has(id)) continue;
     notifications.set(id, {
       id,
@@ -879,6 +884,28 @@ export function createCalendarNotifications(registry, execution = getNotificatio
     });
   }
   return { version: 1, notifications: [...notifications.values()].sort((a, b) => a.id.localeCompare(b.id)) };
+}
+
+export function recordCalendarNotifications(registry, notificationReport) {
+  const notificationIds = new Set(
+    (notificationReport?.notifications ?? []).map((notification) => notification.id),
+  );
+  if (!notificationIds.size) return registry;
+  return {
+    ...registry,
+    events: registry.events.map((event) => {
+      const revision = event.pendingRevision;
+      const id = revision?.evidence?.fingerprint ?? revision?.id;
+      if (!id || !notificationIds.has(id)) return event;
+      return {
+        ...event,
+        pendingRevision: {
+          ...revision,
+          notification: { evidenceFingerprint: id },
+        },
+      };
+    }),
+  };
 }
 
 export function createCalendarFailureNotification(error, execution = getNotificationExecution()) {
@@ -1173,7 +1200,7 @@ export async function synchronizeCalendar({
     [source, process.env.CALENDAR_ICS_URL],
   );
   historicalReport.galleryChanges = [];
-  const registry = mergeRegistry(previousRegistry, parsed, now);
+  let registry = mergeRegistry(previousRegistry, parsed, now);
 
   const galleryEvents = registry.events
     .filter((event) => {
@@ -1200,6 +1227,13 @@ export async function synchronizeCalendar({
     historicalReport.galleryChanges = galleryResult.alarms;
   }
 
+  const notificationReport = createCalendarNotifications(registry);
+  const notificationReportPath = process.env.CALENDAR_NOTIFICATIONS_REPORT_PATH;
+  if (notificationReportPath) {
+    await writeCalendarNotificationsReport(notificationReport, notificationReportPath);
+    registry = recordCalendarNotifications(registry, notificationReport);
+  }
+
   let calendarPublication;
   try {
     calendarPublication = await Promise.all([
@@ -1217,11 +1251,6 @@ export async function synchronizeCalendar({
   await writeHistoricalChangesReport(
     historicalReport,
     process.env.HISTORICAL_CHANGES_REPORT_PATH,
-  );
-  const notificationReport = createCalendarNotifications(registry);
-  await writeCalendarNotificationsReport(
-    notificationReport,
-    process.env.CALENDAR_NOTIFICATIONS_REPORT_PATH,
   );
   return { registry, galleryResult, warnings, historicalReport, notificationReport };
 }
