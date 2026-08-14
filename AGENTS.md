@@ -54,6 +54,69 @@ If a request mixes review and implementation, review first, then ask or infer wh
   `../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/index.md` plus the
   source files required by the current phase. Do not preload later-phase
   context.
+- Before showing a generated roadmap-phase prompt, run the compactness check
+  below. If any rejected pattern remains, regenerate it; do not show a prompt
+  that merely explains or excuses the duplication.
+
+### Roadmap-Phase Prompt Compactness Check
+
+A generated prompt is invalid unless it retains, in brief form:
+
+1. the exact phase and objective;
+2. that previous phases are closed and not to be reaudited;
+3. the minimum-context selector;
+4. critical invariants that cannot change;
+5. relevant scope limits;
+6. preservation of unrelated worktree changes;
+7. verification through `.agents/verification.md`;
+8. the required final report; and
+9. the current no-commit-unless-requested policy.
+
+Persistent instructions supply the detail behind these controls and must not be
+reconstructed in the prompt. Compacting removes redundancy and history, not
+operational controls. If an applicable control is absent, regenerate the prompt.
+
+Reject and regenerate a prompt if it contains any of these:
+
+- an instruction to read a complete roadmap or a complete canonical document;
+- named scripts, workflows, test files, or source-file lists selected by
+  `docs/index.md` or `.agents/project-map.md`;
+- Cloudflare, CI, rollback, secrets, or sensitive-data rules not newly changed
+  by the phase;
+- historical follow-ups or expanded closed-phase protections beyond the brief
+  no-reaudit statement;
+- named verification commands or gates selected by `.agents/verification.md`;
+- headings or equivalent sections for `Alcance autorizado`, `Fuera de alcance`,
+  or `Criterio de salida`.
+
+Use the short `Implement One Roadmap Phase` recipe as the canonical prompt
+shape. Apart from its fixed operational controls, variable text may contain
+only the phase pointer, functional delta, critical invariant, and relevant
+limit. If a generated prompt is substantially longer than that delta plus the
+required compact controls, reject and regenerate it before showing it. It must
+delegate all other context and checks to their canonical sources.
+
+### Final Mandatory Phase-Prompt Gate
+
+Before delivering any phase-execution prompt, validate the final text. Reject,
+compact, and revalidate it if it:
+
+1. says to read a complete document without a direct dependency on it;
+2. enumerates files when a documentation map can select the context;
+3. states any restriction more than once;
+4. carries non-blocking history, including Cloudflare-CI, rollback, or closed
+   follow-ups;
+5. names broad checks that `.agents/verification.md` selects;
+6. repeats instructions about commits, secrets, private URLs, or transactional
+   preservation;
+7. reaudits or redesigns a closed phase without a direct blocking dependency;
+8. reconstructs prior architecture rather than describing the current delta;
+9. copies context already available from a persistent source of truth; or
+10. names an invariant that the current phase cannot actually violate.
+
+Compare the result with the canonical compact recipe. Remove every instruction
+that does not change what the agent must do, must not do, must verify, or must
+report. Do not deliver a prompt until it passes this gate.
 - Use a fresh task when the primary responsibility changes, such as moving
   from tests to synchronization, images, filters, or UI. Keep the current task
   for direct fixes to the phase being implemented.
