@@ -1,4 +1,4 @@
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, useContext } from "react";
 
 export type Language = "es" | "en";
 
@@ -76,7 +76,7 @@ export function isLanguageSwitch(
   );
 }
 
-const COPY = {
+export const COPY = {
   es: {
     nav: {
       label: "Navegación principal",
@@ -361,27 +361,7 @@ interface LanguageContextValue {
   copy: (typeof COPY)[Language];
 }
 
-const LanguageContext = createContext<LanguageContextValue | null>(null);
-
-export function LanguageProvider({
-  language,
-  children,
-}: {
-  language: Language;
-  children: ReactNode;
-}) {
-  return (
-    <LanguageContext.Provider
-      value={{
-        language,
-        locale: language === "es" ? "es-CR" : "en",
-        copy: COPY[language],
-      }}
-    >
-      {children}
-    </LanguageContext.Provider>
-  );
-}
+export const LanguageContext = createContext<LanguageContextValue | null>(null);
 
 export function useLanguage() {
   const context = useContext(LanguageContext);

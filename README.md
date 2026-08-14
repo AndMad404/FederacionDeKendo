@@ -38,12 +38,14 @@ de pasar a la siguiente:
 
 1. Prettier para formato reproducible, con comprobacion en CI y una lista de
    archivos generados que no debe modificar. Esta etapa esta implementada.
-2. ESLint como comando `lint`, inicialmente con la configuracion base aprobada
-   para el proyecto.
+2. ESLint como comando `lint`, con una configuracion base aprobada para el
+   proyecto. La linea base y el aislamiento requerido por Fast Refresh estan
+   implementados; los avisos restantes se resolveran en fases atomicas.
 3. Reglas recomendadas de JavaScript y TypeScript, despues de revisar sus
    hallazgos sobre el codigo actual y acordar cuales bloquearan CI.
-4. Reglas especificas de React, incluidas las reglas de hooks. Esta etapa queda
-   pendiente hasta que el propietario estudie el tema y apruebe su alcance.
+4. Reglas especificas de React, incluidas las reglas de hooks. Fast Refresh ya
+   es estricto; los efectos y dependencias de hooks quedan pendientes de
+   revision y verificacion dirigida.
 
 Prettier comprobara y formateara solo archivos fuente versionados. Directorios
 generados o transitorios como `dist/`, `dist-ssr/`, `node_modules/` y resultados

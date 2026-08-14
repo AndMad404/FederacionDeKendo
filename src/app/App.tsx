@@ -13,9 +13,9 @@ import { getRoutePresentation } from "./config/routePresentation";
 import {
   getLanguageFromPathname,
   isLanguageSwitch,
-  LanguageProvider,
   useLanguage,
 } from "./config/i18n";
+import { LanguageProvider } from "./config/LanguageProvider";
 
 export interface RouteComponentRegistry {
   routes: Record<RouteComponent, ComponentType>;

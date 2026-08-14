@@ -36,7 +36,7 @@ export default tseslint.config(
     rules: {
       "react-hooks/exhaustive-deps": "warn",
       "react-hooks/set-state-in-effect": "warn",
-      "react-refresh/only-export-components": "warn",
+      "react-refresh/only-export-components": "error",
     },
   },
 );
