@@ -19,16 +19,18 @@ function formatNotification(notification) {
   ].join("\n");
 }
 
-export function formatCalendarNotificationEmail(report, from) {
+export function formatCalendarNotificationEmail(report, from, recipient) {
   const notifications = report?.notifications ?? [];
   if (!notifications.length) return null;
   const sender = singleLine(from);
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sender)) {
-    throw new Error("CALENDAR_ALERT_SMTP_USERNAME must be a valid email address.");
+  const recipientAddress = singleLine(recipient);
+  const isEmailAddress = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  if (!isEmailAddress(sender) || !isEmailAddress(recipientAddress)) {
+    throw new Error("Calendar notification sender and recipient must be valid email addresses.");
   }
   return [
     `From: ${sender}`,
-    "To: andresgmr1@gmail.com",
+    `To: ${recipientAddress}`,
     `Subject: [Federacion de Kendo] ${notifications.length} alerta(s) operativa(s) del calendario`,
     "Content-Type: text/plain; charset=UTF-8",
     "",
@@ -52,7 +54,11 @@ async function main() {
   if (report.version !== 1 || !Array.isArray(report.notifications)) {
     throw new Error("Calendar notification report has an invalid schema.");
   }
-  const email = formatCalendarNotificationEmail(report, process.env.CALENDAR_ALERT_SMTP_USERNAME);
+  const email = formatCalendarNotificationEmail(
+    report,
+    process.env.CALENDAR_ALERT_SMTP_USERNAME,
+    process.env.CALENDAR_ALERT_RECIPIENT,
+  );
   if (!email) {
     await writeFile(process.env.GITHUB_OUTPUT, "send=false\n", "utf8");
     return;

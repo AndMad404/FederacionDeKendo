@@ -578,16 +578,27 @@ test("F4: source, parser, mass-disappearance, and verification failures have saf
   }
 });
 
-test("F4: the Gmail delivery body contains only the redacted structured notification", () => {
+test("F4: the approved email delivery body contains only the redacted structured notification", () => {
   const report = createCalendarFailureNotification(
     new Error("Calendar request failed: https://calendar.example.test/private.ics?token=secret"),
   );
-  const email = formatCalendarNotificationEmail(report, "alerts@example.test");
+  const email = formatCalendarNotificationEmail(
+    report,
+    "alerts@example.test",
+    "andresgmr1@gmail.com",
+  );
 
   assert.match(email, /To: andresgmr1@gmail\.com/);
   assert.match(email, /Accion requerida:/);
   assert.doesNotMatch(email, /private\.ics|token=secret/);
-  assert.equal(formatCalendarNotificationEmail({ version: 1, notifications: [] }, "alerts@example.test"), null);
+  assert.equal(
+    formatCalendarNotificationEmail(
+      { version: 1, notifications: [] },
+      "alerts@example.test",
+      "andresgmr1@gmail.com",
+    ),
+    null,
+  );
 });
 
 async function galleryFixture() {
