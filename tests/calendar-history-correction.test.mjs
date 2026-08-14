@@ -281,11 +281,11 @@ test("later synchronization still reports differences not accepted", async () =>
   } finally { await rm(files.directory, { recursive: true, force: true }); }
 });
 
-test("an individual disappearance becomes inactive, remains retained, and is excluded publicly", () => {
+test("an individual disappearance becomes pending, remains retained, and stays public", () => {
   const second = { ...published, sourceId: "present", slug: "2026-02-01-present", aliases: undefined };
   const merged = mergeRegistry({ version: 3, events: [published, second] }, [{ ...second, historical: undefined }], new Date("2026-03-01"));
-  assert.equal(merged.events.find(({ sourceId }) => sourceId === published.sourceId).inactive, true);
-  assert.doesNotMatch(serializeCalendarEvents(merged.events), new RegExp(published.slug));
+  assert.equal(merged.events.find(({ sourceId }) => sourceId === published.sourceId).editorialState, "pendiente");
+  assert.match(serializeCalendarEvents(merged.events), new RegExp(published.slug));
 });
 
 test("disappearance of every historical event aborts before producing a registry", () => {

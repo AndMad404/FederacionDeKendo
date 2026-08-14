@@ -424,6 +424,7 @@ export function mergeRegistry(
   currentEvents,
   now = new Date(),
 ) {
+  const registryVersion = 4;
   assertUniqueCurrentSlugs(currentEvents);
   const historicalEvents = (previousRegistry.events ?? []).filter(
     (event) => event.historical === true || isArchiveEligible(event, now),
@@ -446,6 +447,9 @@ export function mergeRegistry(
   const reconciledCurrentEvents = currentEvents.map((currentEvent) => {
     const previousEvent = previousBySourceId.get(currentEvent.sourceId);
     const aliases = previousEvent?.aliases;
+    if (previousEvent?.editorialState === "eliminado") {
+      return previousEvent;
+    }
     const wasHistorical =
       previousEvent?.historical === true ||
       (previousEvent ? isArchiveEligible(previousEvent, now) : false);
@@ -453,31 +457,89 @@ export function mergeRegistry(
       new Date(currentEvent.archiveEligibleAt).getTime() <= now.getTime();
 
     if (wasHistorical) {
-      return freezeHistoricalSnapshot(previousEvent);
+      const published = freezeHistoricalSnapshot(previousEvent);
+      const matchesPublished = HISTORICAL_COMPARISON_FIELDS.every(
+        (field) => JSON.stringify(published[field]) === JSON.stringify(currentEvent[field]),
+      );
+      if (matchesPublished) {
+        const { pendingRevision, ...restored } = published;
+        return { ...restored, editorialState: "publicado" };
+      }
+      return createPendingRevision(published, currentEvent, "historical_change");
     }
 
     return {
       ...currentEvent,
+      editorialState: "publicado",
       ...(becomesHistorical ? { historical: true } : {}),
       ...(aliases?.length ? { aliases } : {}),
     };
   });
   const reconciledSourceIds = new Set(reconciledCurrentEvents.map((event) => event.sourceId));
-  const retainedHistoricalEvents = (previousRegistry.events ?? [])
+  const retainedEvents = (previousRegistry.events ?? [])
     .filter(
       (event) =>
-        !reconciledSourceIds.has(event.sourceId) &&
-        (event.historical === true || isArchiveEligible(event, now)),
+        !reconciledSourceIds.has(event.sourceId),
     )
-    .map((event) => ({ ...freezeHistoricalSnapshot(event), inactive: true }));
-  const merged = [...reconciledCurrentEvents, ...retainedHistoricalEvents];
+    .map((event) => {
+      const { inactive, ...legacyCompatibleEvent } = event;
+      const published = legacyCompatibleEvent.historical === true || isArchiveEligible(legacyCompatibleEvent, now)
+        ? freezeHistoricalSnapshot(legacyCompatibleEvent)
+        : legacyCompatibleEvent;
+      if (event.editorialState === "eliminado") return published;
+      if (event.editorialState === "pendiente") return published;
+      return createPendingRevision(
+        published,
+        undefined,
+        event.historical === true || isArchiveEligible(event, now)
+          ? "historical_missing"
+          : "future_missing",
+      );
+    });
+  const merged = [...reconciledCurrentEvents, ...retainedEvents];
   assertUniqueCurrentSlugs(merged);
   merged.sort(
     (a, b) =>
       getCalendarDateTimeSortKey(a.date, a.startTime) -
       getCalendarDateTimeSortKey(b.date, b.startTime),
   );
-  return { version: 3, events: merged };
+  return { version: registryVersion, events: merged };
+}
+
+function editorialRevisionId(event, reason) {
+  return fingerprintOrderedFields(
+    { reason, ...(event ?? {}) },
+    ["reason", "sourceId", ...HISTORICAL_COMPARISON_FIELDS],
+  );
+}
+
+function createPendingRevision(publishedEvent, proposedEvent, reason) {
+  return {
+    ...publishedEvent,
+    editorialState: "pendiente",
+    pendingRevision: {
+      id: editorialRevisionId(proposedEvent, reason),
+      reason,
+      proposed: proposedEvent ?? null,
+    },
+  };
+}
+
+export function decidePendingDeletion(event, decision) {
+  if (event.editorialState !== "pendiente") {
+    throw new Error("Only a pending editorial revision can receive a deletion decision.");
+  }
+  if (event.pendingRevision?.id !== decision.revisionId) {
+    throw new Error("The editorial decision is stale for the pending revision.");
+  }
+  if (decision.action === "approve_deletion") {
+    return { ...event, editorialState: "eliminado" };
+  }
+  if (decision.action === "reject_deletion") {
+    const { pendingRevision, ...published } = event;
+    return { ...published, editorialState: "publicado" };
+  }
+  throw new Error("Unsupported editorial decision.");
 }
 
 function canonicalValue(value) {
@@ -618,7 +680,7 @@ export function serializeCalendarEvents(events) {
 
 // Auto-generated from Google Calendar. Do not edit manually.
 export const CALENDAR_EVENTS: CalendarEvent[] = [
-${events.filter((event) => event.inactive !== true).map(serializeCalendarEvent).join(",\n")}
+${events.filter((event) => event.editorialState !== "eliminado" && event.inactive !== true).map(serializeCalendarEvent).join(",\n")}
 ];
 `;
 }
@@ -637,7 +699,7 @@ async function readCalendarSource(source) {
 async function readRegistry(registryPath) {
   try {
     const registry = JSON.parse(await readFile(registryPath, "utf8"));
-    if (![2, 3].includes(registry.version) || !Array.isArray(registry.events)) {
+    if (![2, 3, 4].includes(registry.version) || !Array.isArray(registry.events)) {
       throw new Error("Unsupported calendar event registry.");
     }
     return registry;

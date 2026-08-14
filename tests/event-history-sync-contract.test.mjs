@@ -9,6 +9,7 @@ import sharp from "sharp";
 import {
   HISTORICAL_COMPARISON_FIELDS,
   detectHistoricalChanges,
+  decidePendingDeletion,
   mergeRegistry,
   serializeCalendarEvents,
   synchronizeCalendar,
@@ -39,7 +40,8 @@ const REGISTRY_EVENT_FIELDS = [
   "aliases",
   "archiveEligibleAt",
   "historical",
-  "inactive",
+  "editorialState",
+  "pendingRevision",
   ...PUBLIC_EVENT_FIELDS.filter((field) => !["id", "aliases", "archiveEligibleAt"].includes(field)),
 ];
 
@@ -49,6 +51,7 @@ const historicalSnapshot = {
   aliases: ["2026-01-10-seminario-anterior"],
   archiveEligibleAt: "2026-01-13T06:00:00.000Z",
   historical: true,
+  editorialState: "publicado",
   title: "Seminario original",
   date: "2026-01-10",
   endDate: "2026-01-11",
@@ -99,7 +102,7 @@ function merge(previousEvent, currentEvents = [changedCalendarEvent]) {
 
 test("inventories every field persisted in the registry and public event model", () => {
   assert.deepEqual(REGISTRY_EVENT_FIELDS, [
-    "sourceId", "slug", "aliases", "archiveEligibleAt", "historical", "inactive", "title",
+    "sourceId", "slug", "aliases", "archiveEligibleAt", "historical", "editorialState", "pendingRevision", "title",
     "date", "endDate", "startTime", "endTime", "location", "summary",
     "eventType", "organizer", "infoUrl", "timeZone",
   ]);
@@ -110,7 +113,7 @@ test("inventories every field persisted in the registry and public event model",
   ]);
 });
 
-test("Given one historical event disappears, When another remains in the feed, Then the missing snapshot is retained but inactive", () => {
+test("Given one historical event disappears, When another remains in the feed, Then the missing snapshot remains public and pending", () => {
   const present = { ...historicalSnapshot, sourceId: "present-source", slug: "2026-01-11-present", aliases: undefined };
   const result = mergeRegistry(
     { version: 3, events: [historicalSnapshot, present] },
@@ -119,9 +122,17 @@ test("Given one historical event disappears, When another remains in the feed, T
   );
   assert.deepEqual(
     result.events.find(({ sourceId }) => sourceId === historicalSnapshot.sourceId),
-    { ...historicalSnapshot, inactive: true },
+    {
+      ...historicalSnapshot,
+      editorialState: "pendiente",
+      pendingRevision: {
+        id: result.events.find(({ sourceId }) => sourceId === historicalSnapshot.sourceId).pendingRevision.id,
+        reason: "historical_missing",
+        proposed: null,
+      },
+    },
   );
-  assert.equal(serializeCalendarEvents(result.events).includes(historicalSnapshot.slug), false);
+  assert.equal(serializeCalendarEvents(result.events).includes(historicalSnapshot.slug), true);
 });
 
 test("Given a future event, When Calendar changes every persisted editorial field, Then the changes remain editable", () => {
@@ -132,7 +143,7 @@ test("Given a future event, When Calendar changes every persisted editorial fiel
     [current],
     new Date("2026-03-01T00:00:00.000Z"),
   );
-  assert.deepEqual(result.events[0], { ...current, aliases: previous.aliases });
+  assert.deepEqual(result.events[0], { ...current, aliases: previous.aliases, editorialState: "publicado" });
 });
 
 test("Given an event reaches archiveEligibleAt, When it synchronizes, Then its complete normalized event is captured once", () => {
@@ -146,22 +157,22 @@ test("Given an event reaches archiveEligibleAt, When it synchronizes, Then its c
     new Date("2026-03-01T00:00:00.000Z"),
   );
 
-  assert.deepEqual(first.events, [{ ...current, historical: true }]);
-  assert.deepEqual(
-    mergeRegistry(
-      first,
-      [{ ...current, summary: "Cambio posterior" }],
-      new Date("2026-03-02T00:00:00.000Z"),
-    ),
+  assert.deepEqual(first.events, [{ ...current, historical: true, editorialState: "publicado" }]);
+  const changed = mergeRegistry(
     first,
+    [{ ...current, summary: "Cambio posterior" }],
+    new Date("2026-03-02T00:00:00.000Z"),
   );
+  assert.equal(changed.events[0].editorialState, "pendiente");
+  assert.equal(changed.events[0].summary, current.summary);
 });
 
 test("Given a historical event, When Calendar changes every persisted field, Then its registry and generated TypeScript remain intact", () => {
   const generatedBefore = serializeCalendarEvents([historicalSnapshot]);
   const result = merge(historicalSnapshot);
 
-  assert.deepEqual(result.events, [historicalSnapshot]);
+  assert.equal(result.events[0].editorialState, "pendiente");
+  assert.equal(result.events[0].title, historicalSnapshot.title);
   assert.equal(serializeCalendarEvents(result.events), generatedBefore);
 });
 
@@ -172,8 +183,56 @@ test("Given a historical event, When Calendar removes persisted fields, Then its
   const generatedBefore = serializeCalendarEvents([historicalSnapshot]);
   const result = merge(historicalSnapshot, [current]);
 
-  assert.deepEqual(result.events, [historicalSnapshot]);
+  assert.equal(result.events[0].editorialState, "pendiente");
+  assert.equal(result.events[0].title, historicalSnapshot.title);
   assert.equal(serializeCalendarEvents(result.events), generatedBefore);
+});
+
+test("F1: approvals, rejections, stale decisions, reappearances, and removed records have explicit transitions", () => {
+  const missing = mergeRegistry(
+    {
+      version: 4,
+      events: [
+        historicalSnapshot,
+        { ...historicalSnapshot, sourceId: "present-source", slug: "2026-01-11-present", aliases: undefined },
+      ],
+    },
+    [{ ...historicalSnapshot, sourceId: "present-source", slug: "2026-01-11-present", aliases: undefined }],
+    new Date("2026-03-01T00:00:00.000Z"),
+  ).events.find(({ sourceId }) => sourceId === historicalSnapshot.sourceId);
+  assert.equal(missing.editorialState, "pendiente");
+  assert.equal(serializeCalendarEvents([missing]).includes(missing.slug), true);
+
+  const rejected = decidePendingDeletion(missing, {
+    action: "reject_deletion",
+    revisionId: missing.pendingRevision.id,
+  });
+  assert.equal(rejected.editorialState, "publicado");
+  assert.equal(rejected.pendingRevision, undefined);
+
+  assert.throws(
+    () => decidePendingDeletion(missing, { action: "approve_deletion", revisionId: "obsolete" }),
+    /stale/,
+  );
+  const removed = decidePendingDeletion(missing, {
+    action: "approve_deletion",
+    revisionId: missing.pendingRevision.id,
+  });
+  assert.equal(removed.editorialState, "eliminado");
+  assert.equal(serializeCalendarEvents([removed]).includes(removed.slug), false);
+  assert.equal(removed.pendingRevision.id, missing.pendingRevision.id);
+
+  const reappeared = mergeRegistry(
+    { version: 4, events: [missing] },
+    [{ ...historicalSnapshot }],
+    new Date("2026-03-01T00:00:00.000Z"),
+  ).events[0];
+  assert.equal(reappeared.editorialState, "publicado");
+  assert.equal(reappeared.pendingRevision, undefined);
+  assert.throws(
+    () => mergeRegistry({ version: 4, events: [] }, [historicalSnapshot, { ...historicalSnapshot }]),
+    /Duplicate calendar canonical slug/,
+  );
 });
 
 test("C2: report deterministic field changes without mutating the historical snapshot", () => {
@@ -253,7 +312,7 @@ test("C2: keep operational warnings separate and neutralize Calendar markup in t
   }
 });
 
-test("C2: synchronization writes a private-safe report without changing frozen published bytes", async () => {
+test("C2: synchronization writes a private-safe report while retaining frozen published output", async () => {
   const directory = await mkdtemp(path.join(os.tmpdir(), "fak-c2-sync-"));
   const sourcePath = path.join(directory, "calendar.ics");
   const registryPath = path.join(directory, "registry.json");
@@ -261,7 +320,7 @@ test("C2: synchronization writes a private-safe report without changing frozen p
   const privateDriveUrl = "https://drive.google.com/drive/folders/private-folder";
   const sourceId = createHash("sha256").update("stable-source-uid").digest("hex").slice(0, 24);
   const frozenEvent = { ...historicalSnapshot, sourceId };
-  const registry = { version: 3, events: [frozenEvent] };
+  const registry = { version: 4, events: [frozenEvent] };
   const generated = serializeCalendarEvents(registry.events);
   try {
     await writeFile(registryPath, `${JSON.stringify(registry, null, 2)}\n`);
@@ -273,7 +332,6 @@ test("C2: synchronization writes a private-safe report without changing frozen p
       `URL:${sourcePath}`,
       "END:VEVENT", "END:VCALENDAR", "",
     ].join("\r\n"));
-    const beforeRegistry = await readFile(registryPath, "utf8");
     const beforeOutput = await readFile(outputPath, "utf8");
     const result = await synchronizeCalendar({
       source: sourcePath,
@@ -288,7 +346,7 @@ test("C2: synchronization writes a private-safe report without changing frozen p
       },
     });
     const serializedReport = JSON.stringify(result.historicalReport);
-    assert.equal(await readFile(registryPath, "utf8"), beforeRegistry);
+    assert.equal(result.registry.events[0].editorialState, "pendiente");
     assert.equal(await readFile(outputPath, "utf8"), beforeOutput);
     assert.doesNotMatch(serializedReport, /drive\.google\.com|ALBUM_FOTOS|private-folder/);
     assert.equal(serializedReport.includes(sourcePath), false);
