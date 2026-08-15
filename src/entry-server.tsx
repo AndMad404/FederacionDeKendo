@@ -30,10 +30,13 @@ const SERVER_ROUTE_COMPONENTS: RouteComponentRegistry = {
   },
 };
 
-export function render(url: string) {
+export function render(url: string, prerenderedAt: string) {
   return renderToString(
     <StaticRouter location={url}>
-      <App routeComponents={SERVER_ROUTE_COMPONENTS} />
+      <App
+        routeComponents={SERVER_ROUTE_COMPONENTS}
+        prerenderedAt={prerenderedAt}
+      />
     </StaticRouter>,
   );
 }

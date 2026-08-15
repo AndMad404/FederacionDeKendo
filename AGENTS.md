@@ -29,6 +29,15 @@ Stack:
   difference in one region does not authorize or explain differences elsewhere.
 - Separate verified repo facts from suggestions or future ideas.
 - Treat legal, SEO metadata, and public copy constraints from the user as hard requirements.
+- Prioritize technically justified opportunities to improve SEO within the SPA
+  architecture. A temporary `noindex` policy does not waive this direction:
+  keep prerendered content, routing, metadata, internal links, and generated
+  output ready for eventual indexing when doing so is proportionate and does
+  not violate an approved product constraint.
+- Do not add a new public page only for a speculative SEO benefit. Before
+  implementation, document the page's concrete SEO purpose and technical
+  requirements, define its route and generated-output behavior, and obtain
+  explicit owner approval for its design requirements and visible result.
 - When creating a commit, follow the message convention in `CONTRIBUTING.md`.
 - Use ASCII in repo instructions unless a file already requires non-ASCII text.
 

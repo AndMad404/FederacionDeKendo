@@ -72,7 +72,7 @@ jobs:
         run: >-
           curl --fail --silent --show-error --url smtps://smtp.gmail.com:465 --ssl-reqd
           --user "$CALENDAR_ALERT_SMTP_USERNAME:$CALENDAR_ALERT_SMTP_APP_PASSWORD"
-          --mail-from "$CALENDAR_ALERT_SMTP_USERNAME" --mail-rcpt-to "$CALENDAR_ALERT_RECIPIENT"
+          --mail-from "$CALENDAR_ALERT_SMTP_USERNAME" --mail-rcpt "$CALENDAR_ALERT_RECIPIENT"
           --upload-file "$CALENDAR_NOTIFICATION_EMAIL_PATH"
         env:
           CALENDAR_ALERT_SMTP_USERNAME: ${{ secrets.CALENDAR_ALERT_SMTP_USERNAME }}

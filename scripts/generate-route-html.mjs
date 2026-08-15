@@ -13,6 +13,7 @@ import {
 const ROOT = process.cwd();
 const DIST_DIR = path.join(ROOT, "dist");
 const baseHtml = await readFile(path.join(DIST_DIR, "index.html"), "utf8");
+const prerenderedAt = new Date().toISOString();
 
 function escapeAttribute(value) {
   return String(value)
@@ -70,13 +71,16 @@ function renderRouteHtml(route) {
     `<html lang="${route.language}"`,
   );
 
-  const bodyHtml = render(route.path);
+  const bodyHtml = render(route.path, prerenderedAt);
   html = html.replace(
     '<div id="root"></div>',
     `<div id="root">${bodyHtml}</div>`,
   );
 
-  return html.replace("</head>", `${managedHead(route)}\n  </head>`);
+  return html.replace(
+    "</head>",
+    `    <meta name="app-prerendered-at" content="${prerenderedAt}" />\n${managedHead(route)}\n  </head>`,
+  );
 }
 
 async function writeRouteHtml(route) {
@@ -101,7 +105,7 @@ function renderNotFoundHtml() {
   );
   html = html.replace(/<html\s+lang="[^"]+"/i, '<html lang="es"');
 
-  const bodyHtml = render("/404-not-found/");
+  const bodyHtml = render("/404-not-found/", prerenderedAt);
   html = html.replace(
     '<div id="root"></div>',
     `<div id="root">${bodyHtml}</div>`,
@@ -109,7 +113,7 @@ function renderNotFoundHtml() {
 
   return html.replace(
     "</head>",
-    `${managedHead(getRouteMeta("/404-not-found/"))}\n  </head>`,
+    `    <meta name="app-prerendered-at" content="${prerenderedAt}" />\n${managedHead(getRouteMeta("/404-not-found/"))}\n  </head>`,
   );
 }
 

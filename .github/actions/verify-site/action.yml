@@ -10,6 +10,9 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Lint
+      shell: bash
+      run: pnpm run lint
     - name: Check formatting
       shell: bash
       run: pnpm run format:check

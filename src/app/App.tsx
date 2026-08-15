@@ -16,6 +16,7 @@ import {
   useLanguage,
 } from "./config/i18n";
 import { LanguageProvider } from "./config/LanguageProvider";
+import { PrerenderedAtContext } from "./config/PrerenderedAtContext";
 
 export interface RouteComponentRegistry {
   routes: Record<RouteComponent, ComponentType>;
@@ -175,13 +176,17 @@ function RouteMetadata() {
 
 export default function App({
   routeComponents,
+  prerenderedAt,
 }: {
   routeComponents: RouteComponentRegistry;
+  prerenderedAt?: string;
 }) {
   const { pathname } = useLocation();
   return (
-    <LanguageProvider language={getLanguageFromPathname(pathname)}>
-      <AppShell routeComponents={routeComponents} />
-    </LanguageProvider>
+    <PrerenderedAtContext.Provider value={prerenderedAt}>
+      <LanguageProvider language={getLanguageFromPathname(pathname)}>
+        <AppShell routeComponents={routeComponents} />
+      </LanguageProvider>
+    </PrerenderedAtContext.Provider>
   );
 }

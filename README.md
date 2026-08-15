@@ -30,33 +30,22 @@ Genera el build de produccion:
 pnpm run build
 ```
 
-## Calidad de codigo (adopcion gradual)
+## Calidad de codigo
 
-La estandarizacion de calidad se incorporara en este orden, de menor a mayor
-esfuerzo. Cada etapa debe aprobarse y completarse de forma independiente antes
-de pasar a la siguiente:
+ESLint y Prettier son gates obligatorios del CI. ESLint rechaza tanto errores
+como advertencias; Prettier comprueba que los archivos incluidos conserven el
+formato reproducible del proyecto. Ejecuta localmente los mismos comandos que
+usa CI antes de enviar cambios:
 
-1. Prettier para formato reproducible, con comprobacion en CI y una lista de
-   archivos generados que no debe modificar. Esta etapa esta implementada.
-2. ESLint como comando `lint`, con una configuracion base aprobada para el
-   proyecto. La linea base y el aislamiento requerido por Fast Refresh estan
-   implementados; los avisos restantes se resolveran en fases atomicas.
-3. Reglas recomendadas de JavaScript y TypeScript, despues de revisar sus
-   hallazgos sobre el codigo actual y acordar cuales bloquearan CI.
-4. Reglas especificas de React, incluidas las reglas de hooks. Fast Refresh ya
-   es estricto; los efectos y dependencias de hooks quedan pendientes de
-   revision y verificacion dirigida.
+```bash
+pnpm run lint
+pnpm run format:check
+```
 
 Prettier comprobara y formateara solo archivos fuente versionados. Directorios
 generados o transitorios como `dist/`, `dist-ssr/`, `node_modules/` y resultados
 de pruebas se excluiran para evitar cambios mecanicos que se regeneran en cada
 build o ejecucion de pruebas.
-
-Comprueba el formato sin modificar archivos:
-
-```bash
-pnpm run format:check
-```
 
 Aplica el formato a los archivos incluidos:
 

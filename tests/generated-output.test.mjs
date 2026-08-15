@@ -54,6 +54,19 @@ test("generates the archive route", async () => {
   assert.match(archive, /href="\/eventos\/2026-08-08-examen\/"/);
 });
 
+test("shares one deterministic prerender timestamp across generated routes", async () => {
+  const home = await readDist("index.html");
+  const archive = await readDist("eventos/pasados/index.html");
+  const timestampPattern =
+    /<meta name="app-prerendered-at" content="([^"]+)" \/>/;
+  const homeTimestamp = home.match(timestampPattern)?.[1];
+  const archiveTimestamp = archive.match(timestampPattern)?.[1];
+
+  assert.ok(homeTimestamp);
+  assert.equal(archiveTimestamp, homeTimestamp);
+  assert.equal(new Date(homeTimestamp).toISOString(), homeTimestamp);
+});
+
 test("generates localized English routes with reciprocal language metadata", async () => {
   const home = await readDist("en/index.html");
   const event = await readDist("en/events/2026-08-08-examen/index.html");
