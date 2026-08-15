@@ -22,11 +22,7 @@ export interface GalleryImage {
   description?: string;
 }
 
-type CalendarEventType =
-  | "torneo"
-  | "examen"
-  | "seminario"
-  | "evento";
+type CalendarEventType = "torneo" | "examen" | "seminario" | "evento";
 
 type LegacyCalendarEventType =
   | "Examen"
@@ -55,17 +51,14 @@ export interface CalendarEvent {
 }
 
 export type IconKey =
-  | "mail"
-  | "phone"
-  | "mapPin"
-  | "instagram"
-  | "facebook"
-  | "globe";
+  "mail" | "phone" | "mapPin" | "instagram" | "facebook" | "globe";
 
 export interface InfoItem {
   icon: IconKey;
   label: string;
+  labelTranslationKey?: "email" | "phone";
   value: string;
+  valueTranslationKey?: "viewLocation";
   href: string;
 }
 

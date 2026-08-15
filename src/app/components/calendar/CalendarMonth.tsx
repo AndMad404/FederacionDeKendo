@@ -19,9 +19,7 @@ export function CalendarMonth({
   onPageChange,
 }: CalendarMonthProps) {
   const { copy } = useLanguage();
-  const pageCount = Math.ceil(
-    group.events.length / CALENDAR_EVENTS_PER_PAGE,
-  );
+  const pageCount = Math.ceil(group.events.length / CALENDAR_EVENTS_PER_PAGE);
   const visibleEvents = group.events.slice(
     pageIndex * CALENDAR_EVENTS_PER_PAGE,
     (pageIndex + 1) * CALENDAR_EVENTS_PER_PAGE,
@@ -37,10 +35,7 @@ export function CalendarMonth({
 
       <ul className="mx-auto grid w-full gap-2">
         {visibleEvents.map((event) => (
-          <CalendarEventCard
-            key={event.id}
-            event={event}
-          />
+          <CalendarEventCard key={event.id} event={event} />
         ))}
       </ul>
 

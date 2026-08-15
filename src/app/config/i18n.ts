@@ -1,11 +1,12 @@
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, useContext } from "react";
 
 export type Language = "es" | "en";
 
 const ENGLISH_PREFIX = "/en";
 
 export function getLanguageFromPathname(pathname: string): Language {
-  return pathname === ENGLISH_PREFIX || pathname.startsWith(`${ENGLISH_PREFIX}/`)
+  return pathname === ENGLISH_PREFIX ||
+    pathname.startsWith(`${ENGLISH_PREFIX}/`)
     ? "en"
     : "es";
 }
@@ -34,16 +35,12 @@ export function getLocalizedPath(pathname: string, language: Language) {
 
   const spanishEvent = normalized.match(/^\/eventos\/([^/]+)\/$/);
   if (spanishEvent) {
-    return language === "en"
-      ? `/en/events/${spanishEvent[1]}/`
-      : normalized;
+    return language === "en" ? `/en/events/${spanishEvent[1]}/` : normalized;
   }
 
   const englishEvent = normalized.match(/^\/en\/events\/([^/]+)\/$/);
   if (englishEvent && englishEvent[1] !== "past") {
-    return language === "es"
-      ? `/eventos/${englishEvent[1]}/`
-      : normalized;
+    return language === "es" ? `/eventos/${englishEvent[1]}/` : normalized;
   }
 
   const spanishArchivePage = normalized.match(
@@ -79,7 +76,7 @@ export function isLanguageSwitch(
   );
 }
 
-const COPY = {
+export const COPY = {
   es: {
     nav: {
       label: "Navegación principal",
@@ -93,10 +90,10 @@ const COPY = {
       upcomingEvents: "Próximos eventos",
       pastEvents: "Eventos pasados",
       links: [
-        { path: "/", label: "Inicio" },
-        { path: "/calendario/", label: "Calendario" },
-        { path: "/galeria/", label: "Galería" },
-        { path: "/afiliados/", label: "Afiliados" },
+        { id: "home", path: "/", label: "Inicio" },
+        { id: "calendar", path: "/calendario/", label: "Calendario" },
+        { id: "gallery", path: "/galeria/", label: "Galería" },
+        { id: "affiliates", path: "/afiliados/", label: "Afiliados" },
       ],
     },
     shell: {
@@ -106,15 +103,18 @@ const COPY = {
     home: {
       title: "Federación de Asociaciones de Kendo",
       lead: "Una comunidad que aprende, entrena y crece unida a través del kendo en Costa Rica.",
-      description: "Encuentra un dojo afiliado o consulta nuestros próximos encuentros.",
+      description:
+        "Encuentra un dojo afiliado o consulta nuestros próximos encuentros.",
       dojos: "Encuentra un dojo",
       events: "Próximos eventos",
       upcoming: "Próximos encuentros",
-      heroAlt: "Grupo de practicantes de kendo reunidos después de una actividad",
+      heroAlt:
+        "Grupo de practicantes de kendo reunidos después de una actividad",
     },
     footer: {
       purposeTitle: "Propósito del",
-      purpose: "El concepto del Kendo es disciplinar el carácter humano a través de la aplicación de los principios de la Katana.",
+      purpose:
+        "El concepto del Kendo es disciplinar el carácter humano a través de la aplicación de los principios de la Katana.",
       contacts: "Contactos de la Federación",
       copyright: "© 2026 Federación de Asociaciones de Kendo.",
       rights: "Todos los derechos reservados.",
@@ -184,8 +184,9 @@ const COPY = {
       viewArchive: "Antiguos eventos",
       directions: "Cómo llegar",
       viewDetailsLabel: "Consultar detalles del evento",
-      addToCalendar: "Agregar al calendario",
-      audienceNotice: "Actividad abierta al público como espectador. La participación está reservada a miembros habilitados. El ingreso está sujeto a capacidad, normas del recinto y condiciones de seguridad.",
+      addToCalendar: "Añade a tu calendario",
+      audienceNotice:
+        "Actividad abierta al público como espectador. La participación está reservada a miembros habilitados. El ingreso está sujeto a capacidad, normas del recinto y condiciones de seguridad.",
     },
     archive: {
       title: "Eventos pasados",
@@ -202,11 +203,17 @@ const COPY = {
       type: "Tipo",
       eventType: "Tipo de evento",
       all: "Todos",
-      types: { torneo: "Torneo", examen: "Examen", seminario: "Seminario", evento: "Evento" },
+      types: {
+        torneo: "Torneo",
+        examen: "Examen",
+        seminario: "Seminario",
+        evento: "Evento",
+      },
     },
     notFound: {
       title: "Página no encontrada",
-      description: "La página que buscas no existe o fue movida. Puedes continuar desde alguna de estas secciones.",
+      description:
+        "La página que buscas no existe o fue movida. Puedes continuar desde alguna de estas secciones.",
     },
   },
   en: {
@@ -222,10 +229,10 @@ const COPY = {
       upcomingEvents: "Upcoming events",
       pastEvents: "Past events",
       links: [
-        { path: "/en/", label: "Home" },
-        { path: "/en/calendar/", label: "Calendar" },
-        { path: "/en/gallery/", label: "Gallery" },
-        { path: "/en/affiliates/", label: "Affiliates" },
+        { id: "home", path: "/en/", label: "Home" },
+        { id: "calendar", path: "/en/calendar/", label: "Calendar" },
+        { id: "gallery", path: "/en/gallery/", label: "Gallery" },
+        { id: "affiliates", path: "/en/affiliates/", label: "Affiliates" },
       ],
     },
     shell: {
@@ -243,7 +250,8 @@ const COPY = {
     },
     footer: {
       purposeTitle: "The purpose of",
-      purpose: "The concept of Kendo is to discipline the human character through the application of the principles of the Katana.",
+      purpose:
+        "The concept of Kendo is to discipline the human character through the application of the principles of the Katana.",
       contacts: "Federation contact",
       copyright: "© 2026 Federation of Kendo Associations.",
       rights: "All rights reserved.",
@@ -314,7 +322,8 @@ const COPY = {
       directions: "Directions",
       viewDetailsLabel: "View details for",
       addToCalendar: "Add to calendar",
-      audienceNotice: "The public may attend as spectators. Participation is reserved for eligible members. Admission is subject to venue capacity, rules, and safety requirements.",
+      audienceNotice:
+        "The public may attend as spectators. Participation is reserved for eligible members. Admission is subject to venue capacity, rules, and safety requirements.",
     },
     archive: {
       title: "Past events",
@@ -331,11 +340,17 @@ const COPY = {
       type: "Type",
       eventType: "Event type",
       all: "All",
-      types: { torneo: "Tournament", examen: "Examination", seminario: "Seminar", evento: "Event" },
+      types: {
+        torneo: "Tournament",
+        examen: "Examination",
+        seminario: "Seminar",
+        evento: "Event",
+      },
     },
     notFound: {
       title: "Page not found",
-      description: "The page you are looking for does not exist or has moved. You can continue from one of these sections.",
+      description:
+        "The page you are looking for does not exist or has moved. You can continue from one of these sections.",
     },
   },
 } as const;
@@ -346,30 +361,11 @@ interface LanguageContextValue {
   copy: (typeof COPY)[Language];
 }
 
-const LanguageContext = createContext<LanguageContextValue | null>(null);
-
-export function LanguageProvider({
-  language,
-  children,
-}: {
-  language: Language;
-  children: ReactNode;
-}) {
-  return (
-    <LanguageContext.Provider
-      value={{
-        language,
-        locale: language === "es" ? "es-CR" : "en",
-        copy: COPY[language],
-      }}
-    >
-      {children}
-    </LanguageContext.Provider>
-  );
-}
+export const LanguageContext = createContext<LanguageContextValue | null>(null);
 
 export function useLanguage() {
   const context = useContext(LanguageContext);
-  if (!context) throw new Error("useLanguage must be used within LanguageProvider.");
+  if (!context)
+    throw new Error("useLanguage must be used within LanguageProvider.");
   return context;
 }

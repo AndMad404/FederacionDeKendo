@@ -2,8 +2,134 @@
 
 ```yaml
 schema_version: 2
-last_updated: 2026-08-12
+last_updated: 2026-08-14
 contract: .agents/review-contract.md
+
+latest_calendar_resilience_script_review:
+  id: REV-2026-08-14-01
+  requested_scope: Verify the script-backed identity and fingerprint checks plus the resilience behavior represented by the two calendar infrastructure diagrams.
+  actual_scope:
+    targets:
+      - scripts/sync-calendar-events.mjs
+      - scripts/apply-calendar-editorial-decision.mjs
+      - scripts/correct-calendar-history.mjs
+      - scripts/correct-calendar-history-range.mjs
+      - .github/workflows/sync-calendar.yml
+      - .github/workflows/apply-calendar-editorial-decision.yml
+      - .github/workflows/correct-calendar-history-range.yml
+      - tests/event-history-sync-contract.test.mjs
+      - tests/calendar-history-correction.test.mjs
+      - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/calendar-infrastructure-flows.md
+    axes: [ARCH]
+    included:
+      - exact decision identity, revision, and evidence checks
+      - historical range report and local-state fingerprint checks
+      - pending, published, and removed transitions for future and historical events
+      - mass-disappearance preservation and artifact handoff
+      - correspondence between the implemented behavior and both diagrams
+    excluded:
+      - external GitHub Actions and Cloudflare execution, UI, SEO, visual behavior, and implementation changes
+  baseline:
+    commit: f9cdfe61
+    worktree: clean before this review-state update
+  confirmed_findings:
+    - CRIT-ARCH-001
+    - DOC-ARCH-003
+  evidence:
+    - corepack pnpm exec node --test tests/event-history-sync-contract.test.mjs tests/calendar-history-correction.test.mjs passed 45 tests
+    - exact source, revision, and evidence comparison at scripts/sync-calendar-events.mjs:678-689
+    - historical snapshot and proposal comparisons at scripts/correct-calendar-history.mjs:125-139
+    - artifact upload/download names in .github/workflows/sync-calendar.yml and .github/workflows/correct-calendar-history-range.yml
+    - future replacement and rejected-deletion transitions at scripts/sync-calendar-events.mjs:479-508 and 646-660
+  result: Core pending/publicado/eliminado and fail-closed mass-disappearance behavior is implemented and covered by directed tests, but the historical correction artifact cannot currently be downloaded by its consumer workflow and the resilience diagram overstates revision/evidence retention for future edits and rejected deletions.
+
+latest_calendar_resilience_findings:
+  - id: CRIT-ARCH-001
+    level: CRITICAL
+    axis: ARCH
+    status: resolved
+    target: .github/workflows/correct-calendar-history-range.yml:39
+    problem: The correction workflow downloads artifact calendar-historical-changes, while synchronization uploads the report inside artifact calendar-notification-reports.
+    fix: Use one artifact name in both workflows and add a contract assertion for the producer-consumer name.
+    cost_of_deferring: Every approved historical range correction run fails before the correction script can execute.
+    evidence:
+      - .github/workflows/sync-calendar.yml:87
+      - .github/workflows/correct-calendar-history-range.yml:39
+    introduced_in: REV-2026-08-14-01
+    resolution:
+      resolved_at: 2026-08-14
+      resolved_ref: implementation worktree based on f9cdfe61
+      checks:
+        - corepack pnpm exec node --test tests/calendar-workflow-architecture.test.mjs passed 3 tests
+        - corepack pnpm run test:unit passed 91 tests
+        - git diff --check passed
+  - id: DOC-ARCH-003
+    level: STRUCTURAL
+    axis: ARCH
+    status: resolved
+    target: ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/calendar-infrastructure-flows.md:159
+    problem: The implemented-resilience diagram says applicable future edits retain the previous revision and all saved paths retain revision and evidence, but future edits replace the prior registry event and rejected deletion removes pendingRevision.
+    fix: Either narrow the diagram wording to the state actually retained or implement explicit prior-revision and evidence retention for those transitions.
+    cost_of_deferring: Operators and future phases may rely on an audit trail that the current registry does not preserve.
+    evidence:
+      - scripts/sync-calendar-events.mjs:479-508
+      - scripts/sync-calendar-events.mjs:646-660
+      - tests/event-history-sync-contract.test.mjs
+    introduced_in: REV-2026-08-14-01
+    resolution:
+      resolved_at: 2026-08-14
+      resolved_ref: documentation worktree
+      checks:
+        - calendar-infrastructure-flows.md distinguishes ordinary published updates from retained pending-revision evidence
+
+latest_calendar_flow_alignment_review:
+  id: REV-2026-08-13-01
+  requested_scope: Determine whether recent repository changes alter the canonical calendar infrastructure flow diagram.
+  actual_scope:
+    targets:
+      - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/calendar-infrastructure-flows.md
+      - scripts/sync-calendar-events.mjs
+      - scripts/sync-event-galleries.mjs
+      - scripts/correct-calendar-history-range.mjs
+      - .github/workflows/sync-calendar.yml
+      - .github/workflows/correct-calendar-history-range.yml
+      - src/app/utils/eventArchive.js
+    axes: [ARCH]
+    included:
+      - triggers, source artifacts, decisions, publication paths, and gates represented by the current-flow diagram
+      - committed changes through 22c12617
+    excluded:
+      - visual UI behavior, SEO, non-calendar gallery asset hashing, external workflow execution, and changes to the objective diagram
+  baseline:
+    commit: 22c12617
+    worktree: clean
+  confirmed_findings:
+    - DOC-ARCH-002
+  evidence:
+    - calendar-infrastructure-flows.md current-flow Mermaid diagram
+    - .github/workflows/correct-calendar-history-range.yml
+    - scripts/correct-calendar-history-range.mjs
+    - git diff 2555735b..HEAD for calendar workflow and pipeline targets
+  result: The current-flow diagram is stale for the separately triggered, report-driven historical correction workflow. The 48-hour archive/gallery checkpoint changes a business timing rule but does not change the diagram topology.
+
+open_findings:
+  - id: DOC-ARCH-002
+    level: STRUCTURAL
+    axis: ARCH
+    status: resolved
+    target: ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/calendar-infrastructure-flows.md:19
+    problem: The current-flow diagram shows the retained historical-change report as terminal, but it omits the manual correction workflow that downloads that report, validates an approved date range, writes the registry and public event data, verifies, commits, and re-enters CI.
+    fix: Add a separate manual-trigger branch from the retained report to correct-calendar-history-range.yml, its validation/correction step, calendarEventRegistry.json and calendarEvents.ts, the existing verification gate, commit, and CI.
+    cost_of_deferring: Readers cannot trace the implemented human-approved correction path and may mistake the report for an informational dead end.
+    evidence:
+      - .github/workflows/correct-calendar-history-range.yml
+      - scripts/correct-calendar-history-range.mjs
+    introduced_in: REV-2026-08-13-01
+    resolution:
+      resolved_at: 2026-08-13
+      resolved_ref: documentation worktree
+      checks:
+        - calendar-infrastructure-flows.md includes the manual correction branch from the retained report through the existing verification and CI path
 
 state_rules:
   - Coverage is valid only for its recorded targets, axes, inclusions, and baseline.
@@ -2816,7 +2942,7 @@ latest_spa_mobile_review:
     - id: CRIT-RESP-001
       level: CRITICAL
       axis: RESPONSIVE
-      status: resolved
+      status: accepted_owner_policy
       target: 768x641 Calendar and Affiliates route content
       problem: At exactly 768x641 the tall-md fixed-viewport mode activates, the document cannot scroll, and interactive Calendar and Affiliates content extends below overflow-hidden route containers without another reachable scroll owner.
       fix: Do not select an implementation until the owner understands and approves a content-reachability contract; then ensure overflowing content has one explicit reachable scroll owner while preserving the separately approved 1366x768 composition.
@@ -2841,7 +2967,7 @@ latest_spa_mobile_review:
     - id: STR-ARCH-013
       level: STRUCTURAL
       axis: ARCH
-      status: open
+      status: resolved
       target: custom responsive variants and route-level component utility chains
       problem: Layout policy is distributed across width, height, and orientation variants inside individual components, including intersecting overrides whose source-order behavior has already caused a regression.
       fix: Define a small documented responsive composition contract and reuse non-visual shell primitives or named class sets for viewport ownership, banners, panels, and compact landscape behavior.
@@ -3196,5 +3322,311 @@ latest_home_tablet_frame_fix:
     - a temporary zero-tolerance comparison found 3040 residual changed pixels; inspected diff attributed the remaining material region to the owner-approved ES/EN navbar addition
     - no screenshot baseline was regenerated
   result: Home again presents navbar, 348px hero, all three visible event cards, and footer inside the 768x1024 frame; mobile and 1366x768 remain baseline-matching.
+
+latest_event_seo_review:
+  id: REV-2026-08-13-01
+  requested_scope: Assess SEO for upcoming and past events.
+  actual_scope:
+    targets:
+      - src/app/config/events.ts
+      - src/app/config/seo.ts
+      - src/app/utils/eventRoutes.ts
+      - src/app/utils/eventArchive.js
+      - src/app/components/PastEventsSection.tsx
+      - scripts/generate-route-html.mjs
+      - generated event and archive HTML plus sitemap
+    axes: [SEO]
+    included:
+      - indexability, canonical URLs, hreflang, sitemap, event structured data
+      - server-rendered historical archive content
+    excluded:
+      - production deployment configuration and search-console coverage
+      - keyword research, backlinks, performance, and visual presentation
+  baseline:
+    commit: 1dbec00d
+    worktree: clean before review-state update
+    fingerprints:
+      events.ts: 6053F2452EF4DD51D164688E6F44DE8CA3597CD41A74C80A6AC578FAF669E395
+      seo.ts: 806129991AB0AEA573750447EB692C3CD10E39F9D2375D180E10617541F4DC38
+      eventRoutes.ts: EEBCE353B54638F1DC4E4A3AACF5C1AB9D9446617A075FAE6C7BCAEC8400F7DE
+      PastEventsSection.tsx: 7F2A4F7792BF4E5F88C04CEDF3600CCDBF5B416852BD7115C1171905DBD9C147
+  confirmed_findings: [STR-SEO-006, STR-SEO-007, SMELL-SEO-006, SMELL-SEO-007]
+  findings:
+    - id: STR-SEO-006
+      level: STRUCTURAL
+      axis: SEO
+      status: resolved
+      target: src/app/config/seo.ts:157-160; src/app/config/events.ts:1
+      problem: SITE_INDEXING_ENABLED and EVENT_INDEXING_ENABLED are false, so every event, calendar, and archive page emits noindex,nofollow; the sitemap is empty and no JSON-LD is emitted.
+      fix: Enable public indexing only after confirming the canonical domain and launch policy, then make the event-level index policy explicit for upcoming and historical details.
+      cost_of_deferring: Search engines are instructed not to index any event URL, so the event content cannot obtain organic visibility.
+      evidence:
+        - corepack pnpm run build
+        - corepack pnpm run test:generated passed 5 tests
+        - dist/eventos/2026-09-12-gasshuku-monteverde/index.html:26
+        - dist/eventos/pasados/index.html:20
+        - dist/sitemap.xml contains no url entries
+      resolution:
+        resolved_at: 2026-08-13
+        resolved_ref: owner direction
+        checks:
+          - all generated routes emit noindex, nofollow
+          - sitemap contains no URL entries
+          - generated output tests passed
+    - id: STR-SEO-007
+      level: STRUCTURAL
+      axis: SEO
+      status: resolved
+      target: src/app/components/PastEventsSection.tsx:30-34
+      problem: The archive obtains historical events only after useEffect sets now; static SSR output has an empty archive and no links to historical detail pages.
+      fix: Supply a deterministic server render time or precompute archive content during static generation, while preserving client freshness after hydration.
+      cost_of_deferring: Even after indexing is enabled, crawlers that use the generated HTML will not discover archive entries from the archive page.
+      evidence:
+        - corepack pnpm run build
+        - dist/eventos/pasados/index.html SSR body says Todavia no hay eventos en el archivo
+        - getPastEvents defaults to a real current date when invoked by getRouteManifest in src/app/config/seo.ts:250-268
+      resolution:
+        resolved_at: 2026-08-13
+        resolved_ref: worktree
+        checks:
+          - generated archive HTML contains historical event links
+          - generated output tests passed
+    - id: SMELL-SEO-006
+      level: SMELL
+      axis: SEO
+      status: resolved
+      target: src/app/config/seo.ts:391-426
+      problem: The future Event JSON-LD is prepared only for events with location and assigns EventScheduled without considering a historical event state.
+      fix: When indexing is approved, emit a complete Event entity for eligible published events and use EventCompleted for past events.
+      cost_of_deferring: Rich-result eligibility and schema accuracy will be inconsistent across the archive after indexing is enabled.
+      evidence:
+        - src/app/config/seo.ts:391-426
+      resolution:
+        resolved_at: 2026-08-13
+        resolved_ref: worktree
+        checks:
+          - generated historical event JSON-LD uses EventCompleted
+          - generated output tests passed
+    - id: SMELL-SEO-007
+      level: SMELL
+      axis: SEO
+      status: deferred_presidency_authority
+      target: src/app/config/seo.ts:300
+      problem: Detail-page titles use only the event name, so recurring events such as Examen generate identical HTML titles across different dates.
+      fix: Include the event date or year in the detail-page title while retaining the concise visible h1.
+      cost_of_deferring: Search results and social previews cannot clearly distinguish recurring editions of the same event.
+      evidence:
+        - dist/eventos/2026-08-08-examen/index.html title is Examen | Federacion de Asociaciones de Kendo
+        - dist/eventos/2027-01-30-examen/index.html has the same title
+  evidence:
+    - attempted production URL inspection was blocked by the browsing safety gate; no claim about deployed headers or deployed HTML is made
+    - canonical and reciprocal hreflang tags are present in generated Spanish and English event and archive pages
+    - event title and meta description are generated from localized event data
+  result: The owner-required global noindex policy is active for all routes. The archive now retains server-rendered historical links for a future approved indexing phase; titles remain unchanged under Presidency authority.
+  pending: Production deployment and Search Console indexing coverage were not reviewed.
+  next: Do not enable indexing until the owner explicitly authorizes it.
+
+latest_calendar_timezone_and_localization_review:
+  id: REV-2026-08-13-02
+  requested_scope: Validate the reported calendar-status and event-title-localization findings.
+  actual_scope:
+    targets:
+      - src/app/utils/calendarEvents.ts
+      - src/app/utils/eventArchive.js
+      - src/app/utils/calendarEventPresentation.ts
+      - src/app/utils/localizedEvents.ts
+      - src/app/types.ts
+      - direct callers in EventPage.tsx and seo.ts
+    axes: [ARCH]
+    included:
+      - event-end instant construction and its time-zone source
+      - archive eligibility comparison
+      - English event-title translation lookup and ordinal grammar
+    excluded:
+      - implementation changes
+      - visual presentation
+      - calendar synchronization, historical-route behavior, and non-title localization
+  baseline:
+    commit: 9fd8331d
+    worktree: dirty
+    limitation: eventArchive.js and EventPage.tsx contain unrelated route-worktree changes; evidence below is from their current contents.
+  confirmed_findings:
+    - STR-ARCH-017
+    - SMELL-ARCH-012
+    - STR-ARCH-018
+  findings:
+    - id: STR-ARCH-017
+      level: STRUCTURAL
+      axis: ARCH
+      status: resolved
+      target: src/app/utils/calendarEvents.ts:20-58
+      problem: Event start and end instants are constructed in the executing environment's local time zone rather than event.timeZone, so upcoming, detail, and Event JSON-LD completion decisions vary by visitor or build-host time zone.
+      fix: Convert the event's date and time to an instant using event.timeZone, preserving the existing all-day end-date semantics, and cover offset-boundary cases with directed tests.
+      cost_of_deferring: The public status of an event can disagree with the Costa Rica-anchored archive eligibility around date boundaries.
+      evidence:
+        - src/app/utils/calendarEvents.ts:20-68
+        - src/app/types.ts:38-57
+        - src/app/utils/eventArchive.js:22-71
+        - src/app/components/EventPage.tsx:58
+        - src/app/config/seo.ts:414
+      resolution:
+        resolved_at: 2026-08-13
+        resolved_ref: worktree
+        checks:
+          - calendarEvents.ts derives timed and all-day end instants from event.timeZone, defaulting to America/Costa_Rica
+          - EventPage, upcoming-event filtering, and Event JSON-LD transition at the same inclusive end instant
+          - corepack pnpm run typecheck passed
+          - corepack pnpm run build passed, including SSR and generated route HTML
+          - playwright test tests/e2e/calendar-timezone-localization.spec.ts passed 3 tests
+    - id: SMELL-ARCH-012
+      level: SMELL
+      axis: ARCH
+      status: resolved
+      target: src/app/utils/localizedEvents.ts:13-23
+      problem: Title translations use sequential exact string replacements while summaries use a lookup dictionary with a fallback; whitespace-sensitive literals make title localization silently brittle when source calendar text changes.
+      fix: Use a title Record<string, string> for known source titles, retaining the original title as the fallback; keep any intentionally general ordinal translation as a separately tested rule.
+      cost_of_deferring: Small upstream copy changes can expose Spanish event titles in English pages without an error.
+      evidence:
+        - src/app/utils/localizedEvents.ts:4-35
+        - src/app/data/calendarEvents.ts:9-184
+      resolution:
+        resolved_at: 2026-08-13
+        resolved_ref: worktree
+        checks:
+          - localizedEvents.ts uses TITLE_TRANSLATIONS with the original title as fallback
+          - playwright test tests/e2e/calendar-timezone-localization.spec.ts verifies a published title translation
+    - id: STR-ARCH-018
+      level: STRUCTURAL
+      axis: ARCH
+      status: resolved
+      target: src/app/utils/localizedEvents.ts:21-22
+      problem: The ordinal title rule maps only 3 to rd and maps 1 and 2 to th, producing grammatically incorrect English titles such as 1th and 2th Tournament.
+      fix: Implement the correct ordinal rules (including 11th, 12th, and 13th) or enumerate the published title translations in the title lookup.
+      cost_of_deferring: Public English event copy is visibly incorrect for affected tournament titles.
+      evidence:
+        - src/app/utils/localizedEvents.ts:21-22
+      resolution:
+        resolved_at: 2026-08-13
+        resolved_ref: worktree
+        checks:
+          - published tournament titles are explicit dictionary entries with correct English ordinals
+          - playwright test tests/e2e/calendar-timezone-localization.spec.ts verifies 3er Torneo becomes 3rd Tournament
+  evidence:
+    - Get-Content .agents/review-contract.md
+    - rg -n -C 4 "createLocalDate|getEventEndDate|archiveEligibleAt|translateTitle|SUMMARY_TRANSLATIONS|Torneo" src scripts
+    - git status --short showed a dirty worktree before review
+    - no directed tests presently match calendarEvents.ts or localizedEvents.ts
+  result: All three reported findings were resolved in the worktree. Event completion is now stable across visitor zones and uses an inclusive end instant consistent with archive eligibility; title localization is dictionary-backed with a safe fallback.
+  pending: The unrelated pre-existing end-to-end failure in events.spec.ts for the 48-hour archive transition remains outside this change.
+  next: Reconcile the archive-transition test with the current archive behavior in a separate targeted task.
+
+latest_calendar_date_helper_followup:
+  id: FIX-2026-08-13-05
+  requested_scope: Implement and document the confirmed calendar data/generator follow-up.
+  actual_scope:
+    targets:
+      - src/app/utils/calendarDate.js
+      - src/app/utils/calendarEvents.ts
+      - scripts/sync-calendar-events.mjs
+      - tests/calendar-sync.test.mjs
+      - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/calendar-sync.md
+      - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/architecture.md
+    axes: [ARCH]
+    excluded:
+      - public event data changes
+      - visual presentation
+      - archive policy and external synchronization execution
+  implementation:
+    - Extracted ISO calendar-day arithmetic and deterministic local date/time sort keys into calendarDate.js, importable by both the application and the Node sync script.
+    - Replaced the sync script's host-local Date construction and addDays helpers with the shared functions.
+    - Retained event instant conversion in calendarEvents.ts, where event.timeZone is required to answer whether an event has ended.
+  resolved_findings:
+    - id: SMELL-ARCH-013
+      level: SMELL
+      axis: ARCH
+      status: resolved
+      target: src/app/utils/calendarDate.js
+      problem: Calendar-day addition and chronological sorting had independent application/script implementations, so a later date-logic change could diverge between generated data and runtime behavior.
+      fix: Share pure ISO-date helpers; calendar-day arithmetic and wall-clock sorting do not consult the runner or visitor time zone.
+      checks:
+        - corepack pnpm exec node --test tests/calendar-sync.test.mjs passed 19 tests
+        - corepack pnpm run typecheck passed
+        - corepack pnpm run build passed, including SSR and generated route HTML
+        - git diff --check passed
+  documented:
+    - calendar-sync.md distinguishes host-independent calendar arithmetic from event.timeZone instant conversion.
+    - architecture.md records the shared calendar-date boundary and its consumers.
+  result: The previous time-zone and ordinal findings remain closed by their existing directed browser tests; the remaining date-helper duplication is now removed and documented.
+
+latest_calendar_phase6_review:
+  id: REV-2026-08-14-01
+  requested_scope: Determine whether Phase 6 of the calendar-resilience roadmap is implemented and identify anything omitted.
+  actual_scope:
+    targets:
+      - .github/actions/verify-site/action.yml
+      - .github/workflows/ci.yml
+      - .github/workflows/sync-calendar.yml
+      - .github/workflows/apply-calendar-editorial-decision.yml
+      - .github/workflows/correct-calendar-history-range.yml
+      - package.json
+      - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/calendar-resilience-roadmap.md
+      - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/calendar-sync.md
+      - ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/technical-backlog.md
+    axes: [ARCH]
+    included:
+      - shared verification-gate implementation
+      - verification ordering before automated commits
+      - suppression of duplicate CI for bot-authored commits
+      - preservation of CI coverage for human pushes and pull requests
+      - documentation alignment and deployment-gate evidence
+    excluded:
+      - external GitHub Actions execution
+      - Cloudflare deployment configuration and runtime behavior
+      - visual, SEO, and calendar data behavior
+  baseline:
+    commit: 4a37a9f0
+    worktree: clean before review-state update
+  confirmed_findings:
+    - DOC-ARCH-003
+    - EXT-ARCH-001
+  findings:
+    - id: DOC-ARCH-003
+      level: STRUCTURAL
+      axis: ARCH
+      status: open
+      target: ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/calendar-resilience-roadmap.md:3; ../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/calendar-sync.md:9
+      problem: The Phase 6 implementation in commit 4a37a9f0 is not recorded as completed; the roadmap and operator guide still say CI optimization is pending, and the technical backlog retains the same work as P1.
+      fix: Reconcile the three canonical planning/operation documents with the implemented shared verification gate, retaining only unresolved external deployment evidence as a follow-up.
+      cost_of_deferring: Planning reports a non-existent next implementation phase and can duplicate work.
+      evidence:
+        - commit 4a37a9f0
+        - .github/actions/verify-site/action.yml
+        - .github/workflows/ci.yml
+        - .github/workflows/sync-calendar.yml
+    - id: EXT-ARCH-001
+      level: STRUCTURAL
+      axis: ARCH
+      status: open
+      target: Cloudflare Pages and GitHub repository configuration outside the local repository
+      problem: The repository proves verification completes before each automatic commit and skips duplicate bot CI, but it cannot prove Cloudflare waits for GitHub Actions or consumes only verified artifacts.
+      fix: Inspect one automatic commit in GitHub Actions and its matching Cloudflare deployment timestamps/status, then record the observed publication contract; if Pages deploys directly from push, revise the Phase 6 exit criterion or configure an external gate.
+      cost_of_deferring: The roadmap cannot truthfully claim that deployment only consumes verified artifacts.
+      evidence:
+        - calendar-resilience-roadmap.md:275-286
+        - calendar-sync.md:407-411
+        - technical-backlog.md:22
+  verification:
+    - corepack pnpm run test:sync-directed passed
+    - corepack pnpm run test:unit:without-sync passed
+    - corepack pnpm run test:unit:without-history-correction passed
+    - corepack pnpm run typecheck passed
+    - corepack pnpm run build passed, including SSR and generated routes
+    - corepack pnpm run test:generated passed 5 tests
+    - corepack pnpm run test:e2e passed 207 tests
+  result: The repository implementation satisfies the internal CI-deduplication and human-push coverage portions of Phase 6. Completion of its deployment-artifact condition remains externally unverified, and documentation is stale.
+  pending:
+    - Verify the GitHub Actions-to-Cloudflare publication relationship for an automatic calendar commit.
+    - Reconcile the canonical roadmap, operator guide, and technical backlog after that evidence is recorded or the exit criterion is revised.
+  next: Inspect the external GitHub Actions and Cloudflare deployment records for one known automatic calendar commit.
 
 ```

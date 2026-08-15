@@ -140,8 +140,8 @@ export function DojoCard({
       </h2>
 
       <div className="grid gap-2 md:gap-4 land-compact:gap-1">
-        {getInfoRows(info).map(([leftItem, rightItem]) => (
-          <div key={leftItem.label} className={INFO_GRID}>
+        {getInfoRows(info).map(([leftItem, rightItem], rowIndex) => (
+          <div key={rowIndex} className={INFO_GRID}>
             <InfoCell item={leftItem} side="left" />
             {rightItem ? <InfoCell item={rightItem} side="right" /> : null}
           </div>

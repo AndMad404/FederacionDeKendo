@@ -7,8 +7,10 @@ import {
   navigationArrowButtonClass,
 } from "../../styles/shared";
 
-interface ModalCloseButtonProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" | "type"> {
+interface ModalCloseButtonProps extends Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  "children" | "type"
+> {
   label: string;
 }
 
@@ -29,8 +31,10 @@ export const ModalCloseButton = forwardRef<
   );
 });
 
-interface NavigationArrowButtonProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" | "type"> {
+interface NavigationArrowButtonProps extends Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  "children" | "type"
+> {
   direction: "previous" | "next";
   label: string;
   isActive?: boolean;

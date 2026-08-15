@@ -1,9 +1,4 @@
-import {
-  Suspense,
-  useEffect,
-  useRef,
-  type ComponentType,
-} from "react";
+import { Suspense, useEffect, useRef, type ComponentType } from "react";
 import { Route, Routes, useLocation } from "react-router";
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
@@ -18,9 +13,9 @@ import { getRoutePresentation } from "./config/routePresentation";
 import {
   getLanguageFromPathname,
   isLanguageSwitch,
-  LanguageProvider,
   useLanguage,
 } from "./config/i18n";
+import { LanguageProvider } from "./config/LanguageProvider";
 
 export interface RouteComponentRegistry {
   routes: Record<RouteComponent, ComponentType>;
@@ -89,7 +84,9 @@ function AppShell({
 
       <main
         id="main-content"
-        className={`px-2.5 pt-[calc(4rem_+_10px)] land-sm:pt-[calc(3rem_+_6px)] tall-md:flex-1 ${
+        className={`px-2.5 pt-[calc(4rem_+_10px)] land-sm:pt-[calc(3rem_+_6px)] ${
+          routeComponent === "event" ? "" : "tall-md:flex-1"
+        } ${
           allowsDesktopContainment
             ? "page-fit:min-h-0 page-fit:overflow-hidden"
             : ""
@@ -107,7 +104,13 @@ function AppShell({
                 key={route.path}
                 path={route.path}
                 element={
-                  <Suspense fallback={<p className="sr-only" role="status">{copy.shell.loading}</p>}>
+                  <Suspense
+                    fallback={
+                      <p className="sr-only" role="status">
+                        {copy.shell.loading}
+                      </p>
+                    }
+                  >
                     <Component />
                   </Suspense>
                 }
@@ -117,7 +120,13 @@ function AppShell({
           <Route
             path="*"
             element={
-              <Suspense fallback={<p className="sr-only" role="status">{copy.shell.loading}</p>}>
+              <Suspense
+                fallback={
+                  <p className="sr-only" role="status">
+                    {copy.shell.loading}
+                  </p>
+                }
+              >
                 <NotFoundComponent />
               </Suspense>
             }
@@ -142,9 +151,12 @@ function ScrollToTop() {
     );
     previousPathname.current = pathname;
 
-    if (isInitialLoad || isEquivalentLanguageRoute || window.location.hash) return;
+    if (isInitialLoad || isEquivalentLanguageRoute || window.location.hash)
+      return;
 
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
   }, [pathname]);
 

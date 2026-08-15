@@ -1,0 +1,27 @@
+# Dependencies and package-manager output
+node_modules/
+.pnpm-store/
+pnpm-lock.yaml
+
+# Build and test output
+dist/
+dist-ssr/
+coverage/
+playwright-report/
+test-results/
+vitest-report/
+tmp/
+
+# Generated or externally managed application data
+public/images/
+src/app/data/calendarEventRegistry.json
+src/app/data/calendarEvents.ts
+src/app/data/eventGalleries.ts
+src/app/data/eventGalleryState.json
+
+# Local and tool-managed state
+local/
+.agents/
+.codex/
+.codex-remote-attachments/
+AGENTS.md

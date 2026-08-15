@@ -27,9 +27,7 @@ export function PageTitle({
       ? "pointer-events-none absolute left-1/2 top-4 z-30 -translate-x-1/2"
       : "relative";
   const toneClass =
-    tone === "media"
-      ? "text-site-on-dark drop-shadow-md"
-      : "text-site-navy";
+    tone === "media" ? "text-site-on-dark drop-shadow-md" : "text-site-navy";
   const densityClass = density === "flush" ? "p-0" : "px-3 py-2";
   const decorationClass =
     decoration === "underline"

@@ -68,28 +68,30 @@ Al final corre los checks relevantes de .agents/verification.md.
 ## Implement One Roadmap Phase
 
 ```text
-Implementa unicamente la Fase [numero] de [roadmap].
+Fase [numero], [titulo/enlace directo]: [objetivo exacto].
+Las fases previas estan cerradas; no las reaudites.
 
-Lee AGENTS.md, el roadmap y los contratos aplicables. Usa docs/index.md para
-seleccionar el contexto documental minimo; no cargues fases posteriores.
+Contexto minimo: parte del apartado enlazado; si no basta, usa `docs/index.md`
+y el mapa documental aplicable para seleccionar solo la referencia indispensable.
 
-Alcance:
-- [resultados autorizados de esta fase]
+Delta: [resultado funcional verificable de esta fase].
+Invariantes criticos: [condicion observable que no puede cambiar].
+Decision humana: [bloqueo y alternativa minima que requiere aprobacion; o
+"ninguna"].
 
-Fuera de alcance:
-- [responsabilidades de fases posteriores]
-- cambios visuales no aprobados;
-- refactors no requeridos.
+Limites: [exclusion o frontera relevante de esta fase; no crees commit salvo
+solicitud]. Preserva cambios ajenos del worktree. Selecciona las verificaciones
+mediante `.agents/verification.md`.
 
-Criterio de salida:
-- primero pasan las pruebas dirigidas de la fase;
-- despues pasan las verificaciones finales indicadas por
-  .agents/verification.md;
-- el diff queda limitado, revisable y apto para un commit atomico.
-
-Detente ante una diferencia visual inesperada o una decision de producto que
-el roadmap no haya resuelto. No crees un commit salvo que se solicite.
+Reporte final: delta aplicado, verificaciones ejecutadas y gates aplicables
+omitidos con motivo; bloqueos.
 ```
+
+## Implement One Calendar-Resilience Phase
+
+Use the canonical `Implement One Roadmap Phase` recipe. Its direct phase link
+points to the relevant section of `calendar-resilience-roadmap.md`; do not add
+calendar-specific preamble, file lists, gates, or historical contracts.
 
 ## SEO Change
 

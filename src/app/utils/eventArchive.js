@@ -1,3 +1,5 @@
+import { getArchivePagePath } from "./eventArchiveRoutes.js";
+
 const ARCHIVE_TIME_ZONE = "America/Costa_Rica";
 const ARCHIVE_EVENT_TYPES = new Set([
   "torneo",
@@ -16,7 +18,11 @@ function parseDate(date) {
 function addCalendarDays(date, days) {
   const [year, month, day] = parseDate(date);
   const result = new Date(Date.UTC(year, month - 1, day + days));
-  return [result.getUTCFullYear(), result.getUTCMonth() + 1, result.getUTCDate()];
+  return [
+    result.getUTCFullYear(),
+    result.getUTCMonth() + 1,
+    result.getUTCDate(),
+  ];
 }
 
 function getTimeZoneOffsetMilliseconds(date, timeZone) {
@@ -30,7 +36,9 @@ function getTimeZoneOffsetMilliseconds(date, timeZone) {
     second: "2-digit",
     hourCycle: "h23",
   }).formatToParts(date);
-  const values = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+  const values = Object.fromEntries(
+    parts.map(({ type, value }) => [type, value]),
+  );
   const representedAsUtc = Date.UTC(
     Number(values.year),
     Number(values.month) - 1,
@@ -58,7 +66,7 @@ export function calculateArchiveEligibleAt(
   lastEventDate,
   timeZone = ARCHIVE_TIME_ZONE,
 ) {
-  return localMidnightToInstant(addCalendarDays(lastEventDate, 1), timeZone);
+  return localMidnightToInstant(addCalendarDays(lastEventDate, 2), timeZone);
 }
 
 export function calculateGalleryCheckAt(
@@ -74,7 +82,7 @@ export function getArchiveEligibleAt(event) {
       ? addCalendarDays(event.endDate, -1)
           .map((part, index) => String(part).padStart(index === 0 ? 4 : 2, "0"))
           .join("-")
-      : event.endDate ?? event.date;
+      : (event.endDate ?? event.date);
   return event.archiveEligibleAt
     ? new Date(event.archiveEligibleAt)
     : calculateArchiveEligibleAt(fallbackLastEventDate, ARCHIVE_TIME_ZONE);
@@ -94,7 +102,10 @@ export function normalizeArchiveFilters(filters) {
 export function filterAndSortArchiveEvents(events, filters) {
   const normalized = normalizeArchiveFilters(filters);
   return [...events]
-    .filter((event) => !normalized.year || event.date.startsWith(`${normalized.year}-`))
+    .filter(
+      (event) =>
+        !normalized.year || event.date.startsWith(`${normalized.year}-`),
+    )
     .filter((event) => !normalized.type || event.eventType === normalized.type)
     .sort(
       (a, b) =>
@@ -111,14 +122,7 @@ export function getArchiveYears(events) {
 
 export function buildArchiveUrl(page, language = "es", filters = {}) {
   const normalized = normalizeArchiveFilters(filters);
-  const basePath =
-    language === "en"
-      ? page <= 1
-        ? "/en/events/past/"
-        : `/en/events/past/page/${page}/`
-      : page <= 1
-        ? "/eventos/pasados/"
-        : `/eventos/pasados/pagina/${page}/`;
+  const basePath = getArchivePagePath(page, language);
   const search = new URLSearchParams(normalized).toString();
   return search ? `${basePath}?${search}` : basePath;
 }

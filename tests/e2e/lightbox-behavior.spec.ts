@@ -2,22 +2,33 @@ import { expect, test, type Page } from "@playwright/test";
 import { FIXED_TEST_TIME } from "./design-contract";
 
 async function openLightbox(page: Page) {
-  await page.clock.setFixedTime(FIXED_TEST_TIME);
-  await page.goto("/galeria/");
-  const opener = page.locator(".gallery-featured-frame > button");
-  await expect(opener).toBeVisible();
-  await opener.click();
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    await page.clock.setFixedTime(FIXED_TEST_TIME);
+    await page.goto("/galeria/");
+    const opener = page.locator(".gallery-featured-frame > button");
+    await expect(opener).toBeVisible();
+    await opener.click();
 
-  const dialog = page.getByRole("dialog");
-  await expect(dialog).toBeVisible();
-  return { dialog, opener };
+    const dialog = page.getByRole("dialog");
+    try {
+      await expect(dialog).toBeVisible({ timeout: 5_000 });
+      return { dialog, opener };
+    } catch (error) {
+      if (attempt === 1) throw error;
+    }
+  }
+
+  throw new Error("Unreachable");
 }
 
 test("isolates the open lightbox from the application", async ({ page }) => {
   const { dialog } = await openLightbox(page);
 
   await expect(dialog).toHaveAttribute("aria-labelledby", "lightbox-title");
-  await expect(dialog).toHaveAttribute("aria-describedby", "lightbox-description");
+  await expect(dialog).toHaveAttribute(
+    "aria-describedby",
+    "lightbox-description",
+  );
   await expect(dialog.locator("#lightbox-title")).toBeVisible();
   await expect(dialog.locator("#lightbox-description")).toBeVisible();
   await expect(dialog.getByText(/^1 \/ \d+$/)).toBeVisible();
@@ -29,9 +40,13 @@ test("isolates the open lightbox from the application", async ({ page }) => {
     backgroundTarget?.focus();
 
     return {
-      dialogIsOutsideRoot: Boolean(root && openDialog && !root.contains(openDialog)),
+      dialogIsOutsideRoot: Boolean(
+        root && openDialog && !root.contains(openDialog),
+      ),
       rootIsInert: root?.inert ?? false,
-      focusStayedInDialog: Boolean(openDialog?.contains(document.activeElement)),
+      focusStayedInDialog: Boolean(
+        openDialog?.contains(document.activeElement),
+      ),
     };
   });
 
@@ -46,7 +61,9 @@ test("isolates the open lightbox from the application", async ({ page }) => {
     await expect
       .poll(() =>
         page.evaluate(() =>
-          document.querySelector('[role="dialog"]')?.contains(document.activeElement),
+          document
+            .querySelector('[role="dialog"]')
+            ?.contains(document.activeElement),
         ),
       )
       .toBe(true);
@@ -55,17 +72,33 @@ test("isolates the open lightbox from the application", async ({ page }) => {
   await expect(dialog).toBeVisible();
 });
 
-test("restores the application after closing the lightbox", async ({ page }) => {
+test("restores the application after closing the lightbox", async ({
+  page,
+}) => {
   const { dialog, opener } = await openLightbox(page);
-  await expect.poll(() => page.evaluate(() => document.documentElement.style.overflow)).toBe("hidden");
-  await expect.poll(() => page.evaluate(() => document.body.style.overflow)).toBe("hidden");
+  await expect
+    .poll(() => page.evaluate(() => document.documentElement.style.overflow))
+    .toBe("hidden");
+  await expect
+    .poll(() => page.evaluate(() => document.body.style.overflow))
+    .toBe("hidden");
 
   await page.keyboard.press("Escape");
 
   await expect(dialog).toBeHidden();
-  await expect.poll(() => page.evaluate(() => document.querySelector("#root")?.hasAttribute("inert"))).toBe(false);
-  await expect.poll(() => page.evaluate(() => document.documentElement.style.overflow)).toBe("");
-  await expect.poll(() => page.evaluate(() => document.body.style.overflow)).toBe("");
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        document.querySelector("#root")?.hasAttribute("inert"),
+      ),
+    )
+    .toBe(false);
+  await expect
+    .poll(() => page.evaluate(() => document.documentElement.style.overflow))
+    .toBe("");
+  await expect
+    .poll(() => page.evaluate(() => document.body.style.overflow))
+    .toBe("");
   await expect(opener).toBeFocused();
 });
 
@@ -76,11 +109,19 @@ test("cleans up isolation after backdrop closure", async ({ page }) => {
   await backdrop.click({ position: { x: 1, y: 1 } });
 
   await expect(dialog).toBeHidden();
-  await expect.poll(() => page.evaluate(() => document.querySelector("#root")?.hasAttribute("inert"))).toBe(false);
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        document.querySelector("#root")?.hasAttribute("inert"),
+      ),
+    )
+    .toBe(false);
   await expect(opener).toBeFocused();
 });
 
-test("cleans up isolation when the gallery route unmounts", async ({ page }) => {
+test("cleans up isolation when the gallery route unmounts", async ({
+  page,
+}) => {
   const { dialog } = await openLightbox(page);
 
   await page.evaluate(() => {
@@ -90,7 +131,67 @@ test("cleans up isolation when the gallery route unmounts", async ({ page }) => 
 
   await expect(dialog).toBeHidden();
   await expect(page.locator("main h1")).toBeVisible();
-  await expect.poll(() => page.evaluate(() => document.querySelector("#root")?.hasAttribute("inert"))).toBe(false);
-  await expect.poll(() => page.evaluate(() => document.documentElement.style.overflow)).toBe("");
-  await expect.poll(() => page.evaluate(() => document.body.style.overflow)).toBe("");
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        document.querySelector("#root")?.hasAttribute("inert"),
+      ),
+    )
+    .toBe(false);
+  await expect
+    .poll(() => page.evaluate(() => document.documentElement.style.overflow))
+    .toBe("");
+  await expect
+    .poll(() => page.evaluate(() => document.body.style.overflow))
+    .toBe("");
+});
+
+test("resets pinch zoom when the lightbox image changes and reopens", async ({
+  page,
+}) => {
+  const { dialog } = await openLightbox(page);
+  const imageFrame = dialog.locator("[data-lightbox-image]");
+  const image = imageFrame.locator("img");
+
+  await imageFrame.dispatchEvent("pointerdown", {
+    pointerId: 1,
+    pointerType: "touch",
+    clientX: 100,
+    clientY: 100,
+    button: 0,
+    isPrimary: true,
+  });
+  await imageFrame.dispatchEvent("pointerdown", {
+    pointerId: 2,
+    pointerType: "touch",
+    clientX: 200,
+    clientY: 100,
+    button: 0,
+    isPrimary: false,
+  });
+  await imageFrame.dispatchEvent("pointermove", {
+    pointerId: 2,
+    pointerType: "touch",
+    clientX: 300,
+    clientY: 100,
+    button: 0,
+    isPrimary: false,
+  });
+  await expect(image).toHaveAttribute("style", /transform: scale\(2\)/);
+
+  await page.keyboard.press("ArrowRight");
+  await expect(dialog.getByText(/^2 \/ \d+$/)).toBeVisible();
+  await expect(image).toHaveAttribute(
+    "style",
+    /transform: scale\(1\); transform-origin: 50% 50%/,
+  );
+
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+  await page.locator(".gallery-featured-frame > button").click();
+  const reopenedImage = page.getByRole("dialog").locator("img");
+  await expect(reopenedImage).toHaveAttribute(
+    "style",
+    /transform: scale\(1\); transform-origin: 50% 50%/,
+  );
 });

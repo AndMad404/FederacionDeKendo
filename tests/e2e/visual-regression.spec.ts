@@ -14,7 +14,14 @@ const FIXED_TEST_TIME = new Date("2026-08-04T12:00:00-06:00");
 interface ApprovedPage {
   name: string;
   path: string;
-  component: "home" | "calendar" | "gallery" | "affiliates" | "event" | "pastEvents" | "notFound";
+  component:
+    | "home"
+    | "calendar"
+    | "gallery"
+    | "affiliates"
+    | "event"
+    | "pastEvents"
+    | "notFound";
 }
 
 const DIST_DIRECTORY = resolve(process.cwd(), "dist");
@@ -34,21 +41,32 @@ const generatedRoutePaths = readdirSync(DIST_DIRECTORY, {
 })
   .filter((entry) => entry.isFile() && entry.name === "index.html")
   .map((entry) => {
-    const directory = relative(DIST_DIRECTORY, entry.parentPath).split(sep).join("/");
+    const directory = relative(DIST_DIRECTORY, entry.parentPath)
+      .split(sep)
+      .join("/");
     return directory ? `/${directory}/` : "/";
   })
   .sort();
 
 const approvedPages: ApprovedPage[] = [
   ...generatedRoutePaths.map((path) => ({
-    name: path === "/" ? "home" : path.replace(/^\//, "").replace(/\/$/, "").replaceAll("/", "-"),
+    name:
+      path === "/"
+        ? "home"
+        : path.replace(/^\//, "").replace(/\/$/, "").replaceAll("/", "-"),
     path,
     component: getPageComponent(path),
   })),
-  { name: "not-found", path: "/ruta-visual-inexistente/", component: "notFound" },
+  {
+    name: "not-found",
+    path: "/ruta-visual-inexistente/",
+    component: "notFound",
+  },
 ];
 
-const preferredRepresentativePaths: Partial<Record<ApprovedPage["component"], string>> = {
+const preferredRepresentativePaths: Partial<
+  Record<ApprovedPage["component"], string>
+> = {
   event: "/eventos/2026-08-08-examen/",
 };
 
@@ -90,7 +108,9 @@ for (const viewport of APPROVED_VIEWPORTS) {
     test.use({ viewport });
 
     for (const approvedPage of representativePages) {
-      test(`${approvedPage.component} matches its approved design`, async ({ page }) => {
+      test(`${approvedPage.component} matches its approved design`, async ({
+        page,
+      }) => {
         await prepareApprovedPage(page, approvedPage.path);
         await expect(page).toHaveScreenshot(
           `${approvedPage.component}-${viewport.name}.png`,
@@ -98,13 +118,17 @@ for (const viewport of APPROVED_VIEWPORTS) {
       });
     }
 
-    test("gallery lightbox details match their approved design", async ({ page }) => {
+    test("gallery lightbox details match their approved design", async ({
+      page,
+    }) => {
       await prepareApprovedPage(page, "/galeria/");
       await page.locator(".gallery-featured-frame > button").click();
 
       const dialog = page.getByRole("dialog");
       await expect(dialog).toBeVisible();
-      await expect(dialog).toHaveScreenshot(`gallery-lightbox-${viewport.name}.png`);
+      await expect(dialog).toHaveScreenshot(
+        `gallery-lightbox-${viewport.name}.png`,
+      );
     });
   });
 }

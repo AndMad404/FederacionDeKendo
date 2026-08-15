@@ -1,10 +1,7 @@
 import seoData from "./seo-data.json";
 import { GALLERY_IMAGES, getGalleryImages } from "../data/gallery";
 import { CALENDAR_EVENTS } from "../data/calendarEvents";
-import {
-  EVENT_INDEXING_ENABLED,
-  PAST_EVENTS_PAGE_SIZE,
-} from "./events";
+import { EVENT_INDEXING_ENABLED, PAST_EVENTS_PAGE_SIZE } from "./events";
 import {
   findEventByPathname,
   getArchivePagePath,
@@ -13,6 +10,7 @@ import {
 } from "../utils/eventRoutes";
 import { getLanguageFromPathname, type Language } from "./i18n";
 import { getLocalizedEvent } from "../utils/localizedEvents";
+import { getEventEndDate } from "../utils/calendarEvents";
 import type { RouteComponent } from "./routeTypes";
 
 export type { RouteComponent } from "./routeTypes";
@@ -61,6 +59,8 @@ export interface RouteMeta {
   preloadImage?: PreloadImage;
   eventId?: string;
   archivePage?: number;
+  /** Whether this route is approved for public indexing after site launch. */
+  indexable?: boolean;
   canonicalWhileNoindex?: boolean;
   suppressStructuredData?: boolean;
   /** true para rutas que no deben indexarse (ej. 404). No aparecen en ROUTE_META. */
@@ -153,6 +153,9 @@ assertSeoData(seoData);
 const DATA: SeoData = seoData as SeoData;
 
 const SITE_URL = DATA.siteUrl.replace(/\/$/, "");
+// Public indexing remains paused until the owner separately approves the
+// canonical domain, legal identity, and launch policy.
+const SITE_INDEXING_ENABLED = false;
 const SITE_NAME = DATA.siteName;
 const DEFAULT_SITE_DESCRIPTION = DATA.defaultDescription;
 const DEFAULT_SOCIAL_IMAGE_ALT = DATA.defaultImageAlt;
@@ -224,6 +227,7 @@ function createNotFoundMeta(language: Language): RouteMeta {
     imageHeight: DATA.defaultImageHeight,
     imageType: "image/png",
     schemaType: "WebPage",
+    indexable: false,
     noindex: true,
     suppressStructuredData: true,
   };
@@ -235,10 +239,13 @@ export function getRouteMeta(pathname: string) {
   if (configuredRoute) return configuredRoute;
 
   const event = findEventByPathname(normalizedPath);
-  if (event) return createEventRouteMeta(event, getLanguageFromPathname(pathname));
+  if (event)
+    return createEventRouteMeta(event, getLanguageFromPathname(pathname));
 
-  return getRouteManifest().find((route) => route.path === normalizedPath) ??
-    createNotFoundMeta(getLanguageFromPathname(pathname));
+  return (
+    getRouteManifest().find((route) => route.path === normalizedPath) ??
+    createNotFoundMeta(getLanguageFromPathname(pathname))
+  );
 }
 
 export function getRouteManifest() {
@@ -299,12 +306,16 @@ function createEventRouteMeta(
     imageHeight: calendarMeta.imageHeight,
     imageType: calendarMeta.imageType,
     schemaType: "WebPage",
+    indexable: EVENT_INDEXING_ENABLED,
     noindex: !EVENT_INDEXING_ENABLED,
     canonicalWhileNoindex: true,
   };
 }
 
-function createArchiveRouteMeta(page: number, language: Language = "es"): RouteMeta {
+function createArchiveRouteMeta(
+  page: number,
+  language: Language = "es",
+): RouteMeta {
   const english = language === "en";
   const calendarMeta = CALENDAR_META[language];
   return {
@@ -326,7 +337,8 @@ function createArchiveRouteMeta(page: number, language: Language = "es"): RouteM
     imageHeight: calendarMeta.imageHeight,
     imageType: calendarMeta.imageType,
     schemaType: "CollectionPage",
-    noindex: !EVENT_INDEXING_ENABLED,
+    indexable: false,
+    noindex: false,
     canonicalWhileNoindex: true,
   };
 }
@@ -347,7 +359,7 @@ function getRouteImageUrl(meta: RouteMeta) {
   return absoluteUrl(meta.image || DATA.defaultImage);
 }
 
-function getRouteImageMetadata(meta: RouteMeta) {
+function getRouteImageMetadata() {
   return {
     url: absoluteUrl(DATA.defaultImage),
     alt: DEFAULT_SOCIAL_IMAGE_ALT,
@@ -377,12 +389,14 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
     organizationData.areaServed = DATA.organization.areaServed;
   }
 
-  const image = getRouteImageMetadata(meta);
+  const image = getRouteImageMetadata();
   const routeEntities =
     ROUTE_STRUCTURED_DATA_BUILDERS[meta.component]?.(meta, canonicalUrl) ?? [];
   if (meta.component === "event" && meta.eventId) {
-    const event = CALENDAR_EVENTS.find((candidate) => candidate.id === meta.eventId);
-    if (event?.location) {
+    const event = CALENDAR_EVENTS.find(
+      (candidate) => candidate.id === meta.eventId,
+    );
+    if (event) {
       const localizedEvent = getLocalizedEvent(event, meta.language);
       const startDate = event.startTime
         ? `${event.date}T${event.startTime}:00-06:00`
@@ -401,17 +415,24 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
         description: localizedEvent.summary || meta.description,
         startDate,
         ...(endDate ? { endDate } : {}),
-        eventStatus: "https://schema.org/EventScheduled",
+        eventStatus:
+          getEventEndDate(event).getTime() <= Date.now()
+            ? "https://schema.org/EventCompleted"
+            : "https://schema.org/EventScheduled",
         eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
-        location: {
-          "@type": "Place",
-          name: event.location.split(",", 1)[0].trim(),
-          address: {
-            "@type": "PostalAddress",
-            streetAddress: event.location,
-            addressCountry: "CR",
-          },
-        },
+        ...(event.location
+          ? {
+              location: {
+                "@type": "Place",
+                name: event.location.split(",", 1)[0].trim(),
+                address: {
+                  "@type": "PostalAddress",
+                  streetAddress: event.location,
+                  addressCountry: "CR",
+                },
+              },
+            }
+          : {}),
         image: [image.url],
         url: canonicalUrl,
       });
@@ -466,18 +487,21 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
 }
 
 export function getRouteSeoPayload(meta: RouteMeta): RouteSeoPayload {
-  const noindex = Boolean(meta.noindex);
+  const noindex =
+    !SITE_INDEXING_ENABLED || !meta.indexable || Boolean(meta.noindex);
 
   return {
     title: meta.title,
     description: meta.description || DEFAULT_SITE_DESCRIPTION,
     robots: noindex ? "noindex, nofollow" : "index, follow",
     canonicalUrl:
-      noindex && !meta.canonicalWhileNoindex ? null : getCanonicalUrl(meta),
+      noindex && Boolean(meta.noindex) && !meta.canonicalWhileNoindex
+        ? null
+        : getCanonicalUrl(meta),
     siteName: SITE_NAME,
     locale: meta.locale,
-    image: getRouteImageMetadata(meta),
-    structuredData: getRouteStructuredData(meta),
+    image: getRouteImageMetadata(),
+    structuredData: noindex ? null : getRouteStructuredData(meta),
     preloadImage: meta.preloadImage,
   };
 }

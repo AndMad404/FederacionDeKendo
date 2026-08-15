@@ -61,7 +61,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
     endDate: "2026-09-14",
     location: "El Establo Mountain Hotel, Provincia de Puntarenas, Monteverde, Costa Rica",
     summary: "La participación incluye:\n\n* Transporte ida y vuelta\n* Almuerzo primer día\n* Desayuno del segundo día\n* Habitación compartida\n* Acceso a las instalaciones y senderos del hotel\n* Uso de los salones de entrenamiento\n* Experiencia intensiva de entrenamiento a cargo de senséis de alto nivel\n\nEste encuentro guiado por cuatro senséis japoneses de alto rango nace con el propósito de vivir el kendo más allá del entrenamiento habitual: compartir dos días de disciplina, convivencia y aprendizaje.\n\nEl Gasshuku se desarrollará en el Establo Mountain Hotel, Monteverde. Sus instalaciones y salones de madera ofrecerán un espacio para entrenar, alejarnos por unos días de la rutina y disfrutar de una experiencia diferente alrededor del kendo.",
-    eventType: "evento",
+    eventType: "seminario",
     timeZone: "America/Costa_Rica"
   },
   {
@@ -70,7 +70,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
     title: "CLAK 1er Panamericano BRASIL",
     date: "2026-10-10",
     endDate: "2026-10-12",
-    eventType: "evento",
+    eventType: "seminario",
     timeZone: "America/Costa_Rica"
   },
   {

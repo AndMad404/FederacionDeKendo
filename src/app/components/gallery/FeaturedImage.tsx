@@ -1,8 +1,4 @@
-import {
-  useCallback,
-  type CSSProperties,
-  type MouseEvent,
-} from "react";
+import { useCallback, type CSSProperties, type MouseEvent } from "react";
 import type { GalleryImage } from "../../types";
 import { useSwipeNavigation } from "../../hooks/useSwipeNavigation";
 import { useTransientDirectionFeedback } from "../../hooks/useTransientDirectionFeedback";
@@ -10,10 +6,7 @@ import {
   getGalleryDisplayText,
   getMobileDescriptionPreview,
 } from "./galleryText";
-import {
-  focusRingClass,
-  mediaCaptionSurfaceClass,
-} from "../../styles/shared";
+import { focusRingClass, mediaCaptionSurfaceClass } from "../../styles/shared";
 import { NavigationArrowButton } from "../ui/ModalControls";
 import { useLanguage } from "../../config/i18n";
 
@@ -42,21 +35,17 @@ export function FeaturedImage({
 }: FeaturedImageProps) {
   const { copy } = useLanguage();
   const openDetailsLabel = copy.gallery.openDetails;
-  const {
-    activeDirection: activeArrow,
-    showDirection: showArrowFeedback,
-  } = useTransientDirectionFeedback();
+  const { activeDirection: activeArrow, showDirection: showArrowFeedback } =
+    useTransientDirectionFeedback();
   const positionLabel = `${index + 1} / ${total}`;
-  const { displayTitle, displayTag, displayDescription } = getGalleryDisplayText(image);
+  const { displayTitle, displayTag, displayDescription } =
+    getGalleryDisplayText(image);
   const descriptionPreview = displayDescription
     ? getMobileDescriptionPreview(displayDescription, openDetailsLabel)
     : null;
-  const previewText =
-    descriptionPreview?.isTruncated
-      ? descriptionPreview.preview
-          .slice(0, -openDetailsLabel.length)
-          .trimEnd()
-      : descriptionPreview?.preview;
+  const previewText = descriptionPreview?.isTruncated
+    ? descriptionPreview.preview.slice(0, -openDetailsLabel.length).trimEnd()
+    : descriptionPreview?.preview;
   const handleSwipePrev = useCallback(() => {
     showArrowFeedback("left");
     onSwipePrev();
@@ -111,7 +100,9 @@ export function FeaturedImage({
       />
 
       <figcaption className="absolute inset-x-0 bottom-0">
-        <div className={`grid w-full items-center p-2.5 text-center sm:grid-cols-[minmax(0,1fr)_auto] sm:grid-rows-[auto_auto_auto] sm:items-start sm:px-20 sm:text-left land-sm:grid-rows-[auto_auto] land-sm:gap-x-6 land-sm:gap-y-0.5 land-sm:px-2.5 land-sm:py-2.5 ${mediaCaptionSurfaceClass}`}>
+        <div
+          className={`grid w-full items-center p-2.5 text-center sm:grid-cols-[minmax(0,1fr)_auto] sm:grid-rows-[auto_auto_auto] sm:items-start sm:px-20 sm:text-left land-sm:grid-rows-[auto_auto] land-sm:gap-x-6 land-sm:gap-y-0.5 land-sm:px-2.5 land-sm:py-2.5 ${mediaCaptionSurfaceClass}`}
+        >
           <h2 className="text-xl font-bold leading-tight sm:col-start-1 sm:row-start-1 sm:self-baseline sm:text-2xl land-sm:text-base">
             {displayTitle}
           </h2>
@@ -134,7 +125,9 @@ export function FeaturedImage({
               </span>
             )}
           </p>
-          <p className={`${descriptionPreview?.isTruncated ? "hidden sm:block" : ""} text-right text-xs sm:col-start-2 sm:row-start-3 sm:mt-2.5 sm:self-baseline land-sm:row-start-2 land-sm:mt-0 land-sm:text-[10px] land-sm:leading-none`}>
+          <p
+            className={`${descriptionPreview?.isTruncated ? "hidden sm:block" : ""} text-right text-xs sm:col-start-2 sm:row-start-3 sm:mt-2.5 sm:self-baseline land-sm:row-start-2 land-sm:mt-0 land-sm:text-[10px] land-sm:leading-none`}
+          >
             {positionLabel}
           </p>
         </div>

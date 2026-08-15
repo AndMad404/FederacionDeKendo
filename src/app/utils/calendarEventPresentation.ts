@@ -7,7 +7,10 @@ function formatCalendarDate(date: Date, language: Language) {
     month: "short",
     year: "numeric",
     timeZone: "UTC",
-  }).format(date).replace(".", "").toUpperCase();
+  })
+    .format(date)
+    .replace(".", "")
+    .toUpperCase();
 }
 
 function formatEventDate(date: string, language: Language) {
@@ -25,22 +28,26 @@ export function getEventDateRangeLabels(
   language: Language = "es",
 ) {
   const startDateLabel = formatEventDate(date, language);
-  const endDateValue = endDate
-    ? getInclusiveEndDateValue(endDate)
-    : undefined;
+  const endDateValue = endDate ? getInclusiveEndDateValue(endDate) : undefined;
 
   return {
     startDateLabel,
-    endDateLabel: endDateValue ? formatEventDate(endDateValue, language) : undefined,
+    endDateLabel: endDateValue
+      ? formatEventDate(endDateValue, language)
+      : undefined,
     endDateValue,
   };
 }
 
-export function getEventDateLabel(event: CalendarEvent, language: Language = "es") {
-  const { startDateLabel, endDateLabel } = getEventDateRangeLabels(event, language);
-  return endDateLabel
-    ? `${startDateLabel} - ${endDateLabel}`
-    : startDateLabel;
+export function getEventDateLabel(
+  event: CalendarEvent,
+  language: Language = "es",
+) {
+  const { startDateLabel, endDateLabel } = getEventDateRangeLabels(
+    event,
+    language,
+  );
+  return endDateLabel ? `${startDateLabel} - ${endDateLabel}` : startDateLabel;
 }
 
 export function formatEventTime(
@@ -68,7 +75,8 @@ function getNextDay(date: string) {
 }
 
 export function getGoogleCalendarUrl(event: CalendarEvent) {
-  const endDate = event.endDate ?? (event.startTime ? event.date : getNextDay(event.date));
+  const endDate =
+    event.endDate ?? (event.startTime ? event.date : getNextDay(event.date));
   const params = new URLSearchParams({
     action: "TEMPLATE",
     text: event.title,

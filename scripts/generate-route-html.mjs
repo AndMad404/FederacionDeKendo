@@ -46,10 +46,7 @@ function managedHead(route) {
 function stripManagedHead(html) {
   return html
     .replace(/\n\s*<(?:link|meta)\s+[^>]*data-route-seo[^>]*>/gi, "")
-    .replace(
-      /\n\s*<script\s+[^>]*data-route-seo[^>]*>[\s\S]*?<\/script>/gi,
-      "",
-    )
+    .replace(/\n\s*<script\s+[^>]*data-route-seo[^>]*>[\s\S]*?<\/script>/gi, "")
     .replace(/\n\s*<link\s+rel="preload"[^>]*\s+as="image"[^>]*>/gi, "")
     .replace(/\n\s*<link\s+rel="canonical"[^>]*>/gi, "")
     .replace(/\n\s*<meta\s+name="(?:description|robots)"[^>]*>/gi, "")
@@ -68,10 +65,16 @@ function renderRouteHtml(route) {
     /<title>[\s\S]*?<\/title>/i,
     `<title>${escapeText(seo.title)}</title>`,
   );
-  html = html.replace(/<html\s+lang="[^"]+"/i, `<html lang="${route.language}"`);
+  html = html.replace(
+    /<html\s+lang="[^"]+"/i,
+    `<html lang="${route.language}"`,
+  );
 
   const bodyHtml = render(route.path);
-  html = html.replace('<div id="root"></div>', `<div id="root">${bodyHtml}</div>`);
+  html = html.replace(
+    '<div id="root"></div>',
+    `<div id="root">${bodyHtml}</div>`,
+  );
 
   return html.replace("</head>", `${managedHead(route)}\n  </head>`);
 }
@@ -99,9 +102,15 @@ function renderNotFoundHtml() {
   html = html.replace(/<html\s+lang="[^"]+"/i, '<html lang="es"');
 
   const bodyHtml = render("/404-not-found/");
-  html = html.replace('<div id="root"></div>', `<div id="root">${bodyHtml}</div>`);
+  html = html.replace(
+    '<div id="root"></div>',
+    `<div id="root">${bodyHtml}</div>`,
+  );
 
-  return html.replace("</head>", `${managedHead(getRouteMeta("/404-not-found/"))}\n  </head>`);
+  return html.replace(
+    "</head>",
+    `${managedHead(getRouteMeta("/404-not-found/"))}\n  </head>`,
+  );
 }
 
 async function writeNotFoundHtml() {

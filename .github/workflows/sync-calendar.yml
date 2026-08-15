@@ -36,35 +36,60 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Sync calendar events
+        id: sync
         run: pnpm run sync:calendar
         env:
           HISTORICAL_CHANGES_REPORT_PATH: ${{ runner.temp }}/calendar-historical-changes.json
+          CALENDAR_NOTIFICATIONS_REPORT_PATH: ${{ runner.temp }}/calendar-notifications.json
 
-      - name: Upload historical changes report
+      - name: Directed synchronization tests
+        run: pnpm run test:sync-directed
+
+      - name: Verify generated site
+        uses: ./.github/actions/verify-site
+        with:
+          unit-command: pnpm run test:unit:without-sync
+
+      - name: Emit verification failure notification
+        if: ${{ failure() && steps.sync.outcome == 'success' }}
+        run: node scripts/write-calendar-verification-notification.mjs
+        env:
+          CALENDAR_NOTIFICATIONS_REPORT_PATH: ${{ runner.temp }}/calendar-notifications.json
+          CALENDAR_FAILED_STEP: post-sync verification
+
+      - name: Prepare calendar notification email
+        id: calendar_notification_email
+        if: ${{ always() }}
+        run: node scripts/write-calendar-notification-email.mjs
+        env:
+          CALENDAR_NOTIFICATIONS_REPORT_PATH: ${{ runner.temp }}/calendar-notifications.json
+          CALENDAR_NOTIFICATION_EMAIL_PATH: ${{ runner.temp }}/calendar-notification-email.txt
+          CALENDAR_ALERT_SMTP_USERNAME: ${{ secrets.CALENDAR_ALERT_SMTP_USERNAME }}
+          CALENDAR_ALERT_RECIPIENT: andresgmr1@gmail.com
+
+      - name: Send calendar notification email
+        if: ${{ always() && steps.calendar_notification_email.outputs.send == 'true' }}
+        run: >-
+          curl --fail --silent --show-error --url smtps://smtp.gmail.com:465 --ssl-reqd
+          --user "$CALENDAR_ALERT_SMTP_USERNAME:$CALENDAR_ALERT_SMTP_APP_PASSWORD"
+          --mail-from "$CALENDAR_ALERT_SMTP_USERNAME" --mail-rcpt-to "$CALENDAR_ALERT_RECIPIENT"
+          --upload-file "$CALENDAR_NOTIFICATION_EMAIL_PATH"
+        env:
+          CALENDAR_ALERT_SMTP_USERNAME: ${{ secrets.CALENDAR_ALERT_SMTP_USERNAME }}
+          CALENDAR_ALERT_SMTP_APP_PASSWORD: ${{ secrets.CALENDAR_ALERT_SMTP_APP_PASSWORD }}
+          CALENDAR_ALERT_RECIPIENT: andresgmr1@gmail.com
+          CALENDAR_NOTIFICATION_EMAIL_PATH: ${{ runner.temp }}/calendar-notification-email.txt
+
+      - name: Upload calendar notification reports
+        if: ${{ always() }}
         uses: actions/upload-artifact@v5
         with:
-          name: calendar-historical-changes
-          path: ${{ runner.temp }}/calendar-historical-changes.json
-          if-no-files-found: error
+          name: calendar-notification-reports
+          path: |
+            ${{ runner.temp }}/calendar-historical-changes.json
+            ${{ runner.temp }}/calendar-notifications.json
+          if-no-files-found: warn
           retention-days: 30
-
-      - name: Typecheck
-        run: pnpm run typecheck
-
-      - name: Unit tests
-        run: pnpm run test:unit
-
-      - name: Build
-        run: pnpm run build
-
-      - name: Generated output tests
-        run: pnpm run test:generated
-
-      - name: Install Playwright Chromium
-        run: pnpm exec playwright install --with-deps chromium
-
-      - name: Browser tests
-        run: pnpm run test:e2e
 
       - name: Commit calendar changes
         run: |

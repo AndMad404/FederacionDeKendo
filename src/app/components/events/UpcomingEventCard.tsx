@@ -10,8 +10,7 @@ import {
 import { getEventPath } from "../../utils/eventRoutes";
 import { useLanguage } from "../../config/i18n";
 
-const actionClass =
-  `inline-flex min-h-11 min-w-0 items-center justify-center rounded-lg px-3 py-1.5 text-center text-sm font-semibold leading-tight transition-colors hover:border-site-action hover:bg-site-media lg:min-h-8 lg:px-2.5 lg:py-1 ${actionControlSurfaceClass}`;
+const actionClass = `inline-flex min-h-11 min-w-0 items-center justify-center rounded-lg px-3 py-1.5 text-center text-sm font-semibold leading-tight transition-colors hover:border-site-action hover:bg-site-media lg:min-h-8 lg:px-2.5 lg:py-1 ${actionControlSurfaceClass}`;
 
 const eventDetailsClass =
   "inline-flex min-h-11 min-w-0 items-center justify-center rounded-lg border border-site-action bg-site-action px-3 py-1.5 text-center text-sm font-semibold leading-tight text-site-on-dark transition-colors hover:bg-site-action-hover lg:min-h-8 lg:px-2.5 lg:py-1";
@@ -27,10 +26,7 @@ interface UpcomingEventCardProps {
   index: number;
 }
 
-export function UpcomingEventCard({
-  event,
-  index,
-}: UpcomingEventCardProps) {
+export function UpcomingEventCard({ event, index }: UpcomingEventCardProps) {
   const { language, copy } = useLanguage();
   const { startDateLabel, endDateLabel, endDateValue } =
     getEventDateRangeLabels(event, language);
@@ -44,14 +40,12 @@ export function UpcomingEventCard({
 
   return (
     <li
-      className={`grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-2 rounded-xl border border-site-border bg-site-surface p-3 shadow-sm land-tall:flex land-tall:flex-col land-tall:justify-around land-tall:gap-2 land-tall:text-center lg:flex lg:flex-col lg:justify-around lg:gap-1.5 lg:p-2 lg:text-center ${getEventVisibilityClass(index)}`}
+      className={`grid grid-cols-2 items-center gap-x-3 gap-y-2 rounded-xl border border-site-border bg-site-surface p-3 shadow-sm land-tall:flex land-tall:flex-col land-tall:justify-around land-tall:gap-2 land-tall:text-center lg:flex lg:flex-col lg:justify-around lg:gap-1.5 lg:p-2 lg:text-center ${getEventVisibilityClass(index)}`}
     >
       <h3 className="col-start-2 row-start-1 min-w-0 text-right text-base font-bold leading-tight land-tall:text-center lg:text-center">
         {event.title}
       </h3>
-      <span
-        className="col-start-1 row-start-1 w-28 shrink-0 rounded-lg bg-site-media px-2.5 py-2 text-center text-sm font-bold uppercase leading-tight text-site-action sm:w-auto sm:max-w-[10rem] land-tall:max-w-none lg:max-w-none lg:px-2 lg:py-1.5"
-      >
+      <span className="col-start-1 row-start-1 w-28 shrink-0 rounded-lg bg-site-media px-2.5 py-2 text-center text-sm font-bold uppercase leading-tight text-site-action sm:w-auto sm:max-w-[10rem] land-tall:max-w-none lg:max-w-none lg:px-2 lg:py-1.5">
         <time dateTime={event.date} className="whitespace-nowrap">
           {startDateLabel}
         </time>
@@ -78,7 +72,7 @@ export function UpcomingEventCard({
           rel="noopener noreferrer"
           aria-label={`${copy.calendar.openLocationLabel} ${event.title} ${copy.calendar.mapsPreposition} Google Maps`}
           aria-describedby={locationDescriptionId}
-          className={`col-start-1 row-start-2 justify-self-center ${actionClass} ${focusRingClass}`}
+          className={`col-start-1 row-start-2 w-full justify-self-center ${actionClass} ${focusRingClass}`}
         >
           <MapPin
             className="mr-1.5 size-3.5 shrink-0 text-site-accent"
@@ -91,7 +85,7 @@ export function UpcomingEventCard({
         </a>
       ) : (
         <span
-          className={`col-start-1 row-start-2 justify-self-center text-site-muted ${actionClass}`}
+          className={`col-start-1 row-start-2 w-full justify-self-center text-site-muted ${actionClass}`}
         >
           {copy.common.toBeConfirmed}
         </span>
@@ -100,7 +94,7 @@ export function UpcomingEventCard({
       <Link
         to={getEventPath(event, language)}
         aria-label={`${copy.event.viewDetailsLabel} ${event.title}`}
-        className={`col-start-2 row-start-2 justify-self-end ${eventDetailsClass} ${focusRingClass}`}
+        className={`col-start-2 row-start-2 w-full justify-self-end ${eventDetailsClass} ${focusRingClass}`}
       >
         {copy.common.eventDetails}
       </Link>

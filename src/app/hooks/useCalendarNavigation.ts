@@ -55,8 +55,8 @@ export function useCalendarNavigation(groupCount: number) {
     const syncGroupStart = () => {
       if (!mediaQuery.matches) return;
 
-      setGroupIndex((currentGroupIndex) =>
-        currentGroupIndex - (currentGroupIndex % 2),
+      setGroupIndex(
+        (currentGroupIndex) => currentGroupIndex - (currentGroupIndex % 2),
       );
     };
 

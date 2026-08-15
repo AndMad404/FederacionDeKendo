@@ -9,8 +9,7 @@ export function useGalleryLightbox(images: GalleryImage[]) {
     lightboxId === null
       ? -1
       : images.findIndex((image) => image.id === lightboxId);
-  const lightboxImage =
-    lightboxIndex >= 0 ? images[lightboxIndex] : null;
+  const lightboxImage = lightboxIndex >= 0 ? images[lightboxIndex] : null;
 
   const openLightbox = useCallback(
     (imageId: number, event: MouseEvent<HTMLButtonElement>) => {
