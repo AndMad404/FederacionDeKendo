@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { PAST_EVENTS_PAGE_SIZE } from "../config/events";
 import {
@@ -23,15 +22,15 @@ import {
 import { MediaPageBanner } from "./ui/MediaPageBanner";
 import { useLanguage } from "../config/i18n";
 import { getLocalizedEvents } from "../utils/localizedEvents";
+import { useHydratedNow } from "../hooks/useHydratedNow";
 
 export function PastEventsSection() {
   const { language, copy } = useLanguage();
   const { pathname, search } = useLocation();
   const navigate = useNavigate();
-  const [now, setNow] = useState(() => new Date());
-  useEffect(() => setNow(new Date()), []);
+  const now = useHydratedNow();
   const requestedPage = getArchivePageFromPathname(pathname) ?? 1;
-  const historicalEvents = getPastEvents(now);
+  const historicalEvents = now ? getPastEvents(now) : [];
   const searchParams = new URLSearchParams(search);
   const filters = normalizeArchiveFilters({
     year: searchParams.get("year") ?? undefined,

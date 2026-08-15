@@ -14,8 +14,10 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 export function Navbar() {
   const { pathname } = useLocation();
   const { language, copy } = useLanguage();
-  const [open, setOpen] = useState(false);
-  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [openPath, setOpenPath] = useState<string | null>(null);
+  const [calendarOpenPath, setCalendarOpenPath] = useState<string | null>(null);
+  const open = openPath === pathname;
+  const calendarOpen = calendarOpenPath === pathname;
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const calendarButtonRef = useRef<HTMLButtonElement>(null);
   const calendarMenuRef = useRef<HTMLLIElement>(null);
@@ -32,19 +34,14 @@ export function Navbar() {
   );
 
   useEffect(() => {
-    setCalendarOpen(false);
-    setOpen(false);
-  }, [pathname]);
-
-  useEffect(() => {
     function handleEscape(event: KeyboardEvent) {
       if (event.key !== "Escape") return;
 
       if (calendarOpen) {
-        setCalendarOpen(false);
+        setCalendarOpenPath(null);
         calendarButtonRef.current?.focus();
       } else if (open) {
-        setOpen(false);
+        setOpenPath(null);
         menuButtonRef.current?.focus();
       }
     }
@@ -55,7 +52,7 @@ export function Navbar() {
         !calendarMenuRef.current?.contains(event.target as Node) &&
         !mobileCalendarMenuRef.current?.contains(event.target as Node)
       ) {
-        setCalendarOpen(false);
+        setCalendarOpenPath(null);
       }
     }
 
@@ -68,8 +65,8 @@ export function Navbar() {
   }, [calendarOpen, open]);
 
   function closeNavigation() {
-    setCalendarOpen(false);
-    setOpen(false);
+    setCalendarOpenPath(null);
+    setOpenPath(null);
   }
 
   function renderCalendarMenu(mobile = false) {
@@ -78,8 +75,8 @@ export function Navbar() {
         key={calendarLink.path}
         ref={mobile ? mobileCalendarMenuRef : calendarMenuRef}
         className={mobile ? "w-full" : "relative"}
-        onMouseEnter={mobile ? undefined : () => setCalendarOpen(true)}
-        onMouseLeave={mobile ? undefined : () => setCalendarOpen(false)}
+        onMouseEnter={mobile ? undefined : () => setCalendarOpenPath(pathname)}
+        onMouseLeave={mobile ? undefined : () => setCalendarOpenPath(null)}
         onBlur={
           mobile
             ? undefined
@@ -89,7 +86,7 @@ export function Navbar() {
                     event.relatedTarget as Node | null,
                   )
                 ) {
-                  setCalendarOpen(false);
+                  setCalendarOpenPath(null);
                 }
               }
         }
@@ -101,9 +98,9 @@ export function Navbar() {
           aria-controls={
             mobile ? "mobile-calendar-menu" : "desktop-calendar-menu"
           }
-          onFocus={mobile ? undefined : () => setCalendarOpen(true)}
+          onFocus={mobile ? undefined : () => setCalendarOpenPath(pathname)}
           onClick={() =>
-            mobile ? setCalendarOpen((value) => !value) : setCalendarOpen(true)
+            setCalendarOpenPath(mobile && calendarOpen ? null : pathname)
           }
           className={`inline-flex min-h-11 items-center justify-center gap-1 ${navLinkClass({ isActive: calendarActive })}`}
         >
@@ -153,7 +150,7 @@ export function Navbar() {
           <Link
             to={homeLink.path}
             aria-label={copy.nav.homeLabel}
-            onClick={() => setOpen(false)}
+            onClick={() => setOpenPath(null)}
             className={`flex min-w-0 items-center ${focusRingClass}`}
           >
             <picture>
@@ -202,8 +199,8 @@ export function Navbar() {
             aria-expanded={open}
             aria-label={open ? copy.nav.close : copy.nav.open}
             onClick={() => {
-              setCalendarOpen(false);
-              setOpen(!open);
+              setCalendarOpenPath(null);
+              setOpenPath(open ? null : pathname);
             }}
           >
             {open ? (
@@ -243,7 +240,7 @@ export function Navbar() {
                 <LanguageSelector
                   pathname={pathname}
                   language={language}
-                  onNavigate={() => setOpen(false)}
+                  onNavigate={() => setOpenPath(null)}
                 />
               </div>
             </li>

@@ -30,6 +30,7 @@ test("calendar menu opens on hover and navigates to past events", async ({
     .click();
   await expect(page).toHaveURL(/\/eventos\/pasados\/$/);
   await expect(calendarButton).toHaveClass(/border-site-accent/);
+  await expect(calendarButton).toHaveAttribute("aria-expanded", "false");
 });
 
 test("calendar menu opens on focus, closes with Escape and restores focus", async ({
@@ -88,5 +89,33 @@ test("calendar section expands inside the mobile navigation", async ({
     .getByRole("link", { name: "Eventos pasados", exact: true })
     .click();
   await expect(page).toHaveURL(/\/eventos\/pasados\/$/);
+  await expect(page.locator("#mobile-menu")).toHaveCount(0);
+});
+
+test("navigation history invalidates open desktop and mobile menus", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await page.goto("/calendario/");
+
+  const desktopCalendarButton = page.getByRole("button", {
+    name: "Calendario",
+  });
+  await desktopCalendarButton.focus();
+  await expect(desktopCalendarButton).toHaveAttribute("aria-expanded", "true");
+
+  await page.evaluate(() => {
+    window.history.pushState({}, "", "/galeria/");
+    window.dispatchEvent(new PopStateEvent("popstate"));
+  });
+  await expect(page).toHaveURL(/\/galeria\/$/);
+  await expect(desktopCalendarButton).toHaveAttribute("aria-expanded", "false");
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator('button[aria-controls="mobile-menu"]').click();
+  await expect(page.locator("#mobile-menu")).toBeVisible();
+
+  await page.goBack();
+  await expect(page).toHaveURL(/\/calendario\/$/);
   await expect(page.locator("#mobile-menu")).toHaveCount(0);
 });

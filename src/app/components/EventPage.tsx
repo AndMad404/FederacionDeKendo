@@ -6,7 +6,7 @@ import {
   MapPin,
   Share2,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useLocation } from "react-router";
 import { useLanguage } from "../config/i18n";
 import { getLocalizedEvent } from "../utils/localizedEvents";
@@ -27,6 +27,7 @@ import {
 import { findEventByPathname, getEventPath } from "../utils/eventRoutes";
 import { MediaPageBanner } from "./ui/MediaPageBanner";
 import { HistoricalEventGallery } from "./HistoricalEventGallery";
+import { useHydratedNow } from "../hooks/useHydratedNow";
 
 async function shareEvent(title: string, url: string) {
   if (navigator.share) {
@@ -49,8 +50,7 @@ export function EventPage() {
   const location = useLocation();
   const sourceEvent = findEventByPathname(location.pathname);
   const [copied, setCopied] = useState(false);
-  const [now, setNow] = useState<Date>();
-  useEffect(() => setNow(new Date()), []);
+  const now = useHydratedNow();
 
   if (!sourceEvent) return null;
   const event = getLocalizedEvent(sourceEvent, language);

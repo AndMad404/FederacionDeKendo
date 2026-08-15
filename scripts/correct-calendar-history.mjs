@@ -38,11 +38,18 @@ const safeIdentifierPattern = /^[A-Za-z0-9_-]{1,128}$/;
 const forbiddenPrivateText =
   /ALBUM_FOTOS|webcal:|https?:\/\/[^\s]*drive\.google\.com|https?:\/\/[^\s]*\.ics(?:[?#\s]|$)/i;
 
+function containsControlCharacter(value) {
+  return [...value].some((character) => {
+    const codePoint = character.codePointAt(0);
+    return codePoint <= 31 || codePoint === 127;
+  });
+}
+
 function assertSafeReportValue(value) {
   if (value === null) return;
   if (
     typeof value !== "string" ||
-    /[\u0000-\u001f\u007f]/.test(value) ||
+    containsControlCharacter(value) ||
     forbiddenPrivateText.test(value)
   ) {
     throw new Error("Report contains an invalid or private value.");
@@ -351,8 +358,11 @@ function parseCliArguments(args) {
 }
 
 function safeAuditValue(value) {
-  return String(value)
-    .replace(/[\u0000-\u001f\u007f]/g, " ")
+  return [...String(value)]
+    .map((character) =>
+      containsControlCharacter(character) ? " " : character,
+    )
+    .join("")
     .replace(/[^A-Za-z0-9_.-]/g, "_");
 }
 

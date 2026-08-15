@@ -1254,8 +1254,12 @@ async function stageTextFile(filePath, contents) {
 }
 
 function escapeActionText(value) {
-  return String(value)
-    .replace(/[\u0000-\u001f\u007f]/g, " ")
+  return [...String(value)]
+    .map((character) => {
+      const codePoint = character.codePointAt(0);
+      return codePoint <= 31 || codePoint === 127 ? " " : character;
+    })
+    .join("")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")

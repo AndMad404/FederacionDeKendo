@@ -47,8 +47,9 @@ export function useModalBehavior({
   }, [initialFocusRef]);
 
   useEffect(() => {
+    const trigger = triggerRef?.current;
+
     return () => {
-      const trigger = triggerRef?.current;
       if (!trigger) return;
 
       requestAnimationFrame(() => {

@@ -145,3 +145,53 @@ test("cleans up isolation when the gallery route unmounts", async ({
     .poll(() => page.evaluate(() => document.body.style.overflow))
     .toBe("");
 });
+
+test("resets pinch zoom when the lightbox image changes and reopens", async ({
+  page,
+}) => {
+  const { dialog } = await openLightbox(page);
+  const imageFrame = dialog.locator("[data-lightbox-image]");
+  const image = imageFrame.locator("img");
+
+  await imageFrame.dispatchEvent("pointerdown", {
+    pointerId: 1,
+    pointerType: "touch",
+    clientX: 100,
+    clientY: 100,
+    button: 0,
+    isPrimary: true,
+  });
+  await imageFrame.dispatchEvent("pointerdown", {
+    pointerId: 2,
+    pointerType: "touch",
+    clientX: 200,
+    clientY: 100,
+    button: 0,
+    isPrimary: false,
+  });
+  await imageFrame.dispatchEvent("pointermove", {
+    pointerId: 2,
+    pointerType: "touch",
+    clientX: 300,
+    clientY: 100,
+    button: 0,
+    isPrimary: false,
+  });
+  await expect(image).toHaveAttribute("style", /transform: scale\(2\)/);
+
+  await page.keyboard.press("ArrowRight");
+  await expect(dialog.getByText(/^2 \/ \d+$/)).toBeVisible();
+  await expect(image).toHaveAttribute(
+    "style",
+    /transform: scale\(1\); transform-origin: 50% 50%/,
+  );
+
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+  await page.locator(".gallery-featured-frame > button").click();
+  const reopenedImage = page.getByRole("dialog").locator("img");
+  await expect(reopenedImage).toHaveAttribute(
+    "style",
+    /transform: scale\(1\); transform-origin: 50% 50%/,
+  );
+});

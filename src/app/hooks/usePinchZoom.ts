@@ -1,6 +1,5 @@
 import {
   useCallback,
-  useEffect,
   useRef,
   useState,
   type PointerEvent as ReactPointerEvent,
@@ -16,6 +15,12 @@ interface PinchStart {
   scale: number;
 }
 
+interface ZoomState {
+  resetKey: number;
+  scale: number;
+  transformOrigin: string;
+}
+
 const MIN_SCALE = 1;
 const MAX_SCALE = 3;
 
@@ -28,23 +33,25 @@ export function usePinchZoom(resetKey: number) {
   const pinchStartRef = useRef<PinchStart | null>(null);
   const scaleRef = useRef(MIN_SCALE);
   const didPinchRef = useRef(false);
-  const [scale, setScale] = useState(MIN_SCALE);
-  const [transformOrigin, setTransformOrigin] = useState("50% 50%");
+  const resetKeyRef = useRef(resetKey);
+  const [zoom, setZoom] = useState<ZoomState>({
+    resetKey,
+    scale: MIN_SCALE,
+    transformOrigin: "50% 50%",
+  });
 
-  const resetZoom = useCallback(() => {
+  const ensureCurrentResetKey = useCallback(() => {
+    if (resetKeyRef.current === resetKey) return;
+
+    resetKeyRef.current = resetKey;
     pointersRef.current.clear();
     pinchStartRef.current = null;
     scaleRef.current = MIN_SCALE;
     didPinchRef.current = false;
-    setScale(MIN_SCALE);
-    setTransformOrigin("50% 50%");
-  }, []);
-
-  useEffect(() => {
-    resetZoom();
-  }, [resetKey, resetZoom]);
+  }, [resetKey]);
 
   const onPointerDown = useCallback((event: ReactPointerEvent<HTMLElement>) => {
+    ensureCurrentResetKey();
     if (event.pointerType !== "touch") return false;
 
     const target = event.target as HTMLElement;
@@ -68,7 +75,11 @@ export function usePinchZoom(resetKey: number) {
       const midpointY = (points[0].y + points[1].y) / 2;
       const originX = ((midpointX - imageFrame.left) / imageFrame.width) * 100;
       const originY = ((midpointY - imageFrame.top) / imageFrame.height) * 100;
-      setTransformOrigin(`${originX}% ${originY}%`);
+      setZoom((current) => ({
+        resetKey,
+        scale: current.resetKey === resetKey ? current.scale : MIN_SCALE,
+        transformOrigin: `${originX}% ${originY}%`,
+      }));
     }
 
     pinchStartRef.current = {
@@ -78,9 +89,10 @@ export function usePinchZoom(resetKey: number) {
     didPinchRef.current = true;
     event.preventDefault();
     return true;
-  }, []);
+  }, [ensureCurrentResetKey, resetKey]);
 
   const onPointerMove = useCallback((event: ReactPointerEvent<HTMLElement>) => {
+    ensureCurrentResetKey();
     if (!pointersRef.current.has(event.pointerId)) return false;
 
     pointersRef.current.set(event.pointerId, {
@@ -98,12 +110,20 @@ export function usePinchZoom(resetKey: number) {
     );
 
     scaleRef.current = nextScale;
-    setScale(nextScale);
+    setZoom((current) => ({
+      resetKey,
+      scale: nextScale,
+      transformOrigin:
+        current.resetKey === resetKey
+          ? current.transformOrigin
+          : "50% 50%",
+    }));
     event.preventDefault();
     return true;
-  }, []);
+  }, [ensureCurrentResetKey, resetKey]);
 
   const finishPointer = useCallback((pointerId: number) => {
+    ensureCurrentResetKey();
     const didPinch = didPinchRef.current;
     pointersRef.current.delete(pointerId);
     pinchStartRef.current = null;
@@ -113,11 +133,16 @@ export function usePinchZoom(resetKey: number) {
     }
 
     return didPinch;
-  }, []);
+  }, [ensureCurrentResetKey]);
+
+  const currentZoom =
+    zoom.resetKey === resetKey
+      ? zoom
+      : { resetKey, scale: MIN_SCALE, transformOrigin: "50% 50%" };
 
   return {
-    scale,
-    transformOrigin,
+    scale: currentZoom.scale,
+    transformOrigin: currentZoom.transformOrigin,
     handlers: {
       onPointerDown,
       onPointerMove,
