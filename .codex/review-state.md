@@ -5,6 +5,69 @@ schema_version: 2
 last_updated: 2026-08-14
 contract: .agents/review-contract.md
 
+latest_rendering_seo_performance_review:
+  id: REV-2026-08-17-01
+  requested_scope: Determine whether the site applies prerendering/indexation, Core Web Vitals optimization, technical SEO, and SEO troubleshooting practices.
+  actual_scope:
+    targets:
+      - src/app/config/seo-data.json
+      - src/app/config/seo.ts
+      - src/entry-server.tsx
+      - src/main.tsx
+      - scripts/generate-route-html.mjs
+      - public/robots.txt
+      - tests/generated-output.test.mjs
+      - generated dist route HTML, sitemap.xml, and _redirects
+    axes: [SEO, PERF]
+    included:
+      - SSG/prerender and hydration architecture
+      - robots directives, canonical URLs, hreflang, structured-data generation, sitemap, 404 output, and event redirects
+      - source-level LCP image prioritization, responsive images, lazy loading, and bundle output
+      - presence or absence of measured LCP, INP, and CLS evidence
+    excluded:
+      - deployed response status and redirect chains
+      - Google Search Console, CrUX, field data, crawl logs, and live index coverage
+      - a fresh Lighthouse or browser performance trace
+  baseline:
+    commit: b4516da7
+    worktree: clean before generated build artifacts
+  findings:
+    - id: SEO-INDEX-001
+      level: STRUCTURAL
+      axis: SEO
+      status: open_owner_policy
+      target: src/app/config/seo.ts:158
+      problem: Global indexing is deliberately disabled, so every generated route emits noindex, nofollow, structured data is suppressed, and the generated sitemap contains no URL entries.
+      fix: After owner approval of the canonical domain, legal identity, and launch policy, enable the global and applicable event indexing flags and verify generated plus deployed output.
+      cost_of_deferring: Search engines can crawl the public files but are explicitly instructed not to index any site page.
+      evidence:
+        - SITE_INDEXING_ENABLED is false
+        - generated-output tests assert noindex, no structured data, and no sitemap loc entries
+        - corepack pnpm run build passed and regenerated all configured routes
+      introduced_in: REV-2026-08-17-01
+    - id: PERF-CWV-001
+      level: SMELL
+      axis: PERF
+      status: open
+      target: repository performance verification
+      problem: The implementation contains LCP-oriented image optimizations, but no recorded automated or field measurement establishes current LCP, INP, or CLS values.
+      fix: Establish repeatable lab budgets and collect field data after deployment, then diagnose regressions per route and device class.
+      cost_of_deferring: Core Web Vitals compliance and regressions remain assumptions rather than measured behavior.
+      evidence:
+        - route image preloads use fetchpriority high and responsive source metadata
+        - primary images use eager/high priority while secondary images use lazy loading
+        - no Lighthouse, web-vitals, CrUX, or PerformanceObserver checks found in the reviewed scope
+      introduced_in: REV-2026-08-17-01
+  evidence:
+    - corepack pnpm run build passed outside the filesystem sandbox, including client build, SSR bundle, prerendered route HTML, 404.html, sitemap.xml, and _redirects
+    - corepack pnpm run test:generated passed 6 tests before the clean rebuild
+    - inspected generated-route and metadata source paths at commit b4516da7
+  result: SSG/prerender and most technical SEO mechanisms are implemented and build successfully, but public indexation is intentionally paused and Core Web Vitals are optimized only at source level, not currently demonstrated by measurements.
+  pending:
+    - owner launch/indexing approval
+    - deployed crawl/index evidence and repeatable LCP, INP, and CLS measurements
+  next: Run a production performance/indexability audit after the owner approves indexing and the canonical production domain.
+
 latest_stale_coverage_reconciliation:
   id: REV-2026-08-16-01
   requested_scope: Reconcile the technical and visual coverage marked stale since 2026-08-12.

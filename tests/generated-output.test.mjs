@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import {
+  getRouteManifest,
+  getRouteSeoPayload,
+} from "../dist-ssr/entry-server.js";
 
 async function readDist(relativePath) {
   return readFile(new URL(`../dist/${relativePath}`, import.meta.url), "utf8");
@@ -22,12 +26,14 @@ test("generates event HTML with canonical and no structured data while indexing 
   assert.doesNotMatch(incomplete, /application\/ld\+json/);
 });
 
-test("keeps every generated route noindex, structured-data-free, and sitemap-free while indexing is paused", async () => {
+test("keeps every generated route noindex while including it in the sitemap", async () => {
   const sitemap = await readDist("sitemap.xml");
   const home = await readDist("index.html");
   const calendar = await readDist("calendario/index.html");
-  assert.doesNotMatch(sitemap, /\/eventos\//);
-  assert.doesNotMatch(sitemap, /<loc>/);
+  assert.match(sitemap, /\/eventos\//);
+  assert.match(sitemap, /\/en\/events\//);
+  assert.match(sitemap, /\/eventos\/pasados\//);
+  assert.match(sitemap, /\/en\/events\/past\//);
   assert.match(home, /name="robots" content="noindex, nofollow"/);
   assert.match(calendar, /name="robots" content="noindex, nofollow"/);
   assert.match(
@@ -36,6 +42,18 @@ test("keeps every generated route noindex, structured-data-free, and sitemap-fre
   );
   assert.doesNotMatch(home, /application\/ld\+json/);
   assert.doesNotMatch(calendar, /application\/ld\+json/);
+});
+
+test("keeps the sitemap synchronized with every public generated route", async () => {
+  const sitemap = await readDist("sitemap.xml");
+  const sitemapUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(
+    ([, url]) => url,
+  );
+  const routeUrls = getRouteManifest()
+    .map((route) => getRouteSeoPayload(route))
+    .map((seo) => seo.canonicalUrl);
+
+  assert.deepEqual(sitemapUrls, routeUrls);
 });
 
 test("keeps both calendar archive views noindex and structured-data-free", async () => {
@@ -85,5 +103,5 @@ test("generates localized English routes with reciprocal language metadata", asy
   );
   assert.match(event, /<h1[^>]*>Examination<\/h1>/);
   assert.match(event, /Examinations from 8th to 2nd kyu/);
-  assert.doesNotMatch(sitemap, /<loc>/);
+  assert.match(sitemap, /<loc>/);
 });
