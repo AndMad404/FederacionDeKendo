@@ -23,14 +23,12 @@ for (const target of targets) {
   let quality;
 
   for (quality = 82; quality >= 30; quality -= 2) {
-    const candidate = await source
-      .clone()
-      [target.format]({
-        quality,
-        effort: 6,
-        ...(target.format === "jpeg" ? { mozjpeg: true } : {}),
-      })
-      .toBuffer();
+    const output = source.clone();
+    const candidate = await output[target.format]({
+      quality,
+      effort: 6,
+      ...(target.format === "jpeg" ? { mozjpeg: true } : {}),
+    }).toBuffer();
     if (candidate.length <= MAX_BYTES) {
       optimized = candidate;
       break;
