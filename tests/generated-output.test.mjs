@@ -34,8 +34,10 @@ test("generates complete paused-indexing SEO output for every event route", asyn
   for (const route of eventRoutes) {
     const html = await readDist(`${route.path.slice(1)}index.html`);
     const seo = getRouteSeoPayload(route);
-    const spanishPath = route.language === "es" ? route.path : route.alternatePath;
-    const englishPath = route.language === "en" ? route.path : route.alternatePath;
+    const spanishPath =
+      route.language === "es" ? route.path : route.alternatePath;
+    const englishPath =
+      route.language === "en" ? route.path : route.alternatePath;
 
     assert.equal(seo.robots, "noindex, nofollow");
     assert.ok(seo.canonicalUrl);
