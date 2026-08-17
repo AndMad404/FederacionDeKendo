@@ -86,7 +86,7 @@ const ROUTE_STRUCTURED_DATA_BUILDERS: Partial<
 export interface RouteSeoPayload {
   title: string;
   description: string;
-  robots: "index, follow" | "noindex, nofollow";
+  robots: "index, follow" | "noindex, follow" | "noindex, nofollow";
   canonicalUrl: string | null;
   siteName: string;
   locale: string;
@@ -180,6 +180,52 @@ function absoluteUrl(path: string) {
   if (/^https?:\/\//.test(path)) return path;
 
   return path === "/" ? `${SITE_URL}/` : `${SITE_URL}${path}`;
+}
+
+function formatEventDate(date: string, language: Language) {
+  return new Intl.DateTimeFormat(language === "en" ? "en-US" : "es-CR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${date}T00:00:00Z`));
+}
+
+function truncateDescription(text: string, maxLength = 155) {
+  const normalized = text
+    .replace(/(?:^|\s)\*\s+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (normalized.length <= maxLength) return normalized;
+
+  const candidate = normalized.slice(0, maxLength + 1);
+  const boundary = candidate.lastIndexOf(" ");
+  return boundary > 0 ? candidate.slice(0, boundary).trimEnd() : normalized;
+}
+
+function createEventDescription(
+  event: (typeof CALENDAR_EVENTS)[number],
+  localizedEvent: (typeof CALENDAR_EVENTS)[number],
+  language: Language,
+) {
+  const english = language === "en";
+  const date = formatEventDate(event.date, language);
+  const details = [
+    date,
+    event.startTime,
+    event.location &&
+      (english ? `at ${event.location}` : `en ${event.location}`),
+  ].filter(Boolean);
+  const fallback = english
+    ? "View the event date, time, and details."
+    : "Consulta la fecha, el horario y los detalles del evento.";
+  const prefix = english
+    ? `${localizedEvent.title} on ${details.join(", ")}.`
+    : `${localizedEvent.title}: ${details.join(", ")}.`;
+
+  return truncateDescription(
+    `${prefix} ${localizedEvent.summary || fallback}`,
+  );
 }
 
 function buildGalleryStructuredData(
@@ -298,11 +344,6 @@ function createEventRouteMeta(
     throw new Error(`Missing valid ${language} translation for ${event.id}.`);
   }
   const calendarMeta = CALENDAR_META[language];
-  const description =
-    localizedEvent.summary ||
-    (english
-      ? `View the date, time, and details for ${localizedEvent.title}.`
-      : `Consulta fecha, horario y detalles de ${event.title}.`);
   return {
     path: getEventPath(event, language),
     language,
@@ -313,8 +354,8 @@ function createEventRouteMeta(
         : undefined,
     component: "event",
     eventId: event.id,
-    title: `${localizedEvent.title} | ${SITE_NAME}`,
-    description: description.slice(0, 160),
+    title: `${localizedEvent.title} — ${formatEventDate(event.date, language)} | ${SITE_NAME}`,
+    description: createEventDescription(event, localizedEvent, language),
     image: calendarMeta.image,
     imageAlt: calendarMeta.imageAlt,
     imageWidth: calendarMeta.imageWidth,
@@ -509,7 +550,11 @@ export function getRouteSeoPayload(meta: RouteMeta): RouteSeoPayload {
   return {
     title: meta.title,
     description: meta.description || DEFAULT_SITE_DESCRIPTION,
-    robots: noindex ? "noindex, nofollow" : "index, follow",
+    robots: noindex
+      ? meta.component === "notFound"
+        ? "noindex, nofollow"
+        : "noindex, follow"
+      : "index, follow",
     canonicalUrl:
       noindex && Boolean(meta.noindex) && !meta.canonicalWhileNoindex
         ? null

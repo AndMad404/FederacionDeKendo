@@ -17,7 +17,7 @@ test("generates event HTML with canonical and no structured data while indexing 
   );
 
   assert.match(complete, /<h1[^>]*>Examen<\/h1>/);
-  assert.match(complete, /name="robots" content="noindex, nofollow"/);
+  assert.match(complete, /name="robots" content="noindex, follow"/);
   assert.match(
     complete,
     /rel="canonical" href="https:\/\/fak-kendo\.pages\.dev\/eventos\/2026-08-08-examen\/"/,
@@ -26,7 +26,7 @@ test("generates event HTML with canonical and no structured data while indexing 
   assert.doesNotMatch(incomplete, /application\/ld\+json/);
 });
 
-test("generates complete paused-indexing SEO output for every event route", async () => {
+test("generates localized, unique, paused-indexing SEO output for every event route", async () => {
   const eventRoutes = getRouteManifest().filter(
     (route) => route.component === "event",
   );
@@ -39,10 +39,13 @@ test("generates complete paused-indexing SEO output for every event route", asyn
     const englishPath =
       route.language === "en" ? route.path : route.alternatePath;
 
-    assert.equal(seo.robots, "noindex, nofollow");
+    assert.equal(seo.robots, "noindex, follow");
     assert.ok(seo.canonicalUrl);
-    assert.match(html, /name="description" content="[^"]+"/);
-    assert.ok(html.includes('name="robots" content="noindex, nofollow"'));
+    assert.ok(html.includes(`<title>${seo.title}</title>`));
+    assert.ok(html.includes(`name="description" content="${seo.description}"`));
+    assert.ok(seo.description.length <= 155);
+    assert.doesNotMatch(seo.description, /\s{2,}|\*\s*$/);
+    assert.ok(html.includes('name="robots" content="noindex, follow"'));
     assert.ok(html.includes(`rel="canonical" href="${seo.canonicalUrl}"`));
     assert.ok(html.includes(`property="og:url" content="${seo.canonicalUrl}"`));
     assert.ok(
@@ -50,12 +53,23 @@ test("generates complete paused-indexing SEO output for every event route", asyn
         `hreflang="es-CR" href="https://fak-kendo.pages.dev${spanishPath}"`,
       ),
     );
-    assert.ok(
-      html.includes(
-        `hreflang="en" href="https://fak-kendo.pages.dev${englishPath}"`,
-      ),
-    );
+    if (englishPath) {
+      assert.ok(
+        html.includes(
+          `hreflang="en" href="https://fak-kendo.pages.dev${englishPath}"`,
+        ),
+      );
+    } else {
+      assert.doesNotMatch(html, /hreflang="en"/);
+    }
     assert.doesNotMatch(html, /application\/ld\+json/);
+  }
+
+  for (const language of ["es", "en"]) {
+    const titles = eventRoutes
+      .filter((route) => route.language === language)
+      .map((route) => getRouteSeoPayload(route).title);
+    assert.equal(new Set(titles).size, titles.length);
   }
 });
 
@@ -67,8 +81,8 @@ test("keeps every generated route noindex while including it in the sitemap", as
   assert.match(sitemap, /\/en\/events\//);
   assert.match(sitemap, /\/eventos\/pasados\//);
   assert.match(sitemap, /\/en\/events\/past\//);
-  assert.match(home, /name="robots" content="noindex, nofollow"/);
-  assert.match(calendar, /name="robots" content="noindex, nofollow"/);
+  assert.match(home, /name="robots" content="noindex, follow"/);
+  assert.match(calendar, /name="robots" content="noindex, follow"/);
   assert.match(
     home,
     /rel="canonical" href="https:\/\/fak-kendo\.pages\.dev\/"/,
@@ -94,7 +108,7 @@ test("keeps both calendar archive views noindex and structured-data-free", async
   const englishPastEvents = await readDist("en/events/past/index.html");
 
   for (const html of [pastEvents, englishPastEvents]) {
-    assert.match(html, /name="robots" content="noindex, nofollow"/);
+    assert.match(html, /name="robots" content="noindex, follow"/);
     assert.doesNotMatch(html, /application\/ld\+json/);
   }
 });
