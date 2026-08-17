@@ -5,6 +5,58 @@ schema_version: 2
 last_updated: 2026-08-14
 contract: .agents/review-contract.md
 
+latest_stale_coverage_reconciliation:
+  id: REV-2026-08-16-01
+  requested_scope: Reconcile the technical and visual coverage marked stale since 2026-08-12.
+  actual_scope:
+    targets:
+      - scripts/sync-calendar-events.mjs
+      - scripts/sync-event-galleries.mjs
+      - scripts/correct-calendar-history.mjs
+      - scripts/correct-calendar-history-range.mjs
+      - src/app/components/EventPage.tsx
+      - src/app/components/CalendarSection.tsx
+      - src/app/components/calendar/CalendarEventCard.tsx
+      - src/app/components/GallerySection.tsx
+      - src/app/components/HistoricalEventGallery.tsx
+      - src/app/components/Lightbox.tsx
+      - generated routes and the existing 32-snapshot visual matrix
+    axes: [ARCH, A11Y, RESPONSIVE]
+    included:
+      - calendar, gallery, historical-publication, and workflow contracts
+      - generated-route behavior, geometry, reachability, and lightbox lifecycle
+      - comparison against the existing approved Windows screenshots without updating baselines
+    excluded:
+      - production deployment and external Calendar, Drive, GitHub Actions, or Cloudflare execution
+      - SEO, performance, and source-wide architecture review
+      - approval of visual changes or snapshot regeneration
+  baseline:
+    commit: 504fc8ff
+    worktree: clean before generated verification artifacts
+  findings:
+    - id: VIS-REG-001
+      level: STRUCTURAL
+      axis: RESPONSIVE
+      status: open
+      target: tests/e2e/visual-regression.spec.ts-snapshots
+      problem: Seven current renders differ materially from the approved snapshot baseline: Event at all four viewports, Gallery at both mobile viewports, and Home at tablet.
+      fix: Attribute every changed region to an explicitly approved visual requirement; preserve or correct the implementation as directed, then update only owner-approved baselines.
+      cost_of_deferring: The structural suites remain green, but the repository cannot claim current visual-baseline coverage for those seven surfaces.
+      evidence:
+        - corepack pnpm run test:visual: 25 passed, 7 failed
+        - inspected expected/actual diff artifacts for all seven failures
+      introduced_in: REV-2026-08-16-01
+  evidence:
+    - corepack pnpm run lint passed with zero warnings and errors
+    - corepack pnpm run test:sync-directed passed 59 tests
+    - corepack pnpm run build passed, including SSR and generated route HTML
+    - corepack pnpm run test:e2e passed 209 tests
+    - corepack pnpm run test:visual passed 25 and failed 7 without updating snapshots
+  result: Synchronization and UI behavior coverage is current at 504fc8ff; visual coverage remains stale only for the seven named route/viewport surfaces. The other 25 screenshots, including all four lightbox snapshots, match.
+  pending:
+    - Owner attribution and approval for the seven visual differences before any baseline update.
+  next: Review the seven expected, actual, and diff image triplets against the intended Event, mobile Gallery, and Home tablet changes.
+
 latest_calendar_resilience_script_review:
   id: REV-2026-08-14-01
   requested_scope: Verify the script-backed identity and fingerprint checks plus the resilience behavior represented by the two calendar infrastructure diagrams.
@@ -207,8 +259,8 @@ stale_coverage_notices:
       - scripts/correct-calendar-history-range.mjs
       - related workflows, directed tests, and visual baselines
     reason: Changes committed on 2026-08-12 alter historical-gallery publication, correction workflow, event actions, calendar-card sharing, lightbox presentation, and approved visual snapshots after the prior recorded baselines.
-    status: stale_pending_targeted_review
-    limitation: Documentation reconciliation is not a technical or visual verification of these changes.
+    status: partially_reconciled_by_REV-2026-08-16-01
+    limitation: Synchronization and UI behavior are current at 504fc8ff; visual coverage remains stale for Event at four viewports, Gallery at two mobile viewports, and Home at tablet pending owner attribution and approval.
 
 design_source_status:
   status: obsolete_pending_recreation

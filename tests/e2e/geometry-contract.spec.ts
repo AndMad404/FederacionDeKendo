@@ -272,6 +272,30 @@ test.describe("event details preserve desktop document flow", () => {
   }
 });
 
+test("a short event detail keeps the footer at the desktop viewport bottom", async ({
+  page,
+}) => {
+  await page.setViewportSize(SHELL_CONTRACT.desktopViewport);
+  await preparePage(page, PREFERRED_REPRESENTATIVE_PATHS.event!);
+
+  const geometry = await page.evaluate(() => {
+    const root = document.documentElement;
+    const footer = document.querySelector("footer");
+    return {
+      clientHeight: root.clientHeight,
+      scrollHeight: root.scrollHeight,
+      footerBottom: footer?.getBoundingClientRect().bottom ?? 0,
+    };
+  });
+
+  expect(geometry.scrollHeight).toBeLessThanOrEqual(geometry.clientHeight + 1);
+  expectCssPixels(
+    geometry.footerBottom,
+    geometry.clientHeight,
+    "short event footer bottom",
+  );
+});
+
 for (const viewport of APPROVED_VIEWPORTS) {
   test.describe(`${viewport.name} approved component contracts`, () => {
     test.use({ viewport });
