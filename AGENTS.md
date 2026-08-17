@@ -19,6 +19,12 @@ Stack:
   editing when the request is investigative or materially ambiguous.
 - Prefer existing project patterns over new abstractions.
 - Do not refactor unrelated code while implementing a narrow change.
+- Never use CSS `!important` or Tailwind important modifiers. Resolve cascade
+  conflicts through structure, variants, or natural selector specificity.
+- Responsive design is mobile-first: base styles must serve mobile and touch
+  devices. Apply compact desktop overrides only under explicit desktop
+  conditions, and preserve at least 44 px touch targets on touch-capable and
+  hybrid devices.
 - Do not validate a narrow visual change on top of unrelated visual worktree
   changes. First isolate the authorized patch or stop and ask how the existing
   changes should be preserved.
