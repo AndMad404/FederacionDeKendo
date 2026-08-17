@@ -26,6 +26,37 @@ test("generates event HTML with canonical and no structured data while indexing 
   assert.doesNotMatch(incomplete, /application\/ld\+json/);
 });
 
+test("generates complete paused-indexing SEO output for every event route", async () => {
+  const eventRoutes = getRouteManifest().filter(
+    (route) => route.component === "event",
+  );
+
+  for (const route of eventRoutes) {
+    const html = await readDist(`${route.path.slice(1)}index.html`);
+    const seo = getRouteSeoPayload(route);
+    const spanishPath = route.language === "es" ? route.path : route.alternatePath;
+    const englishPath = route.language === "en" ? route.path : route.alternatePath;
+
+    assert.equal(seo.robots, "noindex, nofollow");
+    assert.ok(seo.canonicalUrl);
+    assert.match(html, /name="description" content="[^"]+"/);
+    assert.ok(html.includes('name="robots" content="noindex, nofollow"'));
+    assert.ok(html.includes(`rel="canonical" href="${seo.canonicalUrl}"`));
+    assert.ok(html.includes(`property="og:url" content="${seo.canonicalUrl}"`));
+    assert.ok(
+      html.includes(
+        `hreflang="es-CR" href="https://fak-kendo.pages.dev${spanishPath}"`,
+      ),
+    );
+    assert.ok(
+      html.includes(
+        `hreflang="en" href="https://fak-kendo.pages.dev${englishPath}"`,
+      ),
+    );
+    assert.doesNotMatch(html, /application\/ld\+json/);
+  }
+});
+
 test("keeps every generated route noindex while including it in the sitemap", async () => {
   const sitemap = await readDist("sitemap.xml");
   const home = await readDist("index.html");
