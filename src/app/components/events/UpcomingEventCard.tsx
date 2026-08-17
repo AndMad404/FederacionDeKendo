@@ -1,4 +1,4 @@
-import { MapPin } from "lucide-react";
+import { Info, MapPin } from "lucide-react";
 import { Link } from "react-router";
 import { actionControlSurfaceClass, focusRingClass } from "../../styles/shared";
 import type { CalendarEvent } from "../../types";
@@ -13,7 +13,7 @@ import { useLanguage } from "../../config/i18n";
 const actionClass = `inline-flex min-h-11 min-w-0 items-center justify-center rounded-lg px-3 py-1.5 text-center text-sm font-semibold leading-tight transition-colors hover:border-site-action hover:bg-site-media lg:min-h-8 lg:px-2.5 lg:py-1 ${actionControlSurfaceClass}`;
 
 const eventDetailsClass =
-  "inline-flex min-h-11 min-w-0 items-center justify-center rounded-lg border border-site-action bg-site-action px-3 py-1.5 text-center text-sm font-semibold leading-tight text-site-on-dark transition-colors hover:bg-site-action-hover lg:min-h-8 lg:px-2.5 lg:py-1";
+  "inline-flex min-h-11 min-w-0 items-center justify-center rounded-full border border-site-action bg-site-action px-3 py-1 text-center text-sm font-semibold leading-tight text-site-on-dark transition-colors hover:bg-site-action-hover lg:min-h-8";
 
 function getEventVisibilityClass(index: number) {
   if (index === 2) return "land-sm:hidden";
@@ -72,13 +72,13 @@ export function UpcomingEventCard({ event, index }: UpcomingEventCardProps) {
           rel="noopener noreferrer"
           aria-label={`${copy.calendar.openLocationLabel} ${event.title} ${copy.calendar.mapsPreposition} Google Maps`}
           aria-describedby={locationDescriptionId}
-          className={`col-start-1 row-start-2 w-full justify-self-center ${actionClass} ${focusRingClass}`}
+          className={`col-start-1 row-start-2 w-fit justify-self-center ${actionClass} ${focusRingClass}`}
         >
           <MapPin
             className="mr-1.5 size-3.5 shrink-0 text-site-accent"
             aria-hidden="true"
           />
-          <span>{copy.event.directions}</span>
+          <span>{copy.calendar.viewLocation}</span>
           <span id={locationDescriptionId} className="sr-only">
             {copy.common.place}: {locationName}. {copy.common.opensMaps}
           </span>
@@ -94,8 +94,9 @@ export function UpcomingEventCard({ event, index }: UpcomingEventCardProps) {
       <Link
         to={getEventPath(event, language)}
         aria-label={`${copy.event.viewDetailsLabel} ${event.title}`}
-        className={`col-start-2 row-start-2 w-full justify-self-end ${eventDetailsClass} ${focusRingClass}`}
+        className={`col-start-2 row-start-2 w-fit justify-self-center ${eventDetailsClass} ${focusRingClass}`}
       >
+        <Info className="mr-1.5 size-4 shrink-0" aria-hidden="true" />
         {copy.common.eventDetails}
       </Link>
     </li>
