@@ -138,3 +138,20 @@ test("generates localized English routes with reciprocal language metadata", asy
   assert.match(event, /Examinations from 8th to 2nd kyu/);
   assert.match(sitemap, /<loc>/);
 });
+
+test("publishes English event routes only when their editorial translation is valid", async () => {
+  const { CALENDAR_EVENTS, getEventTranslationStatus } = await import(
+    "../dist-ssr/entry-server.js"
+  );
+  const englishEventRoutes = getRouteManifest()
+    .filter((route) => route.component === "event" && route.language === "en")
+    .map((route) => route.eventId)
+    .sort();
+  const validTranslationIds = CALENDAR_EVENTS.filter(
+    (event) => getEventTranslationStatus(event) === "valid",
+  )
+    .map((event) => event.id)
+    .sort();
+
+  assert.deepEqual(englishEventRoutes, validTranslationIds);
+});

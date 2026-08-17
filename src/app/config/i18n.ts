@@ -1,4 +1,6 @@
 import { createContext, useContext } from "react";
+import { findEventByPathname } from "../utils/eventRoutes";
+import { getLocalizedEvent } from "../utils/localizedEvents";
 
 export type Language = "es" | "en";
 
@@ -35,7 +37,11 @@ export function getLocalizedPath(pathname: string, language: Language) {
 
   const spanishEvent = normalized.match(/^\/eventos\/([^/]+)\/$/);
   if (spanishEvent) {
-    return language === "en" ? `/en/events/${spanishEvent[1]}/` : normalized;
+    if (language === "es") return normalized;
+    const event = findEventByPathname(normalized);
+    return event && getLocalizedEvent(event, "en")
+      ? `/en/events/${spanishEvent[1]}/`
+      : "/en/";
   }
 
   const englishEvent = normalized.match(/^\/en\/events\/([^/]+)\/$/);

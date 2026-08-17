@@ -9,7 +9,10 @@ import {
   getEventPath,
 } from "../utils/eventRoutes";
 import { getLanguageFromPathname, type Language } from "./i18n";
-import { getLocalizedEvent } from "../utils/localizedEvents";
+import {
+  getEventTranslationStatus,
+  getLocalizedEvent,
+} from "../utils/localizedEvents";
 import { getEventEndDate } from "../utils/calendarEvents";
 import type { RouteComponent } from "./routeTypes";
 
@@ -46,7 +49,7 @@ export interface RouteMeta {
   path: string;
   language: Language;
   locale: "es_CR" | "en_US";
-  alternatePath: string;
+  alternatePath?: string;
   component: RouteComponent;
   title: string;
   description: string;
@@ -239,12 +242,14 @@ export function getRouteMeta(pathname: string) {
   if (configuredRoute) return configuredRoute;
 
   const event = findEventByPathname(normalizedPath);
-  if (event)
-    return createEventRouteMeta(event, getLanguageFromPathname(pathname));
+  const language = getLanguageFromPathname(pathname);
+  if (event && getLocalizedEvent(event, language)) {
+    return createEventRouteMeta(event, language);
+  }
 
   return (
     getRouteManifest().find((route) => route.path === normalizedPath) ??
-    createNotFoundMeta(getLanguageFromPathname(pathname))
+    createNotFoundMeta(language)
   );
 }
 
@@ -259,10 +264,12 @@ export function getRouteManifest() {
 
   return [
     ...Object.values(ROUTE_META),
-    ...CALENDAR_EVENTS.flatMap((event) => [
-      createEventRouteMeta(event, "es"),
-      createEventRouteMeta(event, "en"),
-    ]),
+    ...CALENDAR_EVENTS.flatMap((event) => {
+      const spanishRoute = createEventRouteMeta(event, "es");
+      return getEventTranslationStatus(event) === "valid"
+        ? [spanishRoute, createEventRouteMeta(event, "en")]
+        : [spanishRoute];
+    }),
     ...archiveRoutes,
     ...Array.from({ length: pastPageCount }, (_, index) =>
       createArchiveRouteMeta(index + 1, "en"),
@@ -274,7 +281,9 @@ export function getEventRedirects() {
   return CALENDAR_EVENTS.flatMap((event) =>
     (event.aliases ?? []).flatMap((alias) => [
       { from: `/eventos/${alias}/`, to: getEventPath(event, "es") },
-      { from: `/en/events/${alias}/`, to: getEventPath(event, "en") },
+      ...(getEventTranslationStatus(event) === "valid"
+        ? [{ from: `/en/events/${alias}/`, to: getEventPath(event, "en") }]
+        : []),
     ]),
   );
 }
@@ -284,10 +293,10 @@ function createEventRouteMeta(
   language: Language,
 ): RouteMeta {
   const english = language === "en";
-  // The manifest still contains paired event routes until Phase 2 makes
-  // English publication conditional. Current editorial records cover this
-  // generated event set.
-  const localizedEvent = getLocalizedEvent(event, language)!;
+  const localizedEvent = getLocalizedEvent(event, language);
+  if (!localizedEvent) {
+    throw new Error(`Missing valid ${language} translation for ${event.id}.`);
+  }
   const calendarMeta = CALENDAR_META[language];
   const description =
     localizedEvent.summary ||
@@ -298,7 +307,10 @@ function createEventRouteMeta(
     path: getEventPath(event, language),
     language,
     locale: english ? "en_US" : "es_CR",
-    alternatePath: getEventPath(event, english ? "es" : "en"),
+    alternatePath:
+      english || getEventTranslationStatus(event) === "valid"
+        ? getEventPath(event, english ? "es" : "en")
+        : undefined,
     component: "event",
     eventId: event.id,
     title: `${localizedEvent.title} | ${SITE_NAME}`,
@@ -400,7 +412,8 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
       (candidate) => candidate.id === meta.eventId,
     );
     if (event) {
-      const localizedEvent = getLocalizedEvent(event, meta.language)!;
+      const localizedEvent = getLocalizedEvent(event, meta.language);
+      if (!localizedEvent) return null;
       const startDate = event.startTime
         ? `${event.date}T${event.startTime}:00-06:00`
         : event.date;
@@ -570,6 +583,8 @@ export function getRouteHeadDescriptors(meta: RouteMeta): HeadDescriptor[] {
 
   const spanishPath = meta.language === "es" ? meta.path : meta.alternatePath;
   const englishPath = meta.language === "en" ? meta.path : meta.alternatePath;
+  if (!spanishPath) return descriptors;
+
   descriptors.push(
     {
       tag: "link",
@@ -583,19 +598,22 @@ export function getRouteHeadDescriptors(meta: RouteMeta): HeadDescriptor[] {
       tag: "link",
       attributes: {
         rel: "alternate",
-        hreflang: "en",
-        href: absoluteUrl(englishPath),
-      },
-    },
-    {
-      tag: "link",
-      attributes: {
-        rel: "alternate",
         hreflang: "x-default",
         href: absoluteUrl(spanishPath),
       },
     },
   );
+
+  if (englishPath) {
+    descriptors.push({
+      tag: "link",
+      attributes: {
+        rel: "alternate",
+        hreflang: "en",
+        href: absoluteUrl(englishPath),
+      },
+    });
+  }
 
   if (seo.structuredData) {
     descriptors.push({
