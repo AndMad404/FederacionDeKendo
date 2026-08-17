@@ -103,6 +103,42 @@ test("keeps the sitemap synchronized with every public generated route", async (
   assert.deepEqual(sitemapUrls, routeUrls);
 });
 
+test("uses responsive WebP images for hero and calendar sitemap entries only", async () => {
+  const sitemap = await readDist("sitemap.xml");
+  const sitemapImageUrls = [
+    ...sitemap.matchAll(/<image:loc>([^<]+)<\/image:loc>/g),
+  ].map(([, url]) => url);
+
+  assert.ok(
+    sitemapImageUrls.includes(
+      "https://fak-kendo.pages.dev/images/hero/kendo-hero-formacion-960.webp?v=20260704-0120",
+    ),
+  );
+  assert.ok(
+    sitemapImageUrls.includes(
+      "https://fak-kendo.pages.dev/images/calendar/kendo-calendar-960.webp?v=20260723-1004",
+    ),
+  );
+  assert.ok(
+    sitemapImageUrls.every(
+      (url) =>
+        !url.includes("kendo-hero-formacion.jpg") &&
+        !url.includes("kendo-calendar.jpg"),
+    ),
+  );
+
+  const home = await readDist("index.html");
+  const calendar = await readDist("calendario/index.html");
+  for (const html of [home, calendar]) {
+    assert.match(
+      html,
+      /og:image" content="https:\/\/fak-kendo\.pages\.dev\/images\/social\/kendo-social-card-20260812\.jpg"/,
+    );
+    assert.match(html, /og:image:width" content="1200"/);
+    assert.match(html, /og:image:height" content="630"/);
+  }
+});
+
 test("keeps both calendar archive views noindex and structured-data-free", async () => {
   const pastEvents = await readDist("eventos/pasados/index.html");
   const englishPastEvents = await readDist("en/events/past/index.html");

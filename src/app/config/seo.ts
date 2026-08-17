@@ -404,6 +404,24 @@ export function getRouteSitemapImageUrls(meta: RouteMeta) {
     return GALLERY_IMAGES.map((image) => absoluteUrl(image.src));
   }
 
+  if (meta.component === "home") {
+    return [
+      absoluteUrl(
+        "/images/hero/kendo-hero-formacion-960.webp?v=20260704-0120",
+      ),
+    ];
+  }
+
+  if (
+    meta.component === "calendar" ||
+    meta.component === "event" ||
+    meta.component === "pastEvents"
+  ) {
+    return [
+      absoluteUrl("/images/calendar/kendo-calendar-960.webp?v=20260723-1004"),
+    ];
+  }
+
   return [getRouteImageUrl(meta)];
 }
 
