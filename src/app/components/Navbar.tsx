@@ -161,8 +161,7 @@ export function Navbar() {
               />
               <img
                 src="/images/logo/fakcr-lockup-224.png"
-                alt=""
-                aria-hidden="true"
+                alt={copy.nav.homeLabel}
                 className="size-14 shrink-0 rounded-full bg-site-on-dark object-contain land-sm:size-10"
                 width="56"
                 height="56"
