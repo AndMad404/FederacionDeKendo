@@ -34,7 +34,7 @@ test("opens a prerendered event route with temporary noindex metadata", async ({
   await expect(page.getByText("Actividad programada")).toBeVisible();
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
     "content",
-    "noindex, nofollow",
+    "noindex, follow",
   );
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     "href",
