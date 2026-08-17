@@ -284,7 +284,10 @@ function createEventRouteMeta(
   language: Language,
 ): RouteMeta {
   const english = language === "en";
-  const localizedEvent = getLocalizedEvent(event, language);
+  // The manifest still contains paired event routes until Phase 2 makes
+  // English publication conditional. Current editorial records cover this
+  // generated event set.
+  const localizedEvent = getLocalizedEvent(event, language)!;
   const calendarMeta = CALENDAR_META[language];
   const description =
     localizedEvent.summary ||
@@ -397,7 +400,7 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
       (candidate) => candidate.id === meta.eventId,
     );
     if (event) {
-      const localizedEvent = getLocalizedEvent(event, meta.language);
+      const localizedEvent = getLocalizedEvent(event, meta.language)!;
       const startDate = event.startTime
         ? `${event.date}T${event.startTime}:00-06:00`
         : event.date;

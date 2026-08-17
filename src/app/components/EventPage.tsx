@@ -54,6 +54,7 @@ export function EventPage() {
 
   if (!sourceEvent) return null;
   const event = getLocalizedEvent(sourceEvent, language);
+  if (!event) return null;
 
   const isPast = now
     ? getEventEndDate(event).getTime() <= now.getTime()

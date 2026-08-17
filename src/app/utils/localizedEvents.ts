@@ -1,41 +1,32 @@
 import type { Language } from "../config/i18n";
+import { EVENT_TRANSLATIONS } from "../data/eventTranslations";
 import type { CalendarEvent } from "../types";
 
-const SUMMARY_TRANSLATIONS: Record<string, string> = {
-  "Exámenes de 8vo a 2do kyu": "Examinations from 8th to 2nd kyu",
-  "Categoría con Bogu y sin Bogu": "Categories with and without bogu",
-  "Entrenamientos intensivos de protocolo, técnica y combate.":
-    "Intensive training in etiquette, technique, and combat.",
-  "Torneo por Equipos en Panamá. Invitación de Shinsei Panamá.":
-    "Team tournament in Panama, hosted by Shinsei Panama.",
-};
+export type EventTranslationStatus = "valid" | "missing" | "stale";
 
-const TITLE_TRANSLATIONS: Record<string, string> = {
-  "FEDERACIÓN  : Examen": "FEDERATION: Examination",
-  "FEDERACIÓN : Seminario y Reunión": "FEDERATION: Seminar and Meeting",
-  "CLAK Seminario Instructores CHILE": "CLAK Instructor Seminar CHILE",
-  "CLAK 1er Panamericano BRASIL": "CLAK 1st Pan American Championship BRASIL",
-  "PANAMA Torneo por Equipos": "PANAMA Team Tournament",
-  Examen: "Examination",
-  Seminario: "Seminar",
-  "3er Torneo": "3rd Tournament",
-  "4to Torneo": "4th Tournament",
-  "5to Torneo": "5th Tournament",
-  "6to Torneo": "6th Tournament",
-  "7mo Torneo": "7th Tournament",
-};
+export function getEventTranslationStatus(
+  event: CalendarEvent,
+): EventTranslationStatus {
+  const record = EVENT_TRANSLATIONS[event.id];
+  if (!record) return "missing";
+  return record.source.title === event.title &&
+    record.source.summary === event.summary
+    ? "valid"
+    : "stale";
+}
 
 export function getLocalizedEvent(
   event: CalendarEvent,
   language: Language,
-): CalendarEvent {
+): CalendarEvent | undefined {
   if (language === "es") return event;
+  if (getEventTranslationStatus(event) !== "valid") return undefined;
+
+  const translation = EVENT_TRANSLATIONS[event.id].translation;
   return {
     ...event,
-    title: TITLE_TRANSLATIONS[event.title] ?? event.title,
-    summary: event.summary
-      ? (SUMMARY_TRANSLATIONS[event.summary] ?? event.summary)
-      : undefined,
+    title: translation.title,
+    summary: translation.summary,
   };
 }
 
@@ -43,5 +34,8 @@ export function getLocalizedEvents(
   events: CalendarEvent[],
   language: Language,
 ) {
-  return events.map((event) => getLocalizedEvent(event, language));
+  return events.flatMap((event) => {
+    const localizedEvent = getLocalizedEvent(event, language);
+    return localizedEvent ? [localizedEvent] : [];
+  });
 }

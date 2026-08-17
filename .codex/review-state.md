@@ -5,6 +5,93 @@ schema_version: 2
 last_updated: 2026-08-14
 contract: .agents/review-contract.md
 
+latest_deployed_crawl_seo_review:
+  id: REV-2026-08-17-02
+  requested_scope: Summarize problems in the supplied deployed crawl and identify implementable improvements, accepting noindex as expected.
+  actual_scope:
+    targets:
+      - supplied Screaming Frog-style CSV crawl of https://fak-kendo.pages.dev/
+      - src/app/config/seo-data.json
+      - src/app/config/seo.ts
+      - scripts/generate-route-html.mjs
+      - src/app/data/calendarEvents.ts
+      - src/app/components/HeroSection.tsx
+    axes: [SEO, PERF]
+    included:
+      - HTTP status, required metadata, canonical, language, titles and descriptions
+      - duplicate event metadata, sitemap/noindex consistency, internal-link counts, and crawled image weight
+    excluded:
+      - visual design, editorial fact checking, Search Console, field Core Web Vitals, and deployed response headers not present in the crawl
+  baseline:
+    commit: 458cdc17
+    worktree: clean
+    crawl_timestamp: 2026-08-17
+  findings:
+    - id: SEO-SITEMAP-001
+      level: STRUCTURAL
+      axis: SEO
+      status: open
+      target: scripts/generate-route-html.mjs
+      problem: The generated sitemap includes routes whenever they have a canonical URL, even while every route emits noindex.
+      fix: Include only routes whose effective robots policy is indexable, while retaining canonicals on noindex pages if desired.
+      cost_of_deferring: The sitemap and page directives send conflicting crawl/indexing signals during the intentional noindex period.
+      evidence:
+        - deployed sitemap is 12498 bytes while all 44 crawled HTML pages are noindex
+        - sitemap generation filters on canonicalUrl rather than effective robots policy
+    - id: SEO-EVENT-META-001
+      level: SMELL
+      axis: SEO
+      status: open
+      target: src/app/config/seo.ts:282
+      problem: Recurring events reuse generic titles and summaries, producing duplicate titles and descriptions across distinct URLs.
+      fix: Generate event metadata with localized date and, where useful, location while keeping visible event names unchanged.
+      cost_of_deferring: Event pages remain difficult to distinguish in search previews, shares, and crawlers after indexing is enabled.
+      evidence:
+        - seven Spanish Examination titles and seven English Examination titles are duplicated
+        - repeated generic examination and tournament descriptions occur across multiple routes
+    - id: SEO-EVENT-I18N-001
+      level: SMELL
+      axis: SEO
+      status: open
+      target: src/app/data/calendarEvents.ts:63
+      problem: The English Gasshuku route reuses the Spanish title and long Spanish summary, and the summary is cut mechanically at 160 characters.
+      fix: Supply localized event summaries and normalize/truncate metadata at a sentence or word boundary.
+      cost_of_deferring: The English route exposes mismatched-language and visibly truncated metadata.
+      evidence:
+        - both Gasshuku language routes have the same Spanish 160-character description
+        - both descriptions measure 977 pixels in the supplied crawl
+    - id: SEO-TITLE-WIDTH-001
+      level: POLISH
+      axis: SEO
+      status: open
+      target: src/app/config/seo.ts:301
+      problem: Six event titles exceed the crawler's approximate 580-pixel display threshold.
+      fix: Use a shorter site-name suffix for event metadata or a route-specific compact title template.
+      cost_of_deferring: Some event titles may be truncated in result snippets and link previews.
+      evidence:
+        - six crawled event titles measure 608 to 770 pixels
+    - id: PERF-SOCIAL-IMAGE-001
+      level: POLISH
+      axis: PERF
+      status: open
+      target: src/app/config/seo-data.json:24
+      problem: Crawlers fetch the 848570-byte original hero JPEG through page metadata even though the rendered hero uses responsive WebP files.
+      fix: Create an optimized social-preview image and reference it from SEO metadata without changing the approved visible hero.
+      cost_of_deferring: Social crawlers and audits transfer substantially more image data than necessary; this is not evidence of an LCP regression.
+      evidence:
+        - supplied crawl reports the original hero JPEG at 848570 bytes
+        - HeroSection renders responsive WebP sources
+  evidence:
+    - parsed all 103 crawl rows and separately evaluated 44 HTML rows
+    - all 103 resources returned 200 OK
+    - all HTML rows contain title, meta description, H1, canonical, and language
+    - inspected current SEO generation and event metadata sources at commit 458cdc17
+  result: The deployed crawl has no broken responses or missing basic metadata; the implementable work is sitemap-policy consistency, unique/localized event metadata, compact event titles, and a lighter social image.
+  pending:
+    - Owner decision whether intentional noindex should remain nofollow or become follow.
+    - Decide whether low event-page inlink counts warrant a navigation/content change after indexation is planned.
+  next: Implement the non-visual SEO generation fixes as one bounded phase after owner selects the robots follow policy.
+
 latest_rendering_seo_performance_review:
   id: REV-2026-08-17-01
   requested_scope: Determine whether the site applies prerendering/indexation, Core Web Vitals optimization, technical SEO, and SEO troubleshooting practices.
