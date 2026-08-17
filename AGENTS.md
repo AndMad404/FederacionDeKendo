@@ -12,6 +12,7 @@ Stack:
 
 - Use the current application plus owner-approved measurements, screenshots, and rendered results as the visual baseline.
 - Read the relevant files before making claims or edits.
+- After editing code or configuration, run `corepack pnpm run format:check` before reporting completion. The repository Prettier configuration requires CRLF line endings; do not treat a content-only diff as formatted until this check passes.
 - Keep work scoped to the user's requested file, route, concern, or task.
 - When the user does not know the relevant files, routes, or tests, read
   `.agents/project-map.md` and discover the smallest evidence-based scope.
