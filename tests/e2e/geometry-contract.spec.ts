@@ -222,6 +222,11 @@ test.describe("all generated routes preserve the desktop shell contract", () => 
       expect(geometry.footerBottom).toBeLessThanOrEqual(
         SHELL_CONTRACT.desktopViewport.height + 1,
       );
+      expectCssPixels(
+        geometry.footerBottom,
+        geometry.document.clientHeight,
+        "footer bottom without document scroll",
+      );
       expect(geometry.primaryScrollHeight).toBeLessThanOrEqual(
         geometry.primaryClientHeight + 1,
       );
@@ -254,11 +259,23 @@ test.describe("event details preserve desktop document flow", () => {
       const geometry = await page.evaluate(() => {
         const root = document.documentElement;
         const section = document.querySelector("main > section");
+        const contentWrapper = section?.querySelector(":scope > div");
         const footer = document.querySelector("footer");
+        const contentWrapperStyles = contentWrapper
+          ? getComputedStyle(contentWrapper)
+          : null;
         return {
           hasHorizontalOverflow: root.scrollWidth > root.clientWidth + 1,
+          clientHeight: root.clientHeight,
+          scrollHeight: root.scrollHeight,
           sectionScrollHeight: section?.scrollHeight ?? 0,
           sectionClientHeight: section?.clientHeight ?? 0,
+          contentWrapperPaddingInline: {
+            left: Number.parseFloat(contentWrapperStyles?.paddingLeft ?? "0"),
+            right: Number.parseFloat(
+              contentWrapperStyles?.paddingRight ?? "0",
+            ),
+          },
           footerBottom: footer?.getBoundingClientRect().bottom ?? 0,
         };
       });
@@ -267,33 +284,65 @@ test.describe("event details preserve desktop document flow", () => {
       expect(geometry.sectionScrollHeight).toBeLessThanOrEqual(
         geometry.sectionClientHeight + 1,
       );
-      expect(geometry.footerBottom).toBeGreaterThan(0);
+      expectCssPixels(
+        geometry.contentWrapperPaddingInline.left,
+        0,
+        "event desktop content wrapper left padding",
+      );
+      expectCssPixels(
+        geometry.contentWrapperPaddingInline.right,
+        0,
+        "event desktop content wrapper right padding",
+      );
+      if (geometry.scrollHeight > geometry.clientHeight + 1) {
+        expect(
+          geometry.footerBottom,
+          "a scrolling event footer must extend beyond the first viewport",
+        ).toBeGreaterThan(geometry.clientHeight);
+        expectCssPixels(
+          geometry.footerBottom,
+          geometry.scrollHeight,
+          "scrolling event footer bottom",
+        );
+      } else {
+        expectCssPixels(
+          geometry.footerBottom,
+          geometry.clientHeight,
+          "event footer bottom without document scroll",
+        );
+      }
     });
   }
 });
 
-test("a short event detail keeps the footer at the desktop viewport bottom", async ({
-  page,
-}) => {
-  await page.setViewportSize(SHELL_CONTRACT.desktopViewport);
-  await preparePage(page, PREFERRED_REPRESENTATIVE_PATHS.event!);
+test.describe("compact event actions keep touch-sized hit areas", () => {
+  test.use({ viewport: SHELL_CONTRACT.desktopViewport, hasTouch: true });
 
-  const geometry = await page.evaluate(() => {
-    const root = document.documentElement;
-    const footer = document.querySelector("footer");
-    return {
-      clientHeight: root.clientHeight,
-      scrollHeight: root.scrollHeight,
-      footerBottom: footer?.getBoundingClientRect().bottom ?? 0,
-    };
-  });
+  for (const path of ["/", "/calendario/"]) {
+    test(`${path} keeps location and details actions at least 44px`, async ({
+      page,
+    }) => {
+      await preparePage(page, path);
+      const controls = await page
+        .locator(
+          "main a[aria-label*='ubicación'], main a[aria-label*='detalles']",
+        )
+        .evaluateAll((elements) =>
+          elements
+            .map((element) => {
+              const rect = element.getBoundingClientRect();
+              return { width: rect.width, height: rect.height };
+            })
+            .filter(({ width, height }) => width > 0 && height > 0),
+        );
 
-  expect(geometry.scrollHeight).toBeLessThanOrEqual(geometry.clientHeight + 1);
-  expectCssPixels(
-    geometry.footerBottom,
-    geometry.clientHeight,
-    "short event footer bottom",
-  );
+      expect(controls).not.toEqual([]);
+      for (const control of controls) {
+        expect(control.width).toBeGreaterThanOrEqual(44);
+        expect(control.height).toBeGreaterThanOrEqual(44);
+      }
+    });
+  }
 });
 
 for (const viewport of APPROVED_VIEWPORTS) {

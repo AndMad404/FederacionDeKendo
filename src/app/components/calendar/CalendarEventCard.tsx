@@ -50,7 +50,7 @@ export function CalendarEventCard({ event }: CalendarEventCardProps) {
           rel="noopener noreferrer"
           aria-label={`${copy.calendar.openLocationLabel} ${event.title} ${copy.calendar.mapsPreposition} Google Maps`}
           aria-describedby={locationDescriptionId}
-          className={`inline-flex min-h-11 items-center justify-center rounded-lg px-3 py-1.5 text-sm font-semibold transition hover:border-site-action hover:bg-site-media lg:min-h-8 lg:px-2.5 lg:py-1 ${actionControlSurfaceClass} ${focusRingClass}`}
+          className={`inline-flex min-h-11 items-center justify-center rounded-lg px-3 py-1.5 text-sm font-semibold transition hover:border-site-action hover:bg-site-media lg:min-h-8 lg:px-2.5 lg:py-1 touch:!min-h-11 ${actionControlSurfaceClass} ${focusRingClass}`}
         >
           <MapPin
             className="mr-1.5 size-3.5 shrink-0 text-site-accent-soft"
@@ -70,7 +70,7 @@ export function CalendarEventCard({ event }: CalendarEventCardProps) {
         <Link
           to={getEventPath(event, language)}
           aria-label={`${copy.calendar.viewDetailsLabel} ${event.title}`}
-          className={`inline-flex min-h-11 cursor-pointer items-center justify-center rounded-full border border-site-action bg-site-action px-3 py-1 text-sm font-semibold text-site-on-dark transition-colors hover:bg-site-action-hover lg:min-h-8 ${focusRingClass}`}
+          className={`inline-flex min-h-11 cursor-pointer items-center justify-center rounded-full border border-site-action bg-site-action px-3 py-1 text-sm font-semibold text-site-on-dark transition-colors hover:bg-site-action-hover lg:min-h-8 touch:!min-h-11 ${focusRingClass}`}
         >
           <Info className="mr-1.5 size-4" />
           {copy.common.eventDetails}

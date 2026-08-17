@@ -3058,12 +3058,16 @@ latest_spa_mobile_review:
     - id: SMELL-A11Y-005
       level: SMELL
       axis: A11Y
-      status: open_decision_required
+      status: resolved
       target: src/styles/globals.css root font size and text-only enlargement behavior
       problem: The root font size is fixed at 16px and the layouts are not resilient when only that value is doubled, even though the verified full-page reflow equivalent remains reachable.
       fix: First decide whether text-only enlargement and user default-font preferences are an explicit product requirement beyond the verified full-page zoom path; only then test native browser mechanisms and choose between removing the fixed root size, adding a supported text-scale mode, or accepting zoom as the supported mechanism.
       cost_of_deferring: Users who prefer text-only scaling instead of full-page zoom may encounter clipped content or horizontal overflow, but this is not currently proven to violate WCAG 1.4.4 because a supported zoom mechanism can be sufficient.
       evidence: [src/styles/globals.css root --font-size 16px, temporary root 32px measurements at 768x1024 and 1366x768, W3C Understanding SC 1.4.4]
+      resolution:
+        resolved_at: 2026-08-16
+        summary: Full-page browser zoom is the supported 200-percent enlargement mechanism; text-only enlargement is not a product requirement.
+        checks: [owner-confirmed native Microsoft Edge 200-percent zoom validation, automated reflow-equivalent reachability coverage]
 
 phase_zero_spa_mobile:
   status: responsive_problem_understood_and_fixed
@@ -3132,7 +3136,7 @@ phase_one_responsive_contract:
     approved: The inspected Affiliates 768x1024 rendered result and replacement of its single visual baseline.
 
 phase_two_text_resize:
-  status: problem_explained_decision_pending
+  status: completed_with_full_page_zoom_policy
   requested_scope: Understand the 200-percent text-enlargement concern before any approval or implementation.
   actual_scope:
     targets: [src/styles/globals.css, Home, Calendar, Gallery, Affiliates]
@@ -3152,9 +3156,9 @@ phase_two_text_resize:
     - No connected Chrome browser was available for a second native-zoom attempt in this session.
     - Chromium CDP Emulation.setPageScaleFactor was rejected as evidence: at factor 2 it reduced only the visual viewport to 683x384, kept the 1366x768 layout viewport and min-width:1280 media query active, and reported page zoom 1.
   decision_gate:
-    - Confirm native 200-percent zoom in at least one supported desktop browser before claiming WCAG conformance.
-    - Decide separately whether the product will support text-only enlargement or user-configured default font sizes as an additional accessibility objective.
-    - No layout or typography change is approved in this phase.
+    - Owner confirmed native Microsoft Edge zoom at 200 percent on 2026-08-16.
+    - Full-page zoom is supported; text-only enlargement and user-configured default font sizes are outside the current product requirement.
+    - No layout or typography change is required for this decision.
 
 phase_three_lightbox_isolation:
   status: completed_and_owner_approved
