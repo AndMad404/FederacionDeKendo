@@ -23,7 +23,9 @@ export default tseslint.config(
       ],
       "no-control-regex": "error",
       "no-regex-spaces": "error",
-      "no-unexpected-multiline": "error",
+      // Prettier may wrap computed property access across lines; formatting is
+      // enforced exclusively by the Prettier check.
+      "no-unexpected-multiline": "off",
       "no-useless-escape": "error",
     },
   },
