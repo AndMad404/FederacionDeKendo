@@ -90,7 +90,7 @@ ubicacion.
 
 ## Prerender e hidratacion
 
-El build genera HTML inicial para Inicio, Galeria, Afiliados y la pagina 404:
+El build genera HTML inicial para todas las rutas publicas del manifiesto, incluidas las paginas principales, los eventos y su archivo, ademas de la pagina 404:
 
 1. Vite crea el bundle del navegador en `dist/`.
 2. Vite crea el bundle SSR desde `src/entry-server.tsx` en `dist-ssr/`.
@@ -114,7 +114,7 @@ Verifica que `dist/index.html`, `dist/galeria/index.html`, `dist/afiliados/index
 
 ## Arquitectura SEO
 
-`src/app/config/seo-data.json` es la fuente principal de configuracion para las rutas indexables. Cada registro incluye la ruta, el componente asociado, los metadatos, la imagen social, la imagen LCP que debe precargarse y el tipo base de Schema.org.
+`src/app/config/seo-data.json` es la fuente principal de configuracion para las rutas estaticas. Cada registro incluye la ruta, el componente asociado, los metadatos, la imagen social, la imagen LCP que debe precargarse y el tipo base de Schema.org. Las rutas de eventos y del archivo se derivan de los datos del calendario.
 
 `src/app/config/seo.ts` valida esa configuracion y genera:
 
@@ -123,14 +123,14 @@ Verifica que `dist/index.html`, `dist/galeria/index.html`, `dist/afiliados/index
 - el grafo JSON-LD base;
 - una descripcion comun de etiquetas para el navegador y el prerender.
 
-El build usa el mismo manifiesto para generar las paginas HTML y `dist/sitemap.xml`. No edites un sitemap manual en `public/`: al agregar o eliminar una ruta indexable, actualiza `seo-data.json` y el sitemap se regenerara con `pnpm run build`.
+El build usa el mismo manifiesto para generar las paginas HTML y `dist/sitemap.xml`. El sitemap enumera todas las rutas publicas aunque la politica temporal del sitio mantenga su HTML en `noindex, nofollow`. No edites un sitemap manual en `public/`: las rutas estaticas provienen de `seo-data.json` y los eventos se incorporan automaticamente desde los datos del calendario en el siguiente build.
 
 Para incorporar una nueva pagina:
 
 1. Agrega su identificador a `RouteComponent` y su componente a `ROUTE_COMPONENTS`.
 2. Agrega un registro completo en `seo-data.json`.
 3. Ejecuta `pnpm run typecheck` y `pnpm run build`.
-4. Comprueba que aparezca en `dist/sitemap.xml` y que su HTML tenga una sola description, robots, canonical y bloque JSON-LD.
+4. Comprueba que aparezca en `dist/sitemap.xml` y que su HTML tenga una sola description, robots y canonical. Mientras continue la politica temporal `noindex`, el JSON-LD se omite.
 
 Las entidades estructuradas especificas de una ruta se agregan mediante `ROUTE_STRUCTURED_DATA_BUILDERS`. Solo deben representar informacion visible, verdadera y aprobada.
 
