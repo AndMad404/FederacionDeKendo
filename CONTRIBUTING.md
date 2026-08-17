@@ -2,6 +2,16 @@
 
 ## Commit messages
 
+## Pre-commit verification
+
+`pnpm install` configures the repository hook automatically. Before every
+commit, it runs `pnpm run format:check` and rejects the commit when Prettier
+finds a formatting violation. For an existing clone, run:
+
+```bash
+pnpm run setup:git-hooks
+```
+
 Manual commits must explain the problem, the intended outcome, and how the
 change was verified. Use this structure:
 

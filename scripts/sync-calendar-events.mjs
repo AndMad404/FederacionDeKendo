@@ -24,6 +24,7 @@ import {
   replaceTransaction,
   synchronizeEventGalleries,
 } from "./sync-event-galleries.mjs";
+import eventTranslations from "../src/app/data/eventTranslations.json" with { type: "json" };
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "..");
@@ -54,6 +55,29 @@ const embeddedGoogleDriveFolderUrl =
 const albumUrlSymbol = Symbol("privateAlbumUrl");
 export const MASS_DISAPPEARANCE_MINIMUM = 2;
 export const MASS_DISAPPEARANCE_RATIO = 0.5;
+
+export function getTranslationPublicationCounts(
+  events,
+  translations = eventTranslations,
+) {
+  return events.reduce(
+    (counts, event) => {
+      const translation = translations[event.id];
+      if (!translation) {
+        counts.missing += 1;
+      } else if (
+        translation.source.title !== event.title ||
+        translation.source.summary !== event.summary
+      ) {
+        counts.stale += 1;
+      } else {
+        counts.valid += 1;
+      }
+      return counts;
+    },
+    { valid: 0, missing: 0, stale: 0 },
+  );
+}
 
 export const HISTORICAL_COMPARISON_FIELDS = [
   "slug",
@@ -1301,6 +1325,9 @@ export async function writeActionSummary(
     `Galleries imported this run: ${operationalCounts.importedGalleries ?? 0}`,
     `Frozen galleries: ${operationalCounts.frozenGalleries ?? 0}`,
     `Drive changes detected: ${operationalCounts.driveChanges ?? 0}`,
+    `English translations valid: ${operationalCounts.validTranslations ?? 0}`,
+    `English translations missing: ${operationalCounts.missingTranslations ?? 0}`,
+    `English translations stale: ${operationalCounts.staleTranslations ?? 0}`,
     "",
     "### Operational warnings",
     "",
@@ -1476,6 +1503,20 @@ async function main() {
   console.log(
     `Synced ${result.registry.events.length} event(s) with ${result.warnings.length} warning(s).`,
   );
+  const translationCounts = getTranslationPublicationCounts(
+    result.registry.events,
+  );
+  const pendingTranslations =
+    translationCounts.missing + translationCounts.stale;
+  const actionWarnings = [...result.warnings];
+  if (pendingTranslations) {
+    actionWarnings.push(
+      `${pendingTranslations} English translation(s) require editorial review (${translationCounts.missing} missing, ${translationCounts.stale} stale).`,
+    );
+    console.log(
+      `::warning title=English translations pending::${pendingTranslations} event translation(s) require editorial review (${translationCounts.missing} missing, ${translationCounts.stale} stale).`,
+    );
+  }
   if (result.historicalReport.historicalChanges.length) {
     console.log(
       `::warning title=Historical calendar changes::${result.historicalReport.historicalChanges.length} historical event(s) require confirmation.`,
@@ -1483,7 +1524,7 @@ async function main() {
   }
   await writeCalendarNotificationsSummary(result.notificationReport);
   await writeActionSummary(
-    result.warnings,
+    actionWarnings,
     result.registry.events.length,
     result.historicalReport,
     process.env.GITHUB_STEP_SUMMARY,
@@ -1499,6 +1540,9 @@ async function main() {
       driveChanges: result.historicalReport.galleryChanges.filter(
         (change) => change.status === "galeria_congelada_cambio_detectado",
       ).length,
+      validTranslations: translationCounts.valid,
+      missingTranslations: translationCounts.missing,
+      staleTranslations: translationCounts.stale,
     },
   );
 }

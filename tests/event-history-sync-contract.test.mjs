@@ -14,6 +14,7 @@ import {
   createCalendarNotifications,
   recordCalendarNotifications,
   detectHistoricalChanges,
+  getTranslationPublicationCounts,
   decidePendingDeletion,
   mergeRegistry,
   serializeCalendarEvents,
@@ -717,6 +718,55 @@ test("C2: keep operational warnings separate and neutralize Calendar markup in t
     assert.match(summary, /Drive changes detected: 0/);
     assert.match(summary, /### Historical changes requiring confirmation/);
     assert.doesNotMatch(summary, /<details>|<script>|\n::error::/);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("SEO phase 5: classifies English translation publication without blocking Spanish events", async () => {
+  const events = [
+    { id: "valid", title: "Examen", summary: "Public summary" },
+    { id: "missing", title: "Torneo", summary: undefined },
+    { id: "stale", title: "Seminario actualizado", summary: undefined },
+  ];
+  const translations = {
+    valid: {
+      source: { title: "Examen", summary: "Public summary" },
+      translation: { title: "Examination", summary: "Public summary" },
+    },
+    stale: {
+      source: { title: "Seminario", summary: undefined },
+      translation: { title: "Seminar", summary: undefined },
+    },
+  };
+
+  assert.deepEqual(getTranslationPublicationCounts(events, translations), {
+    valid: 1,
+    missing: 1,
+    stale: 1,
+  });
+  assert.equal(events.length, 3);
+});
+
+test("SEO phase 5: records pending English translations as an operational warning", async () => {
+  const directory = await mkdtemp(path.join(os.tmpdir(), "fak-seo-summary-"));
+  const summaryPath = path.join(directory, "summary.md");
+  try {
+    await writeActionSummary(
+      [
+        "2 English translation(s) require editorial review (1 missing, 1 stale).",
+      ],
+      3,
+      { historicalChanges: [], galleryChanges: [] },
+      summaryPath,
+      { validTranslations: 1, missingTranslations: 1, staleTranslations: 1 },
+    );
+    const summary = await readFile(summaryPath, "utf8");
+    assert.match(summary, /Operational warnings: 1/);
+    assert.match(summary, /English translations valid: 1/);
+    assert.match(summary, /English translations missing: 1/);
+    assert.match(summary, /English translations stale: 1/);
+    assert.match(summary, /require editorial review/);
   } finally {
     await rm(directory, { recursive: true, force: true });
   }

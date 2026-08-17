@@ -1,0 +1,10 @@
+#!/bin/sh
+
+if [ -f ./node_modules/.bin/prettier.cmd ]; then
+  ./node_modules/.bin/prettier.cmd . --check --ignore-unknown
+elif [ -x ./node_modules/.bin/prettier ]; then
+  ./node_modules/.bin/prettier . --check --ignore-unknown
+else
+  echo "Install dependencies before committing so Prettier can run." >&2
+  exit 1
+fi
