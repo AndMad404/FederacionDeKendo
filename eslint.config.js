@@ -39,4 +39,12 @@ export default tseslint.config(
       "react-refresh/only-export-components": "error",
     },
   },
+  {
+    files: ["src/entry-server.tsx"],
+    rules: {
+      // This SSR entry intentionally exports rendering and SEO helpers for
+      // static generation; it is not a Fast Refresh boundary.
+      "react-refresh/only-export-components": "off",
+    },
+  },
 );
