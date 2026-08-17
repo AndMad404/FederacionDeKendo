@@ -223,9 +223,7 @@ function createEventDescription(
     ? `${localizedEvent.title} on ${details.join(", ")}.`
     : `${localizedEvent.title}: ${details.join(", ")}.`;
 
-  return truncateDescription(
-    `${prefix} ${localizedEvent.summary || fallback}`,
-  );
+  return truncateDescription(`${prefix} ${localizedEvent.summary || fallback}`);
 }
 
 function buildGalleryStructuredData(
@@ -406,9 +404,7 @@ export function getRouteSitemapImageUrls(meta: RouteMeta) {
 
   if (meta.component === "home") {
     return [
-      absoluteUrl(
-        "/images/hero/kendo-hero-formacion-960.webp?v=20260704-0120",
-      ),
+      absoluteUrl("/images/hero/kendo-hero-formacion-960.webp?v=20260704-0120"),
     ];
   }
 
