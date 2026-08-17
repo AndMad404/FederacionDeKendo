@@ -6,6 +6,7 @@
 @custom-variant page-fit (@media (min-width: 1280px) and (min-height: 768px));
 @custom-variant land-compact (@media (orientation: landscape) and (min-width: 768px) and (max-height: 480px));
 @custom-variant touch (@media (any-pointer: coarse));
+@custom-variant desktop-fine (@media (min-width: 1024px) and (pointer: fine) and (not (any-pointer: coarse)));
 
 @font-face {
   font-family: "Zen Kaku Gothic New";

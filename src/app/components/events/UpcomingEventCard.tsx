@@ -10,10 +10,10 @@ import {
 import { getEventPath } from "../../utils/eventRoutes";
 import { useLanguage } from "../../config/i18n";
 
-const actionClass = `inline-flex min-h-11 min-w-0 items-center justify-center rounded-lg px-3 py-1.5 text-center text-sm font-semibold leading-tight transition-colors hover:border-site-action hover:bg-site-media lg:min-h-8 lg:px-2.5 lg:py-1 touch:!min-h-11 ${actionControlSurfaceClass}`;
+const actionClass = `inline-flex min-h-11 min-w-0 items-center justify-center rounded-lg px-3 py-1.5 text-center text-sm font-semibold leading-tight transition-colors hover:border-site-action hover:bg-site-media desktop-fine:min-h-8 lg:px-2.5 lg:py-1 ${actionControlSurfaceClass}`;
 
 const eventDetailsClass =
-  "inline-flex min-h-11 min-w-0 items-center justify-center rounded-full border border-site-action bg-site-action px-3 py-1 text-center text-sm font-semibold leading-tight text-site-on-dark transition-colors hover:bg-site-action-hover lg:min-h-8 touch:!min-h-11";
+  "inline-flex min-h-11 min-w-0 items-center justify-center rounded-full border border-site-action bg-site-action px-3 py-1 text-center text-sm font-semibold leading-tight text-site-on-dark transition-colors hover:bg-site-action-hover desktop-fine:min-h-8";
 
 function getEventVisibilityClass(index: number) {
   if (index === 2) return "land-sm:hidden";

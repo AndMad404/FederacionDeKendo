@@ -272,9 +272,7 @@ test.describe("event details preserve desktop document flow", () => {
           sectionClientHeight: section?.clientHeight ?? 0,
           contentWrapperPaddingInline: {
             left: Number.parseFloat(contentWrapperStyles?.paddingLeft ?? "0"),
-            right: Number.parseFloat(
-              contentWrapperStyles?.paddingRight ?? "0",
-            ),
+            right: Number.parseFloat(contentWrapperStyles?.paddingRight ?? "0"),
           },
           footerBottom: footer?.getBoundingClientRect().bottom ?? 0,
         };
@@ -315,31 +313,99 @@ test.describe("event details preserve desktop document flow", () => {
   }
 });
 
-test.describe("compact event actions keep touch-sized hit areas", () => {
+const EVENT_ACTION_SELECTOR =
+  "main a[aria-label*='ubicación'], main a[aria-label*='detalles']";
+
+async function getVisibleEventActionSizes(page: Page) {
+  return page.locator(EVENT_ACTION_SELECTOR).evaluateAll((elements) =>
+    elements
+      .map((element) => {
+        const rect = element.getBoundingClientRect();
+        return { width: rect.width, height: rect.height };
+      })
+      .filter(({ width, height }) => width > 0 && height > 0),
+  );
+}
+
+async function expectEventActionMinimum(page: Page, minimum: number) {
+  let controls: Array<{ width: number; height: number }> = [];
+  await expect
+    .poll(async () => {
+      controls = await getVisibleEventActionSizes(page);
+      return controls.length;
+    })
+    .toBeGreaterThan(0);
+  for (const control of controls) {
+    expect(control.width).toBeGreaterThanOrEqual(minimum);
+    expect(control.height).toBeGreaterThanOrEqual(minimum);
+  }
+}
+
+test.describe("event actions use mobile-first touch geometry", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  for (const path of ["/", "/calendario/"]) {
+    test(`${path} keeps actions at least 44px on mobile`, async ({ page }) => {
+      await preparePage(page, path);
+      await expectEventActionMinimum(page, 44);
+    });
+  }
+});
+
+test.describe("event actions preserve touch geometry on desktop", () => {
   test.use({ viewport: SHELL_CONTRACT.desktopViewport, hasTouch: true });
 
   for (const path of ["/", "/calendario/"]) {
-    test(`${path} keeps location and details actions at least 44px`, async ({
+    test(`${path} keeps actions at least 44px with a coarse pointer`, async ({
       page,
     }) => {
       await preparePage(page, path);
-      const controls = await page
-        .locator(
-          "main a[aria-label*='ubicación'], main a[aria-label*='detalles']",
-        )
-        .evaluateAll((elements) =>
-          elements
-            .map((element) => {
-              const rect = element.getBoundingClientRect();
-              return { width: rect.width, height: rect.height };
-            })
-            .filter(({ width, height }) => width > 0 && height > 0),
-        );
+      await expectEventActionMinimum(page, 44);
+    });
+  }
+});
 
-      expect(controls).not.toEqual([]);
+test.describe("event actions preserve hybrid-device geometry", () => {
+  test.use({ viewport: SHELL_CONTRACT.desktopViewport, hasTouch: true });
+
+  for (const path of ["/", "/calendario/"]) {
+    test(`${path} keeps actions at least 44px with fine and coarse pointers`, async ({
+      page,
+    }) => {
+      const cdpSession = await page.context().newCDPSession(page);
+      await cdpSession.send("Emulation.setEmulatedMedia", {
+        features: [{ name: "pointer", value: "fine" }],
+      });
+      await preparePage(page, path);
+      await expectEventActionMinimum(page, 44);
+    });
+  }
+});
+
+test.describe("event actions preserve compact fine-pointer geometry", () => {
+  test.use({ viewport: SHELL_CONTRACT.desktopViewport });
+
+  for (const path of ["/", "/calendario/"]) {
+    test(`${path} keeps actions at 32px with an exclusively fine pointer`, async ({
+      page,
+    }) => {
+      const cdpSession = await page.context().newCDPSession(page);
+      await cdpSession.send("Emulation.setEmulatedMedia", {
+        features: [
+          { name: "pointer", value: "fine" },
+          { name: "any-pointer", value: "fine" },
+        ],
+      });
+      await preparePage(page, path);
+      let controls: Array<{ width: number; height: number }> = [];
+      await expect
+        .poll(async () => {
+          controls = await getVisibleEventActionSizes(page);
+          return controls.length;
+        })
+        .toBeGreaterThan(0);
       for (const control of controls) {
-        expect(control.width).toBeGreaterThanOrEqual(44);
-        expect(control.height).toBeGreaterThanOrEqual(44);
+        expectCssPixels(control.height, 32, "compact event action height");
       }
     });
   }

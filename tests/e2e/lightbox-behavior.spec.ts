@@ -195,3 +195,41 @@ test("resets pinch zoom when the lightbox image changes and reopens", async ({
     /transform: scale\(1\); transform-origin: 50% 50%/,
   );
 });
+
+test("shared navigation arrows preserve normal, hover, active and disabled states", async ({
+  page,
+}) => {
+  await page.clock.setFixedTime(FIXED_TEST_TIME);
+  await page.goto("/galeria/");
+  const nextArrow = page.getByRole("button", { name: "Imagen siguiente" });
+  await expect(nextArrow).toHaveAttribute("data-active", "false");
+
+  const readColors = () =>
+    nextArrow.evaluate((element) => {
+      const styles = getComputedStyle(element);
+      return {
+        backgroundColor: styles.backgroundColor,
+        borderColor: styles.borderColor,
+        color: styles.color,
+      };
+    });
+
+  const normalColors = await readColors();
+  await nextArrow.hover();
+  await page.waitForTimeout(250);
+  const hoverColors = await readColors();
+  expect(hoverColors).not.toEqual(normalColors);
+
+  await nextArrow.click();
+  await expect(nextArrow).toHaveAttribute("data-active", "true");
+  await page.waitForTimeout(50);
+  expect(await readColors()).toEqual(hoverColors);
+
+  await page.goto("/calendario/");
+  const disabledArrow = page
+    .getByRole("button", { name: "Ver los dos meses anteriores" })
+    .first();
+  await expect(disabledArrow).toBeDisabled();
+  await expect(disabledArrow).toHaveCSS("opacity", "0.35");
+  await expect(disabledArrow).toHaveAttribute("data-active", "false");
+});
