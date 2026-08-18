@@ -748,25 +748,23 @@ test("SEO phase 5: classifies English translation publication without blocking S
   assert.equal(events.length, 3);
 });
 
-test("SEO phase 5: records pending English translations as an operational warning", async () => {
+test("SEO phase 5: reports pending English translations without an alarm", async () => {
   const directory = await mkdtemp(path.join(os.tmpdir(), "fak-seo-summary-"));
   const summaryPath = path.join(directory, "summary.md");
   try {
     await writeActionSummary(
-      [
-        "2 English translation(s) require editorial review (1 missing, 1 stale).",
-      ],
+      [],
       3,
       { historicalChanges: [], galleryChanges: [] },
       summaryPath,
       { validTranslations: 1, missingTranslations: 1, staleTranslations: 1 },
     );
     const summary = await readFile(summaryPath, "utf8");
-    assert.match(summary, /Operational warnings: 1/);
+    assert.match(summary, /Operational warnings: 0/);
     assert.match(summary, /English translations valid: 1/);
     assert.match(summary, /English translations missing: 1/);
     assert.match(summary, /English translations stale: 1/);
-    assert.match(summary, /require editorial review/);
+    assert.doesNotMatch(summary, /require editorial review/);
   } finally {
     await rm(directory, { recursive: true, force: true });
   }

@@ -1506,17 +1506,7 @@ async function main() {
   const translationCounts = getTranslationPublicationCounts(
     result.registry.events,
   );
-  const pendingTranslations =
-    translationCounts.missing + translationCounts.stale;
   const actionWarnings = [...result.warnings];
-  if (pendingTranslations) {
-    actionWarnings.push(
-      `${pendingTranslations} English translation(s) require editorial review (${translationCounts.missing} missing, ${translationCounts.stale} stale).`,
-    );
-    console.log(
-      `::warning title=English translations pending::${pendingTranslations} event translation(s) require editorial review (${translationCounts.missing} missing, ${translationCounts.stale} stale).`,
-    );
-  }
   if (result.historicalReport.historicalChanges.length) {
     console.log(
       `::warning title=Historical calendar changes::${result.historicalReport.historicalChanges.length} historical event(s) require confirmation.`,
