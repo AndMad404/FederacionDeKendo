@@ -1,0 +1,4 @@
+interface:
+  display_name: "Federacion Workflow"
+  short_description: "Run focused federation project workflows"
+  default_prompt: "Use $federacion-workflow to handle this federation website task."

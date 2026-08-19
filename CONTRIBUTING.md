@@ -5,8 +5,9 @@
 ## Pre-commit verification
 
 `pnpm install` configures the repository hook automatically. Before every
-commit, it runs `pnpm run format:check` and rejects the commit when Prettier
-finds a formatting violation. For an existing clone, run:
+commit, it runs the formatting check, ESLint with zero warnings, and the
+TypeScript check. It rejects the commit when any of those fast review gates
+fail. For an existing clone, run:
 
 ```bash
 pnpm run setup:git-hooks

@@ -8,3 +8,21 @@ else
   echo "Install dependencies before committing so Prettier can run." >&2
   exit 1
 fi
+
+if [ -f ./node_modules/.bin/eslint.cmd ]; then
+  ./node_modules/.bin/eslint.cmd . --max-warnings=0
+elif [ -x ./node_modules/.bin/eslint ]; then
+  ./node_modules/.bin/eslint . --max-warnings=0
+else
+  echo "Install dependencies before committing so ESLint can run." >&2
+  exit 1
+fi
+
+if [ -f ./node_modules/.bin/tsc.cmd ]; then
+  ./node_modules/.bin/tsc.cmd --noEmit
+elif [ -x ./node_modules/.bin/tsc ]; then
+  ./node_modules/.bin/tsc --noEmit
+else
+  echo "Install dependencies before committing so TypeScript can run." >&2
+  exit 1
+fi

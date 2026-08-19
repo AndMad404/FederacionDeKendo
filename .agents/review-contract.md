@@ -171,6 +171,22 @@ Every completed review adds or updates a coverage record:
 When a covered target changes, set `status: stale`; do not delete the record or
 continue presenting it as current.
 
+### 8. Commit and Documentation Handoff
+
+When an owner approves a commit that resolves findings or accepts a technical
+or design decision:
+
+1. Record the commit SHA, approved scope, and verification evidence in
+   `.codex/review-state.md`. Keep it limited to technical review facts.
+2. Use the private documentation index to select the canonical document for an
+   approved decision or status change. Update only that document after the
+   commit exists; do not record uncommitted work as a decision.
+3. If the completed review and approved commit expose a material project-level
+   opportunity, report at most three non-blocking recommendations. Each must
+   name the evidence, expected benefit, tradeoff, and the smallest viable
+   alternative. A specific script, methodology, or tool is allowed when it is
+   proportionate and source-backed; it is never adopted without owner approval.
+
 ## Repository-Wide Claim Gate
 
 The phrases `repository-wide`, `whole repository`, `all components`, and
@@ -218,6 +234,10 @@ NEXT: [recommended next file, component, or concern]
 Then update `.codex/review-state.md`. The state update must reflect actual
 coverage, including exclusions and verification gaps; it must not merely state
 that a file was reviewed.
+
+For an approved-commit handoff, append `RECOMMENDATIONS:` after `NEXT:` only
+when there is a material, evidence-backed opportunity. Otherwise write
+`RECOMMENDATIONS: none`.
 
 When the active state becomes difficult to scan, move superseded session detail
 to `.codex/review-history.md` and leave stable IDs plus concise resolution
