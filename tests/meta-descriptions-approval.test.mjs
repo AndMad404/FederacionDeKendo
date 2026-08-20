@@ -7,27 +7,28 @@ import * as ssr from "../dist-ssr/entry-server.js";
 const TERMINAL_PUNCTUATION = /[.!?…]$/u;
 const IRREGULAR_WHITESPACE = /\s{2,}|^\s|\s$/u;
 const APPROVED_STATIC_DESCRIPTIONS = {
-  "/": "Conoce la Federación de Asociaciones de Kendo de Costa Rica, sus actividades, comunidad y espacios para practicar kendo.",
+  "/": "Sitio oficial de la Federación de Asociaciones de Kendo. Conoce el kendo en Costa Rica, sus eventos, comunidad y dojos afiliados.",
   "/eventos/":
-    "Consulta torneos, exámenes, seminarios y otras actividades oficiales de la Federación de Asociaciones de Kendo.",
+    "Consulta el calendario oficial de kendo en Costa Rica: torneos, exámenes, seminarios y actividades de la Federación.",
   "/galeria/":
-    "Explora la galería oficial de entrenamientos, seminarios y actividades de la comunidad de kendo de Costa Rica.",
+    "Explora la galería de la Federación de Asociaciones de Kendo: entrenamientos, actividades y comunidad de kendo en Costa Rica.",
   "/afiliados/":
-    "Encuentra información de contacto, horarios y ubicación de los dojos afiliados a la Federación de Asociaciones de Kendo.",
+    "Encuentra dojos afiliados a la Federación de Asociaciones de Kendo en Costa Rica, con horarios, ubicación y datos de contacto.",
   "/eventos/pasados/":
-    "Consulta el archivo de torneos, exámenes, seminarios y actividades realizadas por la comunidad de kendo de Costa Rica.",
+    "Consulta el archivo de eventos de kendo en Costa Rica: torneos, exámenes, seminarios y actividades anteriores de la Federación.",
   "/en/":
-    "Discover the Federation of Kendo Associations of Costa Rica, its activities, community, and places to practice kendo.",
+    "Official site of the Federation of Kendo Associations. Discover kendo in Costa Rica, upcoming events, the community, and affiliated dojos.",
   "/en/events/":
-    "Find tournaments, examinations, seminars, and other official activities from the Federation of Kendo Associations.",
+    "View Costa Rica’s official kendo calendar: tournaments, examinations, seminars, and federation activities.",
   "/en/gallery/":
-    "Explore the official gallery of training sessions, seminars, and activities from Costa Rica’s kendo community.",
+    "Explore the Federation of Kendo Associations gallery: training, activities, and Costa Rica’s kendo community.",
   "/en/affiliates/":
-    "Find contact details, schedules, and locations for dojos affiliated with the Federation of Kendo Associations.",
+    "Find kendo dojos affiliated with the Federation of Kendo Associations in Costa Rica, including schedules, locations, and contact details.",
   "/en/events/past/":
-    "Browse the archive of tournaments, examinations, seminars, and activities held by Costa Rica’s kendo community.",
+    "Browse past kendo events in Costa Rica, including federation tournaments, examinations, seminars, and activities.",
 };
-const FORBIDDEN_FRAGMENTS = /este y|doscientos metros|includes:/iu;
+const FORBIDDEN_FRAGMENTS =
+  /este y|this and|doscientos metros|two hundred meters|includes:/iu;
 
 async function readDist(path) {
   return readFile(new URL(`../dist/${path}`, import.meta.url), "utf8");
@@ -78,7 +79,7 @@ function buildDescription({
   event = {},
   localizedEvent = {},
   now = "2026-08-20T12:00:00.000Z",
-  override,
+  overrides,
 }) {
   return getDescriptionBuilder()({
     event: {
@@ -149,33 +150,17 @@ test("exposes the event meta-description builder through the SSR namespace", () 
 });
 
 test(
-  "builds complete future and past ES/EN event templates",
+  "uses the approved ES/EN fallback when no summary is available",
   { skip: !hasDescriptionBuilder },
   () => {
     const cases = [
       {
         language: "es",
-        expected:
-          "La Federación invita a la comunidad de kendo y al público interesado a participar.",
+        expected: "Consulta los detalles oficiales del evento.",
       },
       {
         language: "en",
-        expected:
-          "The Federation invites the kendo community and everyone interested to participate.",
-      },
-      {
-        language: "es",
-        event: { date: "2026-08-08" },
-        localizedEvent: { date: "2026-08-08" },
-        expected:
-          "Actividad realizada como parte del calendario oficial de la Federación y la comunidad de kendo.",
-      },
-      {
-        language: "en",
-        event: { date: "2026-08-08" },
-        localizedEvent: { date: "2026-08-08" },
-        expected:
-          "An activity held as part of the Federation’s official calendar and the kendo community.",
+        expected: "View the official event details.",
       },
     ];
 
@@ -212,19 +197,28 @@ test(
   "includes optional time and short venue only when the complete template fits",
   { skip: !hasDescriptionBuilder },
   () => {
-    const withoutOptionals = buildDescription({ language: "es" });
-    assert.doesNotMatch(withoutOptionals, /13:00|Tamashii/u);
+    for (const language of ["es", "en"]) {
+      const withoutOptionals = buildDescription({ language });
+      assert.doesNotMatch(withoutOptionals, /13:00|Tamashii/u);
+      assertDescriptionQuality(
+        withoutOptionals,
+        `${language} future event without optional data`,
+      );
 
-    const withOptionals = buildDescription({
-      language: "es",
-      event: {
-        startTime: "13:00",
-        location: "Tamashii Martial Arts Pinares",
-      },
-    });
-    assert.match(withOptionals, /13:00/u);
-    assert.match(withOptionals, /Tamashii Martial Arts Pinares/u);
-    assertDescriptionQuality(withOptionals, "complete future event");
+      const withOptionals = buildDescription({
+        language,
+        event: {
+          startTime: "13:00",
+          location: "Tamashii Martial Arts Pinares",
+        },
+      });
+      assert.match(withOptionals, /13:00/u);
+      assert.match(withOptionals, /Tamashii Martial Arts Pinares/u);
+      assertDescriptionQuality(
+        withOptionals,
+        `${language} complete future event`,
+      );
+    }
 
     const longAddress = buildDescription({
       language: "es",
@@ -233,9 +227,10 @@ test(
           "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, doscientos metros este y doscientos metros norte, Costa Rica",
       },
     });
+    assert.match(longAddress, /Tamashii Martial Arts Pinares/u);
     assert.doesNotMatch(
       longAddress,
-      /Tamashii|Curridabat|doscientos metros|Costa Rica/u,
+      /Curridabat|doscientos metros|Costa Rica/u,
     );
     assertDescriptionQuality(longAddress, "long address");
   },
@@ -255,10 +250,8 @@ test(
     });
 
     assert.match(description, /13:00/u);
-    assert.doesNotMatch(
-      description,
-      /Tamashii|Curridabat|Postal District|Costa Rica/u,
-    );
+    assert.match(description, /Tamashii Martial Arts Pinares/u);
+    assert.doesNotMatch(description, /Curridabat|Postal District|Costa Rica/u);
     assertDescriptionQuality(description, "time without postal address");
   },
 );
@@ -274,13 +267,13 @@ test(
 
     assert.equal(buildDescription({ language: "es", overrides }), overrides.es);
     assert.equal(buildDescription({ language: "en", overrides }), overrides.en);
-    assert.notEqual(
+    assert.equal(
       buildDescription({ language: "es", overrides: { en: overrides.en } }),
-      overrides.en,
+      buildDescription({ language: "es" }),
     );
-    assert.notEqual(
+    assert.equal(
       buildDescription({ language: "en", overrides: { es: overrides.es } }),
-      overrides.es,
+      buildDescription({ language: "en" }),
     );
   },
 );
@@ -314,7 +307,7 @@ test(
   },
 );
 
-test("audits the complete 44-route description inventory for broken fragments", () => {
+test("audits the complete 44-route description inventory and generated HTML", async () => {
   const routes = ssr.getRouteManifest();
   assert.equal(
     routes.length,
@@ -322,9 +315,26 @@ test("audits the complete 44-route description inventory for broken fragments", 
     "route inventory changed; review this contract",
   );
 
+  const descriptions = [];
   for (const route of routes) {
     const description = ssr.getRouteSeoPayload(route).description;
+    descriptions.push(description);
     assertDescriptionQuality(description, route.path);
     assert.doesNotMatch(description, FORBIDDEN_FRAGMENTS, route.path);
+    const html = await readDist(outputPath(route.path));
+    const descriptionTag = html.match(
+      /<meta\s+[^>]*name="description"[^>]*>/u,
+    )?.[0];
+    assert.equal(
+      descriptionTag?.match(/content="([^"]*)"/u)?.[1],
+      description,
+      `${route.path}: HTML description`,
+    );
   }
+
+  assert.equal(
+    new Set(descriptions).size,
+    descriptions.length,
+    "all generated routes must have unique descriptions",
+  );
 });

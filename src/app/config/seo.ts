@@ -202,39 +202,110 @@ function formatEventDate(date: string, language: Language) {
   }).format(new Date(`${date}T00:00:00Z`));
 }
 
-function truncateDescription(text: string, maxLength = 155) {
-  const normalized = text
+function normalizeDescription(text: string) {
+  return text
     .replace(/(?:^|\s)\*\s+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
-  if (normalized.length <= maxLength) return normalized;
-
-  const candidate = normalized.slice(0, maxLength + 1);
-  const boundary = candidate.lastIndexOf(" ");
-  return boundary > 0 ? candidate.slice(0, boundary).trimEnd() : normalized;
 }
 
-function createEventDescription(
-  event: (typeof CALENDAR_EVENTS)[number],
-  localizedEvent: (typeof CALENDAR_EVENTS)[number],
-  language: Language,
-) {
+function ensureTerminalPunctuation(text: string) {
+  const normalized = normalizeDescription(text);
+  return /[.!?…]$/u.test(normalized) ? normalized : `${normalized}.`;
+}
+
+function getFirstSentence(text?: string) {
+  if (!text) return undefined;
+
+  const normalized = normalizeDescription(text);
+  if (!normalized) return undefined;
+
+  const sentence = normalized.match(/^.*?[.!?…](?=\s|$)/u)?.[0] ?? normalized;
+  return ensureTerminalPunctuation(sentence);
+}
+
+function getShortVenue(location?: string) {
+  if (!location) return undefined;
+
+  return normalizeDescription(location.split(",", 1)[0]);
+}
+
+const EVENT_DESCRIPTION_MAX_LENGTH = 155;
+
+interface EventMetaDescriptionInput {
+  event: (typeof CALENDAR_EVENTS)[number];
+  localizedEvent: (typeof CALENDAR_EVENTS)[number];
+  language: Language;
+  now?: string;
+  overrides?: Partial<Record<Language, string>>;
+}
+
+export function buildEventMetaDescription({
+  event,
+  localizedEvent,
+  language,
+  overrides,
+}: EventMetaDescriptionInput) {
+  const context = `${event.id} (${language})`;
+  const title = normalizeDescription(localizedEvent.title);
+  if (!title) throw new Error(`${context}: event name is required.`);
+  if (!event.date) throw new Error(`${context}: event date is required.`);
+
+  const override = overrides?.[language];
+  if (override !== undefined) {
+    if (
+      override !== normalizeDescription(override) ||
+      !/[.!?…]$/u.test(override)
+    ) {
+      throw new Error(`${context}: invalid editorial description override.`);
+    }
+    return override;
+  }
+
   const english = language === "en";
   const date = formatEventDate(event.date, language);
-  const details = [
-    date,
-    event.startTime,
-    event.location &&
-      (english ? `at ${event.location}` : `en ${event.location}`),
-  ].filter(Boolean);
+  const summary = getFirstSentence(localizedEvent.summary);
   const fallback = english
-    ? "View the event date, time, and details."
-    : "Consulta la fecha, el horario y los detalles del evento.";
-  const prefix = english
-    ? `${localizedEvent.title} on ${details.join(", ")}.`
-    : `${localizedEvent.title}: ${details.join(", ")}.`;
+    ? "View the official event details."
+    : "Consulta los detalles oficiales del evento.";
+  const time = normalizeDescription(event.startTime ?? "") || undefined;
+  const venue = getShortVenue(event.location);
 
-  return truncateDescription(`${prefix} ${localizedEvent.summary || fallback}`);
+  const buildBase = (includeTime: boolean, includeVenue: boolean) => {
+    const optionalDetails = [
+      includeTime && time ? (english ? `at ${time}` : `a las ${time}`) : null,
+      includeVenue && venue ? (english ? `at ${venue}` : `en ${venue}`) : null,
+    ].filter(Boolean);
+    const connector = english ? ` on ${date}` : ` el ${date}`;
+    return `${title}${connector}${optionalDetails.length ? ` ${optionalDetails.join(" ")}` : ""}.`;
+  };
+
+  const variants = [
+    buildBase(true, true),
+    buildBase(true, false),
+    buildBase(false, false),
+  ];
+
+  for (const base of variants) {
+    if (summary) {
+      const withSummary = `${base} ${summary}`;
+      if (withSummary.length <= EVENT_DESCRIPTION_MAX_LENGTH) {
+        return withSummary;
+      }
+    }
+
+    const withFallback = `${base} ${fallback}`;
+    if (withFallback.length <= EVENT_DESCRIPTION_MAX_LENGTH) {
+      return withFallback;
+    }
+  }
+
+  const requiredBase = variants[variants.length - 1];
+  if (requiredBase.length <= EVENT_DESCRIPTION_MAX_LENGTH) return requiredBase;
+
+  throw new Error(
+    `${context}: required event description exceeds 155 characters.`,
+  );
 }
 
 function buildGalleryStructuredData(
@@ -318,7 +389,9 @@ export function getRouteManifest() {
   );
 
   return [
-    ...Object.values(ROUTE_META),
+    ...Object.values(ROUTE_META).filter(
+      (route) => route.component !== "pastEvents",
+    ),
     ...CALENDAR_EVENTS.flatMap((event) => {
       const spanishRoute = createEventRouteMeta(event, "es");
       return getEventTranslationStatus(event) === "valid"
@@ -379,7 +452,11 @@ function createEventRouteMeta(
     component: "event",
     eventId: event.id,
     title: `${localizedEvent.title} — ${formatEventDate(event.date, language)} | ${SITE_NAME}`,
-    description: createEventDescription(event, localizedEvent, language),
+    description: buildEventMetaDescription({
+      event,
+      localizedEvent,
+      language,
+    }),
     image: calendarMeta.image,
     imageAlt: calendarMeta.imageAlt,
     imageWidth: calendarMeta.imageWidth,
@@ -408,9 +485,9 @@ function createArchiveRouteMeta(
     title: english
       ? `Past events${page > 1 ? ` — page ${page}` : ""} | ${SITE_NAME}`
       : `Eventos pasados${page > 1 ? ` — página ${page}` : ""} | ${SITE_NAME}`,
-    description: english
-      ? "Historical archive of kendo tournaments, examinations, seminars, and activities."
-      : "Archivo histórico de torneos, exámenes, seminarios y actividades de kendo.",
+    description:
+      ROUTE_META[english ? "/en/events/past/" : "/eventos/pasados/"]
+        .description,
     image: calendarMeta.image,
     imageAlt: calendarMeta.imageAlt,
     imageWidth: calendarMeta.imageWidth,
