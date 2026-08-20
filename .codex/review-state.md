@@ -5,6 +5,105 @@ schema_version: 2
 last_updated: 2026-08-20
 contract: .agents/review-contract.md
 
+latest_screaming_frog_internal_html_review:
+  id: REV-2026-08-20-06
+  requested_scope: Review the supplied Screaming Frog internal HTML crawl as an SEO audit.
+  actual_scope:
+    targets:
+      - C:/Users/and_m/Documents/internos_todo.csv
+      - 44 HTML URLs represented by that crawl
+    axes: [SEO, PERF]
+    included:
+      - HTTP status, indexability reporting, title, meta description, H1, canonical, language, crawl depth, internal links, near duplicates, HTML size, and response time
+    excluded:
+      - images and other non-HTML resources, structured-data validation, hreflang inventory, external links, Search Console, field Core Web Vitals, and live behavior after the recorded crawl
+  baseline:
+    commit: e0c13066
+    worktree: dirty with pre-existing SEO and review-state changes
+    crawl_timestamp: 2026-08-20 13:46
+    crawl_sha256: 99FC7DA057A77A610415C353CBAC4C7F9B87DDD2B4E6CD4219870289C0DD952E
+  findings:
+    - id: SEO-TITLE-WIDTH-001
+      level: POLISH
+      axis: SEO
+      status: open
+      target: generated event route titles
+      problem: 33 of 44 titles exceed Screaming Frog's approximate 580-pixel preview threshold, all on event-detail routes.
+      fix: Use a shorter event-title suffix or compact localized site name while retaining the unique event name and date.
+      cost_of_deferring: Google may truncate or rewrite some event title links, although this is not a Google compliance failure or fixed character-limit violation.
+      evidence:
+        - supplied crawl reports widths from 596 to 947 pixels for the 33 affected titles
+    - id: SEO-DESC-TRUNC-001
+      level: SMELL
+      axis: SEO
+      status: open
+      target: generated event route descriptions
+      problem: 24 event meta descriptions end without sentence punctuation and visibly stop inside an address or introductory clause.
+      fix: Summarize location at a meaningful boundary and reserve space for a complete event-specific sentence instead of truncating mechanically near 155 characters.
+      cost_of_deferring: Search snippets may present incomplete phrases and hide the event's most useful distinguishing information.
+      evidence:
+        - supplied crawl contains descriptions ending with fragments such as "doscientos metros", "este y", or "Participation includes:"
+  evidence:
+    - parsed 44 HTML URL rows from the CSV; excluded the two Screaming Frog path-summary rows
+    - all 44 URLs returned HTTP 200 and text/html; charset=utf-8
+    - no missing or duplicate title, meta description, H1, or canonical; no canonical mismatch and no near-duplicate group reported
+    - crawl contains 22 Spanish and 22 English pages
+    - response time ranged from 0.087 to 0.232 seconds, average 0.182 seconds
+    - HTML size ranged from 14694 to 29615 bytes, average 18807 bytes
+    - 40 pages under 100 words and 18 pages with fewer than three unique internal inlinks were treated as context, not automatic defects; none is an orphan in the supplied crawl
+  result: The crawl is technically healthy. The actionable SEO work is limited to snippet quality on event pages: overly wide titles and mechanically truncated descriptions. Intentional noindex is accepted and not counted as a finding.
+  pending:
+    - Validate structured data, hreflang, response headers, and Core Web Vitals with their dedicated exports or tools.
+    - Re-crawl after any metadata changes to confirm the event snippet inventory.
+  next: Adjust the event metadata template as one non-visual SEO phase after owner approval, then run the generated-output checks and a fresh crawl.
+
+latest_google_seo_best_practices_review:
+  id: REV-2026-08-20-05
+  requested_scope: Audit the site against current Google Search SEO best practices while accepting the intentional noindex policy.
+  actual_scope:
+    targets:
+      - src/app/config/seo-data.json
+      - src/app/config/seo.ts
+      - scripts/generate-route-html.mjs
+      - public/robots.txt
+      - tests/generated-output.test.mjs
+      - fresh dist/**/index.html, dist/404.html, dist/sitemap.xml, and dist/_redirects
+    axes: [SEO, PERF]
+    included:
+      - crawl access, prerendered content, titles, descriptions, canonical URLs, language and hreflang
+      - crawlable internal links, heading/main landmarks, image alt text, sitemap policy, redirects, and structured-data readiness
+      - source-level page-experience readiness and presence of measurement evidence
+    excluded:
+      - the owner-approved temporary noindex decision itself
+      - deployed response headers, Search Console, Googlebot rendering, Rich Results Test, CrUX, backlinks, and ranking outcomes
+  baseline:
+    commit: e0c13066
+    worktree: dirty with owner changes in scripts/generate-route-html.mjs and tests/generated-output.test.mjs
+    fingerprint:
+      scripts/generate-route-html.mjs: 84EDDC5206758773D8B31E8262FD140893A739A191316B9AD26AC8B0AE2809C4
+      tests/generated-output.test.mjs: 7BBF52FE8535270846DAE3F874B39CFD484F39833274D4F7E59F1BEA161E21C2
+      src/app/config/seo.ts: 21CCB2A2E59E394875C2DCC8E095F3DE2182B43643CCB405BDD2EAB46633E06F
+      src/app/config/seo-data.json: 21670FA1D92D38D874ADFFAFBA00D057B869BF81B0818CAC9AD642C111F0F9F8
+  findings:
+    - id: PERF-CWV-001
+      status: open
+      evidence:
+        - current source and generated-output review still contains no field or repeatable lab measurements for LCP, INP, or CLS
+  evidence:
+    - current Google Search Central documentation reviewed for the SEO Starter Guide, noindex, sitemaps, Event structured data, and page experience
+    - fresh corepack pnpm run build passed after an initial sandbox-only filesystem denial
+    - corepack pnpm run test:generated passed 12 tests
+    - generated inventory inspected 44 route index files: no missing title, description, canonical, html lang, single h1, or main landmark; no duplicate titles or descriptions
+    - generated inventory inspected 112 images with no missing alt attribute and 44 internal link targets with no unresolved generated route
+    - all generated routes emit noindex, follow; robots.txt allows crawling; the freshly generated sitemap has no loc or image entries
+    - structured data is intentionally suppressed while noindex is active; source inspection confirms Event name, startDate, location, image, URL, attendance mode, and status generation for the indexed state
+  result: No additional Google SEO defect was confirmed in the reviewed local scope beyond the already-open lack of measured Core Web Vitals evidence. The current dirty-worktree sitemap change aligns the noindex deployment with Google's sitemap guidance, but deployed and indexing-enabled behavior remain unverified.
+  pending:
+    - Run Search Console URL Inspection and deployed crawling after launch-domain approval.
+    - Validate indexing-enabled JSON-LD with Google's Rich Results Test before enabling indexing.
+    - Establish field or repeatable lab evidence for LCP, INP, and CLS.
+  next: Perform a launch-readiness verification on the approved canonical production domain before changing the global indexing flag.
+
 latest_whatsapp_open_graph_review:
   id: REV-2026-08-20-01
   requested_scope: Audit whether the site emits metadata that WhatsApp uses for link previews.

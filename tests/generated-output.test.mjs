@@ -76,14 +76,11 @@ test("generates localized, unique, paused-indexing SEO output for every event ro
   }
 });
 
-test("keeps every generated route noindex while including it in the sitemap", async () => {
+test("excludes noindex routes from the sitemap", async () => {
   const sitemap = await readDist("sitemap.xml");
   const home = await readDist("index.html");
   const calendar = await readDist("eventos/index.html");
-  assert.match(sitemap, /\/eventos\//);
-  assert.match(sitemap, /\/en\/events\//);
-  assert.match(sitemap, /\/eventos\/pasados\//);
-  assert.match(sitemap, /\/en\/events\/past\//);
+  assert.doesNotMatch(sitemap, /<loc>/);
   assert.match(home, /name="robots" content="noindex, follow"/);
   assert.match(calendar, /name="robots" content="noindex, follow"/);
   assert.match(
@@ -105,41 +102,26 @@ test("uses the JPEG social card in generated Open Graph metadata", async () => {
   assert.match(gallery, /property="og:image:type" content="image\/jpeg"/);
 });
 
-test("keeps the sitemap synchronized with every public generated route", async () => {
+test("keeps the sitemap synchronized with indexable generated routes only", async () => {
   const sitemap = await readDist("sitemap.xml");
   const sitemapUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(
     ([, url]) => url,
   );
   const routeUrls = getRouteManifest()
     .map((route) => getRouteSeoPayload(route))
+    .filter((seo) => seo.robots === "index, follow")
     .map((seo) => seo.canonicalUrl);
 
   assert.deepEqual(sitemapUrls, routeUrls);
 });
 
-test("uses responsive WebP images for hero and calendar sitemap entries only", async () => {
+test("omits sitemap images when no route is indexable", async () => {
   const sitemap = await readDist("sitemap.xml");
   const sitemapImageUrls = [
     ...sitemap.matchAll(/<image:loc>([^<]+)<\/image:loc>/g),
   ].map(([, url]) => url);
 
-  assert.ok(
-    sitemapImageUrls.includes(
-      "https://fak-kendo.pages.dev/images/hero/kendo-hero-formacion-960.webp?v=20260704-0120",
-    ),
-  );
-  assert.ok(
-    sitemapImageUrls.includes(
-      "https://fak-kendo.pages.dev/images/calendar/kendo-calendar-960.webp?v=20260723-1004",
-    ),
-  );
-  assert.ok(
-    sitemapImageUrls.every(
-      (url) =>
-        !url.includes("kendo-hero-formacion.jpg") &&
-        !url.includes("kendo-calendar.jpg"),
-    ),
-  );
+  assert.deepEqual(sitemapImageUrls, []);
 
   const home = await readDist("index.html");
   const calendar = await readDist("eventos/index.html");
@@ -217,7 +199,7 @@ test("generates localized English routes with reciprocal language metadata", asy
   );
   assert.match(event, /<h1[^>]*>Examination<\/h1>/);
   assert.match(event, /Examinations from 8th to 2nd kyu/);
-  assert.match(sitemap, /<loc>/);
+  assert.doesNotMatch(sitemap, /<loc>/);
 });
 
 test("publishes English event routes only when their editorial translation is valid", async () => {
