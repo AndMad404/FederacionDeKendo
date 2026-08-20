@@ -62,7 +62,7 @@ export function EventPage() {
   const locationUrl = event.location
     ? getLocationMapUrl(event.location)
     : undefined;
-  const canonicalPath = getEventPath(event, language);
+  const canonicalPath = getEventPath(event, language, now);
   const eventTitle = event.title;
 
   async function handleShare() {
@@ -203,7 +203,7 @@ export function EventPage() {
                         {copy.event.viewArchive}
                       </Link>
                       <Link
-                        to={english ? "/en/calendar/" : "/calendario/"}
+                        to={english ? "/en/events/" : "/eventos/"}
                         className={`${primaryButtonClass} ${focusRingClass}`}
                       >
                         {copy.archive.upcomingEvents}
@@ -226,7 +226,7 @@ export function EventPage() {
                   ) : null}
                   {!isPast ? (
                     <Link
-                      to={english ? "/en/calendar/" : "/calendario/"}
+                      to={english ? "/en/events/" : "/eventos/"}
                       className={`${primaryButtonClass} ${focusRingClass}`}
                     >
                       {copy.event.backToCalendar}

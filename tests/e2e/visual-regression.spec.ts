@@ -28,10 +28,15 @@ const DIST_DIRECTORY = resolve(process.cwd(), "dist");
 
 function getPageComponent(path: string): ApprovedPage["component"] {
   if (path === "/") return "home";
-  if (path === "/calendario/") return "calendar";
+  if (path === "/eventos/") return "calendar";
   if (path === "/galeria/") return "gallery";
   if (path === "/afiliados/") return "affiliates";
-  if (path.startsWith("/eventos/pasados/")) return "pastEvents";
+  if (
+    path === "/eventos/pasados/" ||
+    path.startsWith("/eventos/pasados/pagina/")
+  ) {
+    return "pastEvents";
+  }
   return "event";
 }
 

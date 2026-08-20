@@ -16,12 +16,14 @@ const CSS_PIXEL_TOLERANCE = 0.51;
 
 function getPageDesign(path: string): PageDesign {
   if (path === "/" || path === "/en/") return "home";
-  if (path === "/calendario/" || path === "/en/calendar/") return "calendar";
+  if (path === "/eventos/" || path === "/en/events/") return "calendar";
   if (path === "/galeria/" || path === "/en/gallery/") return "gallery";
   if (path === "/afiliados/" || path === "/en/affiliates/") return "affiliates";
   if (
-    path.startsWith("/eventos/pasados/") ||
-    path.startsWith("/en/events/past/")
+    path === "/eventos/pasados/" ||
+    path.startsWith("/eventos/pasados/pagina/") ||
+    path === "/en/events/past/" ||
+    path.startsWith("/en/events/past/page/")
   ) {
     return "pastEvents";
   }
@@ -344,7 +346,7 @@ async function expectEventActionMinimum(page: Page, minimum: number) {
 test.describe("event actions use mobile-first touch geometry", () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
-  for (const path of ["/", "/calendario/"]) {
+  for (const path of ["/", "/eventos/"]) {
     test(`${path} keeps actions at least 44px on mobile`, async ({ page }) => {
       await preparePage(page, path);
       await expectEventActionMinimum(page, 44);
@@ -355,7 +357,7 @@ test.describe("event actions use mobile-first touch geometry", () => {
 test.describe("event actions preserve touch geometry on desktop", () => {
   test.use({ viewport: SHELL_CONTRACT.desktopViewport, hasTouch: true });
 
-  for (const path of ["/", "/calendario/"]) {
+  for (const path of ["/", "/eventos/"]) {
     test(`${path} keeps actions at least 44px with a coarse pointer`, async ({
       page,
     }) => {
@@ -368,7 +370,7 @@ test.describe("event actions preserve touch geometry on desktop", () => {
 test.describe("event actions preserve hybrid-device geometry", () => {
   test.use({ viewport: SHELL_CONTRACT.desktopViewport, hasTouch: true });
 
-  for (const path of ["/", "/calendario/"]) {
+  for (const path of ["/", "/eventos/"]) {
     test(`${path} keeps actions at least 44px with fine and coarse pointers`, async ({
       page,
     }) => {
@@ -385,7 +387,7 @@ test.describe("event actions preserve hybrid-device geometry", () => {
 test.describe("event actions preserve compact fine-pointer geometry", () => {
   test.use({ viewport: SHELL_CONTRACT.desktopViewport });
 
-  for (const path of ["/", "/calendario/"]) {
+  for (const path of ["/", "/eventos/"]) {
     test(`${path} keeps actions at 32px with an exclusively fine pointer`, async ({
       page,
     }) => {

@@ -23,10 +23,10 @@ const CONTAINED_VIEWPORTS = [
 
 const REPRESENTATIVE_ROUTES = Object.values({
   home: { name: "home", path: "/" },
-  calendar: { name: "calendar", path: "/calendario/" },
+  calendar: { name: "calendar", path: "/eventos/" },
   gallery: { name: "gallery", path: "/galeria/" },
   affiliates: { name: "affiliates", path: "/afiliados/" },
-  event: { name: "event", path: "/eventos/2026-08-08-examen/" },
+  event: { name: "event", path: "/eventos/pasados/2026-08-08-examen/" },
   pastEvents: { name: "past events", path: "/eventos/pasados/" },
   notFound: { name: "not found", path: "/ruta-responsive-inexistente/" },
 } satisfies Record<RouteComponent, { name: string; path: string }>);

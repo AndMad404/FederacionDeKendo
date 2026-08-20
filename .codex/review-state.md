@@ -2,8 +2,143 @@
 
 ```yaml
 schema_version: 2
-last_updated: 2026-08-14
+last_updated: 2026-08-20
 contract: .agents/review-contract.md
+
+latest_whatsapp_open_graph_review:
+  id: REV-2026-08-20-01
+  requested_scope: Audit whether the site emits metadata that WhatsApp uses for link previews.
+  actual_scope:
+    targets:
+      - index.html
+      - src/app/config/seo-data.json
+      - src/app/config/seo.ts
+      - scripts/generate-route-html.mjs
+      - tests/generated-output.test.mjs
+      - fresh dist/**/index.html output
+    axes: [SEO]
+    included:
+      - Open Graph required properties: og:title, og:type, og:image, og:url
+      - recommended share-preview properties: og:description, og:locale, og:site_name
+      - absolute HTTPS URLs, canonical-to-og:url equality, and emitted social-image presence
+    excluded:
+      - deployed Cloudflare response headers and WhatsApp's external crawler fetch
+      - Twitter Cards, structured data, visual card appearance, and editorial-copy quality
+  baseline:
+    commit: 545ae9f1
+    worktree: clean before the required review-state update
+  evidence:
+    - source inspection at src/app/config/seo.ts:638-660 and scripts/generate-route-html.mjs:30-84
+    - fresh corepack pnpm run build passed on 2026-08-20
+    - corepack pnpm run test:generated passed 11 tests on fresh output
+    - reproducible generated-HTML audit inspected 44 public route files with no missing required or recommended Open Graph properties, no non-HTTPS og:url or og:image values, no canonical-to-og:url mismatch, and no missing emitted social image
+  result: All 44 generated public routes emit the Open Graph metadata WhatsApp needs for previews. Each uses og:type=website and the absolute 1200x630 JPEG social card, with matching canonical and og:url values. Local output does not prove WhatsApp can fetch the deployed URL.
+  pending:
+    - Verify a deployed production URL with WhatsApp's sharing debugger or an actual WhatsApp message after deployment.
+  next: If preview-card behavior is reported as incorrect in WhatsApp, inspect the deployed route and social-image response rather than changing the local metadata generator.
+
+latest_deployed_eventos_route_review:
+  id: REV-2026-08-20-02
+  requested_scope: Investigate metadata problems at https://fak-kendo.pages.dev/eventos/.
+  actual_scope:
+    targets:
+      - deployed https://fak-kendo.pages.dev/eventos/
+      - deployed https://fak-kendo.pages.dev/eventos/pasados/
+      - deployed https://fak-kendo.pages.dev/eventos/2026-08-08-examen/
+      - src/app/config/seo.ts
+      - scripts/generate-route-html.mjs
+      - generated dist/_redirects
+    axes: [SEO]
+    included:
+      - HTTP status and presence of Open Graph required properties
+      - generated route and redirect coverage for the /eventos/ directory URL
+    excluded:
+      - event-detail and archive metadata quality beyond presence
+      - WhatsApp cache state, visual share-card rendering, and implementation changes
+  baseline:
+    commit: 545ae9f1
+    worktree: review-state update only
+  findings:
+    - id: SEO-EVENTOS-ROOT-001
+      level: STRUCTURAL
+      axis: SEO
+      status: open
+      target: https://fak-kendo.pages.dev/eventos/
+      problem: The directory-level Spanish events URL returns HTTP 404 and consequently emits none of the four Open Graph properties WhatsApp requires.
+      fix: Add an explicit permanent redirect from /eventos/ to the intended public destination, currently /eventos/pasados/, and add a generated-output regression assertion.
+      cost_of_deferring: Links shared with the directory URL cannot produce a valid WhatsApp preview and lead visitors to a missing page.
+      evidence:
+        - read-only deployed comparison on 2026-08-20: /eventos/ returned 404 with no og:title, og:type, og:image, or og:url
+        - /eventos/pasados/ and /eventos/2026-08-08-examen/ returned 200 and all four properties
+        - src/app/config/seo.ts:335-343 generates redirects only for event aliases
+        - fresh dist/_redirects contains only event-alias redirect entries
+  result: The reported metadata problem is caused by a missing route or redirect, not a malformed Open Graph implementation on existing public event routes.
+  pending:
+    - Owner confirmation that /eventos/pasados/ is the intended permanent destination for /eventos/.
+  next: Implement the explicit redirect and its regression test after destination approval.
+
+latest_deployed_whatsapp_metadata_inventory:
+  id: REV-2026-08-20-03
+  requested_scope: Audit the reported WhatsApp metadata problem across all deployed pages.
+  actual_scope:
+    targets:
+      - all 44 URLs declared in deployed https://fak-kendo.pages.dev/sitemap.xml
+      - deployed https://fak-kendo.pages.dev/eventos/
+      - deployed https://fak-kendo.pages.dev/en/events/
+      - deployed Open Graph social image
+    axes: [SEO]
+    included:
+      - HTTP status
+      - required Open Graph properties: og:title, og:type, og:image, og:url
+      - recommended Open Graph properties: og:description, og:locale, og:site_name
+      - canonical-to-og:url equality and public social-image availability
+    excluded:
+      - URLs outside the sitemap except the two shareable event-directory entry points
+      - WhatsApp cache state, visual card appearance, and content-quality review
+  baseline:
+    deployed_at: 2026-08-20
+    inventory: deployed sitemap with 44 URLs plus two event-directory URLs
+  findings:
+    - id: SEO-EVENTOS-ROOT-001
+      status: open
+      evidence:
+        - the sitemap audit confirms the same failure for both /eventos/ and /en/events/
+  evidence:
+    - read-only deployed audit inspected 46 URLs: 44 sitemap URLs and two event-directory URLs
+    - all 44 sitemap URLs returned HTTP 200 and emitted every included Open Graph property, with canonical equal to og:url
+    - /eventos/ and /en/events/ each returned HTTP 404 and emitted none of the included Open Graph properties
+    - https://fak-kendo.pages.dev/images/social/kendo-social-card-20260812.jpg returned HTTP 200 with Content-Type image/jpeg
+    - https://fak-kendo.pages.dev/eventos/pasados/? returned HTTP 200; all included properties were present and both canonical and og:url normalized to https://fak-kendo.pages.dev/eventos/pasados/
+  result: The deployed sitemap inventory has complete WhatsApp-relevant Open Graph metadata. The only confirmed failures are the unimplemented Spanish and English event-directory URLs, which are outside the sitemap and return 404.
+  pending:
+    - Owner confirmation of the desired permanent redirect destinations for both directory URLs.
+  next: Add redirects for /eventos/ and /en/events/ to their respective archive pages, with regression coverage, after owner approval.
+
+latest_whatsapp_preview_screenshot_followup:
+  id: REV-2026-08-20-04
+  requested_scope: Diagnose the bare-domain WhatsApp previews shown for /eventos/pasados/ and /eventos/.
+  actual_scope:
+    targets:
+      - deployed https://fak-kendo.pages.dev/eventos/pasados/
+      - deployed https://fak-kendo.pages.dev/eventos/
+      - deployed Open Graph social image
+    axes: [SEO]
+    included:
+      - responses served to Meta and WhatsApp-style crawler user agents
+      - response status, Open Graph property presence, and social-image availability
+    excluded:
+      - Meta's private preview cache, WhatsApp client rendering, and implementation changes
+  baseline:
+    deployed_at: 2026-08-20
+  evidence:
+    - facebookexternalhit/1.1 and WhatsApp/2.24.0 each received HTTP 200 and og:title, og:image, and og:url from /eventos/pasados/
+    - both crawler user agents received HTTP 404 and no Open Graph metadata from /eventos/
+    - facebookexternalhit/1.1 received HTTP 200 and Content-Type image/jpeg from the social-card URL
+  result: The current archive response is consumable by Meta-style crawlers. The screenshot's bare preview for that URL is consistent with stale WhatsApp or Meta preview-cache data, but the cache state cannot be inspected from this repository. The /eventos/ preview is expected to fail because that URL remains 404.
+  pending:
+    - Request a fresh scrape for /eventos/pasados/ in Meta's Sharing Debugger, then send a new WhatsApp message to confirm the refreshed card.
+    - Owner approval to redirect /eventos/ and /en/events/.
+  next: Treat a bare archive preview that persists after a fresh Meta scrape as an external-platform investigation; do not change the verified local Open Graph generator without new evidence.
 
 latest_deployed_crawl_seo_review:
   id: REV-2026-08-17-02

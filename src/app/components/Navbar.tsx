@@ -27,8 +27,8 @@ export function Navbar() {
 
   const calendarPaths =
     language === "en"
-      ? ["/en/calendar/", "/en/events/past/"]
-      : ["/calendario/", "/eventos/pasados/"];
+      ? ["/en/events/", "/en/events/past/"]
+      : ["/eventos/", "/eventos/pasados/"];
   const calendarActive = calendarPaths.some((path) =>
     pathname.startsWith(path),
   );

@@ -51,7 +51,7 @@ export function PastEventsSection() {
     (page - 1) * PAST_EVENTS_PAGE_SIZE,
     page * PAST_EVENTS_PAGE_SIZE,
   );
-  const calendarPath = language === "en" ? "/en/calendar/" : "/calendario/";
+  const calendarPath = language === "en" ? "/en/events/" : "/eventos/";
   const eventTypes: ArchiveEventType[] = ["torneo", "examen", "seminario"];
 
   function changeFilter(name: "year" | "type", value: string) {

@@ -177,8 +177,8 @@ const DEFAULT_SOCIAL_IMAGE_HEIGHT = DATA.defaultImageHeight;
 const AUTHOR = DATA.author;
 const ROUTE_META = DATA.routes;
 const CALENDAR_META: Record<Language, RouteMeta> = {
-  es: ROUTE_META["/calendario/"],
-  en: ROUTE_META["/en/calendar/"],
+  es: ROUTE_META["/eventos/"],
+  en: ROUTE_META["/en/events/"],
 };
 
 function normalizeRoutePath(pathname: string) {
@@ -333,14 +333,29 @@ export function getRouteManifest() {
 }
 
 export function getEventRedirects() {
-  return CALENDAR_EVENTS.flatMap((event) =>
-    (event.aliases ?? []).flatMap((alias) => [
-      { from: `/eventos/${alias}/`, to: getEventPath(event, "es") },
-      ...(getEventTranslationStatus(event) === "valid"
-        ? [{ from: `/en/events/${alias}/`, to: getEventPath(event, "en") }]
-        : []),
-    ]),
-  );
+  return [
+    { from: "/calendario/", to: "/eventos/" },
+    { from: "/en/calendar/", to: "/en/events/" },
+    ...CALENDAR_EVENTS.flatMap((event) => {
+      const spanishPath = getEventPath(event, "es");
+      const englishPath = getEventPath(event, "en");
+      return [
+        ...(spanishPath !== `/eventos/${event.id}/`
+          ? [{ from: `/eventos/${event.id}/`, to: spanishPath }]
+          : []),
+        ...(getEventTranslationStatus(event) === "valid" &&
+        englishPath !== `/en/events/${event.id}/`
+          ? [{ from: `/en/events/${event.id}/`, to: englishPath }]
+          : []),
+        ...(event.aliases ?? []).flatMap((alias) => [
+          { from: `/eventos/${alias}/`, to: spanishPath },
+          ...(getEventTranslationStatus(event) === "valid"
+            ? [{ from: `/en/events/${alias}/`, to: englishPath }]
+            : []),
+        ]),
+      ];
+    }),
+  ];
 }
 
 function createEventRouteMeta(

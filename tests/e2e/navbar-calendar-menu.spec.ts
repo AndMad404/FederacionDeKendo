@@ -4,7 +4,7 @@ test("calendar menu opens on hover and navigates to past events", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1366, height: 768 });
-  await page.goto("/calendario/");
+  await page.goto("/eventos/");
 
   const calendarButton = page.getByRole("button", { name: "Calendario" });
   await calendarButton.hover();
@@ -37,7 +37,7 @@ test("calendar menu opens on focus, closes with Escape and restores focus", asyn
   page,
 }) => {
   await page.setViewportSize({ width: 1366, height: 768 });
-  await page.goto("/calendario/");
+  await page.goto("/eventos/");
 
   const calendarButton = page.getByRole("button", { name: "Calendario" });
   await calendarButton.focus();
@@ -55,7 +55,7 @@ test("calendar menu closes on an outside click and keeps English destinations ac
   page,
 }) => {
   await page.setViewportSize({ width: 1366, height: 768 });
-  await page.goto("/en/calendar/");
+  await page.goto("/en/events/");
 
   const calendarButton = page.getByRole("button", { name: "Calendar" });
   await calendarButton.click();
@@ -77,7 +77,7 @@ test("calendar section expands inside the mobile navigation", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/calendario/");
+  await page.goto("/eventos/");
 
   await page.getByRole("button", { name: "Abrir menú" }).click();
   const calendarButton = page.getByRole("button", { name: "Calendario" });
@@ -96,7 +96,7 @@ test("navigation history invalidates open desktop and mobile menus", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1366, height: 768 });
-  await page.goto("/calendario/");
+  await page.goto("/eventos/");
 
   const desktopCalendarButton = page.getByRole("button", {
     name: "Calendario",
@@ -116,6 +116,6 @@ test("navigation history invalidates open desktop and mobile menus", async ({
   await expect(page.locator("#mobile-menu")).toBeVisible();
 
   await page.goBack();
-  await expect(page).toHaveURL(/\/calendario\/$/);
+  await expect(page).toHaveURL(/\/eventos\/$/);
   await expect(page.locator("#mobile-menu")).toHaveCount(0);
 });

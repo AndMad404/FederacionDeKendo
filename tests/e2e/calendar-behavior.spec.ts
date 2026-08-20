@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 test.describe.configure({ mode: "serial" });
 
-const CALENDAR_PATH = "/calendario/";
+const CALENDAR_PATH = "/eventos/";
 const FIXED_CALENDAR_TIME = new Date("2026-08-04T12:00:00-06:00");
 const FIXED_PAGINATION_TIME = new Date("2026-05-01T12:00:00-06:00");
 

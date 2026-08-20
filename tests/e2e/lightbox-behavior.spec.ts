@@ -225,7 +225,7 @@ test("shared navigation arrows preserve normal, hover, active and disabled state
   await page.waitForTimeout(50);
   expect(await readColors()).toEqual(hoverColors);
 
-  await page.goto("/calendario/");
+  await page.goto("/eventos/");
   const disabledArrow = page
     .getByRole("button", { name: "Ver los dos meses anteriores" })
     .first();

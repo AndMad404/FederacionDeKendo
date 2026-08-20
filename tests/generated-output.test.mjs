@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
+  getEventRedirects,
   getRouteManifest,
   getRouteSeoPayload,
 } from "../dist-ssr/entry-server.js";
@@ -11,7 +12,9 @@ async function readDist(relativePath) {
 }
 
 test("generates event HTML with canonical and no structured data while indexing is paused", async () => {
-  const complete = await readDist("eventos/2026-08-08-examen/index.html");
+  const complete = await readDist(
+    "eventos/pasados/2026-08-08-examen/index.html",
+  );
   const incomplete = await readDist(
     "eventos/2026-10-10-clak-1er-panamericano-brasil/index.html",
   );
@@ -20,7 +23,7 @@ test("generates event HTML with canonical and no structured data while indexing 
   assert.match(complete, /name="robots" content="noindex, follow"/);
   assert.match(
     complete,
-    /rel="canonical" href="https:\/\/fak-kendo\.pages\.dev\/eventos\/2026-08-08-examen\/"/,
+    /rel="canonical" href="https:\/\/fak-kendo\.pages\.dev\/eventos\/pasados\/2026-08-08-examen\/"/,
   );
   assert.doesNotMatch(complete, /application\/ld\+json/);
   assert.doesNotMatch(incomplete, /application\/ld\+json/);
@@ -76,7 +79,7 @@ test("generates localized, unique, paused-indexing SEO output for every event ro
 test("keeps every generated route noindex while including it in the sitemap", async () => {
   const sitemap = await readDist("sitemap.xml");
   const home = await readDist("index.html");
-  const calendar = await readDist("calendario/index.html");
+  const calendar = await readDist("eventos/index.html");
   assert.match(sitemap, /\/eventos\//);
   assert.match(sitemap, /\/en\/events\//);
   assert.match(sitemap, /\/eventos\/pasados\//);
@@ -139,7 +142,7 @@ test("uses responsive WebP images for hero and calendar sitemap entries only", a
   );
 
   const home = await readDist("index.html");
-  const calendar = await readDist("calendario/index.html");
+  const calendar = await readDist("eventos/index.html");
   for (const html of [home, calendar]) {
     assert.match(
       html,
@@ -164,7 +167,23 @@ test("keeps both calendar archive views noindex and structured-data-free", async
 test("generates the archive route", async () => {
   const archive = await readDist("eventos/pasados/index.html");
   assert.match(archive, /Eventos pasados/);
-  assert.match(archive, /href="\/eventos\/2026-08-08-examen\/"/);
+  assert.match(archive, /href="\/eventos\/pasados\/2026-08-08-examen\/"/);
+});
+
+test("redirects legacy calendar and archived event URLs to their canonical routes", async () => {
+  const redirects = await readDist("_redirects");
+  const configuredRedirects = getEventRedirects();
+
+  assert.ok(
+    configuredRedirects.some(
+      ({ from, to }) => from === "/calendario/" && to === "/eventos/",
+    ),
+  );
+  assert.match(redirects, /^\/calendario\/ \/eventos\/ 301$/m);
+  assert.match(
+    redirects,
+    /^\/eventos\/2026-08-08-examen\/ \/eventos\/pasados\/2026-08-08-examen\/ 301$/m,
+  );
 });
 
 test("shares one deterministic prerender timestamp across generated routes", async () => {
@@ -182,12 +201,12 @@ test("shares one deterministic prerender timestamp across generated routes", asy
 
 test("generates localized English routes with reciprocal language metadata", async () => {
   const home = await readDist("en/index.html");
-  const event = await readDist("en/events/2026-08-08-examen/index.html");
+  const event = await readDist("en/events/past/2026-08-08-examen/index.html");
   const sitemap = await readDist("sitemap.xml");
 
   assert.match(home, /<html lang="en" prefix="og: https:\/\/ogp\.me\/ns#">/);
   assert.match(home, />Home<\/a>/);
-  assert.match(home, /href="\/en\/calendar\/"/);
+  assert.match(home, /href="\/en\/events\/"/);
   assert.match(
     home,
     /rel="alternate" hreflang="es-CR" href="https:\/\/fak-kendo\.pages\.dev\/"/,

@@ -1,13 +1,14 @@
 import { expect, test, type Page } from "@playwright/test";
 
 const FIXED_UPCOMING_TIME = new Date("2026-08-09T12:00:00-06:00");
-const HISTORICAL_EVENT_PATH = "/eventos/2026-08-08-examen/";
-const HISTORICAL_EVENT_WITHOUT_GALLERY_PATH = "/eventos/2026-08-22-3er-torneo/";
+const HISTORICAL_EVENT_PATH = "/eventos/pasados/2026-08-08-examen/";
+const HISTORICAL_EVENT_WITHOUT_GALLERY_PATH =
+  "/eventos/pasados/2026-08-22-3er-torneo/";
 const FIXED_HISTORICAL_TIME = new Date("2026-08-24T12:00:00-06:00");
 
 async function discoverUpcomingEvent(page: Page) {
   await page.clock.setFixedTime(FIXED_UPCOMING_TIME);
-  await page.goto("/calendario/");
+  await page.goto("/eventos/");
 
   const eventLink = page
     .getByRole("link", { name: /Ver detalles del evento/ })
@@ -107,8 +108,8 @@ test("accepts only current canonical event routes", async ({ page }) => {
   await page.goto("/eventos/examen-2026-08-08/");
   await expect(page.getByText(/página que buscas no existe/i)).toBeVisible();
 
-  await page.goto("/calendario/#examen-2026-08-08");
-  await expect(page).toHaveURL(/\/calendario\/#examen-2026-08-08$/);
+  await page.goto("/eventos/#examen-2026-08-08");
+  await expect(page).toHaveURL(/\/eventos\/#examen-2026-08-08$/);
   await expect(
     page.getByRole("heading", { name: "Calendario de eventos", level: 1 }),
   ).toBeVisible();
@@ -378,13 +379,13 @@ const viewports = [
 ];
 const routes = [
   "/",
-  "/calendario/",
+  "/eventos/",
   "/galeria/",
   "/afiliados/",
   HISTORICAL_EVENT_PATH,
   "/eventos/pasados/",
   "/en/",
-  "/en/calendar/",
+  "/en/events/",
   "/en/gallery/",
   "/en/affiliates/",
 ];

@@ -38,11 +38,11 @@
       },
       "schemaType": "WebPage"
     },
-    "/calendario/": {
-      "path": "/calendario/",
+    "/eventos/": {
+      "path": "/eventos/",
       "language": "es",
       "locale": "es_CR",
-      "alternatePath": "/en/calendar/",
+      "alternatePath": "/en/events/",
       "component": "calendar",
       "title": "Calendario de eventos | Federación de Asociaciones de Kendo",
       "description": "Consulta los próximos torneos, exámenes, seminarios y actividades oficiales de la Federación de Asociaciones de Kendo.",
@@ -122,11 +122,11 @@
       },
       "schemaType": "WebPage"
     },
-    "/en/calendar/": {
-      "path": "/en/calendar/",
+    "/en/events/": {
+      "path": "/en/events/",
       "language": "en",
       "locale": "en_US",
-      "alternatePath": "/calendario/",
+      "alternatePath": "/eventos/",
       "component": "calendar",
       "title": "Events calendar | Federation of Kendo Associations",
       "description": "View upcoming tournaments, examinations, seminars, and official federation activities.",
