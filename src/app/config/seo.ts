@@ -38,6 +38,10 @@ interface SeoData {
   defaultImageAlt: string;
   defaultImageWidth: number;
   defaultImageHeight: number;
+  author: {
+    name: string;
+    url: string;
+  };
   organization: {
     sport: string;
     areaServed?: string;
@@ -113,8 +117,14 @@ function assertSeoData(value: unknown): asserts value is SeoData {
   }
 
   const data = value as Partial<SeoData>;
-  if (!data.siteUrl || !data.siteName || !data.routes) {
-    throw new Error("SEO config is missing siteUrl, siteName, or routes.");
+  if (
+    !data.siteUrl ||
+    !data.siteName ||
+    !data.author?.name ||
+    !data.author.url ||
+    !data.routes
+  ) {
+    throw new Error("SEO config is missing site identity, author, or routes.");
   }
 
   const validComponents = new Set<RouteComponent>([
@@ -164,6 +174,7 @@ const DEFAULT_SITE_DESCRIPTION = DATA.defaultDescription;
 const DEFAULT_SOCIAL_IMAGE_ALT = DATA.defaultImageAlt;
 const DEFAULT_SOCIAL_IMAGE_WIDTH = DATA.defaultImageWidth;
 const DEFAULT_SOCIAL_IMAGE_HEIGHT = DATA.defaultImageHeight;
+const AUTHOR = DATA.author;
 const ROUTE_META = DATA.routes;
 const CALENDAR_META: Record<Language, RouteMeta> = {
   es: ROUTE_META["/calendario/"],
@@ -435,7 +446,7 @@ function getRouteImageMetadata() {
     alt: DEFAULT_SOCIAL_IMAGE_ALT,
     width: DEFAULT_SOCIAL_IMAGE_WIDTH,
     height: DEFAULT_SOCIAL_IMAGE_HEIGHT,
-    type: "image/webp",
+    type: "image/jpeg",
   };
 }
 
@@ -535,6 +546,11 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
         name: meta.title,
         description: meta.description,
         inLanguage: meta.language,
+        author: {
+          "@type": "Person",
+          name: AUTHOR.name,
+          url: AUTHOR.url,
+        },
         isPartOf: {
           "@id": websiteId,
         },
@@ -584,6 +600,10 @@ export function getRouteSeoPayload(meta: RouteMeta): RouteSeoPayload {
 export function getRouteHeadDescriptors(meta: RouteMeta): HeadDescriptor[] {
   const seo = getRouteSeoPayload(meta);
   const descriptors: HeadDescriptor[] = [
+    {
+      tag: "meta",
+      attributes: { name: "author", content: AUTHOR.name },
+    },
     {
       tag: "meta",
       attributes: { name: "description", content: seo.description },
