@@ -91,14 +91,14 @@ test("keeps every generated route noindex while including it in the sitemap", as
   assert.doesNotMatch(calendar, /application\/ld\+json/);
 });
 
-test("uses the WebP social card in generated Open Graph metadata", async () => {
+test("uses the JPEG social card in generated Open Graph metadata", async () => {
   const gallery = await readDist("galeria/index.html");
 
   assert.match(
     gallery,
-    /property="og:image" content="https:\/\/fak-kendo\.pages\.dev\/images\/social\/kendo-social-card-20260812\.webp"/,
+    /property="og:image" content="https:\/\/fak-kendo\.pages\.dev\/images\/social\/kendo-social-card-20260812\.jpg"/,
   );
-  assert.match(gallery, /property="og:image:type" content="image\/webp"/);
+  assert.match(gallery, /property="og:image:type" content="image\/jpeg"/);
 });
 
 test("keeps the sitemap synchronized with every public generated route", async () => {
@@ -142,9 +142,9 @@ test("uses responsive WebP images for hero and calendar sitemap entries only", a
   for (const html of [home, calendar]) {
     assert.match(
       html,
-      /og:image" content="https:\/\/fak-kendo\.pages\.dev\/images\/social\/kendo-social-card-20260812\.webp"/,
+      /og:image" content="https:\/\/fak-kendo\.pages\.dev\/images\/social\/kendo-social-card-20260812\.jpg"/,
     );
-    assert.match(html, /og:image:type" content="image\/webp"/);
+    assert.match(html, /og:image:type" content="image\/jpeg"/);
     assert.match(html, /og:image:width" content="1200"/);
     assert.match(html, /og:image:height" content="630"/);
   }
