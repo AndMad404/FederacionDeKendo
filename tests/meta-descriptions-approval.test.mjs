@@ -6,18 +6,27 @@ import * as ssr from "../dist-ssr/entry-server.js";
 
 const TERMINAL_PUNCTUATION = /[.!?…]$/u;
 const IRREGULAR_WHITESPACE = /\s{2,}|^\s|\s$/u;
-const STATIC_ROUTES = [
-  "/",
-  "/eventos/",
-  "/galeria/",
-  "/afiliados/",
-  "/eventos/pasados/",
-  "/en/",
-  "/en/events/",
-  "/en/gallery/",
-  "/en/affiliates/",
-  "/en/events/past/",
-];
+const APPROVED_STATIC_DESCRIPTIONS = {
+  "/": "Conoce la Federación de Asociaciones de Kendo de Costa Rica, sus actividades, comunidad y espacios para practicar kendo.",
+  "/eventos/":
+    "Consulta torneos, exámenes, seminarios y otras actividades oficiales de la Federación de Asociaciones de Kendo.",
+  "/galeria/":
+    "Explora la galería oficial de entrenamientos, seminarios y actividades de la comunidad de kendo de Costa Rica.",
+  "/afiliados/":
+    "Encuentra información de contacto, horarios y ubicación de los dojos afiliados a la Federación de Asociaciones de Kendo.",
+  "/eventos/pasados/":
+    "Consulta el archivo de torneos, exámenes, seminarios y actividades realizadas por la comunidad de kendo de Costa Rica.",
+  "/en/":
+    "Discover the Federation of Kendo Associations of Costa Rica, its activities, community, and places to practice kendo.",
+  "/en/events/":
+    "Find tournaments, examinations, seminars, and other official activities from the Federation of Kendo Associations.",
+  "/en/gallery/":
+    "Explore the official gallery of training sessions, seminars, and activities from Costa Rica’s kendo community.",
+  "/en/affiliates/":
+    "Find contact details, schedules, and locations for dojos affiliated with the Federation of Kendo Associations.",
+  "/en/events/past/":
+    "Browse the archive of tournaments, examinations, seminars, and activities held by Costa Rica’s kendo community.",
+};
 const FORBIDDEN_FRAGMENTS = /este y|doscientos metros|includes:/iu;
 
 async function readDist(path) {
@@ -86,44 +95,51 @@ function buildDescription({
     },
     language,
     now,
-    override,
+    overrides,
   });
 }
 
-test("keeps the ten static ES/EN descriptions consistent across config, SEO payload, and HTML", async () => {
+test("keeps the ten approved static ES/EN descriptions consistent across config, SEO payload, and HTML", async (t) => {
   const config = await readSeoConfig();
   const manifest = ssr.getRouteManifest();
-  const descriptions = [];
 
-  for (const path of STATIC_ROUTES) {
-    const configured = config.routes[path];
-    assert.ok(
-      configured,
-      `${path}: static SEO description must live in config`,
-    );
+  for (const [path, approvedDescription] of Object.entries(
+    APPROVED_STATIC_DESCRIPTIONS,
+  )) {
+    await t.test(path, async () => {
+      const configured = config.routes[path];
+      assert.ok(
+        configured,
+        `${path}: static SEO description must live in config`,
+      );
 
-    const route = manifest.find((candidate) => candidate.path === path);
-    assert.ok(route, `${path}: route missing from manifest`);
-    const payload = ssr.getRouteSeoPayload(route);
-    const html = await readDist(outputPath(path));
-    const descriptionTag = html.match(
-      /<meta\s+[^>]*name="description"[^>]*>/u,
-    )?.[0];
-    const htmlDescription = descriptionTag?.match(/content="([^"]*)"/u)?.[1];
+      const route = manifest.find((candidate) => candidate.path === path);
+      assert.ok(route, `${path}: route missing from manifest`);
+      const payload = ssr.getRouteSeoPayload(route);
+      const html = await readDist(outputPath(path));
+      const descriptionTag = html.match(
+        /<meta\s+[^>]*name="description"[^>]*>/u,
+      )?.[0];
+      const htmlDescription = descriptionTag?.match(/content="([^"]*)"/u)?.[1];
 
-    assert.equal(
-      payload.description,
-      configured.description,
-      `${path}: payload`,
-    );
-    assert.equal(htmlDescription, configured.description, `${path}: HTML`);
-    assertDescriptionQuality(configured.description, path);
-    descriptions.push(configured.description);
+      assert.equal(
+        configured.description,
+        approvedDescription,
+        `${path}: config`,
+      );
+      assert.equal(
+        payload.description,
+        approvedDescription,
+        `${path}: payload`,
+      );
+      assert.equal(htmlDescription, approvedDescription, `${path}: HTML`);
+      assertDescriptionQuality(approvedDescription, path);
+    });
   }
 
   assert.equal(
-    new Set(descriptions).size,
-    STATIC_ROUTES.length,
+    new Set(Object.values(APPROVED_STATIC_DESCRIPTIONS)).size,
+    Object.keys(APPROVED_STATIC_DESCRIPTIONS).length,
     "static routes must have unique descriptions",
   );
 });
@@ -193,23 +209,33 @@ test("requires event name and date", { skip: !hasDescriptionBuilder }, () => {
 });
 
 test(
-  "omits optional time and venue without cutting a sentence",
+  "includes optional time and short venue only when the complete template fits",
   { skip: !hasDescriptionBuilder },
   () => {
     const withoutOptionals = buildDescription({ language: "es" });
     assert.doesNotMatch(withoutOptionals, /13:00|Tamashii/u);
 
-    const longAddress = buildDescription({
+    const withOptionals = buildDescription({
       language: "es",
       event: {
         startTime: "13:00",
+        location: "Tamashii Martial Arts Pinares",
+      },
+    });
+    assert.match(withOptionals, /13:00/u);
+    assert.match(withOptionals, /Tamashii Martial Arts Pinares/u);
+    assertDescriptionQuality(withOptionals, "complete future event");
+
+    const longAddress = buildDescription({
+      language: "es",
+      event: {
         location:
           "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, doscientos metros este y doscientos metros norte, Costa Rica",
       },
     });
     assert.doesNotMatch(
       longAddress,
-      /Curridabat|doscientos metros|Costa Rica/u,
+      /Tamashii|Curridabat|doscientos metros|Costa Rica/u,
     );
     assertDescriptionQuality(longAddress, "long address");
   },
@@ -229,7 +255,10 @@ test(
     });
 
     assert.match(description, /13:00/u);
-    assert.doesNotMatch(description, /Curridabat|Postal District|Costa Rica/u);
+    assert.doesNotMatch(
+      description,
+      /Tamashii|Curridabat|Postal District|Costa Rica/u,
+    );
     assertDescriptionQuality(description, "time without postal address");
   },
 );
@@ -243,16 +272,16 @@ test(
       en: "Complete editorial description for the event.",
     };
 
-    assert.equal(
-      buildDescription({ language: "es", override: overrides.es }),
-      overrides.es,
-    );
-    assert.equal(
-      buildDescription({ language: "en", override: overrides.en }),
+    assert.equal(buildDescription({ language: "es", overrides }), overrides.es);
+    assert.equal(buildDescription({ language: "en", overrides }), overrides.en);
+    assert.notEqual(
+      buildDescription({ language: "es", overrides: { en: overrides.en } }),
       overrides.en,
     );
-    assert.notEqual(buildDescription({ language: "es" }), overrides.es);
-    assert.notEqual(buildDescription({ language: "en" }), overrides.en);
+    assert.notEqual(
+      buildDescription({ language: "en", overrides: { es: overrides.es } }),
+      overrides.es,
+    );
   },
 );
 
@@ -272,7 +301,8 @@ test(
     for (const language of ["es", "en"]) {
       for (const [label, override] of invalid) {
         assert.throws(
-          () => buildDescription({ language, override }),
+          () =>
+            buildDescription({ language, overrides: { [language]: override } }),
           (error) => {
             assert.match(String(error), /meta-description-fixture/u, label);
             assert.match(String(error), new RegExp(language, "u"), label);
