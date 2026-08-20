@@ -96,7 +96,7 @@ test("uses the JPEG social card in generated Open Graph metadata", async () => {
 
   assert.match(
     gallery,
-    /property="og:image" content="https:\/\/fak-kendo\.pages\.dev\/images\/social\/kendo-social-card-20260812\.jpg"/,
+    /property="og:image" content="https:\/\/fak-kendo\.pages\.dev\/images\/social\/kendo-social-card-20260812\.jpg\?v=20260820-1"/,
   );
   assert.match(gallery, /property="og:image:type" content="image\/jpeg"/);
 });
@@ -142,7 +142,7 @@ test("uses responsive WebP images for hero and calendar sitemap entries only", a
   for (const html of [home, calendar]) {
     assert.match(
       html,
-      /og:image" content="https:\/\/fak-kendo\.pages\.dev\/images\/social\/kendo-social-card-20260812\.jpg"/,
+      /og:image" content="https:\/\/fak-kendo\.pages\.dev\/images\/social\/kendo-social-card-20260812\.jpg\?v=20260820-1"/,
     );
     assert.match(html, /og:image:type" content="image\/jpeg"/);
     assert.match(html, /og:image:width" content="1200"/);

@@ -4,6 +4,17 @@ Use the narrowest verification that proves the requested change.
 
 Use the repository package manager, `pnpm`. If it is not available directly in Windows PowerShell, prefix the same command with `corepack` (for example, `corepack pnpm run build`).
 
+## Mandatory Delivery Gate
+
+Before reporting an implementation as ready, select every applicable check in
+this guide and in `.agents/project-map.md`, then run all of them successfully.
+Do not treat a successful build, typecheck, or partial test run as completion
+when the changed responsibility has a directed test.
+
+If any required check fails or cannot run, report the change as incomplete,
+name the exact check and reason, and do not present the code as ready to ship.
+The final report must list the checks that passed.
+
 ## Default Commands
 
 For TypeScript or React changes:
