@@ -94,6 +94,7 @@ test("keeps every generated route noindex while including it in the sitemap", as
 test("uses the JPEG social card in generated Open Graph metadata", async () => {
   const gallery = await readDist("galeria/index.html");
 
+  assert.match(gallery, /<html lang="es" prefix="og: https:\/\/ogp\.me\/ns#">/);
   assert.match(
     gallery,
     /property="og:image" content="https:\/\/fak-kendo\.pages\.dev\/images\/social\/kendo-social-card-20260812\.jpg\?v=20260820-1"/,
@@ -184,7 +185,7 @@ test("generates localized English routes with reciprocal language metadata", asy
   const event = await readDist("en/events/2026-08-08-examen/index.html");
   const sitemap = await readDist("sitemap.xml");
 
-  assert.match(home, /<html lang="en">/);
+  assert.match(home, /<html lang="en" prefix="og: https:\/\/ogp\.me\/ns#">/);
   assert.match(home, />Home<\/a>/);
   assert.match(home, /href="\/en\/calendar\/"/);
   assert.match(
