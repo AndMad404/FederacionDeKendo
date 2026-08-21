@@ -8,7 +8,7 @@ const navInteractionClass =
   "transition-[background-color,border-color,color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-sm focus-visible:-translate-y-0.5 focus-visible:shadow-sm active:translate-y-0 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:focus-visible:translate-y-0 motion-reduce:active:scale-100";
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `text-lg tracking-wide ${navInteractionClass} land-sm:text-base ${focusRingClass} ${
+  `inline-flex items-center text-lg tracking-wide ${navInteractionClass} land-sm:text-base ${focusRingClass} ${
     isActive
       ? "border-b-2 border-site-accent pb-0.5 text-site-on-dark"
       : "text-site-on-dark"
