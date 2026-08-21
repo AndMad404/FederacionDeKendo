@@ -57,38 +57,84 @@
 }
 
 :root {
+  --site-color-navy: #0b1f3a;
+  --site-color-blue: #163a63;
+  --site-color-red: #c8102e;
+  --site-color-white: #ffffff;
+  --site-color-black: #000000;
+  --site-color-slate: #64748b;
   --font-size: 16px;
-  --background: #ffffff;
-  --foreground: oklch(0.145 0 0);
-  --border: rgba(0, 0, 0, 0.1);
+  --background: var(--site-color-white);
+  --foreground: var(--site-color-black);
+  --border: color-mix(
+    in srgb,
+    var(--site-color-slate) 25%,
+    var(--site-color-white)
+  );
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: oklch(0.708 0 0);
+  --ring: var(--site-color-blue);
   --radius: 0.625rem;
 }
 
 @theme inline {
   --font-sans: "Zen Kaku Gothic New", system-ui, sans-serif;
-  --color-site-canvas: #f7f5f0;
-  --color-site-surface: #ffffff;
-  --color-site-media: #e9edf2;
-  --color-site-navy: #0b1f3a;
-  --color-site-overlay: #0b1f3a;
-  --color-site-text: #1f2937;
-  --color-site-on-dark: #ffffff;
-  --color-site-action: #163a63;
-  --color-site-action-soft: #315f8c;
-  --color-site-action-text: #163a63;
-  --color-site-action-hover: #102d4f;
-  --color-site-focus: #60a5fa;
-  --color-site-accent: #c8102e;
-  --color-site-accent-strong: #a50d26;
-  --color-site-accent-hover: #8d0b21;
-  --color-site-accent-soft: #f7d9df;
-  --color-site-accent-on-dark: #ef526a;
-  --color-site-border: #d8dee8;
-  --color-site-muted: #64748b;
-  --color-site-subtle: #e2e8f0;
+  --color-site-canvas: var(--site-color-white);
+  --color-site-surface: var(--site-color-white);
+  --color-site-media: color-mix(
+    in srgb,
+    var(--site-color-slate) 18%,
+    var(--site-color-white)
+  );
+  --color-site-navy: var(--site-color-navy);
+  --color-site-overlay: var(--site-color-navy);
+  --color-site-text: var(--site-color-black);
+  --color-site-on-dark: var(--site-color-white);
+  --color-site-action: var(--site-color-blue);
+  --color-site-action-soft: color-mix(
+    in srgb,
+    var(--site-color-blue) 85%,
+    var(--site-color-white)
+  );
+  --color-site-action-text: var(--site-color-blue);
+  --color-site-action-hover: color-mix(
+    in srgb,
+    var(--site-color-blue) 80%,
+    var(--site-color-black)
+  );
+  --color-site-focus: var(--site-color-blue);
+  --color-site-accent: var(--site-color-red);
+  --color-site-accent-strong: color-mix(
+    in srgb,
+    var(--site-color-red) 85%,
+    var(--site-color-black)
+  );
+  --color-site-accent-hover: color-mix(
+    in srgb,
+    var(--site-color-red) 70%,
+    var(--site-color-black)
+  );
+  --color-site-accent-soft: color-mix(
+    in srgb,
+    var(--site-color-red) 15%,
+    var(--site-color-white)
+  );
+  --color-site-accent-on-dark: color-mix(
+    in srgb,
+    var(--site-color-red) 65%,
+    var(--site-color-white)
+  );
+  --color-site-border: color-mix(
+    in srgb,
+    var(--site-color-slate) 25%,
+    var(--site-color-white)
+  );
+  --color-site-muted: var(--site-color-slate);
+  --color-site-subtle: color-mix(
+    in srgb,
+    var(--site-color-slate) 18%,
+    var(--site-color-white)
+  );
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-border: var(--border);
