@@ -1,10 +1,22 @@
 # Federación de Asociaciones de Kendo
 
-Sitio oficial de la Federación de Asociaciones de Kendo.
+> Sitio oficial de la Federación de Asociaciones de Kendo en Costa Rica, con información sobre eventos, comunidad y dojos afiliados.
 
-## Pages
+## Páginas principales
 
-- [Inicio](https://fak-kendo.pages.dev/)
-- [Calendario](https://fak-kendo.pages.dev/calendario/)
-- [Galería](https://fak-kendo.pages.dev/galeria/)
-- [Afiliados](https://fak-kendo.pages.dev/afiliados/)
+- [Inicio](https://fak-kendo.pages.dev/): Presentación de la Federación y próximos encuentros.
+- [Calendario](https://fak-kendo.pages.dev/eventos/): Calendario oficial de torneos, exámenes, seminarios y otras actividades.
+- [Galería](https://fak-kendo.pages.dev/galeria/): Imágenes de entrenamientos, competencias y comunidad.
+- [Dojos afiliados](https://fak-kendo.pages.dev/afiliados/): Ubicaciones, horarios y datos de contacto de los dojos afiliados.
+
+## English pages
+
+- [Home](https://fak-kendo.pages.dev/en/): English-language introduction and upcoming events.
+- [Events calendar](https://fak-kendo.pages.dev/en/events/): Official calendar of tournaments, examinations, seminars, and other activities.
+- [Gallery](https://fak-kendo.pages.dev/en/gallery/): Training, competition, and community images.
+- [Affiliated dojos](https://fak-kendo.pages.dev/en/affiliates/): Locations, schedules, and contact details for affiliated dojos.
+
+## Optional
+
+- [Eventos pasados](https://fak-kendo.pages.dev/eventos/pasados/): Archivo histórico de actividades publicadas.
+- [Past events](https://fak-kendo.pages.dev/en/events/past/): English-language archive of published activities.

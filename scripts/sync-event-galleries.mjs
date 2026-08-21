@@ -134,7 +134,7 @@ async function createVariants(buffer, eventDirectory, baseName, width) {
       .resize({ width, withoutEnlargement: true });
     pipeline =
       format === "webp"
-        ? pipeline.webp({ quality: 72, effort: 6 })
+        ? pipeline.webp({ quality: 55, effort: 6 })
         : pipeline.avif({ quality: 45, effort: 7 });
     const info = await pipeline.toFile(outputPath);
     formats.push({ format, fileName, width: info.width, height: info.height });

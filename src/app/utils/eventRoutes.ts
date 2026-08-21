@@ -4,10 +4,19 @@ import type { Language } from "../config/i18n";
 import { isArchiveEligible } from "./eventArchive.js";
 export { getArchivePagePath } from "./eventArchiveRoutes.js";
 
-export function getEventPath(event: CalendarEvent, language: Language = "es") {
-  return language === "en"
-    ? `/en/events/${event.id}/`
-    : `/eventos/${event.id}/`;
+export function getEventPath(
+  event: CalendarEvent,
+  language: Language = "es",
+  now = new Date(),
+) {
+  const archived = isArchiveEligible(event, now);
+  if (language === "en") {
+    return archived
+      ? `/en/events/past/${event.id}/`
+      : `/en/events/${event.id}/`;
+  }
+
+  return archived ? `/eventos/pasados/${event.id}/` : `/eventos/${event.id}/`;
 }
 
 function findEventBySlug(slug: string) {
@@ -17,8 +26,18 @@ function findEventBySlug(slug: string) {
 }
 
 export function findEventByPathname(pathname: string) {
-  const match = pathname.match(/^\/(?:eventos|en\/events)\/([^/]+)\/?$/);
-  return match ? findEventBySlug(decodeURIComponent(match[1])) : undefined;
+  const archivedMatch = pathname.match(
+    /^\/(?:eventos\/pasados|en\/events\/past)\/([^/]+)\/?$/,
+  );
+  if (archivedMatch) {
+    const event = findEventBySlug(decodeURIComponent(archivedMatch[1]));
+    return event && isArchiveEligible(event) ? event : undefined;
+  }
+
+  const currentMatch = pathname.match(/^\/(?:eventos|en\/events)\/([^/]+)\/?$/);
+  if (!currentMatch) return undefined;
+
+  return findEventBySlug(decodeURIComponent(currentMatch[1]));
 }
 
 export function getPastEvents(now = new Date()) {

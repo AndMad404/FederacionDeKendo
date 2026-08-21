@@ -12,6 +12,7 @@ Stack:
 
 - Use the current application plus owner-approved measurements, screenshots, and rendered results as the visual baseline.
 - Read the relevant files before making claims or edits.
+- After editing code or configuration, run `corepack pnpm run format:check` before reporting completion. The repository Prettier configuration requires CRLF line endings; do not treat a content-only diff as formatted until this check passes.
 - Keep work scoped to the user's requested file, route, concern, or task.
 - When the user does not know the relevant files, routes, or tests, read
   `.agents/project-map.md` and discover the smallest evidence-based scope.
@@ -19,6 +20,22 @@ Stack:
   editing when the request is investigative or materially ambiguous.
 - Prefer existing project patterns over new abstractions.
 - Do not refactor unrelated code while implementing a narrow change.
+- Do not treat a general preference against new tools or refactors as a ban on
+  evidence-based recommendations. When a confirmed problem has a proportionate
+  methodology, script, or tool, describe the option, its evidence, its cost,
+  and the smallest alternative. Do not install, adopt, or add it without owner
+  approval.
+- For programming work that depends on external technical facts, APIs,
+  performance guidance, or benchmark methodology, use current primary sources:
+  official product documentation, standards bodies, or the organization that
+  publishes the relevant benchmark. Cite the source with the recommendation or
+  state when no suitable primary source is available.
+- Never use CSS `!important` or Tailwind important modifiers. Resolve cascade
+  conflicts through structure, variants, or natural selector specificity.
+- Responsive design is mobile-first: base styles must serve mobile and touch
+  devices. Apply compact desktop overrides only under explicit desktop
+  conditions, and preserve at least 44 px touch targets on touch-capable and
+  hybrid devices.
 - Do not validate a narrow visual change on top of unrelated visual worktree
   changes. First isolate the authorized patch or stop and ask how the existing
   changes should be preserved.
@@ -29,7 +46,22 @@ Stack:
   difference in one region does not authorize or explain differences elsewhere.
 - Separate verified repo facts from suggestions or future ideas.
 - Treat legal, SEO metadata, and public copy constraints from the user as hard requirements.
+- Prioritize technically justified opportunities to improve SEO within the SPA
+  architecture. A temporary `noindex` policy does not waive this direction:
+  keep prerendered content, routing, metadata, internal links, and generated
+  output ready for eventual indexing when doing so is proportionate and does
+  not violate an approved product constraint.
+- Do not add a new public page only for a speculative SEO benefit. Before
+  implementation, document the page's concrete SEO purpose and technical
+  requirements, define its route and generated-output behavior, and obtain
+  explicit owner approval for its design requirements and visible result.
 - When creating a commit, follow the message convention in `CONTRIBUTING.md`.
+- After an owner-approved commit that resolves a technical finding or accepts a
+  technical/design decision, update `.codex/review-state.md` with the commit
+  SHA and recorded verification. Then use the private documentation index to
+  update only the selected canonical document when that approved decision
+  changes its recorded state. Do not document unapproved or uncommitted work as
+  a decision.
 - Use ASCII in repo instructions unless a file already requires non-ASCII text.
 
 ## Task Modes
@@ -86,8 +118,8 @@ Reject and regenerate a prompt if it contains any of these:
 - historical follow-ups or expanded closed-phase protections beyond the brief
   no-reaudit statement;
 - named verification commands or gates selected by `.agents/verification.md`;
-- headings or equivalent sections for `Alcance autorizado`, `Fuera de alcance`,
-  or `Criterio de salida`.
+- headings or equivalent sections for `Authorized Scope`, `Out of Scope`,
+  or `Exit Criteria`.
 
 Use the short `Implement One Roadmap Phase` recipe as the canonical prompt
 shape. Apart from its fixed operational controls, variable text may contain

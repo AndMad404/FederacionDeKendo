@@ -1,0 +1,130 @@
+{
+  "2026-05-02-examen": {
+    "source": { "title": "Examen" },
+    "translation": { "title": "Examination" }
+  },
+  "2026-05-29-clak-seminario-instructores-chile": {
+    "source": { "title": "CLAK Seminario Instructores CHILE" },
+    "translation": { "title": "CLAK Instructor Seminar CHILE" }
+  },
+  "2026-05-30-seminario": {
+    "source": { "title": "Seminario" },
+    "translation": { "title": "Seminar" }
+  },
+  "2026-08-08-examen": {
+    "source": { "title": "Examen", "summary": "Exámenes de 8vo a 2do kyu" },
+    "translation": {
+      "title": "Examination",
+      "summary": "Examinations from 8th to 2nd kyu"
+    }
+  },
+  "2026-08-22-3er-torneo": {
+    "source": {
+      "title": "3er Torneo",
+      "summary": "- Categoría con Bogu y sin Bogu\n- Categoría por equipos"
+    },
+    "translation": {
+      "title": "3rd Tournament",
+      "summary": "- Categories with and without bogu\n- Team category"
+    }
+  },
+  "2026-09-12-gasshuku-monteverde": {
+    "source": {
+      "title": "Gasshuku Monteverde",
+      "summary": "La participación incluye:\n\n* Transporte ida y vuelta\n* Almuerzo primer día\n* Desayuno del segundo día\n* Habitación compartida\n* Acceso a las instalaciones y senderos del hotel\n* Uso de los salones de entrenamiento\n* Experiencia intensiva de entrenamiento a cargo de senséis de alto nivel\n\nEste encuentro guiado por cuatro senséis japoneses de alto rango nace con el propósito de vivir el kendo más allá del entrenamiento habitual: compartir dos días de disciplina, convivencia y aprendizaje.\n\nEl Gasshuku se desarrollará en el Establo Mountain Hotel, Monteverde. Sus instalaciones y salones de madera ofrecerán un espacio para entrenar, alejarnos por unos días de la rutina y disfrutar de una experiencia diferente alrededor del kendo."
+    },
+    "translation": {
+      "title": "Gasshuku Monteverde",
+      "summary": "Participation includes: round-trip transportation, lunch on the first day, breakfast on the second day, shared accommodation, access to the hotel's facilities and trails, use of training halls, and an intensive training experience led by high-ranking senseis.\n\nThis gathering, guided by four high-ranking Japanese senseis, was created to experience kendo beyond ordinary practice: two days of discipline, camaraderie, and learning.\n\nGasshuku will take place at Establo Mountain Hotel in Monteverde. Its facilities and wooden halls will provide space to train, step away from routine for a few days, and enjoy a different kendo-centered experience."
+    }
+  },
+  "2026-10-10-clak-1er-panamericano-brasil": {
+    "source": { "title": "CLAK 1er Panamericano BRASIL" },
+    "translation": { "title": "CLAK 1st Pan American Championship BRASIL" }
+  },
+  "2026-10-31-examen": {
+    "source": { "title": "Examen", "summary": "Exámenes de 8vo a 2do kyu" },
+    "translation": {
+      "title": "Examination",
+      "summary": "Examinations from 8th to 2nd kyu"
+    }
+  },
+  "2026-11-21-panama-torneo-por-equipos": {
+    "source": {
+      "title": "PANAMA Torneo por Equipos",
+      "summary": "Torneo por Equipos en Panamá. Invitación de Shinsei Panamá."
+    },
+    "translation": {
+      "title": "PANAMA Team Tournament",
+      "summary": "Team tournament in Panama, hosted by Shinsei Panama."
+    }
+  },
+  "2026-12-12-4to-torneo": {
+    "source": {
+      "title": "4to Torneo",
+      "summary": "Categoría con Bogu y sin Bogu"
+    },
+    "translation": {
+      "title": "4th Tournament",
+      "summary": "Categories with and without bogu"
+    }
+  },
+  "2027-01-30-examen": {
+    "source": { "title": "Examen", "summary": "Exámenes de 8vo a 2do kyu" },
+    "translation": {
+      "title": "Examination",
+      "summary": "Examinations from 8th to 2nd kyu"
+    }
+  },
+  "2027-04-03-5to-torneo": {
+    "source": {
+      "title": "5to Torneo",
+      "summary": "Categoría con Bogu y sin Bogu"
+    },
+    "translation": {
+      "title": "5th Tournament",
+      "summary": "Categories with and without bogu"
+    }
+  },
+  "2027-05-01-examen": {
+    "source": { "title": "Examen", "summary": "Exámenes de 8vo a 2do kyu" },
+    "translation": {
+      "title": "Examination",
+      "summary": "Examinations from 8th to 2nd kyu"
+    }
+  },
+  "2027-07-31-examen": {
+    "source": { "title": "Examen", "summary": "Exámenes de 8vo a 2do kyu" },
+    "translation": {
+      "title": "Examination",
+      "summary": "Examinations from 8th to 2nd kyu"
+    }
+  },
+  "2027-08-14-6to-torneo": {
+    "source": {
+      "title": "6to Torneo",
+      "summary": "Categoría con Bogu y sin Bogu"
+    },
+    "translation": {
+      "title": "6th Tournament",
+      "summary": "Categories with and without bogu"
+    }
+  },
+  "2027-10-30-examen": {
+    "source": { "title": "Examen", "summary": "Exámenes de 8vo a 2do kyu" },
+    "translation": {
+      "title": "Examination",
+      "summary": "Examinations from 8th to 2nd kyu"
+    }
+  },
+  "2027-12-11-7mo-torneo": {
+    "source": {
+      "title": "7mo Torneo",
+      "summary": "Categoría con Bogu y sin Bogu"
+    },
+    "translation": {
+      "title": "7th Tournament",
+      "summary": "Categories with and without bogu"
+    }
+  }
+}

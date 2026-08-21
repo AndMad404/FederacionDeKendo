@@ -11,80 +11,81 @@ manual synchronization.
 ## Discover Scope Without Editing
 
 ```text
-Investiga [problema].
-Usa .agents/project-map.md para descubrir las rutas, archivos, componentes y
-pruebas relacionadas. Resume el alcance en maximo 10 lineas. No edites todavia.
-No revises todas las rutas salvo que encuentres una dependencia compartida que
-lo justifique; si amplias el alcance, explica por que.
+Investigate [problem].
+Use .agents/project-map.md to discover the related routes, files, components,
+and tests. Summarize the scope in a maximum of 10 lines. Do not edit yet.
+Do not review every route unless you find a shared dependency that justifies
+it; if you expand the scope, explain why.
 ```
 
 ## Implement The Discovered Scope
 
 ```text
-Implementa unicamente el alcance identificado para [problema].
-No explores mejoras adicionales ni refactorices fuera de alcance.
-Ejecuta primero la prueba dirigida y despues solo la verificacion final que
-corresponda segun .agents/verification.md.
+Implement only the scope identified for [problem].
+Do not explore additional improvements or refactor outside scope.
+Run the targeted test first, then only the final verification that applies
+per .agents/verification.md.
 ```
 
 ## Discover And Implement When Unambiguous
 
 ```text
-Corrige [problema].
-Primero usa .agents/project-map.md para identificar el alcance minimo. Si la
-causa y el cambio son inequivocos, implementa sin ampliar el alcance y ejecuta
-solo las pruebas relacionadas. Si hay mas de una interpretacion material,
-resume las opciones en maximo 10 lineas y espera mi decision.
+Fix [problem].
+First use .agents/project-map.md to identify the minimal scope. If the cause
+and the change are unambiguous, implement without expanding scope and run
+only the related tests. If there is more than one material interpretation,
+summarize the options in a maximum of 10 lines and wait for my decision.
 ```
 
 ## Review One File
 
 ```text
-Revisa solo [archivo].
-Usa .agents/review-contract.md.
-No asumas codigo no inspeccionado.
-Devuelve findings por severidad y recomienda el siguiente archivo.
+Review only [file].
+Use .agents/review-contract.md.
+Do not assume uninspected code.
+Return findings by severity and recommend the next file.
 ```
 
 ## Plan A Change
 
 ```text
-Quiero cambiar [objetivo].
-Antes de editar, lee los archivos relevantes y dame un plan breve.
-Separa hechos verificados de sugerencias.
-No propongas refactors fuera de alcance.
+I want to change [goal].
+Before editing, read the relevant files and give me a brief plan.
+Separate verified facts from suggestions.
+Do not propose refactors outside scope.
 ```
 
 ## Implement A Specific Finding
 
 ```text
-Aplica solo el finding [nivel/titulo].
-Usa .agents/implementation-contract.md.
-Manten el cambio minimo.
-No toques archivos no relacionados.
-Al final corre los checks relevantes de .agents/verification.md.
+Apply only the finding [level/title].
+Use .agents/implementation-contract.md.
+Keep the change minimal.
+Do not touch unrelated files.
+At the end, run the relevant checks from .agents/verification.md.
 ```
 
 ## Implement One Roadmap Phase
 
 ```text
-Fase [numero], [titulo/enlace directo]: [objetivo exacto].
-Las fases previas estan cerradas; no las reaudites.
+Phase [number], [title/direct link]: [exact goal].
+Previous phases are closed; do not re-audit them.
 
-Contexto minimo: parte del apartado enlazado; si no basta, usa `docs/index.md`
-y el mapa documental aplicable para seleccionar solo la referencia indispensable.
+Minimal context: start from the linked section; if that is not enough, use
+`docs/index.md` and the applicable documentation map to select only the
+indispensable reference.
 
-Delta: [resultado funcional verificable de esta fase].
-Invariantes criticos: [condicion observable que no puede cambiar].
-Decision humana: [bloqueo y alternativa minima que requiere aprobacion; o
-"ninguna"].
+Delta: [verifiable functional result of this phase].
+Critical invariants: [observable condition that must not change].
+Human decision: [blocker and minimal alternative requiring approval; or
+"none"].
 
-Limites: [exclusion o frontera relevante de esta fase; no crees commit salvo
-solicitud]. Preserva cambios ajenos del worktree. Selecciona las verificaciones
-mediante `.agents/verification.md`.
+Limits: [exclusion or relevant boundary of this phase; do not create a commit
+unless requested]. Preserve unrelated worktree changes. Select verifications
+via `.agents/verification.md`.
 
-Reporte final: delta aplicado, verificaciones ejecutadas y gates aplicables
-omitidos con motivo; bloqueos.
+Final report: delta applied, verifications run, and applicable gates skipped
+with reason; blockers.
 ```
 
 ## Implement One Calendar-Resilience Phase
@@ -96,26 +97,26 @@ calendar-specific preamble, file lists, gates, or historical contracts.
 ## SEO Change
 
 ```text
-Cambia [titulo/descripcion/metadato] para [ruta].
-Empieza por src/app/config/seo-data.json.
-Verifica runtime y HTML generado.
-No cambies copy visible ni datos legales fuera del alcance.
+Change [title/description/metadata] for [route].
+Start with src/app/config/seo-data.json.
+Verify runtime and generated HTML.
+Do not change visible copy or legal data outside scope.
 ```
 
 ## Responsive Bug
 
 ```text
-Corrige el problema responsive en [ruta/componente].
-Valida mobile, tablet y desktop.
-No redisenes la seccion completa.
-Manten touch targets >=44px.
+Fix the responsive issue in [route/component].
+Validate mobile, tablet, and desktop.
+Do not redesign the entire section.
+Keep touch targets >=44px.
 ```
 
 ## Final Self-Review
 
 ```text
-Revisa tu propio diff.
-Busca regresiones en TS, React, Tailwind, A11Y, SEO, PERF y RESPONSIVE.
-No hagas cambios nuevos salvo que encuentres un bug claro.
-Reporta riesgos restantes.
+Review your own diff.
+Look for regressions in TS, React, Tailwind, A11Y, SEO, PERF, and RESPONSIVE.
+Do not make new changes unless you find a clear bug.
+Report remaining risks.
 ```

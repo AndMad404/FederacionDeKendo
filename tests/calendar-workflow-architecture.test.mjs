@@ -44,6 +44,21 @@ test("Phase 6: writer workflows run their directed test and shared gate before c
   }
 });
 
+test("Calendar synchronization only commits staged content changes", async () => {
+  const sync = await workflow(".github/workflows/sync-calendar.yml");
+
+  assertBefore(
+    sync,
+    'git add -A -- "${sync_paths[@]}"',
+    "git diff --cached --quiet",
+  );
+  assertBefore(
+    sync,
+    "git diff --cached --quiet",
+    'git commit -m "chore: sync calendar events"',
+  );
+});
+
 test("Phase 6: the shared gate and human CI coverage remain complete", async () => {
   const action = await workflow(".github/actions/verify-site/action.yml");
   for (const command of [

@@ -67,7 +67,7 @@ export function AfiliadosSection() {
         title={copy.affiliates.title}
         description={copy.affiliates.description}
         image={{
-          src: "/images/affiliates/kendo-affiliates.jpg",
+          src: "/images/affiliates/kendo-affiliates-1200.webp",
           sources: [
             {
               srcSet:

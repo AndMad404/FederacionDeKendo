@@ -27,8 +27,8 @@ export function Navbar() {
 
   const calendarPaths =
     language === "en"
-      ? ["/en/calendar/", "/en/events/past/"]
-      : ["/calendario/", "/eventos/pasados/"];
+      ? ["/en/events/", "/en/events/past/"]
+      : ["/eventos/", "/eventos/pasados/"];
   const calendarActive = calendarPaths.some((path) =>
     pathname.startsWith(path),
   );
@@ -108,7 +108,7 @@ export function Navbar() {
           <ChevronDown
             size={18}
             aria-hidden="true"
-            className={`transition-transform ${calendarOpen ? "rotate-180" : ""}`}
+            className={`transition-transform motion-reduce:transition-none ${calendarOpen ? "rotate-180" : ""}`}
           />
         </button>
         {calendarOpen && (
@@ -161,8 +161,7 @@ export function Navbar() {
               />
               <img
                 src="/images/logo/fakcr-lockup-224.png"
-                alt=""
-                aria-hidden="true"
+                alt={copy.nav.homeLabel}
                 className="size-14 shrink-0 rounded-full bg-site-on-dark object-contain land-sm:size-10"
                 width="56"
                 height="56"

@@ -86,7 +86,7 @@ export function HistoricalEventGallery({
             height={featured.height}
             loading="lazy"
             decoding="async"
-            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:transform-none"
           />
         </picture>
         <button
@@ -145,7 +145,7 @@ export function HistoricalEventGallery({
                 height={image.thumbnailHeight}
                 loading="lazy"
                 decoding="async"
-                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:transform-none"
               />
             </button>
           ))}

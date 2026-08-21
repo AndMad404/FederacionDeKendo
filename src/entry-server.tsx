@@ -10,6 +10,7 @@ import { EventPage } from "./app/components/EventPage";
 import { PastEventsSection } from "./app/components/PastEventsSection";
 
 export {
+  buildEventMetaDescription,
   getRouteHeadDescriptors,
   getEventRedirects,
   getRouteManifest,
@@ -17,6 +18,12 @@ export {
   getRouteSeoPayload,
   getRouteSitemapImageUrls,
 } from "./app/config/seo";
+export { CALENDAR_EVENTS } from "./app/data/calendarEvents";
+export {
+  getEventTranslationStatus,
+  getLocalizedEvent,
+  getLocalizedEvents,
+} from "./app/utils/localizedEvents";
 
 const SERVER_ROUTE_COMPONENTS: RouteComponentRegistry = {
   routes: {
@@ -30,10 +37,13 @@ const SERVER_ROUTE_COMPONENTS: RouteComponentRegistry = {
   },
 };
 
-export function render(url: string) {
+export function render(url: string, prerenderedAt: string) {
   return renderToString(
     <StaticRouter location={url}>
-      <App routeComponents={SERVER_ROUTE_COMPONENTS} />
+      <App
+        routeComponents={SERVER_ROUTE_COMPONENTS}
+        prerenderedAt={prerenderedAt}
+      />
     </StaticRouter>,
   );
 }

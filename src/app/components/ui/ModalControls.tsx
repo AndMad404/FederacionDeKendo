@@ -3,7 +3,6 @@ import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import {
   focusRingClass,
   modalCloseButtonClass,
-  navigationArrowActiveClass,
   navigationArrowButtonClass,
 } from "../../styles/shared";
 
@@ -53,9 +52,8 @@ export function NavigationArrowButton({
     <button
       type="button"
       aria-label={label}
-      className={`${navigationArrowButtonClass} ${
-        isActive ? navigationArrowActiveClass : ""
-      } ${focusRingClass} ${className}`}
+      data-active={isActive}
+      className={`${navigationArrowButtonClass} ${focusRingClass} ${className}`}
       {...props}
     >
       <Icon className="size-5 md:size-6" aria-hidden="true" />

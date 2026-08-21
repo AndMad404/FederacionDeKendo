@@ -1,3 +1,8 @@
+/*
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Frame-Options: SAMEORIGIN
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'; img-src 'self' data:; font-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests
+
 /
   Link: </images/hero/kendo-hero-formacion-960.webp?v=20260704-0120>; rel=preload; as=image; fetchpriority=high; imagesrcset="/images/hero/kendo-hero-formacion-480.webp?v=20260704-0120 480w, /images/hero/kendo-hero-formacion-960.webp?v=20260704-0120 960w, /images/hero/kendo-hero-formacion-1500.webp?v=20260704-0120 1500w"; imagesizes="100vw"
 

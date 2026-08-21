@@ -54,6 +54,7 @@ export function EventPage() {
 
   if (!sourceEvent) return null;
   const event = getLocalizedEvent(sourceEvent, language);
+  if (!event) return null;
 
   const isPast = now
     ? getEventEndDate(event).getTime() <= now.getTime()
@@ -61,7 +62,7 @@ export function EventPage() {
   const locationUrl = event.location
     ? getLocationMapUrl(event.location)
     : undefined;
-  const canonicalPath = getEventPath(event, language);
+  const canonicalPath = getEventPath(event, language, now);
   const eventTitle = event.title;
 
   async function handleShare() {
@@ -103,7 +104,7 @@ export function EventPage() {
         }}
       />
 
-      <div className="relative z-20 -mt-11 grid w-full justify-items-stretch gap-3 px-3 pb-2.5 pt-3 sm:-mt-13 sm:px-4 sm:pb-2.5 sm:pt-4 tall-md:px-4 tall-md:py-4 tall-md:pb-2.5 land-sm:gap-2 land-sm:px-3 land-sm:pb-2.5 land-sm:pt-3 land-compact:-mt-8">
+      <div className="relative z-20 -mt-11 grid w-full justify-items-stretch gap-3 px-3 pb-2.5 pt-3 sm:-mt-13 sm:px-4 sm:pb-2.5 sm:pt-4 tall-md:py-4 tall-md:pb-2.5 lg:px-0 land-sm:gap-2 land-sm:px-3 land-sm:pb-2.5 land-sm:pt-3 land-compact:-mt-8">
         <div className="mx-auto grid w-full max-w-5xl gap-3 land-sm:gap-2">
           <article
             className={`grid gap-3 px-5 py-3 md:px-5 md:py-3 land-sm:gap-2 land-sm:p-3 ${panelSurfaceClass}`}
@@ -202,7 +203,7 @@ export function EventPage() {
                         {copy.event.viewArchive}
                       </Link>
                       <Link
-                        to={english ? "/en/calendar/" : "/calendario/"}
+                        to={english ? "/en/events/" : "/eventos/"}
                         className={`${primaryButtonClass} ${focusRingClass}`}
                       >
                         {copy.archive.upcomingEvents}
@@ -225,7 +226,7 @@ export function EventPage() {
                   ) : null}
                   {!isPast ? (
                     <Link
-                      to={english ? "/en/calendar/" : "/calendario/"}
+                      to={english ? "/en/events/" : "/eventos/"}
                       className={`${primaryButtonClass} ${focusRingClass}`}
                     >
                       {copy.event.backToCalendar}

@@ -13,7 +13,7 @@ Recommended exports:
 - Preferred formats for photos: WebP and AVIF.
 - Keep descriptive filenames, dimensions in code, and meaningful alt text.
 
-Current site images use AVIF first where available, WebP next, with JPG fallbacks for hero and affiliates.
+Current site images use AVIF first where available and WebP for all published photo fallbacks. Committed JPG files remain source inputs for responsive-image generation where required.
 
 ## Responsive image processing
 
@@ -68,3 +68,13 @@ The script generates:
 - `public/images/gallery/kendo-gallery-08-1600.webp`
 
 If Windows reports an image as busy, close the browser, image previews, or local dev server using it and run the command again.
+
+## Delivered-image optimization
+
+Run the following after adding or replacing a published social card or event-gallery image:
+
+```bash
+pnpm images:optimize-delivered
+```
+
+It creates the social-card WebP export and recompresses listed delivered assets until they are at or below 100,000 bytes without changing their dimensions.

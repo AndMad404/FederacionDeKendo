@@ -359,9 +359,7 @@ function parseCliArguments(args) {
 
 function safeAuditValue(value) {
   return [...String(value)]
-    .map((character) =>
-      containsControlCharacter(character) ? " " : character,
-    )
+    .map((character) => (containsControlCharacter(character) ? " " : character))
     .join("")
     .replace(/[^A-Za-z0-9_.-]/g, "_");
 }

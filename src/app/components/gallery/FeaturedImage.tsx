@@ -92,7 +92,7 @@ export function FeaturedImage({
         decoding="async"
         fetchpriority="high"
         style={imageStyle}
-        className={`gallery-featured-image ${objectPositionClass} h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-105`}
+        className={`gallery-featured-image ${objectPositionClass} h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:transform-none`}
       />
       <div
         className="absolute inset-0 bg-gradient-to-b from-site-navy/55 via-transparent to-site-navy/80"

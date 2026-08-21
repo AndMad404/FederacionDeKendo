@@ -13,6 +13,7 @@ import {
 const ROOT = process.cwd();
 const DIST_DIR = path.join(ROOT, "dist");
 const baseHtml = await readFile(path.join(DIST_DIR, "index.html"), "utf8");
+const prerenderedAt = new Date().toISOString();
 
 function escapeAttribute(value) {
   return String(value)
@@ -50,6 +51,7 @@ function stripManagedHead(html) {
     .replace(/\n\s*<link\s+rel="preload"[^>]*\s+as="image"[^>]*>/gi, "")
     .replace(/\n\s*<link\s+rel="canonical"[^>]*>/gi, "")
     .replace(/\n\s*<meta\s+name="(?:description|robots)"[^>]*>/gi, "")
+    .replace(/\n\s*<meta\s+name="author"[^>]*>/gi, "")
     .replace(/\n\s*<meta\s+property="og:[^"]+"[^>]*>/gi, "")
     .replace(
       /\n\s*<script\s+type="application\/ld\+json"[^>]*>[\s\S]*?<\/script>/gi,
@@ -70,13 +72,16 @@ function renderRouteHtml(route) {
     `<html lang="${route.language}"`,
   );
 
-  const bodyHtml = render(route.path);
+  const bodyHtml = render(route.path, prerenderedAt);
   html = html.replace(
     '<div id="root"></div>',
     `<div id="root">${bodyHtml}</div>`,
   );
 
-  return html.replace("</head>", `${managedHead(route)}\n  </head>`);
+  return html.replace(
+    "</head>",
+    `    <meta name="app-prerendered-at" content="${prerenderedAt}" />\n${managedHead(route)}\n  </head>`,
+  );
 }
 
 async function writeRouteHtml(route) {
@@ -101,7 +106,7 @@ function renderNotFoundHtml() {
   );
   html = html.replace(/<html\s+lang="[^"]+"/i, '<html lang="es"');
 
-  const bodyHtml = render("/404-not-found/");
+  const bodyHtml = render("/404-not-found/", prerenderedAt);
   html = html.replace(
     '<div id="root"></div>',
     `<div id="root">${bodyHtml}</div>`,
@@ -109,7 +114,7 @@ function renderNotFoundHtml() {
 
   return html.replace(
     "</head>",
-    `${managedHead(getRouteMeta("/404-not-found/"))}\n  </head>`,
+    `    <meta name="app-prerendered-at" content="${prerenderedAt}" />\n${managedHead(getRouteMeta("/404-not-found/"))}\n  </head>`,
   );
 }
 
@@ -133,7 +138,7 @@ const sitemap = [
   '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">',
   ...routes.flatMap((route) => {
     const seo = getRouteSeoPayload(route);
-    return seo.canonicalUrl && seo.robots === "index, follow"
+    return seo.robots === "index, follow" && seo.canonicalUrl
       ? [
           "  <url>",
           `    <loc>${escapeText(seo.canonicalUrl)}</loc>`,

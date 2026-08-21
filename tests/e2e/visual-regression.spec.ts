@@ -10,6 +10,7 @@ const APPROVED_VIEWPORTS = [
 ] as const;
 
 const FIXED_TEST_TIME = new Date("2026-08-04T12:00:00-06:00");
+const HISTORICAL_EVENT_REFERENCE_TIME = new Date("2026-08-20T12:00:00-06:00");
 
 interface ApprovedPage {
   name: string;
@@ -28,10 +29,15 @@ const DIST_DIRECTORY = resolve(process.cwd(), "dist");
 
 function getPageComponent(path: string): ApprovedPage["component"] {
   if (path === "/") return "home";
-  if (path === "/calendario/") return "calendar";
+  if (path === "/eventos/") return "calendar";
   if (path === "/galeria/") return "gallery";
   if (path === "/afiliados/") return "affiliates";
-  if (path.startsWith("/eventos/pasados/")) return "pastEvents";
+  if (
+    path === "/eventos/pasados/" ||
+    path.startsWith("/eventos/pasados/pagina/")
+  ) {
+    return "pastEvents";
+  }
   return "event";
 }
 
@@ -67,7 +73,7 @@ const approvedPages: ApprovedPage[] = [
 const preferredRepresentativePaths: Partial<
   Record<ApprovedPage["component"], string>
 > = {
-  event: "/eventos/2026-08-08-examen/",
+  event: "/eventos/pasados/2026-08-08-examen/",
 };
 
 const representativePages = Array.from(
@@ -84,8 +90,12 @@ const representativePages = Array.from(
   ([, page]) => page,
 );
 
-async function prepareApprovedPage(page: Page, path: string) {
-  await page.clock.setFixedTime(FIXED_TEST_TIME);
+async function prepareApprovedPage(
+  page: Page,
+  path: string,
+  referenceTime = FIXED_TEST_TIME,
+) {
+  await page.clock.setFixedTime(referenceTime);
   await page.goto(path);
   await expect(page.locator("main h1")).toBeVisible();
   await page.evaluate(async () => {
@@ -111,7 +121,13 @@ for (const viewport of APPROVED_VIEWPORTS) {
       test(`${approvedPage.component} matches its approved design`, async ({
         page,
       }) => {
-        await prepareApprovedPage(page, approvedPage.path);
+        await prepareApprovedPage(
+          page,
+          approvedPage.path,
+          approvedPage.component === "event"
+            ? HISTORICAL_EVENT_REFERENCE_TIME
+            : FIXED_TEST_TIME,
+        );
         await expect(page).toHaveScreenshot(
           `${approvedPage.component}-${viewport.name}.png`,
         );

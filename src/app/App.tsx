@@ -16,6 +16,7 @@ import {
   useLanguage,
 } from "./config/i18n";
 import { LanguageProvider } from "./config/LanguageProvider";
+import { PrerenderedAtContext } from "./config/PrerenderedAtContext";
 
 export interface RouteComponentRegistry {
   routes: Record<RouteComponent, ComponentType>;
@@ -29,7 +30,7 @@ function applyRouteHead(pathname: string) {
 
   document
     .querySelectorAll(
-      '[data-route-seo], link[rel="canonical"], link[rel="preload"][as="image"], meta[name="description"], meta[name="robots"], meta[property^="og:"], script#route-json-ld',
+      '[data-route-seo], link[rel="canonical"], link[rel="preload"][as="image"], meta[name="author"], meta[name="description"], meta[name="robots"], meta[property^="og:"], script#route-json-ld',
     )
     .forEach((element) => element.remove());
 
@@ -84,9 +85,9 @@ function AppShell({
 
       <main
         id="main-content"
-        className={`px-2.5 pt-[calc(4rem_+_10px)] land-sm:pt-[calc(3rem_+_6px)] ${
-          routeComponent === "event" ? "" : "tall-md:flex-1"
-        } ${
+        className={`${
+          routeComponent === "event" ? "lg:flex-1" : "tall-md:flex-1"
+        } px-2.5 pt-[calc(4rem_+_10px)] land-sm:pt-[calc(3rem_+_6px)] ${
           allowsDesktopContainment
             ? "page-fit:min-h-0 page-fit:overflow-hidden"
             : ""
@@ -175,13 +176,17 @@ function RouteMetadata() {
 
 export default function App({
   routeComponents,
+  prerenderedAt,
 }: {
   routeComponents: RouteComponentRegistry;
+  prerenderedAt?: string;
 }) {
   const { pathname } = useLocation();
   return (
-    <LanguageProvider language={getLanguageFromPathname(pathname)}>
-      <AppShell routeComponents={routeComponents} />
-    </LanguageProvider>
+    <PrerenderedAtContext.Provider value={prerenderedAt}>
+      <LanguageProvider language={getLanguageFromPathname(pathname)}>
+        <AppShell routeComponents={routeComponents} />
+      </LanguageProvider>
+    </PrerenderedAtContext.Provider>
   );
 }

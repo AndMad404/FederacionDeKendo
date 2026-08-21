@@ -2,8 +2,444 @@
 
 ```yaml
 schema_version: 2
-last_updated: 2026-08-14
+last_updated: 2026-08-20
 contract: .agents/review-contract.md
+
+latest_screaming_frog_internal_html_review:
+  id: REV-2026-08-20-06
+  requested_scope: Review the supplied Screaming Frog internal HTML crawl as an SEO audit.
+  actual_scope:
+    targets:
+      - C:/Users/and_m/Documents/internos_todo.csv
+      - 44 HTML URLs represented by that crawl
+    axes: [SEO, PERF]
+    included:
+      - HTTP status, indexability reporting, title, meta description, H1, canonical, language, crawl depth, internal links, near duplicates, HTML size, and response time
+    excluded:
+      - images and other non-HTML resources, structured-data validation, hreflang inventory, external links, Search Console, field Core Web Vitals, and live behavior after the recorded crawl
+  baseline:
+    commit: e0c13066
+    worktree: dirty with pre-existing SEO and review-state changes
+    crawl_timestamp: 2026-08-20 13:46
+    crawl_sha256: 99FC7DA057A77A610415C353CBAC4C7F9B87DDD2B4E6CD4219870289C0DD952E
+  findings:
+    - id: SEO-TITLE-WIDTH-001
+      level: POLISH
+      axis: SEO
+      status: open
+      target: generated event route titles
+      problem: 33 of 44 titles exceed Screaming Frog's approximate 580-pixel preview threshold, all on event-detail routes.
+      fix: Use a shorter event-title suffix or compact localized site name while retaining the unique event name and date.
+      cost_of_deferring: Google may truncate or rewrite some event title links, although this is not a Google compliance failure or fixed character-limit violation.
+      evidence:
+        - supplied crawl reports widths from 596 to 947 pixels for the 33 affected titles
+    - id: SEO-DESC-TRUNC-001
+      level: SMELL
+      axis: SEO
+      status: open
+      target: generated event route descriptions
+      problem: 24 event meta descriptions end without sentence punctuation and visibly stop inside an address or introductory clause.
+      fix: Summarize location at a meaningful boundary and reserve space for a complete event-specific sentence instead of truncating mechanically near 155 characters.
+      cost_of_deferring: Search snippets may present incomplete phrases and hide the event's most useful distinguishing information.
+      evidence:
+        - supplied crawl contains descriptions ending with fragments such as "doscientos metros", "este y", or "Participation includes:"
+  evidence:
+    - parsed 44 HTML URL rows from the CSV; excluded the two Screaming Frog path-summary rows
+    - all 44 URLs returned HTTP 200 and text/html; charset=utf-8
+    - no missing or duplicate title, meta description, H1, or canonical; no canonical mismatch and no near-duplicate group reported
+    - crawl contains 22 Spanish and 22 English pages
+    - response time ranged from 0.087 to 0.232 seconds, average 0.182 seconds
+    - HTML size ranged from 14694 to 29615 bytes, average 18807 bytes
+    - 40 pages under 100 words and 18 pages with fewer than three unique internal inlinks were treated as context, not automatic defects; none is an orphan in the supplied crawl
+  result: The crawl is technically healthy. The actionable SEO work is limited to snippet quality on event pages: overly wide titles and mechanically truncated descriptions. Intentional noindex is accepted and not counted as a finding.
+  pending:
+    - Validate structured data, hreflang, response headers, and Core Web Vitals with their dedicated exports or tools.
+    - Re-crawl after any metadata changes to confirm the event snippet inventory.
+  next: Adjust the event metadata template as one non-visual SEO phase after owner approval, then run the generated-output checks and a fresh crawl.
+
+latest_google_seo_best_practices_review:
+  id: REV-2026-08-20-05
+  requested_scope: Audit the site against current Google Search SEO best practices while accepting the intentional noindex policy.
+  actual_scope:
+    targets:
+      - src/app/config/seo-data.json
+      - src/app/config/seo.ts
+      - scripts/generate-route-html.mjs
+      - public/robots.txt
+      - tests/generated-output.test.mjs
+      - fresh dist/**/index.html, dist/404.html, dist/sitemap.xml, and dist/_redirects
+    axes: [SEO, PERF]
+    included:
+      - crawl access, prerendered content, titles, descriptions, canonical URLs, language and hreflang
+      - crawlable internal links, heading/main landmarks, image alt text, sitemap policy, redirects, and structured-data readiness
+      - source-level page-experience readiness and presence of measurement evidence
+    excluded:
+      - the owner-approved temporary noindex decision itself
+      - deployed response headers, Search Console, Googlebot rendering, Rich Results Test, CrUX, backlinks, and ranking outcomes
+  baseline:
+    commit: e0c13066
+    worktree: dirty with owner changes in scripts/generate-route-html.mjs and tests/generated-output.test.mjs
+    fingerprint:
+      scripts/generate-route-html.mjs: 84EDDC5206758773D8B31E8262FD140893A739A191316B9AD26AC8B0AE2809C4
+      tests/generated-output.test.mjs: 7BBF52FE8535270846DAE3F874B39CFD484F39833274D4F7E59F1BEA161E21C2
+      src/app/config/seo.ts: 21CCB2A2E59E394875C2DCC8E095F3DE2182B43643CCB405BDD2EAB46633E06F
+      src/app/config/seo-data.json: 21670FA1D92D38D874ADFFAFBA00D057B869BF81B0818CAC9AD642C111F0F9F8
+  findings:
+    - id: PERF-CWV-001
+      status: open
+      evidence:
+        - current source and generated-output review still contains no field or repeatable lab measurements for LCP, INP, or CLS
+  evidence:
+    - current Google Search Central documentation reviewed for the SEO Starter Guide, noindex, sitemaps, Event structured data, and page experience
+    - fresh corepack pnpm run build passed after an initial sandbox-only filesystem denial
+    - corepack pnpm run test:generated passed 12 tests
+    - generated inventory inspected 44 route index files: no missing title, description, canonical, html lang, single h1, or main landmark; no duplicate titles or descriptions
+    - generated inventory inspected 112 images with no missing alt attribute and 44 internal link targets with no unresolved generated route
+    - all generated routes emit noindex, follow; robots.txt allows crawling; the freshly generated sitemap has no loc or image entries
+    - structured data is intentionally suppressed while noindex is active; source inspection confirms Event name, startDate, location, image, URL, attendance mode, and status generation for the indexed state
+  result: No additional Google SEO defect was confirmed in the reviewed local scope beyond the already-open lack of measured Core Web Vitals evidence. The current dirty-worktree sitemap change aligns the noindex deployment with Google's sitemap guidance, but deployed and indexing-enabled behavior remain unverified.
+  pending:
+    - Run Search Console URL Inspection and deployed crawling after launch-domain approval.
+    - Validate indexing-enabled JSON-LD with Google's Rich Results Test before enabling indexing.
+    - Establish field or repeatable lab evidence for LCP, INP, and CLS.
+  next: Perform a launch-readiness verification on the approved canonical production domain before changing the global indexing flag.
+
+latest_whatsapp_open_graph_review:
+  id: REV-2026-08-20-01
+  requested_scope: Audit whether the site emits metadata that WhatsApp uses for link previews.
+  actual_scope:
+    targets:
+      - index.html
+      - src/app/config/seo-data.json
+      - src/app/config/seo.ts
+      - scripts/generate-route-html.mjs
+      - tests/generated-output.test.mjs
+      - fresh dist/**/index.html output
+    axes: [SEO]
+    included:
+      - Open Graph required properties: og:title, og:type, og:image, og:url
+      - recommended share-preview properties: og:description, og:locale, og:site_name
+      - absolute HTTPS URLs, canonical-to-og:url equality, and emitted social-image presence
+    excluded:
+      - deployed Cloudflare response headers and WhatsApp's external crawler fetch
+      - Twitter Cards, structured data, visual card appearance, and editorial-copy quality
+  baseline:
+    commit: 545ae9f1
+    worktree: clean before the required review-state update
+  evidence:
+    - source inspection at src/app/config/seo.ts:638-660 and scripts/generate-route-html.mjs:30-84
+    - fresh corepack pnpm run build passed on 2026-08-20
+    - corepack pnpm run test:generated passed 11 tests on fresh output
+    - reproducible generated-HTML audit inspected 44 public route files with no missing required or recommended Open Graph properties, no non-HTTPS og:url or og:image values, no canonical-to-og:url mismatch, and no missing emitted social image
+  result: All 44 generated public routes emit the Open Graph metadata WhatsApp needs for previews. Each uses og:type=website and the absolute 1200x630 JPEG social card, with matching canonical and og:url values. Local output does not prove WhatsApp can fetch the deployed URL.
+  pending:
+    - Verify a deployed production URL with WhatsApp's sharing debugger or an actual WhatsApp message after deployment.
+  next: If preview-card behavior is reported as incorrect in WhatsApp, inspect the deployed route and social-image response rather than changing the local metadata generator.
+
+latest_deployed_eventos_route_review:
+  id: REV-2026-08-20-02
+  requested_scope: Investigate metadata problems at https://fak-kendo.pages.dev/eventos/.
+  actual_scope:
+    targets:
+      - deployed https://fak-kendo.pages.dev/eventos/
+      - deployed https://fak-kendo.pages.dev/eventos/pasados/
+      - deployed https://fak-kendo.pages.dev/eventos/2026-08-08-examen/
+      - src/app/config/seo.ts
+      - scripts/generate-route-html.mjs
+      - generated dist/_redirects
+    axes: [SEO]
+    included:
+      - HTTP status and presence of Open Graph required properties
+      - generated route and redirect coverage for the /eventos/ directory URL
+    excluded:
+      - event-detail and archive metadata quality beyond presence
+      - WhatsApp cache state, visual share-card rendering, and implementation changes
+  baseline:
+    commit: 545ae9f1
+    worktree: review-state update only
+  findings:
+    - id: SEO-EVENTOS-ROOT-001
+      level: STRUCTURAL
+      axis: SEO
+      status: open
+      target: https://fak-kendo.pages.dev/eventos/
+      problem: The directory-level Spanish events URL returns HTTP 404 and consequently emits none of the four Open Graph properties WhatsApp requires.
+      fix: Add an explicit permanent redirect from /eventos/ to the intended public destination, currently /eventos/pasados/, and add a generated-output regression assertion.
+      cost_of_deferring: Links shared with the directory URL cannot produce a valid WhatsApp preview and lead visitors to a missing page.
+      evidence:
+        - read-only deployed comparison on 2026-08-20: /eventos/ returned 404 with no og:title, og:type, og:image, or og:url
+        - /eventos/pasados/ and /eventos/2026-08-08-examen/ returned 200 and all four properties
+        - src/app/config/seo.ts:335-343 generates redirects only for event aliases
+        - fresh dist/_redirects contains only event-alias redirect entries
+  result: The reported metadata problem is caused by a missing route or redirect, not a malformed Open Graph implementation on existing public event routes.
+  pending:
+    - Owner confirmation that /eventos/pasados/ is the intended permanent destination for /eventos/.
+  next: Implement the explicit redirect and its regression test after destination approval.
+
+latest_deployed_whatsapp_metadata_inventory:
+  id: REV-2026-08-20-03
+  requested_scope: Audit the reported WhatsApp metadata problem across all deployed pages.
+  actual_scope:
+    targets:
+      - all 44 URLs declared in deployed https://fak-kendo.pages.dev/sitemap.xml
+      - deployed https://fak-kendo.pages.dev/eventos/
+      - deployed https://fak-kendo.pages.dev/en/events/
+      - deployed Open Graph social image
+    axes: [SEO]
+    included:
+      - HTTP status
+      - required Open Graph properties: og:title, og:type, og:image, og:url
+      - recommended Open Graph properties: og:description, og:locale, og:site_name
+      - canonical-to-og:url equality and public social-image availability
+    excluded:
+      - URLs outside the sitemap except the two shareable event-directory entry points
+      - WhatsApp cache state, visual card appearance, and content-quality review
+  baseline:
+    deployed_at: 2026-08-20
+    inventory: deployed sitemap with 44 URLs plus two event-directory URLs
+  findings:
+    - id: SEO-EVENTOS-ROOT-001
+      status: open
+      evidence:
+        - the sitemap audit confirms the same failure for both /eventos/ and /en/events/
+  evidence:
+    - read-only deployed audit inspected 46 URLs: 44 sitemap URLs and two event-directory URLs
+    - all 44 sitemap URLs returned HTTP 200 and emitted every included Open Graph property, with canonical equal to og:url
+    - /eventos/ and /en/events/ each returned HTTP 404 and emitted none of the included Open Graph properties
+    - https://fak-kendo.pages.dev/images/social/kendo-social-card-20260812.jpg returned HTTP 200 with Content-Type image/jpeg
+    - https://fak-kendo.pages.dev/eventos/pasados/? returned HTTP 200; all included properties were present and both canonical and og:url normalized to https://fak-kendo.pages.dev/eventos/pasados/
+  result: The deployed sitemap inventory has complete WhatsApp-relevant Open Graph metadata. The only confirmed failures are the unimplemented Spanish and English event-directory URLs, which are outside the sitemap and return 404.
+  pending:
+    - Owner confirmation of the desired permanent redirect destinations for both directory URLs.
+  next: Add redirects for /eventos/ and /en/events/ to their respective archive pages, with regression coverage, after owner approval.
+
+latest_whatsapp_preview_screenshot_followup:
+  id: REV-2026-08-20-04
+  requested_scope: Diagnose the bare-domain WhatsApp previews shown for /eventos/pasados/ and /eventos/.
+  actual_scope:
+    targets:
+      - deployed https://fak-kendo.pages.dev/eventos/pasados/
+      - deployed https://fak-kendo.pages.dev/eventos/
+      - deployed Open Graph social image
+    axes: [SEO]
+    included:
+      - responses served to Meta and WhatsApp-style crawler user agents
+      - response status, Open Graph property presence, and social-image availability
+    excluded:
+      - Meta's private preview cache, WhatsApp client rendering, and implementation changes
+  baseline:
+    deployed_at: 2026-08-20
+  evidence:
+    - facebookexternalhit/1.1 and WhatsApp/2.24.0 each received HTTP 200 and og:title, og:image, and og:url from /eventos/pasados/
+    - both crawler user agents received HTTP 404 and no Open Graph metadata from /eventos/
+    - facebookexternalhit/1.1 received HTTP 200 and Content-Type image/jpeg from the social-card URL
+  result: The current archive response is consumable by Meta-style crawlers. The screenshot's bare preview for that URL is consistent with stale WhatsApp or Meta preview-cache data, but the cache state cannot be inspected from this repository. The /eventos/ preview is expected to fail because that URL remains 404.
+  pending:
+    - Request a fresh scrape for /eventos/pasados/ in Meta's Sharing Debugger, then send a new WhatsApp message to confirm the refreshed card.
+    - Owner approval to redirect /eventos/ and /en/events/.
+  next: Treat a bare archive preview that persists after a fresh Meta scrape as an external-platform investigation; do not change the verified local Open Graph generator without new evidence.
+
+latest_deployed_crawl_seo_review:
+  id: REV-2026-08-17-02
+  requested_scope: Summarize problems in the supplied deployed crawl and identify implementable improvements, accepting noindex as expected.
+  actual_scope:
+    targets:
+      - supplied Screaming Frog-style CSV crawl of https://fak-kendo.pages.dev/
+      - src/app/config/seo-data.json
+      - src/app/config/seo.ts
+      - scripts/generate-route-html.mjs
+      - src/app/data/calendarEvents.ts
+      - src/app/components/HeroSection.tsx
+    axes: [SEO, PERF]
+    included:
+      - HTTP status, required metadata, canonical, language, titles and descriptions
+      - duplicate event metadata, sitemap/noindex consistency, internal-link counts, and crawled image weight
+    excluded:
+      - visual design, editorial fact checking, Search Console, field Core Web Vitals, and deployed response headers not present in the crawl
+  baseline:
+    commit: 458cdc17
+    worktree: clean
+    crawl_timestamp: 2026-08-17
+  findings:
+    - id: SEO-SITEMAP-001
+      level: STRUCTURAL
+      axis: SEO
+      status: open
+      target: scripts/generate-route-html.mjs
+      problem: The generated sitemap includes routes whenever they have a canonical URL, even while every route emits noindex.
+      fix: Include only routes whose effective robots policy is indexable, while retaining canonicals on noindex pages if desired.
+      cost_of_deferring: The sitemap and page directives send conflicting crawl/indexing signals during the intentional noindex period.
+      evidence:
+        - deployed sitemap is 12498 bytes while all 44 crawled HTML pages are noindex
+        - sitemap generation filters on canonicalUrl rather than effective robots policy
+    - id: SEO-EVENT-META-001
+      level: SMELL
+      axis: SEO
+      status: open
+      target: src/app/config/seo.ts:282
+      problem: Recurring events reuse generic titles and summaries, producing duplicate titles and descriptions across distinct URLs.
+      fix: Generate event metadata with localized date and, where useful, location while keeping visible event names unchanged.
+      cost_of_deferring: Event pages remain difficult to distinguish in search previews, shares, and crawlers after indexing is enabled.
+      evidence:
+        - seven Spanish Examination titles and seven English Examination titles are duplicated
+        - repeated generic examination and tournament descriptions occur across multiple routes
+    - id: SEO-EVENT-I18N-001
+      level: SMELL
+      axis: SEO
+      status: open
+      target: src/app/data/calendarEvents.ts:63
+      problem: The English Gasshuku route reuses the Spanish title and long Spanish summary, and the summary is cut mechanically at 160 characters.
+      fix: Supply localized event summaries and normalize/truncate metadata at a sentence or word boundary.
+      cost_of_deferring: The English route exposes mismatched-language and visibly truncated metadata.
+      evidence:
+        - both Gasshuku language routes have the same Spanish 160-character description
+        - both descriptions measure 977 pixels in the supplied crawl
+    - id: SEO-TITLE-WIDTH-001
+      level: POLISH
+      axis: SEO
+      status: open
+      target: src/app/config/seo.ts:301
+      problem: Six event titles exceed the crawler's approximate 580-pixel display threshold.
+      fix: Use a shorter site-name suffix for event metadata or a route-specific compact title template.
+      cost_of_deferring: Some event titles may be truncated in result snippets and link previews.
+      evidence:
+        - six crawled event titles measure 608 to 770 pixels
+    - id: PERF-SOCIAL-IMAGE-001
+      level: POLISH
+      axis: PERF
+      status: open
+      target: src/app/config/seo-data.json:24
+      problem: Crawlers fetch the 848570-byte original hero JPEG through page metadata even though the rendered hero uses responsive WebP files.
+      fix: Create an optimized social-preview image and reference it from SEO metadata without changing the approved visible hero.
+      cost_of_deferring: Social crawlers and audits transfer substantially more image data than necessary; this is not evidence of an LCP regression.
+      evidence:
+        - supplied crawl reports the original hero JPEG at 848570 bytes
+        - HeroSection renders responsive WebP sources
+  evidence:
+    - parsed all 103 crawl rows and separately evaluated 44 HTML rows
+    - all 103 resources returned 200 OK
+    - all HTML rows contain title, meta description, H1, canonical, and language
+    - inspected current SEO generation and event metadata sources at commit 458cdc17
+  result: The deployed crawl has no broken responses or missing basic metadata; the implementable work is sitemap-policy consistency, unique/localized event metadata, compact event titles, and a lighter social image.
+  pending:
+    - Owner decision whether intentional noindex should remain nofollow or become follow.
+    - Decide whether low event-page inlink counts warrant a navigation/content change after indexation is planned.
+  next: Implement the non-visual SEO generation fixes as one bounded phase after owner selects the robots follow policy.
+
+latest_rendering_seo_performance_review:
+  id: REV-2026-08-17-01
+  requested_scope: Determine whether the site applies prerendering/indexation, Core Web Vitals optimization, technical SEO, and SEO troubleshooting practices.
+  actual_scope:
+    targets:
+      - src/app/config/seo-data.json
+      - src/app/config/seo.ts
+      - src/entry-server.tsx
+      - src/main.tsx
+      - scripts/generate-route-html.mjs
+      - public/robots.txt
+      - tests/generated-output.test.mjs
+      - generated dist route HTML, sitemap.xml, and _redirects
+    axes: [SEO, PERF]
+    included:
+      - SSG/prerender and hydration architecture
+      - robots directives, canonical URLs, hreflang, structured-data generation, sitemap, 404 output, and event redirects
+      - source-level LCP image prioritization, responsive images, lazy loading, and bundle output
+      - presence or absence of measured LCP, INP, and CLS evidence
+    excluded:
+      - deployed response status and redirect chains
+      - Google Search Console, CrUX, field data, crawl logs, and live index coverage
+      - a fresh Lighthouse or browser performance trace
+  baseline:
+    commit: b4516da7
+    worktree: clean before generated build artifacts
+  findings:
+    - id: SEO-INDEX-001
+      level: STRUCTURAL
+      axis: SEO
+      status: open_owner_policy
+      target: src/app/config/seo.ts:158
+      problem: Global indexing is deliberately disabled, so every generated route emits noindex, nofollow, structured data is suppressed, and the generated sitemap contains no URL entries.
+      fix: After owner approval of the canonical domain, legal identity, and launch policy, enable the global and applicable event indexing flags and verify generated plus deployed output.
+      cost_of_deferring: Search engines can crawl the public files but are explicitly instructed not to index any site page.
+      evidence:
+        - SITE_INDEXING_ENABLED is false
+        - generated-output tests assert noindex, no structured data, and no sitemap loc entries
+        - corepack pnpm run build passed and regenerated all configured routes
+      introduced_in: REV-2026-08-17-01
+    - id: PERF-CWV-001
+      level: SMELL
+      axis: PERF
+      status: open
+      target: repository performance verification
+      problem: The implementation contains LCP-oriented image optimizations, but no recorded automated or field measurement establishes current LCP, INP, or CLS values.
+      fix: Establish repeatable lab budgets and collect field data after deployment, then diagnose regressions per route and device class.
+      cost_of_deferring: Core Web Vitals compliance and regressions remain assumptions rather than measured behavior.
+      evidence:
+        - route image preloads use fetchpriority high and responsive source metadata
+        - primary images use eager/high priority while secondary images use lazy loading
+        - no Lighthouse, web-vitals, CrUX, or PerformanceObserver checks found in the reviewed scope
+      introduced_in: REV-2026-08-17-01
+  evidence:
+    - corepack pnpm run build passed outside the filesystem sandbox, including client build, SSR bundle, prerendered route HTML, 404.html, sitemap.xml, and _redirects
+    - corepack pnpm run test:generated passed 6 tests before the clean rebuild
+    - inspected generated-route and metadata source paths at commit b4516da7
+  result: SSG/prerender and most technical SEO mechanisms are implemented and build successfully, but public indexation is intentionally paused and Core Web Vitals are optimized only at source level, not currently demonstrated by measurements.
+  pending:
+    - owner launch/indexing approval
+    - deployed crawl/index evidence and repeatable LCP, INP, and CLS measurements
+  next: Run a production performance/indexability audit after the owner approves indexing and the canonical production domain.
+
+latest_stale_coverage_reconciliation:
+  id: REV-2026-08-16-01
+  requested_scope: Reconcile the technical and visual coverage marked stale since 2026-08-12.
+  actual_scope:
+    targets:
+      - scripts/sync-calendar-events.mjs
+      - scripts/sync-event-galleries.mjs
+      - scripts/correct-calendar-history.mjs
+      - scripts/correct-calendar-history-range.mjs
+      - src/app/components/EventPage.tsx
+      - src/app/components/CalendarSection.tsx
+      - src/app/components/calendar/CalendarEventCard.tsx
+      - src/app/components/GallerySection.tsx
+      - src/app/components/HistoricalEventGallery.tsx
+      - src/app/components/Lightbox.tsx
+      - generated routes and the existing 32-snapshot visual matrix
+    axes: [ARCH, A11Y, RESPONSIVE]
+    included:
+      - calendar, gallery, historical-publication, and workflow contracts
+      - generated-route behavior, geometry, reachability, and lightbox lifecycle
+      - comparison against the existing approved Windows screenshots without updating baselines
+    excluded:
+      - production deployment and external Calendar, Drive, GitHub Actions, or Cloudflare execution
+      - SEO, performance, and source-wide architecture review
+      - approval of visual changes or snapshot regeneration
+  baseline:
+    commit: 504fc8ff
+    worktree: clean before generated verification artifacts
+  findings:
+    - id: VIS-REG-001
+      level: STRUCTURAL
+      axis: RESPONSIVE
+      status: open
+      target: tests/e2e/visual-regression.spec.ts-snapshots
+      problem: Seven current renders differ materially from the approved snapshot baseline: Event at all four viewports, Gallery at both mobile viewports, and Home at tablet.
+      fix: Attribute every changed region to an explicitly approved visual requirement; preserve or correct the implementation as directed, then update only owner-approved baselines.
+      cost_of_deferring: The structural suites remain green, but the repository cannot claim current visual-baseline coverage for those seven surfaces.
+      evidence:
+        - corepack pnpm run test:visual: 25 passed, 7 failed
+        - inspected expected/actual diff artifacts for all seven failures
+      introduced_in: REV-2026-08-16-01
+  evidence:
+    - corepack pnpm run lint passed with zero warnings and errors
+    - corepack pnpm run test:sync-directed passed 59 tests
+    - corepack pnpm run build passed, including SSR and generated route HTML
+    - corepack pnpm run test:e2e passed 209 tests
+    - corepack pnpm run test:visual passed 25 and failed 7 without updating snapshots
+  result: Synchronization and UI behavior coverage is current at 504fc8ff; visual coverage remains stale only for the seven named route/viewport surfaces. The other 25 screenshots, including all four lightbox snapshots, match.
+  pending:
+    - Owner attribution and approval for the seven visual differences before any baseline update.
+  next: Review the seven expected, actual, and diff image triplets against the intended Event, mobile Gallery, and Home tablet changes.
 
 latest_calendar_resilience_script_review:
   id: REV-2026-08-14-01
@@ -207,8 +643,8 @@ stale_coverage_notices:
       - scripts/correct-calendar-history-range.mjs
       - related workflows, directed tests, and visual baselines
     reason: Changes committed on 2026-08-12 alter historical-gallery publication, correction workflow, event actions, calendar-card sharing, lightbox presentation, and approved visual snapshots after the prior recorded baselines.
-    status: stale_pending_targeted_review
-    limitation: Documentation reconciliation is not a technical or visual verification of these changes.
+    status: partially_reconciled_by_REV-2026-08-16-01
+    limitation: Synchronization and UI behavior are current at 504fc8ff; visual coverage remains stale for Event at four viewports, Gallery at two mobile viewports, and Home at tablet pending owner attribution and approval.
 
 design_source_status:
   status: obsolete_pending_recreation
@@ -3006,12 +3442,16 @@ latest_spa_mobile_review:
     - id: SMELL-A11Y-005
       level: SMELL
       axis: A11Y
-      status: open_decision_required
+      status: resolved
       target: src/styles/globals.css root font size and text-only enlargement behavior
       problem: The root font size is fixed at 16px and the layouts are not resilient when only that value is doubled, even though the verified full-page reflow equivalent remains reachable.
       fix: First decide whether text-only enlargement and user default-font preferences are an explicit product requirement beyond the verified full-page zoom path; only then test native browser mechanisms and choose between removing the fixed root size, adding a supported text-scale mode, or accepting zoom as the supported mechanism.
       cost_of_deferring: Users who prefer text-only scaling instead of full-page zoom may encounter clipped content or horizontal overflow, but this is not currently proven to violate WCAG 1.4.4 because a supported zoom mechanism can be sufficient.
       evidence: [src/styles/globals.css root --font-size 16px, temporary root 32px measurements at 768x1024 and 1366x768, W3C Understanding SC 1.4.4]
+      resolution:
+        resolved_at: 2026-08-16
+        summary: Full-page browser zoom is the supported 200-percent enlargement mechanism; text-only enlargement is not a product requirement.
+        checks: [owner-confirmed native Microsoft Edge 200-percent zoom validation, automated reflow-equivalent reachability coverage]
 
 phase_zero_spa_mobile:
   status: responsive_problem_understood_and_fixed
@@ -3080,7 +3520,7 @@ phase_one_responsive_contract:
     approved: The inspected Affiliates 768x1024 rendered result and replacement of its single visual baseline.
 
 phase_two_text_resize:
-  status: problem_explained_decision_pending
+  status: completed_with_full_page_zoom_policy
   requested_scope: Understand the 200-percent text-enlargement concern before any approval or implementation.
   actual_scope:
     targets: [src/styles/globals.css, Home, Calendar, Gallery, Affiliates]
@@ -3100,9 +3540,9 @@ phase_two_text_resize:
     - No connected Chrome browser was available for a second native-zoom attempt in this session.
     - Chromium CDP Emulation.setPageScaleFactor was rejected as evidence: at factor 2 it reduced only the visual viewport to 683x384, kept the 1366x768 layout viewport and min-width:1280 media query active, and reported page zoom 1.
   decision_gate:
-    - Confirm native 200-percent zoom in at least one supported desktop browser before claiming WCAG conformance.
-    - Decide separately whether the product will support text-only enlargement or user-configured default font sizes as an additional accessibility objective.
-    - No layout or typography change is approved in this phase.
+    - Owner confirmed native Microsoft Edge zoom at 200 percent on 2026-08-16.
+    - Full-page zoom is supported; text-only enlargement and user-configured default font sizes are outside the current product requirement.
+    - No layout or typography change is required for this decision.
 
 phase_three_lightbox_isolation:
   status: completed_and_owner_approved

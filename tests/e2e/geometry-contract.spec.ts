@@ -16,12 +16,14 @@ const CSS_PIXEL_TOLERANCE = 0.51;
 
 function getPageDesign(path: string): PageDesign {
   if (path === "/" || path === "/en/") return "home";
-  if (path === "/calendario/" || path === "/en/calendar/") return "calendar";
+  if (path === "/eventos/" || path === "/en/events/") return "calendar";
   if (path === "/galeria/" || path === "/en/gallery/") return "gallery";
   if (path === "/afiliados/" || path === "/en/affiliates/") return "affiliates";
   if (
-    path.startsWith("/eventos/pasados/") ||
-    path.startsWith("/en/events/past/")
+    path === "/eventos/pasados/" ||
+    path.startsWith("/eventos/pasados/pagina/") ||
+    path === "/en/events/past/" ||
+    path.startsWith("/en/events/past/page/")
   ) {
     return "pastEvents";
   }
@@ -222,6 +224,11 @@ test.describe("all generated routes preserve the desktop shell contract", () => 
       expect(geometry.footerBottom).toBeLessThanOrEqual(
         SHELL_CONTRACT.desktopViewport.height + 1,
       );
+      expectCssPixels(
+        geometry.footerBottom,
+        geometry.document.clientHeight,
+        "footer bottom without document scroll",
+      );
       expect(geometry.primaryScrollHeight).toBeLessThanOrEqual(
         geometry.primaryClientHeight + 1,
       );
@@ -254,11 +261,21 @@ test.describe("event details preserve desktop document flow", () => {
       const geometry = await page.evaluate(() => {
         const root = document.documentElement;
         const section = document.querySelector("main > section");
+        const contentWrapper = section?.querySelector(":scope > div");
         const footer = document.querySelector("footer");
+        const contentWrapperStyles = contentWrapper
+          ? getComputedStyle(contentWrapper)
+          : null;
         return {
           hasHorizontalOverflow: root.scrollWidth > root.clientWidth + 1,
+          clientHeight: root.clientHeight,
+          scrollHeight: root.scrollHeight,
           sectionScrollHeight: section?.scrollHeight ?? 0,
           sectionClientHeight: section?.clientHeight ?? 0,
+          contentWrapperPaddingInline: {
+            left: Number.parseFloat(contentWrapperStyles?.paddingLeft ?? "0"),
+            right: Number.parseFloat(contentWrapperStyles?.paddingRight ?? "0"),
+          },
           footerBottom: footer?.getBoundingClientRect().bottom ?? 0,
         };
       });
@@ -267,7 +284,131 @@ test.describe("event details preserve desktop document flow", () => {
       expect(geometry.sectionScrollHeight).toBeLessThanOrEqual(
         geometry.sectionClientHeight + 1,
       );
-      expect(geometry.footerBottom).toBeGreaterThan(0);
+      expectCssPixels(
+        geometry.contentWrapperPaddingInline.left,
+        0,
+        "event desktop content wrapper left padding",
+      );
+      expectCssPixels(
+        geometry.contentWrapperPaddingInline.right,
+        0,
+        "event desktop content wrapper right padding",
+      );
+      if (geometry.scrollHeight > geometry.clientHeight + 1) {
+        expect(
+          geometry.footerBottom,
+          "a scrolling event footer must extend beyond the first viewport",
+        ).toBeGreaterThan(geometry.clientHeight);
+        expectCssPixels(
+          geometry.footerBottom,
+          geometry.scrollHeight,
+          "scrolling event footer bottom",
+        );
+      } else {
+        expectCssPixels(
+          geometry.footerBottom,
+          geometry.clientHeight,
+          "event footer bottom without document scroll",
+        );
+      }
+    });
+  }
+});
+
+const EVENT_ACTION_SELECTOR =
+  "main a[aria-label*='ubicación'], main a[aria-label*='detalles']";
+
+async function getVisibleEventActionSizes(page: Page) {
+  return page.locator(EVENT_ACTION_SELECTOR).evaluateAll((elements) =>
+    elements
+      .map((element) => {
+        const rect = element.getBoundingClientRect();
+        return { width: rect.width, height: rect.height };
+      })
+      .filter(({ width, height }) => width > 0 && height > 0),
+  );
+}
+
+async function expectEventActionMinimum(page: Page, minimum: number) {
+  let controls: Array<{ width: number; height: number }> = [];
+  await expect
+    .poll(async () => {
+      controls = await getVisibleEventActionSizes(page);
+      return controls.length;
+    })
+    .toBeGreaterThan(0);
+  for (const control of controls) {
+    expect(control.width).toBeGreaterThanOrEqual(minimum);
+    expect(control.height).toBeGreaterThanOrEqual(minimum);
+  }
+}
+
+test.describe("event actions use mobile-first touch geometry", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  for (const path of ["/", "/eventos/"]) {
+    test(`${path} keeps actions at least 44px on mobile`, async ({ page }) => {
+      await preparePage(page, path);
+      await expectEventActionMinimum(page, 44);
+    });
+  }
+});
+
+test.describe("event actions preserve touch geometry on desktop", () => {
+  test.use({ viewport: SHELL_CONTRACT.desktopViewport, hasTouch: true });
+
+  for (const path of ["/", "/eventos/"]) {
+    test(`${path} keeps actions at least 44px with a coarse pointer`, async ({
+      page,
+    }) => {
+      await preparePage(page, path);
+      await expectEventActionMinimum(page, 44);
+    });
+  }
+});
+
+test.describe("event actions preserve hybrid-device geometry", () => {
+  test.use({ viewport: SHELL_CONTRACT.desktopViewport, hasTouch: true });
+
+  for (const path of ["/", "/eventos/"]) {
+    test(`${path} keeps actions at least 44px with fine and coarse pointers`, async ({
+      page,
+    }) => {
+      const cdpSession = await page.context().newCDPSession(page);
+      await cdpSession.send("Emulation.setEmulatedMedia", {
+        features: [{ name: "pointer", value: "fine" }],
+      });
+      await preparePage(page, path);
+      await expectEventActionMinimum(page, 44);
+    });
+  }
+});
+
+test.describe("event actions preserve compact fine-pointer geometry", () => {
+  test.use({ viewport: SHELL_CONTRACT.desktopViewport });
+
+  for (const path of ["/", "/eventos/"]) {
+    test(`${path} keeps actions at 32px with an exclusively fine pointer`, async ({
+      page,
+    }) => {
+      const cdpSession = await page.context().newCDPSession(page);
+      await cdpSession.send("Emulation.setEmulatedMedia", {
+        features: [
+          { name: "pointer", value: "fine" },
+          { name: "any-pointer", value: "fine" },
+        ],
+      });
+      await preparePage(page, path);
+      let controls: Array<{ width: number; height: number }> = [];
+      await expect
+        .poll(async () => {
+          controls = await getVisibleEventActionSizes(page);
+          return controls.length;
+        })
+        .toBeGreaterThan(0);
+      for (const control of controls) {
+        expectCssPixels(control.height, 32, "compact event action height");
+      }
     });
   }
 });

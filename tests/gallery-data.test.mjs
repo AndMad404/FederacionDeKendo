@@ -35,19 +35,16 @@ test("gallery asset versions match the current file contents", async () => {
   }
 });
 
-test("gallery SEO image and preload versions match their current assets", async () => {
-  const getHash = async (assetPath) =>
-    createHash("sha256")
-      .update(await readFile(path.join("public", assetPath)))
-      .digest("hex")
-      .slice(0, 12);
+test("gallery SEO image and preload use the current WebP asset", () => {
+  const seo = JSON.parse(seoData);
+  const galleryImage = `/images/gallery/kendo-gallery-01.webp?v=${assetHashes["/images/gallery/kendo-gallery-01.webp"]}`;
 
-  assert.match(
-    seoData,
-    new RegExp(
-      `/images/gallery/kendo-gallery-01\\.jpg\\?v=${await getHash("/images/gallery/kendo-gallery-01.jpg")}`,
-    ),
-  );
+  for (const route of ["/galeria/", "/en/gallery/"]) {
+    assert.equal(seo.routes[route].image, galleryImage);
+    assert.equal(seo.routes[route].imageType, "image/webp");
+    assert.equal(seo.routes[route].preloadImage.href, galleryImage);
+  }
+
   assert.match(
     seoData,
     new RegExp(

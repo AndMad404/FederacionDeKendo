@@ -9,7 +9,10 @@ import {
   getEventPath,
 } from "../utils/eventRoutes";
 import { getLanguageFromPathname, type Language } from "./i18n";
-import { getLocalizedEvent } from "../utils/localizedEvents";
+import {
+  getEventTranslationStatus,
+  getLocalizedEvent,
+} from "../utils/localizedEvents";
 import { getEventEndDate } from "../utils/calendarEvents";
 import type { RouteComponent } from "./routeTypes";
 
@@ -35,6 +38,10 @@ interface SeoData {
   defaultImageAlt: string;
   defaultImageWidth: number;
   defaultImageHeight: number;
+  author: {
+    name: string;
+    url: string;
+  };
   organization: {
     sport: string;
     areaServed?: string;
@@ -46,7 +53,7 @@ export interface RouteMeta {
   path: string;
   language: Language;
   locale: "es_CR" | "en_US";
-  alternatePath: string;
+  alternatePath?: string;
   component: RouteComponent;
   title: string;
   description: string;
@@ -83,7 +90,7 @@ const ROUTE_STRUCTURED_DATA_BUILDERS: Partial<
 export interface RouteSeoPayload {
   title: string;
   description: string;
-  robots: "index, follow" | "noindex, nofollow";
+  robots: "index, follow" | "noindex, follow" | "noindex, nofollow";
   canonicalUrl: string | null;
   siteName: string;
   locale: string;
@@ -110,8 +117,14 @@ function assertSeoData(value: unknown): asserts value is SeoData {
   }
 
   const data = value as Partial<SeoData>;
-  if (!data.siteUrl || !data.siteName || !data.routes) {
-    throw new Error("SEO config is missing siteUrl, siteName, or routes.");
+  if (
+    !data.siteUrl ||
+    !data.siteName ||
+    !data.author?.name ||
+    !data.author.url ||
+    !data.routes
+  ) {
+    throw new Error("SEO config is missing site identity, author, or routes.");
   }
 
   const validComponents = new Set<RouteComponent>([
@@ -161,10 +174,11 @@ const DEFAULT_SITE_DESCRIPTION = DATA.defaultDescription;
 const DEFAULT_SOCIAL_IMAGE_ALT = DATA.defaultImageAlt;
 const DEFAULT_SOCIAL_IMAGE_WIDTH = DATA.defaultImageWidth;
 const DEFAULT_SOCIAL_IMAGE_HEIGHT = DATA.defaultImageHeight;
+const AUTHOR = DATA.author;
 const ROUTE_META = DATA.routes;
 const CALENDAR_META: Record<Language, RouteMeta> = {
-  es: ROUTE_META["/calendario/"],
-  en: ROUTE_META["/en/calendar/"],
+  es: ROUTE_META["/eventos/"],
+  en: ROUTE_META["/en/events/"],
 };
 
 function normalizeRoutePath(pathname: string) {
@@ -177,6 +191,124 @@ function absoluteUrl(path: string) {
   if (/^https?:\/\//.test(path)) return path;
 
   return path === "/" ? `${SITE_URL}/` : `${SITE_URL}${path}`;
+}
+
+function formatEventDate(date: string, language: Language) {
+  return new Intl.DateTimeFormat(language === "en" ? "en-US" : "es-CR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${date}T00:00:00Z`));
+}
+
+function normalizeDescription(text: string) {
+  return text
+    .replace(/(?:^|\s)\*\s+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function ensureTerminalPunctuation(text: string) {
+  const normalized = normalizeDescription(text);
+  return /[.!?…]$/u.test(normalized) ? normalized : `${normalized}.`;
+}
+
+function getFirstSentence(text?: string) {
+  if (!text) return undefined;
+
+  const normalized = normalizeDescription(text);
+  if (!normalized) return undefined;
+
+  const sentence = normalized.match(/^.*?[.!?…](?=\s|$)/u)?.[0] ?? normalized;
+  return ensureTerminalPunctuation(sentence);
+}
+
+function getShortVenue(location?: string) {
+  if (!location) return undefined;
+
+  return normalizeDescription(location.split(",", 1)[0]);
+}
+
+// Dynamic event pages need a dependable minimum viable description even when
+// Calendar provides little or no editorial copy. Static routes are curated
+// separately and intentionally do not share this character limit.
+const EVENT_DESCRIPTION_MAX_LENGTH = 155;
+
+interface EventMetaDescriptionInput {
+  event: (typeof CALENDAR_EVENTS)[number];
+  localizedEvent: (typeof CALENDAR_EVENTS)[number];
+  language: Language;
+  now?: string;
+  overrides?: Partial<Record<Language, string>>;
+}
+
+export function buildEventMetaDescription({
+  event,
+  localizedEvent,
+  language,
+  overrides,
+}: EventMetaDescriptionInput) {
+  const context = `${event.id} (${language})`;
+  const title = normalizeDescription(localizedEvent.title);
+  if (!title) throw new Error(`${context}: event name is required.`);
+  if (!event.date) throw new Error(`${context}: event date is required.`);
+
+  const override = overrides?.[language];
+  if (override !== undefined) {
+    if (
+      override !== normalizeDescription(override) ||
+      !/[.!?…]$/u.test(override)
+    ) {
+      throw new Error(`${context}: invalid editorial description override.`);
+    }
+    return override;
+  }
+
+  const english = language === "en";
+  const date = formatEventDate(event.date, language);
+  const summary = getFirstSentence(localizedEvent.summary);
+  const fallback = english
+    ? "View the official event details."
+    : "Consulta los detalles oficiales del evento.";
+  const time = normalizeDescription(event.startTime ?? "") || undefined;
+  const venue = getShortVenue(event.location);
+
+  const buildBase = (includeTime: boolean, includeVenue: boolean) => {
+    const optionalDetails = [
+      includeTime && time ? (english ? `at ${time}` : `a las ${time}`) : null,
+      includeVenue && venue ? (english ? `at ${venue}` : `en ${venue}`) : null,
+    ].filter(Boolean);
+    const connector = english ? ` on ${date}` : ` el ${date}`;
+    return `${title}${connector}${optionalDetails.length ? ` ${optionalDetails.join(" ")}` : ""}.`;
+  };
+
+  const variants = [
+    buildBase(true, true),
+    buildBase(true, false),
+    buildBase(false, false),
+  ];
+
+  for (const base of variants) {
+    if (summary) {
+      const withSummary = `${base} ${summary}`;
+      if (withSummary.length <= EVENT_DESCRIPTION_MAX_LENGTH) {
+        return withSummary;
+      }
+    }
+
+    const withFallback = `${base} ${fallback}`;
+    if (withFallback.length <= EVENT_DESCRIPTION_MAX_LENGTH) {
+      return withFallback;
+    }
+  }
+
+  const requiredBase = variants[variants.length - 1];
+  if (requiredBase.length <= EVENT_DESCRIPTION_MAX_LENGTH) return requiredBase;
+
+  throw new Error(
+    `${context}: required event description exceeds 155 characters.`,
+  );
 }
 
 function buildGalleryStructuredData(
@@ -225,7 +357,7 @@ function createNotFoundMeta(language: Language): RouteMeta {
     imageAlt: DATA.defaultImageAlt,
     imageWidth: DATA.defaultImageWidth,
     imageHeight: DATA.defaultImageHeight,
-    imageType: "image/png",
+    imageType: "image/webp",
     schemaType: "WebPage",
     indexable: false,
     noindex: true,
@@ -239,12 +371,14 @@ export function getRouteMeta(pathname: string) {
   if (configuredRoute) return configuredRoute;
 
   const event = findEventByPathname(normalizedPath);
-  if (event)
-    return createEventRouteMeta(event, getLanguageFromPathname(pathname));
+  const language = getLanguageFromPathname(pathname);
+  if (event && getLocalizedEvent(event, language)) {
+    return createEventRouteMeta(event, language);
+  }
 
   return (
     getRouteManifest().find((route) => route.path === normalizedPath) ??
-    createNotFoundMeta(getLanguageFromPathname(pathname))
+    createNotFoundMeta(language)
   );
 }
 
@@ -258,11 +392,15 @@ export function getRouteManifest() {
   );
 
   return [
-    ...Object.values(ROUTE_META),
-    ...CALENDAR_EVENTS.flatMap((event) => [
-      createEventRouteMeta(event, "es"),
-      createEventRouteMeta(event, "en"),
-    ]),
+    ...Object.values(ROUTE_META).filter(
+      (route) => route.component !== "pastEvents",
+    ),
+    ...CALENDAR_EVENTS.flatMap((event) => {
+      const spanishRoute = createEventRouteMeta(event, "es");
+      return getEventTranslationStatus(event) === "valid"
+        ? [spanishRoute, createEventRouteMeta(event, "en")]
+        : [spanishRoute];
+    }),
     ...archiveRoutes,
     ...Array.from({ length: pastPageCount }, (_, index) =>
       createArchiveRouteMeta(index + 1, "en"),
@@ -271,12 +409,29 @@ export function getRouteManifest() {
 }
 
 export function getEventRedirects() {
-  return CALENDAR_EVENTS.flatMap((event) =>
-    (event.aliases ?? []).flatMap((alias) => [
-      { from: `/eventos/${alias}/`, to: getEventPath(event, "es") },
-      { from: `/en/events/${alias}/`, to: getEventPath(event, "en") },
-    ]),
-  );
+  return [
+    { from: "/calendario/", to: "/eventos/" },
+    { from: "/en/calendar/", to: "/en/events/" },
+    ...CALENDAR_EVENTS.flatMap((event) => {
+      const spanishPath = getEventPath(event, "es");
+      const englishPath = getEventPath(event, "en");
+      return [
+        ...(spanishPath !== `/eventos/${event.id}/`
+          ? [{ from: `/eventos/${event.id}/`, to: spanishPath }]
+          : []),
+        ...(getEventTranslationStatus(event) === "valid" &&
+        englishPath !== `/en/events/${event.id}/`
+          ? [{ from: `/en/events/${event.id}/`, to: englishPath }]
+          : []),
+        ...(event.aliases ?? []).flatMap((alias) => [
+          { from: `/eventos/${alias}/`, to: spanishPath },
+          ...(getEventTranslationStatus(event) === "valid"
+            ? [{ from: `/en/events/${alias}/`, to: englishPath }]
+            : []),
+        ]),
+      ];
+    }),
+  ];
 }
 
 function createEventRouteMeta(
@@ -285,21 +440,26 @@ function createEventRouteMeta(
 ): RouteMeta {
   const english = language === "en";
   const localizedEvent = getLocalizedEvent(event, language);
+  if (!localizedEvent) {
+    throw new Error(`Missing valid ${language} translation for ${event.id}.`);
+  }
   const calendarMeta = CALENDAR_META[language];
-  const description =
-    localizedEvent.summary ||
-    (english
-      ? `View the date, time, and details for ${localizedEvent.title}.`
-      : `Consulta fecha, horario y detalles de ${event.title}.`);
   return {
     path: getEventPath(event, language),
     language,
     locale: english ? "en_US" : "es_CR",
-    alternatePath: getEventPath(event, english ? "es" : "en"),
+    alternatePath:
+      english || getEventTranslationStatus(event) === "valid"
+        ? getEventPath(event, english ? "es" : "en")
+        : undefined,
     component: "event",
     eventId: event.id,
-    title: `${localizedEvent.title} | ${SITE_NAME}`,
-    description: description.slice(0, 160),
+    title: `${localizedEvent.title} — ${formatEventDate(event.date, language)} | ${SITE_NAME}`,
+    description: buildEventMetaDescription({
+      event,
+      localizedEvent,
+      language,
+    }),
     image: calendarMeta.image,
     imageAlt: calendarMeta.imageAlt,
     imageWidth: calendarMeta.imageWidth,
@@ -328,9 +488,9 @@ function createArchiveRouteMeta(
     title: english
       ? `Past events${page > 1 ? ` — page ${page}` : ""} | ${SITE_NAME}`
       : `Eventos pasados${page > 1 ? ` — página ${page}` : ""} | ${SITE_NAME}`,
-    description: english
-      ? "Historical archive of kendo tournaments, examinations, seminars, and activities."
-      : "Archivo histórico de torneos, exámenes, seminarios y actividades de kendo.",
+    description:
+      ROUTE_META[english ? "/en/events/past/" : "/eventos/pasados/"]
+        .description,
     image: calendarMeta.image,
     imageAlt: calendarMeta.imageAlt,
     imageWidth: calendarMeta.imageWidth,
@@ -346,6 +506,22 @@ function createArchiveRouteMeta(
 export function getRouteSitemapImageUrls(meta: RouteMeta) {
   if (meta.component === "gallery") {
     return GALLERY_IMAGES.map((image) => absoluteUrl(image.src));
+  }
+
+  if (meta.component === "home") {
+    return [
+      absoluteUrl("/images/hero/kendo-hero-formacion-960.webp?v=20260704-0120"),
+    ];
+  }
+
+  if (
+    meta.component === "calendar" ||
+    meta.component === "event" ||
+    meta.component === "pastEvents"
+  ) {
+    return [
+      absoluteUrl("/images/calendar/kendo-calendar-960.webp?v=20260723-1004"),
+    ];
   }
 
   return [getRouteImageUrl(meta)];
@@ -398,6 +574,7 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
     );
     if (event) {
       const localizedEvent = getLocalizedEvent(event, meta.language);
+      if (!localizedEvent) return null;
       const startDate = event.startTime
         ? `${event.date}T${event.startTime}:00-06:00`
         : event.date;
@@ -464,6 +641,11 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
         name: meta.title,
         description: meta.description,
         inLanguage: meta.language,
+        author: {
+          "@type": "Person",
+          name: AUTHOR.name,
+          url: AUTHOR.url,
+        },
         isPartOf: {
           "@id": websiteId,
         },
@@ -493,7 +675,11 @@ export function getRouteSeoPayload(meta: RouteMeta): RouteSeoPayload {
   return {
     title: meta.title,
     description: meta.description || DEFAULT_SITE_DESCRIPTION,
-    robots: noindex ? "noindex, nofollow" : "index, follow",
+    robots: noindex
+      ? meta.component === "notFound"
+        ? "noindex, nofollow"
+        : "noindex, follow"
+      : "index, follow",
     canonicalUrl:
       noindex && Boolean(meta.noindex) && !meta.canonicalWhileNoindex
         ? null
@@ -509,6 +695,10 @@ export function getRouteSeoPayload(meta: RouteMeta): RouteSeoPayload {
 export function getRouteHeadDescriptors(meta: RouteMeta): HeadDescriptor[] {
   const seo = getRouteSeoPayload(meta);
   const descriptors: HeadDescriptor[] = [
+    {
+      tag: "meta",
+      attributes: { name: "author", content: AUTHOR.name },
+    },
     {
       tag: "meta",
       attributes: { name: "description", content: seo.description },
@@ -567,6 +757,8 @@ export function getRouteHeadDescriptors(meta: RouteMeta): HeadDescriptor[] {
 
   const spanishPath = meta.language === "es" ? meta.path : meta.alternatePath;
   const englishPath = meta.language === "en" ? meta.path : meta.alternatePath;
+  if (!spanishPath) return descriptors;
+
   descriptors.push(
     {
       tag: "link",
@@ -580,19 +772,22 @@ export function getRouteHeadDescriptors(meta: RouteMeta): HeadDescriptor[] {
       tag: "link",
       attributes: {
         rel: "alternate",
-        hreflang: "en",
-        href: absoluteUrl(englishPath),
-      },
-    },
-    {
-      tag: "link",
-      attributes: {
-        rel: "alternate",
         hreflang: "x-default",
         href: absoluteUrl(spanishPath),
       },
     },
   );
+
+  if (englishPath) {
+    descriptors.push({
+      tag: "link",
+      attributes: {
+        rel: "alternate",
+        hreflang: "en",
+        href: absoluteUrl(englishPath),
+      },
+    });
+  }
 
   if (seo.structuredData) {
     descriptors.push({

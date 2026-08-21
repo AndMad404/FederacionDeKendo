@@ -33,12 +33,6 @@ const hashes = Object.fromEntries(
   ),
 );
 
-const ogImagePath = "/images/gallery/kendo-gallery-01.jpg";
-const ogImageHash = createHash("sha256")
-  .update(await readFile(path.join("public", ogImagePath)))
-  .digest("hex")
-  .slice(0, 12);
-
 await writeFile(
   "src/app/data/gallery-asset-hashes.json",
   `${JSON.stringify(hashes, null, 2)}\n`,
@@ -48,10 +42,6 @@ const seoDataPath = "src/app/config/seo-data.json";
 const seoData = await readFile(seoDataPath, "utf8");
 const replaceGalleryPreloadVersions = (content) =>
   content
-    .replaceAll(
-      /\/images\/gallery\/kendo-gallery-01\.jpg\?v=[a-z0-9-]+/g,
-      `${ogImagePath}?v=${ogImageHash}`,
-    )
     .replaceAll(
       /\/images\/gallery\/kendo-gallery-01\.webp\?v=[a-z0-9-]+/g,
       `/images/gallery/kendo-gallery-01.webp?v=${hashes["/images/gallery/kendo-gallery-01.webp"]}`,

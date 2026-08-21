@@ -23,7 +23,9 @@ export default tseslint.config(
       ],
       "no-control-regex": "error",
       "no-regex-spaces": "error",
-      "no-unexpected-multiline": "error",
+      // Prettier may wrap computed property access across lines; formatting is
+      // enforced exclusively by the Prettier check.
+      "no-unexpected-multiline": "off",
       "no-useless-escape": "error",
     },
   },
@@ -37,6 +39,14 @@ export default tseslint.config(
       "react-hooks/exhaustive-deps": "error",
       "react-hooks/set-state-in-effect": "error",
       "react-refresh/only-export-components": "error",
+    },
+  },
+  {
+    files: ["src/entry-server.tsx"],
+    rules: {
+      // This SSR entry intentionally exports rendering and SEO helpers for
+      // static generation; it is not a Fast Refresh boundary.
+      "react-refresh/only-export-components": "off",
     },
   },
 );

@@ -1,4 +1,6 @@
 import { createContext, useContext } from "react";
+import { findEventByPathname } from "../utils/eventRoutes";
+import { getLocalizedEvent } from "../utils/localizedEvents";
 
 export type Language = "es" | "en";
 
@@ -13,7 +15,7 @@ export function getLanguageFromPathname(pathname: string): Language {
 
 const STATIC_ROUTE_PAIRS = [
   ["/", "/en/"],
-  ["/calendario/", "/en/calendar/"],
+  ["/eventos/", "/en/events/"],
   ["/galeria/", "/en/gallery/"],
   ["/afiliados/", "/en/affiliates/"],
   ["/eventos/pasados/", "/en/events/past/"],
@@ -33,9 +35,33 @@ export function getLocalizedPath(pathname: string, language: Language) {
     }
   }
 
+  const spanishArchivedEvent = normalized.match(
+    /^\/eventos\/pasados\/([^/]+)\/$/,
+  );
+  if (spanishArchivedEvent) {
+    if (language === "es") return normalized;
+    const event = findEventByPathname(normalized);
+    return event && getLocalizedEvent(event, "en")
+      ? `/en/events/past/${spanishArchivedEvent[1]}/`
+      : "/en/";
+  }
+
+  const englishArchivedEvent = normalized.match(
+    /^\/en\/events\/past\/([^/]+)\/$/,
+  );
+  if (englishArchivedEvent) {
+    if (language === "en") return normalized;
+    const event = findEventByPathname(normalized);
+    return event ? `/eventos/pasados/${englishArchivedEvent[1]}/` : "/";
+  }
+
   const spanishEvent = normalized.match(/^\/eventos\/([^/]+)\/$/);
   if (spanishEvent) {
-    return language === "en" ? `/en/events/${spanishEvent[1]}/` : normalized;
+    if (language === "es") return normalized;
+    const event = findEventByPathname(normalized);
+    return event && getLocalizedEvent(event, "en")
+      ? `/en/events/${spanishEvent[1]}/`
+      : "/en/";
   }
 
   const englishEvent = normalized.match(/^\/en\/events\/([^/]+)\/$/);
@@ -91,7 +117,7 @@ export const COPY = {
       pastEvents: "Eventos pasados",
       links: [
         { id: "home", path: "/", label: "Inicio" },
-        { id: "calendar", path: "/calendario/", label: "Calendario" },
+        { id: "calendar", path: "/eventos/", label: "Calendario" },
         { id: "gallery", path: "/galeria/", label: "Galería" },
         { id: "affiliates", path: "/afiliados/", label: "Afiliados" },
       ],
@@ -130,7 +156,7 @@ export const COPY = {
       shareEvent: "Compartir evento",
     },
     calendar: {
-      title: "Calendario de eventos",
+      title: "Eventos",
       description: "Torneos, exámenes y actividades de kendo.",
       empty: "No hay próximos eventos publicados.",
       pastEvents: "Eventos pasados",
@@ -193,7 +219,7 @@ export const COPY = {
       description: "Archivo histórico de actividades publicadas.",
       upcomingEvents: "Próximos eventos",
       empty: "Todavía no hay eventos en el archivo.",
-      viewEvent: "Ver página del evento",
+      viewEvent: "Detalles del evento",
       pagination: "Paginación del archivo",
       previous: "Anterior",
       next: "Siguiente",
@@ -230,7 +256,7 @@ export const COPY = {
       pastEvents: "Past events",
       links: [
         { id: "home", path: "/en/", label: "Home" },
-        { id: "calendar", path: "/en/calendar/", label: "Calendar" },
+        { id: "calendar", path: "/en/events/", label: "Calendar" },
         { id: "gallery", path: "/en/gallery/", label: "Gallery" },
         { id: "affiliates", path: "/en/affiliates/", label: "Affiliates" },
       ],
@@ -330,7 +356,7 @@ export const COPY = {
       description: "Historical archive of published activities.",
       upcomingEvents: "Upcoming events",
       empty: "There are no events in the archive yet.",
-      viewEvent: "View event page",
+      viewEvent: "Event details",
       pagination: "Archive pagination",
       previous: "Previous",
       next: "Next",
