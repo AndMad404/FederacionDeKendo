@@ -1,0 +1,209 @@
+import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import {
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import test from "node:test";
+
+import { evaluateToolUse } from "../../.codex/hooks/pre-tool-use.mjs";
+import { evaluateSubagentReport } from "../../.codex/hooks/subagent-stop.mjs";
+import { evaluateStop } from "../../.codex/hooks/stop-quality-gate.mjs";
+import {
+  captureRelevantFingerprint,
+  recordHookFailure,
+  saveSessionState,
+} from "../../.codex/hooks/shared.mjs";
+
+function runHook(script, input, args = []) {
+  const result = spawnSync(
+    process.execPath,
+    [`.codex/hooks/${script}`, ...args],
+    {
+      cwd: process.cwd(),
+      encoding: "utf8",
+      input: JSON.stringify(input),
+    },
+  );
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.stderr, "");
+  return JSON.parse(result.stdout);
+}
+
+test("hooks.json configures command handlers and keeps phase-one advisors non-blocking", () => {
+  const config = JSON.parse(readFileSync(".codex/hooks.json", "utf8"));
+  assert.deepEqual(Object.keys(config.hooks).sort(), [
+    "PreToolUse",
+    "SessionStart",
+    "Stop",
+    "SubagentStart",
+    "SubagentStop",
+  ]);
+  for (const groups of Object.values(config.hooks)) {
+    for (const group of groups) {
+      for (const hook of group.hooks) assert.equal(hook.type, "command");
+    }
+  }
+  assert.match(config.hooks.PreToolUse[0].hooks[0].command, /--advisory$/);
+  assert.match(config.hooks.SubagentStop[0].hooks[0].command, /--advisory$/);
+  assert.doesNotMatch(config.hooks.Stop[0].hooks[0].command, /--advisory/);
+
+  const prettierIgnore = readFileSync(".prettierignore", "utf8");
+  assert.match(prettierIgnore, /^!\.codex\/hooks\.json$/m);
+  assert.match(prettierIgnore, /^!\.codex\/hooks\/\*\*$/m);
+});
+
+test("Stop and SubagentStop command handlers emit valid JSON only", async () => {
+  const subagentOutput = runHook(
+    "subagent-stop.mjs",
+    {
+      cwd: process.cwd(),
+      hook_event_name: "SubagentStop",
+      last_assistant_message: "Incomplete",
+      session_id: "json-contract",
+      stop_hook_active: false,
+    },
+    ["--advisory"],
+  );
+  assert.equal(subagentOutput.continue, true);
+  assert.equal(subagentOutput.decision, undefined);
+
+  const stopSessionId = "json-contract-stop";
+  await saveSessionState(stopSessionId, {
+    fingerprint: captureRelevantFingerprint(process.cwd()),
+    root: process.cwd(),
+  });
+  const stopOutput = runHook("stop-quality-gate.mjs", {
+    cwd: process.cwd(),
+    hook_event_name: "Stop",
+    session_id: stopSessionId,
+    stop_hook_active: true,
+  });
+  assert.equal(typeof stopOutput, "object");
+  assert.equal(stopOutput.decision, undefined);
+});
+
+test("second failures are recorded inside review-state YAML", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "codex-hook-review-"));
+  try {
+    mkdirSync(path.join(root, ".codex"));
+    writeFileSync(
+      path.join(root, ".codex", "review-state.md"),
+      "# Technical Review State\n\n```yaml\nschema_version: 2\nlast_updated: 2026-08-20\n\n```\n",
+    );
+    assert.equal(
+      recordHookFailure(root, {
+        sessionId: "session",
+        event: "Stop",
+        problem: "Gate failed twice.",
+        evidence: "format:check failed",
+      }),
+      true,
+    );
+    const state = readFileSync(
+      path.join(root, ".codex", "review-state.md"),
+      "utf8",
+    );
+    assert.match(state, /hook_gate_failure_/);
+    assert.match(state, /status: needs_human_review/);
+    assert.ok(state.indexOf("hook_gate_failure_") < state.lastIndexOf("```"));
+  } finally {
+    rmSync(root, { force: true, recursive: true });
+  }
+});
+
+test("PreToolUse advisory output uses supported context fields", () => {
+  const output = evaluateToolUse({
+    tool_input: { command: "git push origin main" },
+  });
+  assert.equal(output.hookSpecificOutput.hookEventName, "PreToolUse");
+  assert.match(output.hookSpecificOutput.additionalContext, /git push/);
+  assert.equal(output.hookSpecificOutput.permissionDecision, undefined);
+});
+
+test("PreToolUse enforcement uses the supported deny schema", () => {
+  const output = evaluateToolUse(
+    { tool_input: { command: "git commit -m test" } },
+    { enforce: true },
+  );
+  assert.deepEqual(
+    Object.keys(output.hookSpecificOutput).sort(),
+    ["hookEventName", "permissionDecision", "permissionDecisionReason"].sort(),
+  );
+  assert.equal(output.hookSpecificOutput.permissionDecision, "deny");
+});
+
+test("SubagentStop stays advisory in phase one", () => {
+  const output = evaluateSubagentReport({ last_assistant_message: "Done." });
+  assert.equal(output.continue, true);
+  assert.match(output.systemMessage, /Advisory mode/);
+  assert.equal(output.decision, undefined);
+});
+
+test("SubagentStop enforcement continues only once", () => {
+  const first = evaluateSubagentReport(
+    { last_assistant_message: "Done.", stop_hook_active: false },
+    { enforce: true },
+  );
+  assert.equal(first.decision, "block");
+
+  const second = evaluateSubagentReport(
+    { last_assistant_message: "Still incomplete.", stop_hook_active: true },
+    { enforce: true },
+  );
+  assert.equal(second.continue, true);
+  assert.equal(second.decision, undefined);
+  assert.match(second.recordFailure, /missing/);
+});
+
+test("Stop blocks once and then records a human-review failure", async () => {
+  const dependencies = {
+    root: "C:/repo",
+    state: { fingerprint: "before" },
+    captureFingerprint: () => "after",
+    runChecks: () => [
+      {
+        command: "corepack pnpm run format:check",
+        ok: false,
+        output: "Formatting failed",
+      },
+    ],
+  };
+  const first = await evaluateStop(
+    { session_id: "session", stop_hook_active: false },
+    dependencies,
+  );
+  assert.equal(first.output.decision, "block");
+  assert.equal(first.failure, undefined);
+
+  const second = await evaluateStop(
+    { session_id: "session", stop_hook_active: true },
+    dependencies,
+  );
+  assert.equal(second.output.continue, true);
+  assert.equal(second.output.decision, undefined);
+  assert.equal(second.failure.event, "Stop");
+});
+
+test("Stop skips checks when relevant files did not change", async () => {
+  let ranChecks = false;
+  const result = await evaluateStop(
+    { session_id: "session", stop_hook_active: false },
+    {
+      root: "C:/repo",
+      state: { fingerprint: "same" },
+      captureFingerprint: () => "same",
+      runChecks: () => {
+        ranChecks = true;
+        return [];
+      },
+    },
+  );
+  assert.equal(result.output.continue, true);
+  assert.equal(ranChecks, false);
+});

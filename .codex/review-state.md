@@ -2,8 +2,92 @@
 
 ```yaml
 schema_version: 2
-last_updated: 2026-08-20
+last_updated: 2026-08-21
 contract: .agents/review-contract.md
+
+latest_test-responsibility_review:
+  id: REV-2026-08-21-01
+  requested_scope: Review whether the refactored test suite contains unnecessary or overlapping tests.
+  actual_scope:
+    targets:
+      - tests/architecture/**/*.test.mjs
+      - tests/data/**/*.{test.mjs,spec.ts}
+      - tests/behavior/**/*.spec.ts
+      - tests/design/**/*.{spec.ts,ts}
+      - package.json
+    axes: [ARCH, RESPONSIVE]
+    included:
+      - responsibility boundaries after the test refactor
+      - repeated contracts across Data, Behavior, and Design
+      - duplicate viewport matrices and command composition
+    excluded:
+      - product behavior correctness, visual baseline accuracy, test performance, and CI execution
+  baseline:
+    commit: 1fca95bf
+    worktree: dirty with owner Codex-hook additions and package.json changes
+    fingerprint:
+      tests/behavior/events.spec.ts: B11E949D53FAC9140B493D9C32D6784B940922B71C08CA0A983F69C7B32CD28A
+      tests/behavior/event-history-filters.spec.ts: 6F9530F3212D3960A9B84AD5ACA702E0C2F596E79B961EB63B78DBF0536D789D
+      tests/design/event-content-layout.spec.ts: D1FD33521DC8CB122DC15DC97E724858C88B01ADA31DF37A69688E5180B90EAB
+      tests/design/geometry-contract.spec.ts: F970E1B0DAACD17CC7343E43E97DB6E8E84F44B9EE6E72E412EEA14B4CF2E860
+  findings:
+    - id: TEST-ARCH-001
+      level: STRUCTURAL
+      axis: ARCH
+      status: resolved
+      target: tests/behavior/events.spec.ts:304-335
+      problem: The Behavior suite rechecks route-shell visibility and 1366x768 overflow for ten routes at four viewports, which is already the Design suite's geometry and reachability contract.
+      fix: Remove this matrix from Behavior; retain route navigation assertions there and let tests/design/geometry-contract.spec.ts plus tests/design/responsive-reachability.spec.ts own shell and viewport checks.
+      cost_of_deferring: The same layout regression fails in two responsibilities, making failures slower to diagnose and weakening the stated classification rule.
+      evidence:
+        - tests/behavior/events.spec.ts:304-335
+        - tests/design/geometry-contract.spec.ts:164-421
+        - tests/design/responsive-reachability.spec.ts:154
+      resolution:
+        resolved_at: 2026-08-21
+        resolved_ref: worktree SHA256 7150303AFB66F47A3F1590A991B8CF34B8CB7ED8789927A844618F615108C09D
+        checks:
+          - corepack pnpm run test:behavior (32 passed)
+          - corepack pnpm run test:design (180 passed)
+    - id: TEST-RESP-001
+      level: SMELL
+      axis: RESPONSIVE
+      status: resolved
+      target: tests/behavior/event-history-filters.spec.ts:80-109
+      problem: A Behavior test loops through the entire viewport matrix solely to assert filter visibility and adds a desktop document-height assertion, which is a Design responsibility and overlaps the design contracts.
+      fix: Keep one semantic filter-interaction test in Behavior; move viewport visibility and bounded-shell assertions to the relevant Design contract or remove them if that contract already covers the archive route.
+      cost_of_deferring: Behavior failures can be caused by responsive geometry rather than an interaction regression.
+      evidence:
+        - tests/behavior/event-history-filters.spec.ts:80-109
+        - tests/design/geometry-contract.spec.ts:164-421
+        - tests/design/responsive-reachability.spec.ts:154
+      resolution:
+        resolved_at: 2026-08-21
+        resolved_ref: worktree SHA256 81BD428CEBE4A92A456D5D24F2B61A5DFF8BFEE25E69C9BD525B8CE8DF173DE5
+        checks:
+          - corepack pnpm run test:behavior (32 passed)
+          - corepack pnpm run test:design (180 passed)
+    - id: TEST-DATA-001
+      level: SMELL
+      axis: ARCH
+      status: open
+      target: tests/data/gallery-data.test.mjs:14-24; tests/data/static-public-content.test.mjs:73-120
+      problem: The English-gallery inventory is split between two source-parsing tests that both enumerate the same Spanish IDs and English records.
+      fix: Merge the English-copy identity assertion into static-public-content.test.mjs, leaving gallery-data.test.mjs focused on asset hashes and gallery SEO assets.
+      cost_of_deferring: A future gallery schema change requires editing two nearby inventory tests and obscures which one owns the public-content contract.
+      evidence:
+        - tests/data/gallery-data.test.mjs:14-24
+        - tests/data/static-public-content.test.mjs:73-120
+  evidence:
+    - rg inventory of every test declaration under tests/ on 2026-08-21
+    - package.json command composition inspected
+    - corepack pnpm run test:behavior passed 32 tests after removing the two matrices
+    - corepack pnpm run test:design passed 180 tests after removing the two matrices
+    - node node_modules/prettier/bin/prettier.cjs --check tests/behavior/events.spec.ts tests/behavior/event-history-filters.spec.ts passed
+  result: The four top-level responsibilities are understandable. The two Behavior-versus-Design overlaps are removed and verified; the gallery-data separation remains intentionally unchanged at owner direction.
+  pending:
+    - Inspect runtime duration and flaky-test history before deciding whether to reduce remaining cross-browser viewport repetitions.
+  next: Reassess TEST-DATA-001 only if the gallery content schema changes; the owner chose to retain its current split.
 
 latest_screaming_frog_internal_html_review:
   id: REV-2026-08-20-06

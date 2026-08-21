@@ -70,31 +70,3 @@ test("filters apply available values and the empty state remains available", asy
     page.getByText("Todavía no hay eventos en el archivo."),
   ).toBeVisible();
 });
-
-for (const viewport of [
-  { width: 360, height: 800 },
-  { width: 390, height: 844 },
-  { width: 768, height: 1024 },
-  { width: 1366, height: 768 },
-]) {
-  test(`shows accessible filters at ${viewport.width}x${viewport.height}`, async ({
-    page,
-  }) => {
-    await page.setViewportSize(viewport);
-    await page.goto("/eventos/pasados/");
-    await expect(
-      page.getByRole("combobox", { name: "Año", exact: true }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("combobox", { name: "Tipo", exact: true }),
-    ).toBeVisible();
-    if (viewport.width === 1366) {
-      await expect(page.locator("nav").first()).toBeVisible();
-      await expect(page.getByLabel("Paginación del archivo")).toBeVisible();
-      await expect(page.locator("footer")).toBeVisible();
-      expect(
-        await page.evaluate(() => document.documentElement.scrollHeight),
-      ).toBeLessThanOrEqual(768);
-    }
-  });
-}

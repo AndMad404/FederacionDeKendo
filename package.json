@@ -15,6 +15,7 @@
     "lint": "eslint . --max-warnings=0",
     "preview": "vite preview",
     "test:architecture": "node --test tests/architecture/*.test.mjs",
+    "test:codex-hooks": "node --test tests/architecture/codex-hooks.test.mjs",
     "test:data:node": "node --test tests/data/*.test.mjs",
     "test:data": "pnpm run test:data:node && playwright test tests/data",
     "test:behavior": "playwright test tests/behavior",
