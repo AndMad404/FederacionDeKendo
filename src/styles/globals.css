@@ -171,6 +171,22 @@ html {
   );
 }
 
+@keyframes calendar-menu-enter {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.nav-calendar-menu {
+  animation: calendar-menu-enter 160ms ease-out;
+}
+
 @media (min-width: 640px) {
   .gallery-featured-image:not(.gallery-featured-image--native-position) {
     object-position: var(--gallery-featured-object-position, center 0%);
@@ -191,5 +207,9 @@ html {
   .group:hover img {
     scale: 1;
     transform: none;
+  }
+
+  .nav-calendar-menu {
+    animation: none;
   }
 }
