@@ -4,8 +4,11 @@ import { ChevronDown, Menu, X } from "lucide-react";
 import { focusRingClass } from "../styles/shared";
 import { getLocalizedPath, useLanguage } from "../config/i18n";
 
+const navInteractionClass =
+  "transition-[background-color,border-color,color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-sm focus-visible:-translate-y-0.5 focus-visible:shadow-sm active:translate-y-0 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:focus-visible:translate-y-0 motion-reduce:active:scale-100";
+
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `text-lg tracking-wide transition-[color,transform] duration-200 hover:-translate-y-0.5 focus-visible:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:focus-visible:translate-y-0 motion-reduce:active:scale-100 land-sm:text-base ${focusRingClass} ${
+  `text-lg tracking-wide ${navInteractionClass} land-sm:text-base ${focusRingClass} ${
     isActive
       ? "border-b-2 border-site-accent pb-0.5 text-site-on-dark"
       : "text-site-on-dark"
@@ -126,7 +129,7 @@ export function Navbar() {
                 <NavLink
                   to={path}
                   className={({ isActive }) =>
-                    `block min-h-11 rounded-md px-4 py-2.5 text-base transition-[color,background-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-sm focus-visible:-translate-y-0.5 focus-visible:shadow-sm active:translate-y-0 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:focus-visible:translate-y-0 motion-reduce:active:scale-100 ${focusRingClass} ${
+                    `block min-h-11 rounded-md px-4 py-2.5 text-base ${navInteractionClass} ${focusRingClass} ${
                       isActive
                         ? "bg-site-on-dark text-site-navy"
                         : "text-site-on-dark hover:bg-site-on-dark/10"
@@ -193,7 +196,7 @@ export function Navbar() {
           <button
             ref={menuButtonRef}
             type="button"
-            className={`inline-flex size-11 shrink-0 items-center justify-center rounded-lg border border-white/70 bg-white/10 text-white transition-[background-color,border-color,transform] duration-200 hover:border-white hover:bg-white/20 hover:text-white active:scale-95 motion-reduce:transition-none motion-reduce:active:transform-none md:hidden ${focusRingClass}`}
+            className={`inline-flex size-11 shrink-0 items-center justify-center rounded-lg border border-white/70 bg-white/10 text-white hover:border-white hover:bg-white/20 hover:text-white ${navInteractionClass} md:hidden ${focusRingClass}`}
             aria-controls="mobile-menu"
             aria-expanded={open}
             aria-label={open ? copy.nav.close : copy.nav.open}
@@ -281,7 +284,7 @@ function LanguageSelector({
                 : copy.nav.switchToEnglish
             }
             onClick={onNavigate}
-            className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-md px-2 text-sm font-bold transition-[background-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100 ${focusRingClass} ${
+            className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-md px-2 text-sm font-bold ${navInteractionClass} ${focusRingClass} ${
               active
                 ? "bg-site-on-dark text-site-navy shadow-sm"
                 : "text-site-on-dark/85 hover:bg-site-on-dark/15 hover:text-site-on-dark"
