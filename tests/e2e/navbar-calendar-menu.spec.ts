@@ -9,6 +9,9 @@ test("calendar menu opens on hover and navigates to past events", async ({
   const calendarButton = page.getByRole("button", {
     name: "Opciones del calendario",
   });
+  await expect(calendarButton).toHaveClass(/rounded-full/);
+  await expect(calendarButton).toHaveClass(/border-site-action/);
+  await expect(calendarButton).toHaveClass(/bg-site-action/);
   await calendarButton.hover();
 
   await expect(calendarButton).toHaveAttribute("aria-expanded", "true");
