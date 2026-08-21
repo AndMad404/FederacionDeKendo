@@ -85,7 +85,7 @@ export function UpcomingEventCard({ event, index }: UpcomingEventCardProps) {
         </a>
       ) : (
         <span
-          className={`col-start-1 row-start-2 w-full justify-self-center text-site-muted ${actionClass}`}
+          className={`inline-flex min-h-11 w-full min-w-0 items-center justify-center rounded-lg border border-site-border bg-site-surface px-3 py-1.5 text-center text-sm font-semibold leading-tight text-site-muted desktop-fine:min-h-8 lg:px-2.5 lg:py-1 ${actionControlSurfaceClass}`}
         >
           {copy.common.toBeConfirmed}
         </span>
