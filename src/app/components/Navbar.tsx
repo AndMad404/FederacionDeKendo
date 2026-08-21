@@ -128,11 +128,12 @@ export function Navbar() {
               <li key={path} className={mobile ? undefined : "w-full"}>
                 <NavLink
                   to={path}
+                  end
                   className={({ isActive }) =>
                     `block min-h-11 rounded-md px-4 py-2.5 text-base ${navInteractionClass} ${focusRingClass} ${
                       isActive
-                        ? "bg-site-on-dark text-site-navy"
-                        : "text-site-on-dark hover:bg-site-on-dark/10"
+                        ? "bg-site-on-dark text-site-navy shadow-sm"
+                        : "text-site-on-dark/85 hover:bg-site-on-dark/15 hover:text-site-on-dark"
                     }`
                   }
                 >
@@ -216,7 +217,7 @@ export function Navbar() {
         {open && (
           <ul
             id="mobile-menu"
-            className="flex flex-col items-center gap-5 bg-site-navy px-6 py-5 text-center md:hidden"
+            className="flex flex-col items-center gap-5 bg-site-navy px-6 pb-5 pt-0 text-center md:hidden"
           >
             {copy.nav.links.map((link) =>
               link.id === "calendar" ? (
@@ -234,17 +235,13 @@ export function Navbar() {
                 </li>
               ),
             )}
-            <li className="mt-1 w-full border-t border-site-on-dark/20 pt-4">
-              <div className="flex items-center justify-center gap-3">
-                <span className="text-sm font-semibold text-site-on-dark/85">
-                  {copy.nav.language}
-                </span>
-                <LanguageSelector
-                  pathname={pathname}
-                  language={language}
-                  onNavigate={() => setOpenPath(null)}
-                />
-              </div>
+            <li>
+              <LanguageSelector
+                pathname={pathname}
+                language={language}
+                labels="full"
+                onNavigate={() => setOpenPath(null)}
+              />
             </li>
           </ul>
         )}
@@ -256,10 +253,12 @@ export function Navbar() {
 function LanguageSelector({
   pathname,
   language,
+  labels = "abbreviated",
   onNavigate,
 }: {
   pathname: string;
   language: "es" | "en";
+  labels?: "abbreviated" | "full";
   onNavigate?: () => void;
 }) {
   const { copy } = useLanguage();
@@ -290,7 +289,11 @@ function LanguageSelector({
                 : "text-site-on-dark/85 hover:bg-site-on-dark/15 hover:text-site-on-dark"
             }`}
           >
-            {option.toUpperCase()}
+            {labels === "full"
+              ? option === "es"
+                ? "Español"
+                : "English"
+              : option.toUpperCase()}
           </Link>
         );
       })}

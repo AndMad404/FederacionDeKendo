@@ -182,7 +182,7 @@ export const COPY = {
     },
     affiliates: {
       title: "Dojos afiliados",
-      description: "Dojos afiliados donde practicar kendo.",
+      description: "A encuentra donde practicar kendo.",
       pagination: "Paginación de dojos afiliados",
       previousPage: "Página anterior de dojos",
       nextPage: "Página siguiente de dojos",

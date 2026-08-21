@@ -99,9 +99,9 @@ export function getComponentSpacingContract(
   if (design === "calendar") {
     return {
       selector: "[data-page-content-boundary]",
-      paddingTop: viewportWidth >= 640 ? 12 : 16,
+      paddingTop: 16,
       paddingRight: viewportWidth >= 640 ? 8 : 12,
-      paddingBottom: viewportWidth >= 640 ? 12 : 16,
+      paddingBottom: 16,
       paddingLeft: viewportWidth >= 640 ? 8 : 12,
       rowGap: viewportWidth >= 768 ? 8 : 12,
       columnGap: viewportWidth >= 768 ? 8 : 12,
