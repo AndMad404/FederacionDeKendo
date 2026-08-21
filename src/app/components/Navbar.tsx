@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
+import { NavigationArrowButton } from "./ui/ModalControls";
 import { focusRingClass } from "../styles/shared";
 import { getLocalizedPath, useLanguage } from "../config/i18n";
 
@@ -94,26 +95,34 @@ export function Navbar() {
               }
         }
       >
-        <button
-          ref={mobile ? undefined : calendarButtonRef}
-          type="button"
-          aria-expanded={calendarOpen}
-          aria-controls={
-            mobile ? "mobile-calendar-menu" : "desktop-calendar-menu"
-          }
-          onFocus={mobile ? undefined : () => setCalendarOpenPath(pathname)}
-          onClick={() =>
-            setCalendarOpenPath(mobile && calendarOpen ? null : pathname)
-          }
-          className={`inline-flex min-h-11 items-center justify-center gap-1 ${navLinkClass({ isActive: calendarActive })}`}
+        <div
+          className={`inline-flex items-center justify-center gap-2 ${
+            mobile ? "w-full" : ""
+          }`}
         >
-          {calendarLink.label}
-          <ChevronDown
-            size={18}
-            aria-hidden="true"
-            className={`transition-transform motion-reduce:transition-none ${calendarOpen ? "rotate-180" : ""}`}
+          <NavLink
+            to={calendarLink.path}
+            end
+            onClick={mobile ? closeNavigation : undefined}
+            className={navLinkClass({ isActive: calendarActive })}
+          >
+            {calendarLink.label}
+          </NavLink>
+          <NavigationArrowButton
+            ref={mobile ? undefined : calendarButtonRef}
+            direction="down"
+            label={copy.nav.calendarMenu}
+            isActive={calendarOpen}
+            aria-expanded={calendarOpen}
+            aria-controls={
+              mobile ? "mobile-calendar-menu" : "desktop-calendar-menu"
+            }
+            onFocus={mobile ? undefined : () => setCalendarOpenPath(pathname)}
+            onClick={() =>
+              setCalendarOpenPath(mobile && calendarOpen ? null : pathname)
+            }
           />
-        </button>
+        </div>
         {calendarOpen && (
           <ul
             id={mobile ? "mobile-calendar-menu" : "desktop-calendar-menu"}

@@ -1,5 +1,5 @@
 import { forwardRef, type ButtonHTMLAttributes } from "react";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, X } from "lucide-react";
 import {
   focusRingClass,
   modalCloseButtonClass,
@@ -34,29 +34,40 @@ interface NavigationArrowButtonProps extends Omit<
   ButtonHTMLAttributes<HTMLButtonElement>,
   "children" | "type"
 > {
-  direction: "previous" | "next";
+  direction: "previous" | "next" | "down";
   label: string;
   isActive?: boolean;
 }
 
-export function NavigationArrowButton({
-  direction,
-  label,
-  isActive = false,
-  className = "",
-  ...props
-}: NavigationArrowButtonProps) {
-  const Icon = direction === "previous" ? ChevronLeft : ChevronRight;
+export const NavigationArrowButton = forwardRef<
+  HTMLButtonElement,
+  NavigationArrowButtonProps
+>(function NavigationArrowButton(
+  { direction, label, isActive = false, className = "", ...props },
+  ref,
+) {
+  const Icon =
+    direction === "previous"
+      ? ChevronLeft
+      : direction === "next"
+        ? ChevronRight
+        : ChevronDown;
 
   return (
     <button
+      ref={ref}
       type="button"
       aria-label={label}
       data-active={isActive}
       className={`${navigationArrowButtonClass} ${focusRingClass} ${className}`}
       {...props}
     >
-      <Icon className="size-5 md:size-6" aria-hidden="true" />
+      <Icon
+        className={`size-5 transition-transform motion-reduce:transition-none md:size-6 ${
+          direction === "down" && isActive ? "rotate-180" : ""
+        }`}
+        aria-hidden="true"
+      />
     </button>
   );
-}
+});
