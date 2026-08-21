@@ -156,7 +156,7 @@ export const COPY = {
       shareEvent: "Compartir evento",
     },
     calendar: {
-      title: "Eventos",
+      title: "Próximos eventos",
       description: "Torneos, exámenes y actividades de kendo.",
       empty: "No hay próximos eventos publicados.",
       pastEvents: "Eventos pasados",
@@ -293,7 +293,7 @@ export const COPY = {
       shareEvent: "Share event",
     },
     calendar: {
-      title: "Events calendar",
+      title: "Upcoming events",
       description: "Kendo tournaments, examinations, and activities.",
       empty: "There are no upcoming published events.",
       pastEvents: "Past events",
