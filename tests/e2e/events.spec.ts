@@ -111,7 +111,7 @@ test("accepts only current canonical event routes", async ({ page }) => {
   await page.goto("/eventos/#examen-2026-08-08");
   await expect(page).toHaveURL(/\/eventos\/#examen-2026-08-08$/);
   await expect(
-    page.getByRole("heading", { name: "Calendario de eventos", level: 1 }),
+    page.getByRole("heading", { name: "Eventos", level: 1 }),
   ).toBeVisible();
 });
 

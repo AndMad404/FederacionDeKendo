@@ -230,6 +230,9 @@ function getShortVenue(location?: string) {
   return normalizeDescription(location.split(",", 1)[0]);
 }
 
+// Dynamic event pages need a dependable minimum viable description even when
+// Calendar provides little or no editorial copy. Static routes are curated
+// separately and intentionally do not share this character limit.
 const EVENT_DESCRIPTION_MAX_LENGTH = 155;
 
 interface EventMetaDescriptionInput {

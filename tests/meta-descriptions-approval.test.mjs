@@ -145,6 +145,24 @@ test("keeps the ten approved static ES/EN descriptions consistent across config,
   );
 });
 
+test("does not impose the dynamic event limit on curated static descriptions", () => {
+  const staticRoute = ssr
+    .getRouteManifest()
+    .find((route) => route.path === "/");
+  assert.ok(staticRoute, "home route missing from manifest");
+
+  const curatedDescription =
+    "Esta descripción estática deliberadamente supera ciento cincuenta y cinco caracteres para comprobar que la calidad editorial conserva prioridad y que el límite técnico permanece aislado en las páginas dinámicas de eventos.";
+  assert.ok(curatedDescription.length > 155);
+  assert.equal(
+    ssr.getRouteSeoPayload({
+      ...staticRoute,
+      description: curatedDescription,
+    }).description,
+    curatedDescription,
+  );
+});
+
 test("exposes the event meta-description builder through the SSR namespace", () => {
   getDescriptionBuilder();
 });

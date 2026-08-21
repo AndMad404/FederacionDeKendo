@@ -11,7 +11,7 @@ async function openCalendar(page: Page, now = FIXED_CALENDAR_TIME) {
   await page.goto(CALENDAR_PATH);
   await page.waitForLoadState("networkidle");
   await expect(
-    page.getByRole("heading", { name: "Calendario de eventos", level: 1 }),
+    page.getByRole("heading", { name: "Eventos", level: 1 }),
   ).toBeVisible();
 }
 
