@@ -341,14 +341,13 @@ test("switches languages while preserving the current section", async ({
   await expect(page).toHaveURL(/\/galeria\/$/);
 });
 
-test("exposes the language selector inside the mobile menu", async ({
-  page,
-}) => {
+test("exposes language controls inside the mobile menu", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/en/");
 
   await page.getByRole("button", { name: "Open menu" }).click();
-  await expect(page.getByText("Language", { exact: true })).toBeVisible();
+  await expect(page.getByText("Español", { exact: true })).toBeVisible();
+  await expect(page.getByText("English", { exact: true })).toBeVisible();
   await expect(
     page.getByRole("link", { name: "View site in English" }),
   ).toHaveAttribute("aria-current", "page");
