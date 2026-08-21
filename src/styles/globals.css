@@ -176,3 +176,20 @@ html {
     object-position: var(--gallery-featured-object-position, center 0%);
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0s;
+    animation-iteration-count: 1;
+    scroll-behavior: auto;
+    transition-duration: 0s;
+  }
+
+  .group:hover .gallery-featured-image,
+  .group:hover img {
+    scale: 1;
+    transform: none;
+  }
+}

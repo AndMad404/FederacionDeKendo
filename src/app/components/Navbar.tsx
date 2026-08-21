@@ -108,7 +108,7 @@ export function Navbar() {
           <ChevronDown
             size={18}
             aria-hidden="true"
-            className={`transition-transform ${calendarOpen ? "rotate-180" : ""}`}
+            className={`transition-transform motion-reduce:transition-none ${calendarOpen ? "rotate-180" : ""}`}
           />
         </button>
         {calendarOpen && (

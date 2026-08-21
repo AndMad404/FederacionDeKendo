@@ -38,7 +38,7 @@ function Thumbnail({ image, isActive, buttonRef, onClick }: ThumbnailProps) {
         decoding="async"
         sizes={THUMBNAIL_SIZES}
         style={{ objectPosition: image.objectPosition }}
-        className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
+        className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:transform-none"
       />
     </button>
   );
