@@ -5,10 +5,13 @@ import {
   getEventRedirects,
   getRouteManifest,
   getRouteSeoPayload,
-} from "../dist-ssr/entry-server.js";
+} from "../../dist-ssr/entry-server.js";
 
 async function readDist(relativePath) {
-  return readFile(new URL(`../dist/${relativePath}`, import.meta.url), "utf8");
+  return readFile(
+    new URL(`../../dist/${relativePath}`, import.meta.url),
+    "utf8",
+  );
 }
 
 test("generates event HTML with canonical and no structured data while indexing is paused", async () => {
@@ -204,7 +207,7 @@ test("generates localized English routes with reciprocal language metadata", asy
 
 test("publishes English event routes only when their editorial translation is valid", async () => {
   const { CALENDAR_EVENTS, getEventTranslationStatus } =
-    await import("../dist-ssr/entry-server.js");
+    await import("../../dist-ssr/entry-server.js");
   const englishEventRoutes = getRouteManifest()
     .filter((route) => route.component === "event" && route.language === "en")
     .map((route) => route.eventId)

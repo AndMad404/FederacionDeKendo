@@ -21,9 +21,9 @@ import {
   synchronizeCalendar,
   writeActionSummary,
   writeCalendarNotificationsSummary,
-} from "../scripts/sync-calendar-events.mjs";
-import { synchronizeEventGalleries } from "../scripts/sync-event-galleries.mjs";
-import { formatCalendarNotificationEmail } from "../scripts/write-calendar-notification-email.mjs";
+} from "../../scripts/sync-calendar-events.mjs";
+import { synchronizeEventGalleries } from "../../scripts/sync-event-galleries.mjs";
+import { formatCalendarNotificationEmail } from "../../scripts/write-calendar-notification-email.mjs";
 
 const PUBLIC_EVENT_FIELDS = [
   "id",

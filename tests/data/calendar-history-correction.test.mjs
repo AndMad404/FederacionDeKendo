@@ -8,16 +8,16 @@ import {
   applyHistoricalCorrection,
   fingerprintHistoricalProposal,
   fingerprintHistoricalSnapshot,
-} from "../scripts/correct-calendar-history.mjs";
+} from "../../scripts/correct-calendar-history.mjs";
 import {
   applyHistoricalCorrectionsByDateRange,
   parseCliArguments,
-} from "../scripts/correct-calendar-history-range.mjs";
+} from "../../scripts/correct-calendar-history-range.mjs";
 import {
   detectHistoricalChanges,
   mergeRegistry,
   serializeCalendarEvents,
-} from "../scripts/sync-calendar-events.mjs";
+} from "../../scripts/sync-calendar-events.mjs";
 
 const published = {
   sourceId: "stable-source",

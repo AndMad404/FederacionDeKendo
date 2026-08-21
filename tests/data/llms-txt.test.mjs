@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import { validateLlmsTxt } from "../scripts/check-llms-txt.mjs";
+import { validateLlmsTxt } from "../../scripts/check-llms-txt.mjs";
 
 const configuredPaths = new Set([
   "/",
@@ -18,7 +18,7 @@ const configuredPaths = new Set([
 
 test("the published llms.txt complies with the project contract", async () => {
   const content = await readFile(
-    new URL("../public/llms.txt", import.meta.url),
+    new URL("../../public/llms.txt", import.meta.url),
     "utf8",
   );
 

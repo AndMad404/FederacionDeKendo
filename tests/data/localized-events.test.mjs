@@ -6,7 +6,7 @@ import {
   getEventTranslationStatus,
   getLocalizedEvent,
   getLocalizedEvents,
-} from "../dist-ssr/entry-server.js";
+} from "../../dist-ssr/entry-server.js";
 
 const gasshuku = CALENDAR_EVENTS.find(
   ({ id }) => id === "2026-09-12-gasshuku-monteverde",

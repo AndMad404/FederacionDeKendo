@@ -4,5 +4,5 @@ import baseConfig from "./playwright.config";
 export default defineConfig({
   ...baseConfig,
   testIgnore: [],
-  testMatch: "**/visual-regression.spec.ts",
+  testMatch: "**/design/visual-regression.spec.ts",
 });

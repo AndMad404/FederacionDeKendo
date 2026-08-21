@@ -15,20 +15,20 @@ import {
   parseCalendarEvent,
   parseVEvents,
   synchronizeCalendar,
-} from "../scripts/sync-calendar-events.mjs";
-import { calculateArchiveEligibleAt } from "../src/app/utils/eventArchive.js";
+} from "../../scripts/sync-calendar-events.mjs";
+import { calculateArchiveEligibleAt } from "../../src/app/utils/eventArchive.js";
 import {
   addCalendarDays,
   getCalendarDateTimeSortKey,
-} from "../src/app/utils/calendarDate.js";
+} from "../../src/app/utils/calendarDate.js";
 
-const fixturePath = new URL("./fixtures/calendar-events.ics", import.meta.url);
+const fixturePath = new URL("../fixtures/calendar-events.ics", import.meta.url);
 const phase2FixturePath = new URL(
-  "./fixtures/calendar-events-phase-2.ics",
+  "../fixtures/calendar-events-phase-2.ics",
   import.meta.url,
 );
 const invalidPhase2FixturePath = new URL(
-  "./fixtures/calendar-events-phase-2-invalid.ics",
+  "../fixtures/calendar-events-phase-2-invalid.ics",
   import.meta.url,
 );
 

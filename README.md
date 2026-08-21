@@ -55,14 +55,17 @@ pnpm run format
 
 ## Pruebas
 
-La suite predeterminada usa contratos funcionales, geometricos, responsive y
-de accesibilidad que toleran cambios ordinarios de contenido. Las capturas se
-ejecutan por separado en Windows para evitar diferencias de renderizado con el
-CI de Ubuntu.
+Las pruebas se agrupan por la responsabilidad que demuestran: arquitectura,
+datos, comportamiento y diseno. Las capturas aprobadas se ejecutan por separado
+en Windows para evitar diferencias de renderizado con el CI de Ubuntu.
 
 ```bash
 pnpm run build
-pnpm run test:e2e
+pnpm run test:architecture
+pnpm run test:data
+pnpm run test:behavior
+pnpm run test:design
+pnpm run test:all
 pnpm run test:visual
 ```
 

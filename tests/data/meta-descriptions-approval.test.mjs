@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-import * as ssr from "../dist-ssr/entry-server.js";
+import * as ssr from "../../dist-ssr/entry-server.js";
 
 const TERMINAL_PUNCTUATION = /[.!?…]$/u;
 const IRREGULAR_WHITESPACE = /\s{2,}|^\s|\s$/u;
@@ -31,13 +31,13 @@ const FORBIDDEN_FRAGMENTS =
   /este y|this and|doscientos metros|two hundred meters|includes:/iu;
 
 async function readDist(path) {
-  return readFile(new URL(`../dist/${path}`, import.meta.url), "utf8");
+  return readFile(new URL(`../../dist/${path}`, import.meta.url), "utf8");
 }
 
 async function readSeoConfig() {
   return JSON.parse(
     await readFile(
-      new URL("../src/app/config/seo-data.json", import.meta.url),
+      new URL("../../src/app/config/seo-data.json", import.meta.url),
       "utf8",
     ),
   );

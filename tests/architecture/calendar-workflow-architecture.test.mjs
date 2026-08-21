@@ -32,7 +32,7 @@ test("Phase 6: writer workflows run their directed test and shared gate before c
     ],
     [
       ".github/workflows/correct-calendar-history-range.yml",
-      "tests/calendar-history-correction.test.mjs",
+      "tests/data/calendar-history-correction.test.mjs",
       "Commit approved historical range",
     ],
   ];
@@ -65,8 +65,10 @@ test("Phase 6: the shared gate and human CI coverage remain complete", async () 
     "pnpm run typecheck",
     "pnpm run build",
     "pnpm run test:generated",
+    "pnpm exec playwright test tests/data",
     "pnpm exec playwright install --with-deps chromium",
-    "pnpm run test:e2e",
+    "pnpm run test:behavior",
+    "pnpm run test:design",
   ]) {
     assert.match(
       action,

@@ -23,26 +23,6 @@ async function discoverUpcomingEvent(page: Page) {
   return { eventLink, path: path!, title: title! };
 }
 
-test("opens a prerendered event route with temporary noindex metadata", async ({
-  page,
-}) => {
-  const { path, title } = await discoverUpcomingEvent(page);
-  await page.goto(path);
-
-  await expect(
-    page.getByRole("heading", { name: title, level: 1 }),
-  ).toBeVisible();
-  await expect(page.getByText("Actividad programada")).toBeVisible();
-  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
-    "content",
-    "noindex, follow",
-  );
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
-    "href",
-    `https://fak-kendo.pages.dev${path}`,
-  );
-});
-
 test("calendar cards link to the canonical event page", async ({ page }) => {
   const { eventLink, path } = await discoverUpcomingEvent(page);
   await expect(eventLink).toHaveAttribute("href", path);
@@ -64,44 +44,6 @@ test("scheduled event pages offer an add-to-calendar button", async ({
   const href = await addToCalendar.getAttribute("href");
   expect(href).toBeTruthy();
   expect(new URL(href!).searchParams.get("text")).toBe(title);
-});
-
-test("mobile portrait centers the calendar action and removes the description margin", async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  const { path } = await discoverUpcomingEvent(page);
-  await page.goto(path);
-
-  const addToCalendar = page.getByRole("link", {
-    name: "Añade a tu calendario",
-  });
-  const description = page.getByRole("heading", {
-    name: "Descripción",
-    level: 2,
-  });
-
-  await expect(addToCalendar).toBeVisible();
-  await expect(description).toBeVisible();
-
-  const calendarAction = await addToCalendar.evaluate((link) => {
-    const styles = getComputedStyle(link.parentElement!);
-    return {
-      marginTop: styles.marginTop,
-      marginBottom: styles.marginBottom,
-      justifyContent: styles.justifyContent,
-    };
-  });
-  const descriptionSection = await description.evaluate(
-    (heading) => getComputedStyle(heading.parentElement!).marginTop,
-  );
-
-  expect(calendarAction).toEqual({
-    marginTop: "10px",
-    marginBottom: "10px",
-    justifyContent: "center",
-  });
-  expect(descriptionSection).toBe("0px");
 });
 
 test("accepts only current canonical event routes", async ({ page }) => {
@@ -208,7 +150,7 @@ for (const viewport of [
   { width: 768, height: 1024 },
   { width: 1366, height: 768 },
 ]) {
-  test(`historical gallery is responsive and accessible at ${viewport.width}x${viewport.height}`, async ({
+  test(`historical gallery is operable and accessible at ${viewport.width}x${viewport.height}`, async ({
     page,
   }) => {
     await page.setViewportSize(viewport);
@@ -219,41 +161,10 @@ for (const viewport of [
       name: "Fotografías del evento Examen",
     });
     await expect(gallery).toBeVisible();
-    const featuredImage = gallery.locator("figure");
     const thumbnails = gallery.getByRole("group", {
       name: "Seleccionar fotografía",
     });
-    const geometry = await page.evaluate(() => {
-      const gallery = document.querySelector<HTMLElement>(
-        'section[aria-label="Fotografías del evento Examen"]',
-      );
-      const figure = gallery?.querySelector<HTMLElement>("figure");
-      const thumbnails = gallery?.querySelector<HTMLElement>('[role="group"]');
-      const event = document.querySelector<HTMLElement>(
-        'section[aria-labelledby="event-page-title"]',
-      );
-      const footer = document.querySelector<HTMLElement>("footer");
-      const thumb = thumbnails?.querySelector<HTMLElement>("button");
-      return {
-        galleryWidth: gallery?.getBoundingClientRect().width ?? 0,
-        figureWidth: figure?.getBoundingClientRect().width ?? 0,
-        eventWidth: event?.getBoundingClientRect().width ?? 0,
-        thumbnailWidth: thumb?.getBoundingClientRect().width ?? 0,
-        thumbnailHeight: thumb?.getBoundingClientRect().height ?? 0,
-        footerGap:
-          footer && thumbnails
-            ? footer.getBoundingClientRect().top -
-              thumbnails.getBoundingClientRect().bottom
-            : 0,
-      };
-    });
-    expect(geometry.figureWidth).toBeCloseTo(geometry.galleryWidth, 0);
-    expect(geometry.footerGap).toBeCloseTo(10, 0);
-    if (viewport.width < 640) {
-      expect(geometry.figureWidth).toBeCloseTo(geometry.eventWidth, 0);
-      expect(geometry.thumbnailWidth).toBeGreaterThan(geometry.thumbnailHeight);
-    }
-    await expect(featuredImage).toBeVisible();
+    await expect(gallery.locator("figure")).toBeVisible();
     await expect(thumbnails).toBeVisible();
     await expect(gallery.locator("img[alt]")).toHaveCount(4);
     await expect(

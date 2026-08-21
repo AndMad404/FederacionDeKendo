@@ -18,17 +18,24 @@ regresion visual.
 - Las capturas complementan la revision; no reemplazan los contratos de
   estructura, geometria, contenido o accesibilidad.
 
-## Suite predeterminada
+## Responsabilidades
 
 Ejecutar despues del build:
 
 ```powershell
 pnpm run build
-pnpm run test:e2e
+pnpm run test:architecture
+pnpm run test:data
+pnpm run test:behavior
+pnpm run test:design
+pnpm run test:all
 ```
 
-`test:e2e` ejecuta las pruebas funcionales y
-`tests/e2e/geometry-contract.spec.ts`. No ejecuta comparaciones de capturas.
+Cada caso pertenece a una sola responsabilidad: Arquitectura protege limites
+estructurales y workflows; Datos protege contenido estatico, SEO y transiciones
+dinamicas; Comportamiento protege interaccion y accesibilidad funcional; Diseno
+protege geometria y responsive mobile-first. `test:visual` conserva solamente
+las capturas aprobadas y no forma parte de `test:all`.
 
 La suite cubre:
 
@@ -43,7 +50,7 @@ La suite cubre:
   nombres accesibles de controles visibles.
 
 Las medidas y viewports aprobados viven en
-`tests/e2e/design-contract.ts`. Cambiar ese archivo equivale a cambiar el
+`tests/design/design-contract.ts`. Cambiar ese archivo equivale a cambiar el
 contrato visual y requiere aprobacion explicita del propietario.
 
 ## Eventos nuevos
@@ -116,10 +123,10 @@ redondeos de subpixel. Los valores CSS aprobados siguen siendo explicitos.
 
 ## Responsabilidades de cada archivo
 
-- `tests/e2e/design-contract.ts`: medidas, viewports y representantes.
-- `tests/e2e/geometry-contract.spec.ts`: contratos deterministas.
-- `tests/e2e/events.spec.ts`: comportamiento y navegacion.
-- `tests/e2e/visual-regression.spec.ts`: capturas manuales.
+- `tests/architecture/`: limites internos, estilos y workflows.
+- `tests/data/`: contenido publico, SEO, sincronizacion y estados de datos.
+- `tests/behavior/`: navegacion, calendario, filtros, idiomas y lightbox.
+- `tests/design/`: medidas, responsive, controles tactiles y capturas manuales.
 - `playwright.config.ts`: suite predeterminada de CI.
 - `playwright.visual.config.ts`: suite visual de Windows.
 - `.agents/verification.md`: criterios de verificacion para implementaciones.

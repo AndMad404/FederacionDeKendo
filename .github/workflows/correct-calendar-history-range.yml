@@ -56,7 +56,7 @@ jobs:
         run: pnpm run correct:calendar-history-range --report calendar-historical-changes.json --from "${{ inputs.from }}" --to "${{ inputs.to }}"
 
       - name: Directed historical correction tests
-        run: node --test tests/calendar-history-correction.test.mjs
+        run: node --test tests/data/calendar-history-correction.test.mjs
 
       - name: Verify generated site
         uses: ./.github/actions/verify-site
