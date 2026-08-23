@@ -1,6 +1,8 @@
 import { expect, test, type Page } from "@playwright/test";
 
-const FIXED_UPCOMING_TIME = new Date("2026-08-09T12:00:00-06:00");
+const FIXED_UPCOMING_TIME = new Date("2026-08-23T12:00:00-06:00");
+const TOURNAMENT_EVENT_PATH = "/eventos/2026-08-22-3er-torneo/";
+const GASSHUKU_EVENT_PATH = "/eventos/2026-09-12-gasshuku-monteverde/";
 const HISTORICAL_EVENT_PATH = "/eventos/pasados/2026-08-08-examen/";
 const HISTORICAL_EVENT_WITHOUT_GALLERY_PATH =
   "/eventos/pasados/2026-08-22-3er-torneo/";
@@ -9,10 +11,12 @@ const FIXED_HISTORICAL_TIME = new Date("2026-08-24T12:00:00-06:00");
 async function discoverUpcomingEvent(page: Page) {
   await page.clock.setFixedTime(FIXED_UPCOMING_TIME);
   await page.goto("/eventos/");
+  await page.waitForLoadState("networkidle");
 
-  const eventLink = page
-    .getByRole("link", { name: /Ver detalles del evento/ })
-    .first();
+  const eventLink = page.getByRole("link", {
+    name: "Ver detalles del evento Gasshuku Monteverde",
+  });
+  await expect(eventLink).toHaveAttribute("href", GASSHUKU_EVENT_PATH);
   const path = await eventLink.getAttribute("href");
   expect(path).toMatch(/^\/eventos\/[^/]+\/$/);
 
@@ -28,6 +32,20 @@ test("calendar cards link to the canonical event page", async ({ page }) => {
   await expect(eventLink).toHaveAttribute("href", path);
   await eventLink.click();
   await expect(page).toHaveURL(new RegExp(`${path}$`));
+});
+
+test("shows the next event after the previous event ends", async ({ page }) => {
+  await page.clock.setFixedTime(new Date("2026-08-22T16:59:59-06:00"));
+  await page.goto("/eventos/");
+
+  const firstEventLink = page
+    .getByRole("link", { name: /Ver detalles del evento/ })
+    .first();
+  await expect(firstEventLink).toHaveAttribute("href", TOURNAMENT_EVENT_PATH);
+
+  await page.clock.setFixedTime(new Date("2026-08-22T17:00:00-06:00"));
+  await page.reload();
+  await expect(firstEventLink).toHaveAttribute("href", GASSHUKU_EVENT_PATH);
 });
 
 test("scheduled event pages offer an add-to-calendar button", async ({
@@ -62,10 +80,12 @@ test("homepage event details link to the canonical event page", async ({
 }) => {
   await page.clock.setFixedTime(FIXED_UPCOMING_TIME);
   await page.goto("/");
+  await page.waitForLoadState("networkidle");
 
-  const eventLink = page
-    .getByRole("link", { name: /Consultar detalles del evento/ })
-    .first();
+  const eventLink = page.getByRole("link", {
+    name: "Consultar detalles del evento Gasshuku Monteverde",
+  });
+  await expect(eventLink).toHaveAttribute("href", GASSHUKU_EVENT_PATH);
   const path = await eventLink.getAttribute("href");
   expect(path).toMatch(/^\/eventos\/[^/]+\/$/);
   await eventLink.click();
