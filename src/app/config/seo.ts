@@ -478,6 +478,8 @@ function createArchiveRouteMeta(
 ): RouteMeta {
   const english = language === "en";
   const calendarMeta = CALENDAR_META[language];
+  const archiveDescription =
+    ROUTE_META[english ? "/en/events/past/" : "/eventos/pasados/"].description;
   return {
     path: getArchivePagePath(page, language),
     language,
@@ -489,8 +491,9 @@ function createArchiveRouteMeta(
       ? `Past events${page > 1 ? ` — page ${page}` : ""} | ${SITE_NAME}`
       : `Eventos pasados${page > 1 ? ` — página ${page}` : ""} | ${SITE_NAME}`,
     description:
-      ROUTE_META[english ? "/en/events/past/" : "/eventos/pasados/"]
-        .description,
+      page > 1
+        ? `${archiveDescription} ${english ? "Page" : "Página"} ${page}.`
+        : archiveDescription,
     image: calendarMeta.image,
     imageAlt: calendarMeta.imageAlt,
     imageWidth: calendarMeta.imageWidth,

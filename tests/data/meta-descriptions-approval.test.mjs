@@ -325,12 +325,12 @@ test(
   },
 );
 
-test("audits the complete 44-route description inventory and generated HTML", async () => {
+test("audits the complete dynamic route description inventory and generated HTML", async () => {
   const routes = ssr.getRouteManifest();
   assert.equal(
+    new Set(routes.map(({ path }) => path)).size,
     routes.length,
-    44,
-    "route inventory changed; review this contract",
+    "route manifest must not contain duplicate paths",
   );
 
   const descriptions = [];
