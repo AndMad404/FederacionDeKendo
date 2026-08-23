@@ -117,7 +117,15 @@ test("shares the canonical page and displays the complete description", async ({
 
   await expect(
     page.getByRole("heading", { name: "Descripción", level: 2 }).locator("+ p"),
-  ).not.toBeEmpty();
+  ).toHaveCount(0);
+  const description = page
+    .getByRole("heading", { name: "Descripción", level: 2 })
+    .locator("+ div");
+  await expect(description.locator("ul > li")).toHaveCount(7);
+  await expect(
+    description.getByText("Transporte ida y vuelta", { exact: true }),
+  ).toBeVisible();
+  await expect(description.locator("p")).toHaveCount(3);
   await expect(
     page.getByRole("button", { name: "Leer descripción completa" }),
   ).toHaveCount(0);
