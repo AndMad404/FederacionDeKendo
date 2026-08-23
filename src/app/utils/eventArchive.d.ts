@@ -11,10 +11,18 @@ export function calculateArchiveEligibleAt(
   lastEventDate: string,
   timeZone?: string,
 ): Date;
+export function calculatePublicPastAt(
+  lastEventDate: string,
+  timeZone?: string,
+): Date;
 
 export function isArchiveEligible(event: CalendarEvent, now?: Date): boolean;
 export function getArchiveEligibleAt(event: CalendarEvent): Date;
 export function calculateGalleryCheckAt(
+  lastEventDate: string,
+  timeZone?: string,
+): Date;
+export function calculateGalleryDeadlineAt(
   lastEventDate: string,
   timeZone?: string,
 ): Date;

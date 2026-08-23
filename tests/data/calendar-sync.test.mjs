@@ -16,7 +16,12 @@ import {
   parseVEvents,
   synchronizeCalendar,
 } from "../../scripts/sync-calendar-events.mjs";
-import { calculateArchiveEligibleAt } from "../../src/app/utils/eventArchive.js";
+import {
+  calculateArchiveEligibleAt,
+  calculateGalleryCheckAt,
+  calculateGalleryDeadlineAt,
+  calculatePublicPastAt,
+} from "../../src/app/utils/eventArchive.js";
 import {
   addCalendarDays,
   getCalendarDateTimeSortKey,
@@ -263,6 +268,25 @@ test("Given an event at month end, When the 48-hour calendar checkpoint arrives,
   assert.equal(
     calculateArchiveEligibleAt("2026-01-31").toISOString(),
     "2026-02-02T06:00:00.000Z",
+  );
+});
+
+test("separates public expiry, the first gallery check, and the final 48-hour deadline", () => {
+  assert.equal(
+    calculatePublicPastAt("2026-08-22").toISOString(),
+    "2026-08-23T06:00:00.000Z",
+  );
+  assert.equal(
+    calculateGalleryCheckAt("2026-08-22").toISOString(),
+    "2026-08-23T06:00:00.000Z",
+  );
+  assert.equal(
+    calculateGalleryDeadlineAt("2026-08-22").toISOString(),
+    "2026-08-24T06:00:00.000Z",
+  );
+  assert.equal(
+    calculateArchiveEligibleAt("2026-08-22").toISOString(),
+    "2026-08-24T06:00:00.000Z",
   );
 });
 

@@ -13,6 +13,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import {
   calculateArchiveEligibleAt,
   calculateGalleryCheckAt,
+  calculateGalleryDeadlineAt,
   getArchiveEligibleAt,
   isArchiveEligible,
 } from "../src/app/utils/eventArchive.js";
@@ -1425,22 +1426,30 @@ export async function synchronizeCalendar({
   let registry = mergeRegistry(previousRegistry, parsed, now);
 
   const galleryEvents = registry.events
-    .filter((event) => {
+    .map((event) => {
       const lastEventDate =
         event.endDate && !event.startTime && !event.endTime
           ? addCalendarDays(event.endDate, -1)
           : (event.endDate ?? event.date);
-      return (
-        calculateGalleryCheckAt(lastEventDate, event.timeZone).getTime() <=
-        now.getTime()
+      const firstCheckAt = calculateGalleryCheckAt(
+        lastEventDate,
+        event.timeZone,
       );
+      if (firstCheckAt.getTime() > now.getTime()) return undefined;
+      const deadlineAt = calculateGalleryDeadlineAt(
+        lastEventDate,
+        event.timeZone,
+      );
+      return {
+        slug: event.slug,
+        title: event.title,
+        date: event.date,
+        albumUrl: getPrivateAlbumUrl(currentBySourceId.get(event.sourceId)),
+        galleryCheckPhase:
+          deadlineAt.getTime() <= now.getTime() ? "final" : "first",
+      };
     })
-    .map((event) => ({
-      slug: event.slug,
-      title: event.title,
-      date: event.date,
-      albumUrl: getPrivateAlbumUrl(currentBySourceId.get(event.sourceId)),
-    }));
+    .filter(Boolean);
   let galleryResult;
   if (galleryEvents.length || galleryOptions?.force) {
     galleryResult = await synchronizeEventGalleries({

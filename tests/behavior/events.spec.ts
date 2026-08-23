@@ -123,16 +123,16 @@ test("shares the canonical page and displays the complete description", async ({
   ).toHaveCount(0);
 });
 
-test("moves an event from upcoming to history when the event ends", async ({
+test("moves an event from upcoming to history after its local date expires", async ({
   page,
 }) => {
-  await page.clock.setFixedTime(new Date("2026-08-08T14:59:59-06:00"));
+  await page.clock.setFixedTime(new Date("2026-08-08T23:59:59-06:00"));
   await page.goto("/eventos/pasados/");
   await expect(page.locator(`a[href="${HISTORICAL_EVENT_PATH}"]`)).toHaveCount(
     0,
   );
 
-  await page.clock.setFixedTime(new Date("2026-08-08T15:00:00-06:00"));
+  await page.clock.setFixedTime(new Date("2026-08-09T00:00:00-06:00"));
   await page.reload();
   await expect(
     page.locator(`a[href="${HISTORICAL_EVENT_PATH}"]`),

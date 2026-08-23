@@ -1,5 +1,6 @@
 import type { CalendarEvent } from "../types";
 import { addCalendarDays } from "./calendarDate.js";
+import { calculatePublicPastAt } from "./eventArchive.js";
 
 export interface UpcomingEventGroup {
   monthKey: string;
@@ -93,7 +94,14 @@ export function getEventEndDate(event: CalendarEvent) {
 }
 
 export function isPastEvent(event: CalendarEvent, now = new Date()) {
-  return getEventEndDate(event).getTime() <= now.getTime();
+  const lastEventDate =
+    event.endDate && !event.startTime && !event.endTime
+      ? addCalendarDays(event.endDate, -1)
+      : (event.endDate ?? event.date);
+  return (
+    calculatePublicPastAt(lastEventDate, event.timeZone).getTime() <=
+    now.getTime()
+  );
 }
 
 export function getUpcomingEvents(

@@ -195,8 +195,9 @@ export async function synchronizeEventGalleries({
   const warnings = [];
   const alarms = [];
   const previousState = await readJson(statePath, {
-    version: 1,
+    version: 2,
     galleries: {},
+    checks: {},
   });
   let previousGalleries = {};
   try {
@@ -207,8 +208,12 @@ export async function synchronizeEventGalleries({
     if (error?.code !== "ENOENT") throw error;
   }
   const nextState = structuredClone(previousState);
+  nextState.version = 2;
+  nextState.galleries ??= {};
+  nextState.checks ??= {};
   const nextGalleries = structuredClone(previousGalleries);
-  let hasNewGallery = false;
+  let hasGalleryChange = false;
+  let hasStateChange = false;
   let importedCount = 0;
   const stage = `${imagesRoot}.${process.pid}.stage`;
   await rm(stage, { recursive: true, force: true });
@@ -240,6 +245,17 @@ export async function synchronizeEventGalleries({
     }
     const frozen = stateFrozen ?? manifestFrozen;
     if (frozen) continue;
+    const galleryCheckPhase = event.galleryCheckPhase ?? "final";
+    const previousCheckPhase = previousState.checks?.[event.slug]?.phase;
+    const phaseRank = { first: 1, final: 2 };
+    if (
+      (phaseRank[previousCheckPhase] ?? 0) >=
+      (phaseRank[galleryCheckPhase] ?? 0)
+    ) {
+      continue;
+    }
+    nextState.checks[event.slug] = { phase: galleryCheckPhase };
+    hasStateChange = true;
     if (!event.albumUrl) {
       alarms.push({
         slug: event.slug,
@@ -307,7 +323,8 @@ export async function synchronizeEventGalleries({
       if (frozen) {
         if (!stateFrozen) {
           nextState.galleries[event.slug] = { fingerprint: frozen.fingerprint };
-          hasNewGallery = true;
+          hasGalleryChange = true;
+          hasStateChange = true;
         }
         if (frozen.fingerprint !== fingerprint) {
           warnings.push(
@@ -364,7 +381,8 @@ export async function synchronizeEventGalleries({
       }
       nextGalleries[event.slug] = { fingerprint, images };
       nextState.galleries[event.slug] = { fingerprint };
-      hasNewGallery = true;
+      hasGalleryChange = true;
+      hasStateChange = true;
       importedCount += 1;
     } catch {
       warnings.push(
@@ -380,7 +398,7 @@ export async function synchronizeEventGalleries({
     }
   }
 
-  if (!hasNewGallery) {
+  if (!hasGalleryChange && !hasStateChange) {
     await rm(stage, { recursive: true, force: true });
     return {
       galleries: nextGalleries,
@@ -391,16 +409,21 @@ export async function synchronizeEventGalleries({
     };
   }
 
-  const manifestStage = `${manifestPath}.${process.pid}.stage`;
   const stateStage = `${statePath}.${process.pid}.stage`;
-  await mkdir(path.dirname(manifestStage), { recursive: true });
-  await writeFile(manifestStage, serializeManifest(nextGalleries));
+  await mkdir(path.dirname(stateStage), { recursive: true });
   await writeFile(stateStage, `${JSON.stringify(nextState, null, 2)}\n`);
-  const publication = [
-    { target: imagesRoot, staged: stage },
-    { target: manifestPath, staged: manifestStage },
-    { target: statePath, staged: stateStage },
-  ];
+  const publication = [{ target: statePath, staged: stateStage }];
+  if (hasGalleryChange) {
+    const manifestStage = `${manifestPath}.${process.pid}.stage`;
+    await mkdir(path.dirname(manifestStage), { recursive: true });
+    await writeFile(manifestStage, serializeManifest(nextGalleries));
+    publication.unshift(
+      { target: imagesRoot, staged: stage },
+      { target: manifestPath, staged: manifestStage },
+    );
+  } else {
+    await rm(stage, { recursive: true, force: true });
+  }
   if (!deferPublish) await replaceTransaction(publication);
   return {
     galleries: nextGalleries,

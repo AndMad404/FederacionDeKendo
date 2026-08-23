@@ -16,7 +16,7 @@ import {
   primaryButtonClass,
   secondaryButtonClass,
 } from "../styles/shared";
-import { getEventEndDate } from "../utils/calendarEvents";
+import { isPastEvent } from "../utils/calendarEvents";
 import {
   formatEventTime,
   getEventDateLabel,
@@ -56,9 +56,7 @@ export function EventPage() {
   const event = getLocalizedEvent(sourceEvent, language);
   if (!event) return null;
 
-  const isPast = now
-    ? getEventEndDate(event).getTime() <= now.getTime()
-    : false;
+  const isPast = now ? isPastEvent(event, now) : false;
   const locationUrl = event.location
     ? getLocationMapUrl(event.location)
     : undefined;

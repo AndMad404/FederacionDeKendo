@@ -286,7 +286,78 @@ test("reports an unpublished album without inventing a frozen gallery", async ()
       },
     ]);
     await assert.rejects(stat(context.options.manifestPath), /ENOENT/);
-    await assert.rejects(stat(context.options.statePath), /ENOENT/);
+    assert.deepEqual(result.state.checks["2026-01-01-evento"], {
+      phase: "final",
+    });
+  } finally {
+    await rm(context.directory, { recursive: true, force: true });
+  }
+});
+
+test("checks an absent gallery once at 24 hours and once at the 48-hour deadline", async () => {
+  const context = await fixture([]);
+  const event = {
+    slug: "2026-01-01-evento",
+    title: "Evento",
+    galleryCheckPhase: "first",
+  };
+  try {
+    const first = await synchronizeEventGalleries({
+      ...context.options,
+      events: [event],
+    });
+    assert.equal(first.alarms.length, 1);
+    assert.deepEqual(first.state.checks[event.slug], { phase: "first" });
+
+    const repeatedFirst = await synchronizeEventGalleries({
+      ...context.options,
+      events: [event],
+    });
+    assert.deepEqual(repeatedFirst.alarms, []);
+
+    const final = await synchronizeEventGalleries({
+      ...context.options,
+      events: [{ ...event, galleryCheckPhase: "final" }],
+    });
+    assert.equal(final.alarms.length, 1);
+    assert.deepEqual(final.state.checks[event.slug], { phase: "final" });
+
+    const repeatedFinal = await synchronizeEventGalleries({
+      ...context.options,
+      events: [{ ...event, galleryCheckPhase: "final" }],
+    });
+    assert.deepEqual(repeatedFinal.alarms, []);
+  } finally {
+    await rm(context.directory, { recursive: true, force: true });
+  }
+});
+
+test("imports content uploaded between the 24-hour check and the 48-hour deadline", async () => {
+  const files = [{ name: "1.jpg", id: "one", buffer: await image("red") }];
+  const context = await fixture(files);
+  const event = { slug: "2026-01-01-evento", title: "Evento" };
+  try {
+    await synchronizeEventGalleries({
+      ...context.options,
+      events: [{ ...event, galleryCheckPhase: "first" }],
+    });
+
+    const final = await synchronizeEventGalleries({
+      ...context.options,
+      events: [
+        {
+          ...event,
+          galleryCheckPhase: "final",
+          albumUrl: "https://drive.google.com/drive/folders/publicAlbum",
+        },
+      ],
+      listFolder: async () => files,
+      downloadFile: async (file) => file.buffer,
+    });
+
+    assert.equal(final.importedCount, 1);
+    assert.equal(final.galleries[event.slug].images.length, 1);
+    assert.deepEqual(final.state.checks[event.slug], { phase: "final" });
   } finally {
     await rm(context.directory, { recursive: true, force: true });
   }
