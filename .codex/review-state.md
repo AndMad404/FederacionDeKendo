@@ -4082,6 +4082,28 @@ latest_calendar_date_helper_followup:
     - architecture.md records the shared calendar-date boundary and its consumers.
   result: The previous time-zone and ordinal findings remain closed by their existing directed browser tests; the remaining date-helper duplication is now removed and documented.
 
+latest_event_public_history_fix:
+  id: FIX-2026-08-23-01
+  requested_scope: Move completed events from upcoming events into past events while preserving the 48-hour content window.
+  baseline:
+    commit: 4f1cb335
+    worktree: clean immediately after the implementation commit
+  implementation:
+    - Public classification now uses the event end instant for upcoming lists, historical lists, canonical paths, and historical route acceptance.
+    - archiveEligibleAt remains the separate 48-hour checkpoint used by synchronization to freeze editorial content and galleries.
+  verification:
+    - corepack pnpm run typecheck passed
+    - corepack pnpm run build passed, including generated historical routes for the 2026-08-22 tournament
+    - corepack pnpm run test:behavior passed 33 tests
+    - corepack pnpm run test:sync-directed passed 62 tests
+    - corepack pnpm run test:generated passed 12 tests
+    - directed Prettier check and git diff --check passed
+    - global format:check remains blocked by pre-existing formatting differences in CalendarEventCard.tsx and CalendarSection.tsx
+  result: Commit 4f1cb335 separates public past-event visibility from the 48-hour editorial freeze without changing synchronization policy.
+  documented:
+    - event-history-roadmap.md records the public transition and updated phase evidence.
+    - calendar-sync.md distinguishes the public event-end boundary from archiveEligibleAt.
+
 latest_calendar_phase6_review:
   id: REV-2026-08-14-01
   requested_scope: Determine whether Phase 6 of the calendar-resilience roadmap is implemented and identify anything omitted.
