@@ -1,7 +1,7 @@
 import { CALENDAR_EVENTS } from "../data/calendarEvents";
 import type { CalendarEvent } from "../types";
 import type { Language } from "../config/i18n";
-import { isArchiveEligible } from "./eventArchive.js";
+import { isPastEvent } from "./calendarEvents";
 export { getArchivePagePath } from "./eventArchiveRoutes.js";
 
 export function getEventPath(
@@ -9,7 +9,7 @@ export function getEventPath(
   language: Language = "es",
   now = new Date(),
 ) {
-  const archived = isArchiveEligible(event, now);
+  const archived = isPastEvent(event, now);
   if (language === "en") {
     return archived
       ? `/en/events/past/${event.id}/`
@@ -31,7 +31,7 @@ export function findEventByPathname(pathname: string) {
   );
   if (archivedMatch) {
     const event = findEventBySlug(decodeURIComponent(archivedMatch[1]));
-    return event && isArchiveEligible(event) ? event : undefined;
+    return event && isPastEvent(event) ? event : undefined;
   }
 
   const currentMatch = pathname.match(/^\/(?:eventos|en\/events)\/([^/]+)\/?$/);
@@ -42,7 +42,7 @@ export function findEventByPathname(pathname: string) {
 
 export function getPastEvents(now = new Date()) {
   return [...CALENDAR_EVENTS]
-    .filter((event) => isArchiveEligible(event, now))
+    .filter((event) => isPastEvent(event, now))
     .sort(
       (a, b) =>
         new Date(`${b.date}T${b.startTime ?? "00:00"}`).getTime() -

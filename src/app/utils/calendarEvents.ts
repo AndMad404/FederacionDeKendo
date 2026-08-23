@@ -92,13 +92,17 @@ export function getEventEndDate(event: CalendarEvent) {
   );
 }
 
+export function isPastEvent(event: CalendarEvent, now = new Date()) {
+  return getEventEndDate(event).getTime() <= now.getTime();
+}
+
 export function getUpcomingEvents(
   events: readonly CalendarEvent[],
   now = new Date(),
   max = 4,
 ) {
   return [...events]
-    .filter((event) => getEventEndDate(event) > now)
+    .filter((event) => !isPastEvent(event, now))
     .sort(
       (a, b) => getEventStartDate(a).getTime() - getEventStartDate(b).getTime(),
     )

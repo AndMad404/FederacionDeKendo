@@ -123,16 +123,16 @@ test("shares the canonical page and displays the complete description", async ({
   ).toHaveCount(0);
 });
 
-test("uses injected time for the 48-hour calendar transition into event history", async ({
+test("moves an event from upcoming to history when the event ends", async ({
   page,
 }) => {
-  await page.clock.setFixedTime(new Date("2026-08-09T23:59:59-06:00"));
+  await page.clock.setFixedTime(new Date("2026-08-08T14:59:59-06:00"));
   await page.goto("/eventos/pasados/");
   await expect(page.locator(`a[href="${HISTORICAL_EVENT_PATH}"]`)).toHaveCount(
     0,
   );
 
-  await page.clock.setFixedTime(new Date("2026-08-10T00:00:00-06:00"));
+  await page.clock.setFixedTime(new Date("2026-08-08T15:00:00-06:00"));
   await page.reload();
   await expect(
     page.locator(`a[href="${HISTORICAL_EVENT_PATH}"]`),
@@ -243,7 +243,7 @@ test("renders the historical archive and a custom not-found view", async ({
   await expect(
     page.getByRole("heading", { name: "Eventos pasados", level: 1 }),
   ).toBeVisible();
-  await expect(page.getByText("Página 1 de 1")).toBeVisible();
+  await expect(page.getByText("Página 1 de 2")).toBeVisible();
 
   await page.goto("/eventos/ruta-inexistente/");
   await expect(page.getByText(/página que buscas no existe/i)).toBeVisible();
