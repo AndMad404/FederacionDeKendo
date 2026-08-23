@@ -23,6 +23,7 @@ import { MediaPageBanner } from "./ui/MediaPageBanner";
 import { useLanguage } from "../config/i18n";
 import { getLocalizedEvents } from "../utils/localizedEvents";
 import { useHydratedNow } from "../hooks/useHydratedNow";
+import { EventSummary } from "./EventSummary";
 
 export function PastEventsSection() {
   const { language, copy } = useLanguage();
@@ -143,9 +144,14 @@ export function PastEventsSection() {
                       {getEventDateLabel(event, language)}
                     </p>
                     <h2 className="mt-1 font-bold">{event.title}</h2>
-                    <p className="mt-1 line-clamp-2 text-sm text-site-muted">
-                      {event.summary ?? copy.common.informationPending}
-                    </p>
+                    <div className="mt-1">
+                      <EventSummary
+                        summary={
+                          event.summary ?? copy.common.informationPending
+                        }
+                        compact
+                      />
+                    </div>
                   </div>
                   <Link
                     to={getEventPath(event, language)}

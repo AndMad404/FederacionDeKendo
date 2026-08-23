@@ -28,6 +28,7 @@ import { findEventByPathname, getEventPath } from "../utils/eventRoutes";
 import { MediaPageBanner } from "./ui/MediaPageBanner";
 import { HistoricalEventGallery } from "./HistoricalEventGallery";
 import { useHydratedNow } from "../hooks/useHydratedNow";
+import { EventSummary } from "./EventSummary";
 
 async function shareEvent(title: string, url: string) {
   if (navigator.share) {
@@ -179,9 +180,9 @@ export function EventPage() {
 
                 <div className="grid gap-1">
                   <h2 className="font-bold">{copy.event.description}</h2>
-                  <p className="whitespace-pre-line text-sm leading-relaxed text-site-muted">
-                    {event.summary ?? copy.common.informationPending}
-                  </p>
+                  <EventSummary
+                    summary={event.summary ?? copy.common.informationPending}
+                  />
                 </div>
               </div>
 
