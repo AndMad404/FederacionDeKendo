@@ -731,13 +731,11 @@ stale_coverage_notices:
     limitation: Synchronization and UI behavior are current at 504fc8ff; visual coverage remains stale for Event at four viewports, Gallery at two mobile viewports, and Home at tablet pending owner attribution and approval.
 
 design_source_status:
-  status: obsolete_pending_recreation
-  obsolete_source: the original Figma Make design and export
+  status: external_source_retired
   temporary_visual_authority:
     - current application behavior and geometry
     - owner-approved measurements, screenshots, and rendered results
-  rule: Do not claim fidelity to or drift from the original Figma. A recreated Figma becomes authoritative only after explicit owner approval.
-  planned_work: Recreate Figma from the approved current product, including supported routes, responsive viewports, components, tokens, and interactive states.
+  rule: Do not claim fidelity to or drift from a retired external design source. A new source becomes authoritative only after explicit owner approval.
   recorded_at: 2026-08-01
 
 latest_calendar_freeze_review:
@@ -861,7 +859,7 @@ latest_design_contract_migration:
   baseline:
     commit: c0e73e23
     worktree: clean before implementation
-    visual_authority: Current owner-approved application geometry and rendered styles; the obsolete Figma was not used.
+    visual_authority: Current owner-approved application geometry and rendered styles; no retired external design source was used.
   result_ref: uncommitted worktree based on c0e73e23
   implemented:
     - added tests/e2e/design-contract.ts as the explicit source for approved viewports, margins, padding, gaps, radius, and representative page selection
@@ -890,7 +888,7 @@ latest_session:
       - computed outer and internal padding, responsive variant precedence, and alignment offsets
       - requested 669x386 and nearby 844x390 landscape presentations
     excluded:
-      - application-code edits, typography, colors, radii, other routes, Figma comparison, and production behavior
+      - application-code edits, typography, colors, radii, other routes, external design comparison, and production behavior
   baseline:
     commit: ece88800
     worktree: dirty only from the prior review-state documentation update
@@ -915,7 +913,7 @@ previous_landscape_review:
       - requested 669x386 and nearby 844x390 landscape presentations
     excluded:
       - application-code edits
-      - Figma comparison, other routes, keyboard interaction, screen-reader execution, performance, SEO, and production behavior
+      - external design comparison, other routes, keyboard interaction, screen-reader execution, performance, SEO, and production behavior
   baseline:
     commit: ece88800
     worktree: clean before this review-state update
@@ -1123,7 +1121,7 @@ latest_style_review_session:
       - semantic color tokens, surfaces, radii, shadows, buttons, typography, spacing, and central-content composition
       - comparison with Calendar and Affiliates as the closest internal-page references
     excluded:
-      - Figma pixel fidelity because no current Figma node was supplied
+      - pixel fidelity to an external design source because no current reference was supplied
       - SEO, copy quality, React behavior, and production deployment
       - exhaustive visual inspection of every site route
   baseline:
@@ -1233,9 +1231,9 @@ latest_design_metrics_review:
       - same-element class conflicts and generated CSS precedence
       - inherited text declarations repeated by descendants
       - no-effect absolute sizing, aspect-ratio, centering, and base-typography utilities
-      - repeated important overrides and legacy Figma theme scaffolding
+      - repeated important overrides and legacy generated-theme scaffolding
     excluded:
-      - Figma pixel fidelity because no current Figma node was supplied
+      - pixel fidelity to an external design source because no current reference was supplied
       - responsive browser geometry, copy, SEO, accessibility, React behavior, and production deployment
   baseline:
     commit: 39386711
@@ -1260,7 +1258,7 @@ latest_design_metrics_cleanup:
   implemented:
     - split neutral surface metrics from panel radius and text tone, then used the neutral primitive for the Calendar empty state and NotFound actions
     - replaced PageTitle important overrides with explicit density, decoration, and casing variants
-    - removed unused generic Figma/shadcn theme families, the dark-mode block, the dark custom variant, and generated chart/sidebar tokens while preserving consumed base tokens
+    - removed unused generic generated/shadcn theme families, the dark-mode block, the dark custom variant, and generated chart/sidebar tokens while preserving consumed base tokens
     - removed the reviewed no-effect absolute sizing, thumbnail aspect ratio, centering, inherited text, and base paragraph-size utilities
     - removed the redundant Footer heading and contact wrappers
   resolved_findings: [STR-TW-002, SMELL-TW-001, SMELL-TW-002, POL-TW-008, POL-ARCH-003]
@@ -1353,7 +1351,7 @@ prior_modal_control_review_session:
     excluded:
       - implementation of the recommended control primitive
       - exhaustive keyboard, swipe, and focus regression testing
-      - pixel-level comparison with Figma because no Figma artifact was supplied
+      - pixel-level comparison with an external design source because no reference artifact was supplied
       - production deployment behavior
   baseline:
     commit: 391c061b
@@ -1394,7 +1392,7 @@ prior_redundancy_session:
     excluded:
       - implementation of proposed refactors
       - TypeScript, Tailwind, accessibility, performance, SEO, and responsive correctness
-      - visual or pixel-level Figma comparison
+      - visual or pixel-level external design comparison
       - runtime browser and production behavior
   baseline:
     commit: bffe7fc5
@@ -1456,7 +1454,7 @@ prior_session:
       - route geometry at the required responsive matrix and variant-boundary viewports
     excluded:
       - TS, React, accessibility, performance, and SEO concerns unrelated to the requested Tailwind/responsive behavior
-      - pixel-level comparison with Figma because no Figma artifact was included in the inspected files
+      - pixel-level comparison with an external design source because no reference artifact was included in the inspected files
       - production deployment behavior
   baseline:
     commit: f35c9557
@@ -1683,7 +1681,7 @@ coverage:
     included:
       - computed caption padding, content edge offsets, caption-row overlap, and horizontal document overflow
     excluded:
-      - unrelated gallery behavior, other routes, Figma fidelity, deployed production output, and regenerated documentation screenshots
+      - unrelated gallery behavior, other routes, external-design fidelity, deployed production output, and regenerated documentation screenshots
     depth: reviewed_and_locally_verified
     status: current
     evidence:
@@ -1704,7 +1702,7 @@ coverage:
     included:
       - computed padding, responsive variant precedence, and caption content offsets
     excluded:
-      - implementation, typography, color, radius, other routes, Figma fidelity, and production behavior
+      - implementation, typography, color, radius, other routes, external-design fidelity, and production behavior
     depth: reviewed_and_locally_verified
     status: stale
     stale_reason: FeaturedImage.tsx changed when POL-TW-009 was resolved; the resolution checks below supersede only the padding finding, not the full original review scope.
@@ -1794,7 +1792,7 @@ coverage:
       - resolution of STR-TW-002, SMELL-TW-001, SMELL-TW-002, POL-TW-008, and POL-ARCH-003
       - generated CSS output and responsive geometry of affected consumers
       - desktop no-scroll invariant across all six routes
-    excluded: [exact Figma fidelity, production deployment]
+    excluded: [exact external-design fidelity, production deployment]
     depth: implemented_and_verified
     status: current
     fingerprint: 29FC55201050DD80870189BC353FC27C7CF085B5B9EEBFDCA7AA9ABF5764715C
@@ -1822,7 +1820,7 @@ coverage:
       - no-effect utilities, repeated important overrides, and excess presentational nesting
       - legacy theme and dark-mode scaffolding
     excluded:
-      - exact Figma fidelity
+      - exact external-design fidelity
       - responsive browser geometry and runtime interaction
       - color contrast, semantics, SEO, React hook behavior, and performance
     depth: reviewed
@@ -2022,7 +2020,7 @@ coverage:
       - previous/next navigation and Escape close in both dialogs
       - TypeScript and production plus SSR build integrity
     excluded:
-      - pixel-level Figma comparison
+      - pixel-level external design comparison
       - production deployment behavior
     depth: verified
     evidence:
@@ -2061,7 +2059,7 @@ coverage:
     excluded:
       - implementation
       - exhaustive modal interaction regression
-      - Figma pixel comparison
+      - external design pixel comparison
       - production behavior
     depth: reviewed
     evidence:
@@ -2356,7 +2354,7 @@ coverage:
     excluded:
       - implementation
       - TypeScript, Tailwind, accessibility, performance, SEO, and responsive correctness
-      - visual or pixel-level Figma comparison
+      - visual or pixel-level external design comparison
       - runtime browser and production behavior
     depth: reviewed
     evidence:
@@ -2575,7 +2573,7 @@ coverage:
       - responsive route geometry
     excluded:
       - unrelated TS, React, accessibility, performance, and SEO concerns
-      - pixel-level Figma comparison without a Figma artifact
+      - pixel-level external design comparison without a reference artifact
       - production deployment behavior
     depth: reviewed
     evidence:
@@ -3307,7 +3305,7 @@ current_review:
     - corepack pnpm run typecheck passed
     - corepack pnpm run test:unit passed with 12 tests
     - corepack pnpm run test:generated passed with 5 tests
-  result: No reproducible CRITICAL was found in the inspected sample; three maintainability risks were confirmed without using the obsolete Figma as evidence.
+  result: No reproducible CRITICAL was found in the inspected sample; three maintainability risks were confirmed without using a retired external design source as evidence.
 
 latest_calendar_refactor:
   id: FIX-2026-08-04-05
@@ -3392,10 +3390,6 @@ coverage:
     status: current
 
 pending_reviews:
-  - id: PEND-ARCH-005
-    target: recreate Figma from the approved current product
-    axes: [ARCH, RESPONSIVE]
-    reason: The original Figma Make design is obsolete. A new file must cover current routes, reference viewports, tokens, components, and interactive states, then receive explicit owner approval before it can establish fidelity or drift.
   - id: PEND-SEO-003
     target: client-approved provisional name, official-name cutover, canonical domain, and redirect policy
     axes: [SEO, ARCH]
@@ -3445,7 +3439,7 @@ latest_spa_mobile_review:
     targets: [src/app/App.tsx, src/main.tsx, src/app/routeRegistry.client.tsx, src/app/components/**/*.tsx, src/app/hooks/*.ts, src/styles/globals.css, responsive Playwright inventory]
     axes: [ARCH, REACT, A11Y, PERF, RESPONSIVE]
     included: [SPA navigation and hydration, route splitting, viewport and orientation strategy, content reachability, touch targets, modal isolation, responsive test matrix]
-    excluded: [SEO depth, copy accuracy, visual fidelity, obsolete Figma comparison, live assistive technology, field performance, generator internals]
+    excluded: [SEO depth, copy accuracy, visual fidelity, retired external design comparison, live assistive technology, field performance, generator internals]
   baseline: { commit: a394c725, worktree: clean before this state update }
   confirmed_findings: [CRIT-RESP-001, STR-RESP-003, STR-ARCH-013, SMELL-A11Y-003, SMELL-A11Y-004]
   evidence:
@@ -3778,7 +3772,7 @@ latest_hero_overlay_review:
     targets: [src/app/components/HeroSection.tsx, homepage at 360x800, 390x844, 768x1024, and 1366x768]
     axes: [A11Y, RESPONSIVE]
     included: [saved Git diff, approved screenshot comparison, text-to-image contrast, right-side subject visibility]
-    excluded: [style edits, baseline regeneration, obsolete Figma, production behavior, other routes except contamination checks]
+    excluded: [style edits, baseline regeneration, retired external design source, production behavior, other routes except contamination checks]
   baseline:
     commit: 88733b9c
     worktree: dirty with unrelated EventPage.tsx and MediaPageBanner.tsx visual changes

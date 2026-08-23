@@ -218,7 +218,7 @@ session` or name the exact utility families reviewed.
 - Flag early STRUCTURAL findings; they are cheaper before more components
   depend on them.
 - Skip team-coordination concerns unless asked.
-- Flag Figma-to-code drift under ARCH with note `Figma drift` only after the owner has explicitly approved a recreated Figma as current. The original Figma is obsolete and cannot establish drift.
+- Flag design-to-code drift under ARCH only after the owner has explicitly approved the external design source as current. A retired source cannot establish drift.
 - Flag excess nesting, magic numbers, and duplicated AI-export logic under ARCH
   with note `AI-gen smell`.
 

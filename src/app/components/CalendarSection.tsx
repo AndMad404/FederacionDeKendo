@@ -1,12 +1,7 @@
 import { useMemo } from "react";
 import { CALENDAR_EVENTS } from "../data/calendarEvents";
 import { getUpcomingEventGroups } from "../utils/calendarEvents";
-import {
-  focusRingClass,
-  panelSurfaceClass,
-  secondaryButtonClass,
-  surfaceClass,
-} from "../styles/shared";
+import { panelSurfaceClass, surfaceClass } from "../styles/shared";
 import { CalendarMonth } from "./calendar/CalendarMonth";
 import { CalendarNavigation } from "./calendar/CalendarNavigation";
 import { MediaPageBanner } from "./ui/MediaPageBanner";
