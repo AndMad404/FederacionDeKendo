@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import { Link } from "react-router";
 import { CALENDAR_EVENTS } from "../data/calendarEvents";
 import { getUpcomingEventGroups } from "../utils/calendarEvents";
 import {
@@ -14,6 +13,7 @@ import { MediaPageBanner } from "./ui/MediaPageBanner";
 import { useLanguage, type Language } from "../config/i18n";
 import { getLocalizedEvents } from "../utils/localizedEvents";
 import { useCalendarNavigation } from "../hooks/useCalendarNavigation";
+import { EventSectionNavigation } from "./events/EventSectionNavigation";
 
 function CalendarBanner() {
   const { copy } = useLanguage();
@@ -97,9 +97,6 @@ export function CalendarSection() {
 
   const currentGroup = eventGroups[groupIndex];
   const nextGroup = eventGroups[groupIndex + 1];
-  const archivePath =
-    language === "en" ? "/en/events/past/" : "/eventos/pasados/";
-
   return (
     <section
       aria-labelledby="calendar-title"
@@ -113,14 +110,7 @@ export function CalendarSection() {
             className={`flex w-full touch-pan-y select-none flex-col justify-start gap-3 px-3 py-4 text-center sm:px-2 md:max-w-5xl md:gap-2 md:py-4 xl:min-h-[24.625rem] page-fit:py-[15px] land-sm:gap-2 land-sm:px-2 land-sm:py-2 ${panelSurfaceClass}`}
             {...swipeHandlers}
           >
-            <div className="flex justify-center">
-              <Link
-                to={archivePath}
-                className={`${secondaryButtonClass} ${focusRingClass}`}
-              >
-                {copy.calendar.pastEvents}
-              </Link>
-            </div>
+            <EventSectionNavigation active="upcoming" />
 
             <CalendarNavigation
               currentMonthLabel={formatMonth(currentGroup.monthKey, language)}
@@ -166,11 +156,14 @@ export function CalendarSection() {
         </div>
       ) : (
         <div className="relative z-10 flex flex-1 items-center justify-center px-4">
-          <p
-            className={`rounded-lg px-6 py-5 text-center text-lg ${surfaceClass}`}
+          <div
+            className={`flex w-full max-w-md flex-col gap-3 p-4 text-center ${panelSurfaceClass}`}
           >
-            {copy.calendar.empty}
-          </p>
+            <EventSectionNavigation active="upcoming" />
+            <p className={`rounded-lg px-6 py-5 text-lg ${surfaceClass}`}>
+              {copy.calendar.empty}
+            </p>
+          </div>
         </div>
       )}
     </section>

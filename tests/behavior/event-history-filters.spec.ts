@@ -29,14 +29,125 @@ test("persists combined filters on reload and localized routes", async ({
   ).toHaveValue("examen");
 });
 
+test("renders localized upcoming and past event navigation with the active page", async ({
+  page,
+}) => {
+  const routes = [
+    {
+      path: "/eventos/",
+      upcomingPath: "/eventos/",
+      pastPath: "/eventos/pasados/",
+      upcoming: "Próximos eventos",
+      past: "Eventos pasados",
+      active: "upcoming",
+    },
+    {
+      path: "/eventos/pasados/",
+      upcomingPath: "/eventos/",
+      pastPath: "/eventos/pasados/",
+      upcoming: "Próximos eventos",
+      past: "Eventos pasados",
+      active: "past",
+    },
+    {
+      path: "/en/events/",
+      upcomingPath: "/en/events/",
+      pastPath: "/en/events/past/",
+      upcoming: "Upcoming events",
+      past: "Past events",
+      active: "upcoming",
+    },
+    {
+      path: "/en/events/past/",
+      upcomingPath: "/en/events/",
+      pastPath: "/en/events/past/",
+      upcoming: "Upcoming events",
+      past: "Past events",
+      active: "past",
+    },
+  ] as const;
+
+  for (const route of routes) {
+    await page.goto(route.path);
+    const main = page.locator("main");
+    const upcoming = main.getByRole("link", {
+      name: route.upcoming,
+      exact: true,
+    });
+    const past = main.getByRole("link", { name: route.past, exact: true });
+    const inactive = route.active === "upcoming" ? past : upcoming;
+    const inactivePath =
+      route.active === "upcoming" ? route.pastPath : route.upcomingPath;
+
+    await expect(upcoming).toHaveAttribute("href", route.upcomingPath);
+    await expect(past).toHaveAttribute("href", route.pastPath);
+    await expect(route.active === "upcoming" ? upcoming : past).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    await expect(inactive).not.toHaveAttribute("aria-current");
+    expect((await inactive.boundingBox())?.height).toBeGreaterThanOrEqual(44);
+
+    await inactive.focus();
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(new RegExp(`${inactivePath}$`));
+  }
+});
+
+test("aligns the calendar and historical content panels on the reference desktop", async ({
+  page,
+}) => {
+  await page.clock.setFixedTime(new Date("2026-08-04T12:00:00-06:00"));
+  await page.setViewportSize({ width: 1366, height: 768 });
+
+  await page.goto("/eventos/");
+  const calendarTop = await page
+    .locator("[data-page-content-boundary]")
+    .boundingBox();
+
+  await page.goto("/eventos/pasados/");
+  const archiveTop = await page
+    .locator("[data-page-content-boundary]")
+    .boundingBox();
+
+  expect(calendarTop).not.toBeNull();
+  expect(archiveTop).not.toBeNull();
+  expect(Math.abs(calendarTop!.y - archiveTop!.y)).toBeLessThanOrEqual(1);
+});
+
 test("preserves filters in pagination and resets to page one when changed", async ({
   page,
 }) => {
   await page.goto("/eventos/pasados/?type=examen");
   const next = page.getByRole("link", { name: "Siguiente" });
   await expect(next).toHaveAttribute("href", /pagina\/2\/\?type=examen$/);
+  await expect(next.locator("svg")).toHaveCount(1);
+  expect((await next.boundingBox())?.height).toBeGreaterThanOrEqual(44);
   await next.click();
   await expect(page).toHaveURL(/pagina\/2\/\?type=examen$/);
+  const previous = page.getByRole("link", { name: "Anterior" });
+  await expect(previous).toHaveAttribute(
+    "href",
+    /eventos\/pasados\/\?type=examen$/,
+  );
+  await expect(previous.locator("svg")).toHaveCount(1);
+  await previous.click();
+  await expect(page).toHaveURL(/eventos\/pasados\/\?type=examen$/);
+
+  await page.goto("/en/events/past/?type=examen");
+  const englishNext = page.getByRole("link", { name: "Next" });
+  await expect(englishNext).toHaveAttribute(
+    "href",
+    /en\/events\/past\/page\/2\/\?type=examen$/,
+  );
+  await englishNext.click();
+  await expect(page).toHaveURL(/en\/events\/past\/page\/2\/\?type=examen$/);
+  await expect(page.getByRole("link", { name: "Previous" })).toHaveAttribute(
+    "href",
+    /en\/events\/past\/\?type=examen$/,
+  );
+
+  await page.goto("/eventos/pasados/?type=examen");
   await page
     .getByRole("combobox", { name: "Año", exact: true })
     .selectOption("2026");

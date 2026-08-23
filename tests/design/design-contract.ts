@@ -96,7 +96,7 @@ export function getComponentSpacingContract(
     };
   }
 
-  if (design === "calendar") {
+  if (design === "calendar" || design === "pastEvents") {
     return {
       selector: "[data-page-content-boundary]",
       paddingTop: viewportWidth >= 1280 ? 15 : 16,

@@ -1,10 +1,11 @@
 import { Link, useLocation, useNavigate } from "react-router";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { PAST_EVENTS_PAGE_SIZE } from "../config/events";
 import {
   focusRingClass,
+  navigationArrowButtonClass,
   panelSurfaceClass,
   primaryButtonClass,
-  secondaryButtonClass,
 } from "../styles/shared";
 import { getEventDateLabel } from "../utils/calendarEventPresentation";
 import {
@@ -24,6 +25,7 @@ import { useLanguage } from "../config/i18n";
 import { getLocalizedEvents } from "../utils/localizedEvents";
 import { useHydratedNow } from "../hooks/useHydratedNow";
 import { EventSummary } from "./EventSummary";
+import { EventSectionNavigation } from "./events/EventSectionNavigation";
 
 export function PastEventsSection() {
   const { language, copy } = useLanguage();
@@ -52,7 +54,6 @@ export function PastEventsSection() {
     (page - 1) * PAST_EVENTS_PAGE_SIZE,
     page * PAST_EVENTS_PAGE_SIZE,
   );
-  const calendarPath = language === "en" ? "/en/events/" : "/eventos/";
   const eventTypes: ArchiveEventType[] = ["torneo", "examen", "seminario"];
 
   function changeFilter(name: "year" | "type", value: string) {
@@ -87,17 +88,14 @@ export function PastEventsSection() {
         }}
       />
 
-      <div className="relative z-20 -mt-11 flex min-h-0 flex-1 items-start justify-center px-3 pb-0 pt-3 sm:-mt-13 sm:px-4 sm:pb-0 sm:pt-4 tall-md:p-4 land-sm:px-3 land-sm:pb-0 land-sm:pt-3 land-compact:-mt-8">
+      <div className="relative z-20 -mt-11 flex min-h-0 flex-1 items-start justify-center px-3 pb-0 pt-3 sm:-mt-13 sm:px-4 sm:pb-0 sm:pt-4 tall-md:p-4 page-fit:absolute page-fit:inset-0 page-fit:mt-0 page-fit:items-start page-fit:px-4 page-fit:pb-4 page-fit:pt-20 land-sm:px-2 land-sm:pb-0 land-sm:pt-2 land-compact:-mt-8">
         <div
-          className={`flex w-full max-w-5xl flex-col gap-3 p-4 ${panelSurfaceClass}`}
+          data-page-content-boundary
+          className={`flex w-full touch-pan-y select-none flex-col justify-start gap-3 px-3 py-4 text-center sm:px-2 md:max-w-5xl md:gap-2 md:py-4 xl:min-h-[24.625rem] page-fit:py-[15px] land-sm:gap-2 land-sm:px-2 land-sm:py-2 ${panelSurfaceClass}`}
         >
+          <EventSectionNavigation active="past" />
+
           <div className="grid grid-cols-2 items-end gap-3 md:mx-auto md:w-fit md:grid-cols-[auto_auto]">
-            <Link
-              to={calendarPath}
-              className={`col-span-2 justify-self-center ${secondaryButtonClass} ${focusRingClass}`}
-            >
-              {copy.archive.upcomingEvents}
-            </Link>
             <label className="relative min-w-0 text-xs font-bold text-site-muted">
               <select
                 name="year"
@@ -175,18 +173,20 @@ export function PastEventsSection() {
             {page > 1 ? (
               <Link
                 to={buildArchiveUrl(page - 1, language, filters)}
-                className={`${secondaryButtonClass} ${focusRingClass}`}
+                aria-label={copy.archive.previous}
+                className={`${navigationArrowButtonClass} ${focusRingClass}`}
               >
-                {copy.archive.previous}
+                <ChevronLeft className="size-5 md:size-6" aria-hidden="true" />
               </Link>
             ) : null}
             <span className="text-sm font-semibold">{pageLabel}</span>
             {page < pageCount ? (
               <Link
                 to={buildArchiveUrl(page + 1, language, filters)}
-                className={`${secondaryButtonClass} ${focusRingClass}`}
+                aria-label={copy.archive.next}
+                className={`${navigationArrowButtonClass} ${focusRingClass}`}
               >
-                {copy.archive.next}
+                <ChevronRight className="size-5 md:size-6" aria-hidden="true" />
               </Link>
             ) : null}
           </nav>
