@@ -1,8 +1,11 @@
 import { expect, test, type Browser } from "@playwright/test";
 
 const TIMED_EVENT_PATH = "/en/events/2026-08-22-3er-torneo/";
-const AFTER_EVENT_END = new Date("2026-08-22T23:30:00.000Z");
+const PAST_TIMED_EVENT_PATH = "/en/events/past/2026-08-22-3er-torneo/";
+const BEFORE_TIMED_EVENT_PUBLIC_PAST = new Date("2026-08-23T05:59:59.000Z");
+const TIMED_EVENT_PUBLIC_PAST = new Date("2026-08-23T06:00:00.000Z");
 const ALL_DAY_EVENT_PATH = "/en/events/2026-05-02-examen/";
+const PAST_ALL_DAY_EVENT_PATH = "/en/events/past/2026-05-02-examen/";
 
 async function expectActivityStatusInTimeZone(
   browser: Browser,
@@ -27,14 +30,28 @@ test("event completion uses the event time zone instead of the visitor time zone
     browser,
     "America/Costa_Rica",
     TIMED_EVENT_PATH,
-    AFTER_EVENT_END,
-    "Completed activity",
+    BEFORE_TIMED_EVENT_PUBLIC_PAST,
+    "Scheduled activity",
   );
   await expectActivityStatusInTimeZone(
     browser,
     "Pacific/Kiritimati",
     TIMED_EVENT_PATH,
-    AFTER_EVENT_END,
+    BEFORE_TIMED_EVENT_PUBLIC_PAST,
+    "Scheduled activity",
+  );
+  await expectActivityStatusInTimeZone(
+    browser,
+    "America/Costa_Rica",
+    PAST_TIMED_EVENT_PATH,
+    TIMED_EVENT_PUBLIC_PAST,
+    "Completed activity",
+  );
+  await expectActivityStatusInTimeZone(
+    browser,
+    "Pacific/Kiritimati",
+    PAST_TIMED_EVENT_PATH,
+    TIMED_EVENT_PUBLIC_PAST,
     "Completed activity",
   );
 });
@@ -52,7 +69,7 @@ test("all-day events end at the next midnight in the event time zone", async ({
   await expectActivityStatusInTimeZone(
     browser,
     "Pacific/Kiritimati",
-    ALL_DAY_EVENT_PATH,
+    PAST_ALL_DAY_EVENT_PATH,
     new Date("2026-05-03T06:00:00.000Z"),
     "Completed activity",
   );
