@@ -1,8 +1,22 @@
 {
-  "version": 1,
+  "version": 2,
   "galleries": {
     "2026-08-08-examen": {
       "fingerprint": "2164e8b1aa9e2137057d27be603d707fb25d0c2b8c31e5ed1be3912763284fe8"
+    }
+  },
+  "checks": {
+    "2026-05-02-examen": {
+      "phase": "final"
+    },
+    "2026-05-29-clak-seminario-instructores-chile": {
+      "phase": "final"
+    },
+    "2026-05-30-seminario": {
+      "phase": "final"
+    },
+    "2026-08-22-3er-torneo": {
+      "phase": "final"
     }
   }
 }
