@@ -36,7 +36,6 @@ export function evaluateToolUse(input, { enforce = false } = {}) {
     };
   }
   return {
-    systemMessage: `${reason} Advisory mode did not block the tool call.`,
     hookSpecificOutput: {
       hookEventName: "PreToolUse",
       additionalContext: reason,

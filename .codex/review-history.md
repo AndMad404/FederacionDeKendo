@@ -1,5 +1,17 @@
 # Technical Review History
 
+This index routes historical review provenance. Historical snapshots are read
+only when a current finding needs its origin or prior evidence; they are not
+part of the default review context.
+
+## Snapshots
+
+| Snapshot | Captured | SHA-256 | Purpose |
+|---|---|---|---|
+| `review-history-2026-08-23.md` | 2026-08-23 | `2F0A88F8E96A89AFCCC752DB0CF762891411A5F41F21DFB4C7B259A91A964EE2` | Full pre-compaction schema-v2 state, including resolved sessions, stale coverage, open findings, decisions, and verification evidence. |
+
+## Legacy schema
+
 This file preserves review-state records that predate schema v2. Historical
 claims remain useful as provenance, but they are not current coverage unless a
 v2 record revalidates them with an explicit baseline and evidence.

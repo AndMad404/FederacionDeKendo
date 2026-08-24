@@ -27,14 +27,14 @@ export async function handleSessionStart(input) {
   });
 
   const changedFiles = worktree
-    ? worktree.split(/\r?\n/).slice(0, 12).join("; ")
+    ? worktree.split(/\r?\n/).slice(0, 5).join("; ")
     : "none";
   return {
     hookSpecificOutput: {
       hookEventName: "SessionStart",
       additionalContext:
-        `Codex supervision baseline: HEAD ${head}; pre-existing worktree changes: ${changedFiles}. ` +
-        "Preserve those changes. Agents advise, project hooks enforce mechanical gates, and the owner retains non-derivable decisions.",
+        `Baseline HEAD ${head}; existing changes: ${changedFiles}. ` +
+        "Preserve them; owner decisions remain human.",
     },
   };
 }

@@ -88,13 +88,13 @@ test("Stop and SubagentStop command handlers emit valid JSON only", async () => 
   assert.equal(stopOutput.decision, undefined);
 });
 
-test("second failures are recorded inside review-state YAML", () => {
+test("second failures stay in compact active review state", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "codex-hook-review-"));
   try {
     mkdirSync(path.join(root, ".codex"));
     writeFileSync(
       path.join(root, ".codex", "review-state.md"),
-      "# Technical Review State\n\n```yaml\nschema_version: 2\nlast_updated: 2026-08-20\n\n```\n",
+      "# Technical Review State\n\n```yaml\nschema_version: 3\nlast_updated: 2026-08-20\nhistory_index: .codex/review-history.md\n\n```\n",
     );
     assert.equal(
       recordHookFailure(root, {
@@ -111,6 +111,7 @@ test("second failures are recorded inside review-state YAML", () => {
     );
     assert.match(state, /hook_gate_failure_/);
     assert.match(state, /status: needs_human_review/);
+    assert.match(state, /history_index: \.codex\/review-history\.md/);
     assert.ok(state.indexOf("hook_gate_failure_") < state.lastIndexOf("```"));
   } finally {
     rmSync(root, { force: true, recursive: true });
@@ -124,6 +125,18 @@ test("PreToolUse advisory output uses supported context fields", () => {
   assert.equal(output.hookSpecificOutput.hookEventName, "PreToolUse");
   assert.match(output.hookSpecificOutput.additionalContext, /git push/);
   assert.equal(output.hookSpecificOutput.permissionDecision, undefined);
+  assert.equal(output.systemMessage, undefined);
+});
+
+test("hook context limits stay below the persistent-context budget", () => {
+  const config = JSON.parse(readFileSync(".codex/hooks.json", "utf8"));
+  assert.ok(
+    config.hooks.SessionStart[0].hooks[0].additionalContextLimit <= 400,
+  );
+  assert.ok(config.hooks.PreToolUse[0].hooks[0].additionalContextLimit <= 300);
+  assert.ok(
+    config.hooks.SubagentStart[0].hooks[0].additionalContextLimit <= 600,
+  );
 });
 
 test("PreToolUse enforcement uses the supported deny schema", () => {

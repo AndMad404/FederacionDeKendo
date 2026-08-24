@@ -11,7 +11,7 @@
             "commandWindows": "powershell.exe -NoProfile -NonInteractive -Command \"$root = git rev-parse --show-toplevel; node (Join-Path $root '.codex/hooks/session-start.mjs')\"",
             "timeout": 15,
             "statusMessage": "Recording the project supervision baseline",
-            "additionalContextLimit": 1200
+            "additionalContextLimit": 400
           }
         ]
       }
@@ -25,7 +25,7 @@
             "commandWindows": "powershell.exe -NoProfile -NonInteractive -Command \"$root = git rev-parse --show-toplevel; node (Join-Path $root '.codex/hooks/subagent-start.mjs')\"",
             "timeout": 10,
             "statusMessage": "Loading the subagent review contract",
-            "additionalContextLimit": 1000
+            "additionalContextLimit": 600
           }
         ]
       }
@@ -53,7 +53,7 @@
             "commandWindows": "powershell.exe -NoProfile -NonInteractive -Command \"$root = git rev-parse --show-toplevel; node (Join-Path $root '.codex/hooks/pre-tool-use.mjs') --advisory\"",
             "timeout": 10,
             "statusMessage": "Checking project-sensitive operations",
-            "additionalContextLimit": 800
+            "additionalContextLimit": 300
           }
         ]
       }

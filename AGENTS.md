@@ -1,236 +1,89 @@
 # FederacionDeKendo Agent Guide
 
-This repository is the official website for a kendo federation.
-
-Stack:
-- React 18
-- TypeScript
-- Tailwind CSS 4
-- Vite
+Official federation website: React 18, TypeScript, Tailwind CSS 4, and Vite.
 
 ## Core Rules
 
-- Use the current application plus owner-approved measurements, screenshots, and rendered results as the visual baseline.
-- Read the relevant files before making claims or edits.
-- After editing code or configuration, run `corepack pnpm run format:check` before reporting completion. The repository Prettier configuration requires CRLF line endings; do not treat a content-only diff as formatted until this check passes.
-- Keep work scoped to the user's requested file, route, concern, or task.
-- When the user does not know the relevant files, routes, or tests, read
-  `.agents/project-map.md` and discover the smallest evidence-based scope.
-  Do not inspect every route by default. Summarize the discovered scope before
-  editing when the request is investigative or materially ambiguous.
-- Prefer existing project patterns over new abstractions.
-- Do not refactor unrelated code while implementing a narrow change.
-- Do not treat a general preference against new tools or refactors as a ban on
-  evidence-based recommendations. When a confirmed problem has a proportionate
-  methodology, script, or tool, describe the option, its evidence, its cost,
-  and the smallest alternative. Do not install, adopt, or add it without owner
-  approval.
-- For programming work that depends on external technical facts, APIs,
-  performance guidance, or benchmark methodology, use current primary sources:
-  official product documentation, standards bodies, or the organization that
-  publishes the relevant benchmark. Cite the source with the recommendation or
-  state when no suitable primary source is available.
-- Never use CSS `!important` or Tailwind important modifiers. Resolve cascade
-  conflicts through structure, variants, or natural selector specificity.
-- Responsive design is mobile-first: base styles must serve mobile and touch
-  devices. Apply compact desktop overrides only under explicit desktop
-  conditions, and preserve at least 44 px touch targets on touch-capable and
-  hybrid devices.
-- Do not validate a narrow visual change on top of unrelated visual worktree
-  changes. First isolate the authorized patch or stop and ask how the existing
-  changes should be preserved.
-- Do not implement any visual change without explicit owner approval. This
-  includes spacing, dimensions, alignment, typography, colors, filters,
-  visibility, responsive presentation, and shared visual tokens.
-- Treat every unexpected visual-regression difference as blocking. An intended
-  difference in one region does not authorize or explain differences elsewhere.
-- Separate verified repo facts from suggestions or future ideas.
-- Treat legal, SEO metadata, and public copy constraints from the user as hard requirements.
-- Prioritize technically justified opportunities to improve SEO within the SPA
-  architecture. A temporary `noindex` policy does not waive this direction:
-  keep prerendered content, routing, metadata, internal links, and generated
-  output ready for eventual indexing when doing so is proportionate and does
-  not violate an approved product constraint.
-- Do not add a new public page only for a speculative SEO benefit. Before
-  implementation, document the page's concrete SEO purpose and technical
-  requirements, define its route and generated-output behavior, and obtain
-  explicit owner approval for its design requirements and visible result.
-- When creating a commit, follow the message convention in `CONTRIBUTING.md`.
-- After an owner-approved commit that resolves a technical finding or accepts a
-  technical/design decision, update `.codex/review-state.md` with the commit
-  SHA and recorded verification. Then use the private documentation index to
-  update only the selected canonical document when that approved decision
-  changes its recorded state. Do not document unapproved or uncommitted work as
-  a decision.
-- Use ASCII in repo instructions unless a file already requires non-ASCII text.
+- Read relevant sources before claiming or editing; separate verified facts from
+  suggestions.
+- Keep scope minimal. Use `.agents/project-map.md` only when the target is not
+  known, and expand only when evidence identifies a shared dependency.
+- Preserve unrelated worktree changes. Do not refactor outside the requested
+  concern or create a commit unless requested.
+- Prefer current project patterns. Do not add a methodology, tool, dependency,
+  or abstraction without evidence and owner approval.
+- Use current primary sources for external technical claims.
+- Treat legal constraints, public copy, SEO metadata, and owner decisions as
+  hard requirements. Do not add a speculative public page for SEO.
+- Never use CSS or Tailwind `!important`. Keep responsive styles mobile-first
+  and preserve 44 px targets on touch-capable and hybrid devices.
+- Do not implement visual changes without explicit owner approval. Use the
+  current application plus approved measurements, screenshots, and renders as
+  the baseline; isolate unrelated visual changes and block on every unexpected
+  visual difference.
+- Runtime, tests, builds, workflows, and public operations must never depend on
+  private documentation in `../DesarrolloAsistidoIA/`.
+- Use ASCII in repository instructions unless the file requires otherwise.
 
-## Task Modes
+## Task Router
 
-Use the smallest mode that fits the user's request.
+Load only the contract for the active responsibility:
 
-- Review mode: read `.agents/review-contract.md` before reviewing code.
-- Implementation mode: read `.agents/implementation-contract.md` before editing code.
-- Verification mode: read `.agents/verification.md` before deciding which checks to run.
-- Prompting examples: use `.agents/prompt-recipes.md` when the user wants help asking Codex for work.
+- Review: `.agents/review-contract.md`
+- Implementation: `.agents/implementation-contract.md`
+- Verification selection: `.agents/verification.md`
+- Prompt generation: `.agents/prompt-recipes.md`
+- Unknown technical scope: `.agents/project-map.md`
+- Private documentation: start at
+  `../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/index.md`
 
-If a request mixes review and implementation, review first, then ask or infer which findings should be applied.
+Do not preload these files together. If review leads to implementation, finish
+the review decision first and then switch responsibility.
 
-## Phased Roadmap Execution
+## Decisions and Phases
 
-- Execute an approved roadmap one independently verifiable phase at a time.
-  Do not combine parser, data pipeline, UI, visual, SEO, or documentation phases
-  merely because they belong to the same feature.
-- Start each phase from its canonical roadmap or backlog entry instead of
-  repeating the full project history in the task prompt.
-- Read only the documentation routed by
-  `../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/index.md` plus the
-  source files required by the current phase. Do not preload later-phase
-  context.
-- Before showing a generated roadmap-phase prompt, run the compactness check
-  below. If any rejected pattern remains, regenerate it; do not show a prompt
-  that merely explains or excuses the duplication.
+- Execute one independently verifiable roadmap phase at a time from its linked
+  section. Previous closed phases are not reaudited without a direct blocker.
+- Do not parallelize phases that share files, outputs, or sequential
+  dependencies.
+- Resolve derivable ambiguity from the routed sources. Ask the owner only when
+  a missing choice changes architecture, permissions, credentials, persistence,
+  security, operations, notifications, business policy, or a contract.
+- Use the canonical roadmap recipe and its compactness and executability gate
+  in `.agents/prompt-recipes.md`; do not reconstruct persistent context inside a
+  generated prompt.
+- Use a fresh task only when the primary responsibility changes. A direct fix
+  to the current result remains in the same task. Hook events such as
+  `SessionStart` are automatic and must not become user tasks or messages.
 
-### Roadmap-Phase Prompt Compactness Check
+## Review State and Documentation
 
-A generated prompt is invalid unless it retains, in brief form:
+- `.codex/review-state.md` contains unresolved technical state only. Read it for
+  review work, not ordinary implementation.
+- `.codex/review-history.md` routes resolved or superseded provenance. Read a
+  history snapshot only when an active finding requires its origin or evidence.
+- After an owner-requested commit resolves a finding or records an approved
+  decision, follow the review contract and update only the canonical private
+  document selected by its index.
+- Follow `CONTRIBUTING.md` for requested commit messages.
 
-1. the exact phase and objective;
-2. that previous phases are closed and not to be reaudited;
-3. the minimum-context selector;
-4. critical invariants that cannot change;
-5. relevant scope limits;
-6. preservation of unrelated worktree changes;
-7. verification through `.agents/verification.md`;
-8. the required final report; and
-9. the current no-commit-unless-requested policy.
+## Product Invariants
 
-Persistent instructions supply the detail behind these controls and must not be
-reconstructed in the prompt. Compacting removes redundancy and history, not
-operational controls. If an applicable control is absent, regenerate the prompt.
+- Bounded routes at 1366x768 keep navbar, primary content, and footer in one
+  viewport without document or primary-section vertical scrolling. Variable
+  lists use an explicit bounded interaction.
+- Event detail routes are the exception: the document scrolls normally and no
+  nested container may hide editorial content or historical galleries.
+- `src/app/config/seo-data.json` owns route and organization metadata;
+  `src/app/config/seo.ts` and `scripts/generate-route-html.mjs` consume it.
+- Build runs postbuild route generation. SEO or head changes require source and
+  generated-HTML verification. Gallery work requires data, components, and
+  responsive outputs to be considered together.
 
-Reject and regenerate a prompt if it contains any of these:
+## Completion
 
-- an instruction to read a complete roadmap or a complete canonical document;
-- named scripts, workflows, test files, or source-file lists selected by
-  `docs/index.md` or `.agents/project-map.md`;
-- Cloudflare, CI, rollback, secrets, or sensitive-data rules not newly changed
-  by the phase;
-- historical follow-ups or expanded closed-phase protections beyond the brief
-  no-reaudit statement;
-- named verification commands or gates selected by `.agents/verification.md`;
-- headings or equivalent sections for `Authorized Scope`, `Out of Scope`,
-  or `Exit Criteria`.
-
-Use the short `Implement One Roadmap Phase` recipe as the canonical prompt
-shape. Apart from its fixed operational controls, variable text may contain
-only the phase pointer, functional delta, critical invariant, and relevant
-limit. If a generated prompt is substantially longer than that delta plus the
-required compact controls, reject and regenerate it before showing it. It must
-delegate all other context and checks to their canonical sources.
-
-### Final Mandatory Phase-Prompt Gate
-
-Before delivering any phase-execution prompt, validate the final text. Reject,
-compact, and revalidate it if it:
-
-1. says to read a complete document without a direct dependency on it;
-2. enumerates files when a documentation map can select the context;
-3. states any restriction more than once;
-4. carries non-blocking history, including Cloudflare-CI, rollback, or closed
-   follow-ups;
-5. names broad checks that `.agents/verification.md` selects;
-6. repeats instructions about commits, secrets, private URLs, or transactional
-   preservation;
-7. reaudits or redesigns a closed phase without a direct blocking dependency;
-8. reconstructs prior architecture rather than describing the current delta;
-9. copies context already available from a persistent source of truth; or
-10. names an invariant that the current phase cannot actually violate.
-
-Compare the result with the canonical compact recipe. Remove every instruction
-that does not change what the agent must do, must not do, must verify, or must
-report. Do not deliver a prompt until it passes this gate.
-
-### Human Decision Ownership and Approval
-
-Treat a missing decision as a human block when answers would materially change
-architecture, permissions, external services, credentials, persistence,
-security, operational policy, notification channels, business decisions, or a
-contract. Advance only to that point, report the block and minimal alternative,
-then wait for owner approval. Resolve ambiguity from source-of-truth documents,
-code, and maps without asking the owner. Before finalizing a prompt, ask one
-concise owner question only when the missing requirement is not derivable and
-would materially change the implementation or reserve a decision to the owner.
-
-### Executable Prompt Governance
-
-Classify each phase-prompt instruction explicitly as one of: verifiable
-invariant, human decision, scope limit, verification, or final report. Do not
-use one category to imply another.
-
-Critical instructions must state an observable condition or a clear human
-escalation point. Prefer a condition such as "the same revision and cause do
-not create a second notification" over an untestable quality preference.
-
-Run two separate pre-delivery gates: compactness and executability. The latter
-fails if a critical rule lacks an observable behavior or a clear human
-escalation path. Regenerate the prompt until both gates pass.
-- Use a fresh task when the primary responsibility changes, such as moving
-  from tests to synchronization, images, filters, or UI. Keep the current task
-  for direct fixes to the phase being implemented.
-- During implementation, run the narrowest reproducing or directed check
-  first. Run broader typecheck, build, E2E, or visual gates once the directed
-  checks pass and the phase is ready for final verification.
-- Keep each completed phase suitable for an atomic commit and independent
-  review. Do not create a commit unless the user requests it.
-- Resolve blocking CI or test regressions before starting dependent structural
-  or visual phases.
-- Do not use parallel agents for sequential phases that share files or depend
-  on each other's output. Parallel work is appropriate only for genuinely
-  independent investigation or review.
-
-## Documentation Scope
-
-- Extended project documentation is stored outside this runtime repository at
-  `../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/` in the owner's
-  local workspace.
-- Start documentation work with
-  `../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/index.md`. Use its
-  routing table to select the smallest relevant document set; do not read the
-  full documentation tree by default.
-- For architecture, ADR, backlog, calendar-operation, or historical-document
-  work, read the relevant file from that location when it is available.
-- Never make application code, build scripts, tests, deployment, or workflows
-  depend on the private documentation repository.
-- If a future document becomes an input required by runtime or automation, keep
-  that required input in this repository.
-- Keep `.codex/review-state.md` limited to technical findings about this public
-  project.
-
-## Project-Specific Context
-
-- `src/app/App.tsx` is the route shell for `/`, `/calendario`, `/galeria`, and `/afiliados`.
-- At the reference desktop viewport (1366x768), bounded routes must keep the
-  navbar, main content, and footer within the visible viewport. Neither the
-  document nor the route's primary section may require vertical scrolling.
-  Lists with variable content must use a bounded presentation such as
-  pagination, filtering, or another explicit navigation pattern instead of
-  adding desktop scroll. Event-detail routes (`/eventos/<slug>/` and
-  `/en/events/<slug>/`) are the explicit exception: their descriptions and
-  optional historical galleries use normal document scrolling so all
-  editorial content remains visible and reachable. This rule does not prohibit
-  the documented mobile, tablet, or landscape scrolling behavior.
-- `src/app/config/seo-data.json` is the central source for route titles, descriptions, SEO text, locale/language, and organization metadata.
-- `src/app/config/seo.ts` and `scripts/generate-route-html.mjs` emit runtime and generated metadata from the SEO config.
-- `pnpm run build` also runs `postbuild`, generating route HTML under `dist/`.
-- If `pnpm` is not available directly in Windows PowerShell, use `corepack pnpm` with the same arguments.
-- For SEO/head changes, verify both source files and generated `dist` HTML.
-- For gallery or image work, inspect `src/app/data/gallery.ts`, gallery components, and responsive image outputs together.
-
-## Default Done Criteria
-
-Unless the user explicitly narrows the task to analysis only:
-
-- Explain the change briefly.
-- Run the relevant verification commands from `.agents/verification.md` when feasible.
-- Report any command that could not be run.
-- Do not claim production behavior is fixed from local files alone when the user is reporting deployed behavior.
+- Run the narrowest directed check first and select final checks through
+  `.agents/verification.md`.
+- After editing code or configuration, `corepack pnpm run format:check` must
+  pass; CRLF is required. Report skipped or unavailable checks.
+- Do not claim a deployed problem is fixed from local files alone.

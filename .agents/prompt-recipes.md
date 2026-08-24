@@ -94,6 +94,19 @@ Use the canonical `Implement One Roadmap Phase` recipe. Its direct phase link
 points to the relevant section of `calendar-resilience-roadmap.md`; do not add
 calendar-specific preamble, file lists, gates, or historical contracts.
 
+### Roadmap prompt gate
+
+Before delivery, reject and regenerate a phase prompt unless every instruction
+is an observable invariant, human decision, scope limit, verification route, or
+final-report requirement. Keep the exact phase, delta, applicable invariant,
+relevant limit, preservation of unrelated changes, verification selector, final
+report, and no-commit policy.
+
+Remove complete-document requests, routed file or command lists, duplicated
+restrictions, closed-phase history, unrelated operational detail, and context
+already owned by a contract. Ask one owner question only when a non-derivable
+decision materially changes the implementation.
+
 ## SEO Change
 
 ```text
