@@ -1,10 +1,12 @@
 import { createHash } from "node:crypto";
 import { execFileSync, spawnSync } from "node:child_process";
-import { existsSync, readFileSync, renameSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+
+import { updateReviewStateAtomically } from "../review-state.mjs";
 
 const RELEVANT_EXTENSIONS = new Set([
   ".cjs",
@@ -149,43 +151,39 @@ export function runCompletionChecks(root) {
   ];
 }
 
-function yamlString(value) {
-  const sanitized = Array.from(String(value), (character) =>
-    character.charCodeAt(0) <= 31 ? " " : character,
-  ).join("");
-  return JSON.stringify(sanitized);
-}
-
 export function recordHookFailure(root, failure) {
   const reviewStatePath = path.join(root, ".codex", "review-state.md");
   if (!existsSync(reviewStatePath)) return false;
-
-  const current = readFileSync(reviewStatePath, "utf8");
-  const fenceIndex = current.lastIndexOf("\n```");
-  if (fenceIndex < 0) return false;
-
-  const timestamp = new Date().toISOString();
-  const key = `hook_gate_failure_${timestamp.replace(/[-:.TZ]/g, "")}`;
-  const entry = [
-    "",
-    `${key}:`,
-    `  recorded_at: ${yamlString(timestamp)}`,
-    `  session_id: ${yamlString(failure.sessionId)}`,
-    `  event: ${yamlString(failure.event)}`,
-    "  status: needs_human_review",
-    `  problem: ${yamlString(failure.problem)}`,
-    `  evidence: ${yamlString(failure.evidence.slice(0, 1600))}`,
-  ].join("\n");
-  const dated = current.replace(
-    /^last_updated: .*$/m,
-    `last_updated: ${timestamp.slice(0, 10)}`,
-  );
-  const datedFenceIndex = dated.lastIndexOf("\n```");
-  const next = `${dated.slice(0, datedFenceIndex)}${entry}${dated.slice(datedFenceIndex)}`;
-  const temporaryPath = `${reviewStatePath}.${process.pid}.tmp`;
-  writeFileSync(temporaryPath, next, "utf8");
-  renameSync(temporaryPath, reviewStatePath);
-  return true;
+  try {
+    const timestamp = new Date().toISOString();
+    updateReviewStateAtomically(reviewStatePath, (state) => {
+      const baseId = `HOOK-${timestamp.replace(/\D/g, "")}`;
+      let id = baseId;
+      let suffix = 2;
+      while (state.hookFailures.some((entry) => entry.id === id)) {
+        id = `${baseId}-${suffix}`;
+        suffix += 1;
+      }
+      state.hookFailures.push({
+        id,
+        recordedAt: timestamp,
+        sessionId: String(failure.sessionId || "unknown").slice(0, 200),
+        event: String(failure.event || "unknown").slice(0, 64),
+        status: "needs_human_review",
+        problem: String(failure.problem || "Hook quality gate failed.").slice(
+          0,
+          400,
+        ),
+        evidence: String(failure.evidence || "No evidence recorded.").slice(
+          0,
+          800,
+        ),
+      });
+    });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function formatCheckFailures(checks) {

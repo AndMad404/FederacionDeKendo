@@ -19,6 +19,10 @@ import {
   recordHookFailure,
   saveSessionState,
 } from "../../.codex/hooks/shared.mjs";
+import {
+  parseReviewStateMarkdown,
+  serializeReviewStateMarkdown,
+} from "../../.codex/review-state.mjs";
 
 function runHook(script, input, args = []) {
   const result = spawnSync(
@@ -92,10 +96,52 @@ test("second failures stay in compact active review state", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "codex-hook-review-"));
   try {
     mkdirSync(path.join(root, ".codex"));
+    const fixture = parseReviewStateMarkdown(
+      readFileSync(".codex/review-state.md", "utf8"),
+    );
+    fixture.hookFailures = [];
     writeFileSync(
       path.join(root, ".codex", "review-state.md"),
-      "# Technical Review State\n\n```yaml\nschema_version: 3\nlast_updated: 2026-08-20\nhistory_index: .codex/review-history.md\n\n```\n",
+      serializeReviewStateMarkdown(fixture),
     );
+    assert.equal(
+      recordHookFailure(root, {
+        sessionId: "session",
+        event: "Stop",
+        problem: "Gate failed twice.",
+        evidence: "x".repeat(2000),
+      }),
+      true,
+    );
+    const state = parseReviewStateMarkdown(
+      readFileSync(path.join(root, ".codex", "review-state.md"), "utf8"),
+    );
+    assert.equal(state.hookFailures.length, 1);
+    assert.match(state.hookFailures[0].id, /^HOOK-/);
+    assert.equal(state.hookFailures[0].status, "needs_human_review");
+    assert.equal(state.hookFailures[0].evidence.length, 800);
+    assert.equal(state.historyIndex, ".codex/review-history.md");
+    assert.ok(
+      Buffer.byteLength(
+        readFileSync(
+          path.join(root, ".codex", "review-state.md"),
+          "utf8",
+        ).replaceAll("\r\n", "\n"),
+      ) <=
+        32 * 1024,
+    );
+  } finally {
+    rmSync(root, { force: true, recursive: true });
+  }
+});
+
+test("hook failure recording rejects invalid state without modifying it", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "codex-hook-invalid-"));
+  try {
+    mkdirSync(path.join(root, ".codex"));
+    const statePath = path.join(root, ".codex", "review-state.md");
+    const invalid = "# Technical Review State\r\n\r\n```json\r\n{}\r\n```\r\n";
+    writeFileSync(statePath, invalid, "utf8");
     assert.equal(
       recordHookFailure(root, {
         sessionId: "session",
@@ -103,16 +149,9 @@ test("second failures stay in compact active review state", () => {
         problem: "Gate failed twice.",
         evidence: "format:check failed",
       }),
-      true,
+      false,
     );
-    const state = readFileSync(
-      path.join(root, ".codex", "review-state.md"),
-      "utf8",
-    );
-    assert.match(state, /hook_gate_failure_/);
-    assert.match(state, /status: needs_human_review/);
-    assert.match(state, /history_index: \.codex\/review-history\.md/);
-    assert.ok(state.indexOf("hook_gate_failure_") < state.lastIndexOf("```"));
+    assert.equal(readFileSync(statePath, "utf8"), invalid);
   } finally {
     rmSync(root, { force: true, recursive: true });
   }

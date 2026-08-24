@@ -3,70 +3,132 @@ import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
+import {
+  extractResolvedIndexFromSnapshot,
+  parseReviewStateMarkdown,
+} from "../../.codex/review-state.mjs";
+
 const read = (path) => readFileSync(path, "utf8");
-const bytes = (path) => Buffer.byteLength(read(path));
+const gitNormalizedBytes = (path) =>
+  Buffer.byteLength(read(path).replaceAll("\r\n", "\n"));
+
+const BASELINE_COMMIT = "5531ee4f";
+const STATIC_CONTEXT_SCENARIOS = [
+  {
+    name: "known implementation",
+    files: [
+      "AGENTS.md",
+      ".agents/implementation-contract.md",
+      ".agents/verification.md",
+    ],
+    baselineBytes: 24_609,
+  },
+  {
+    name: "technical review",
+    files: [
+      "AGENTS.md",
+      ".agents/review-contract.md",
+      ".codex/review-state.md",
+      ".agents/verification.md",
+    ],
+    baselineBytes: 288_306,
+    maximumBytes: 50_000,
+  },
+  {
+    name: "roadmap prompt",
+    files: ["AGENTS.md", ".agents/prompt-recipes.md"],
+    baselineBytes: 16_939,
+  },
+];
+
+const CRITICAL_CONTROLS = {
+  "CTRL-SCOPE":
+    "Preserve unrelated worktree changes. Do not refactor outside the requested concern or create a commit unless requested.",
+  "CTRL-OWNER":
+    "Prefer current project patterns. Do not add a methodology, tool, dependency, or abstraction without evidence and owner approval.",
+  "CTRL-PUBLIC-SEO":
+    "Treat legal constraints, public copy, SEO metadata, and owner decisions as hard requirements. Do not add a speculative public page for SEO.",
+  "CTRL-VISUAL":
+    "Do not implement visual changes without explicit owner approval. Use the current application plus approved measurements, screenshots, and renders as the baseline; isolate unrelated visual changes and block on every unexpected visual difference.",
+  "CTRL-PHASE":
+    "Do not parallelize phases that share files, outputs, or sequential dependencies.",
+  "CTRL-FORMAT":
+    "After editing code or configuration, `corepack pnpm run format:check` must pass; CRLF is required. Report skipped or unavailable checks.",
+  "CTRL-DEPLOY":
+    "Do not claim a deployed problem is fixed from local files alone.",
+};
+
+function readCriticalControls(markdown) {
+  const controls = {};
+  const pattern = /^- \[(CTRL-[A-Z-]+)\] ([\s\S]*?)(?=\n- |\n\n|(?![\s\S]))/gm;
+  for (const match of markdown.matchAll(pattern)) {
+    assert.equal(controls[match[1]], undefined, `duplicate ${match[1]}`);
+    controls[match[1]] = match[2].replace(/\s+/g, " ").trim();
+  }
+  return controls;
+}
+
+function assertCriticalControls(markdown) {
+  assert.deepEqual(readCriticalControls(markdown), CRITICAL_CONTROLS);
+}
 
 test("persistent agent context stays within the approved compact budgets", () => {
-  assert.ok(bytes("AGENTS.md") <= 6000);
-  assert.ok(bytes(".agents/review-contract.md") <= 5000);
-  assert.ok(bytes(".codex/review-state.md") <= 16000);
+  assert.ok(gitNormalizedBytes("AGENTS.md") <= 6000);
+  assert.ok(gitNormalizedBytes(".agents/review-contract.md") <= 5000);
+  assert.ok(gitNormalizedBytes(".codex/review-state.md") <= 32 * 1024);
 });
 
-test("three representative task packages remain below their 2026-08-23 baselines", () => {
-  const scenarios = [
-    {
-      name: "known implementation",
-      current: bytes("AGENTS.md") + bytes(".agents/implementation-contract.md"),
-      baseline: 13502 + 5055,
-    },
-    {
-      name: "technical review",
-      current:
-        bytes("AGENTS.md") +
-        bytes(".agents/review-contract.md") +
-        bytes(".codex/review-state.md"),
-      baseline: 13502 + 9643 + 263438,
-    },
-    {
-      name: "roadmap prompt",
-      current: bytes("AGENTS.md") + bytes(".agents/prompt-recipes.md"),
-      baseline: 13502 + 3795,
-    },
-  ];
-
-  for (const scenario of scenarios) {
-    assert.ok(
-      scenario.current < scenario.baseline,
-      `${scenario.name}: ${scenario.current} must stay below ${scenario.baseline}`,
+test("static context packages remain below raw-byte baselines", () => {
+  for (const scenario of STATIC_CONTEXT_SCENARIOS) {
+    const currentBytes = scenario.files.reduce(
+      (total, path) => total + gitNormalizedBytes(path),
+      0,
     );
+    assert.ok(
+      currentBytes < scenario.baselineBytes,
+      `${scenario.name}: ${currentBytes} must stay below ${scenario.baselineBytes} raw bytes from ${BASELINE_COMMIT}`,
+    );
+    if (scenario.maximumBytes) {
+      assert.ok(
+        currentBytes <= scenario.maximumBytes,
+        `${scenario.name}: ${currentBytes} exceeds ${scenario.maximumBytes}`,
+      );
+    }
   }
 });
 
-test("compaction retains critical supervision controls", () => {
+test("critical supervision controls retain exact approved semantics", () => {
   const agents = read("AGENTS.md");
-  for (const required of [
-    "owner approval",
-    "Preserve unrelated worktree changes",
-    "Do not implement visual changes",
-    "Do not add a speculative public page",
-    "Do not parallelize phases",
-    "format:check",
-    "deployed problem",
-  ]) {
-    assert.match(agents, new RegExp(required));
-  }
+  assertCriticalControls(agents);
+  assert.throws(() =>
+    assertCriticalControls(
+      agents.replace(
+        "Do not implement visual changes",
+        "Implement visual changes",
+      ),
+    ),
+  );
 });
 
-test("active review state excludes historical review sessions", () => {
-  const state = read(".codex/review-state.md");
-  assert.match(state, /^schema_version: 3$/m);
-  assert.match(state, /^history_index: \.codex\/review-history\.md$/m);
-  assert.match(state, /^open_findings:$/m);
-  assert.match(state, /^pending_reviews:$/m);
-  assert.doesNotMatch(
-    state,
-    /^(?:latest_|previous_|prior_|resolved_findings:|stale_coverage_notices:)/m,
+test("active review state is canonical and indexes every explicit resolution", () => {
+  const state = parseReviewStateMarkdown(read(".codex/review-state.md"));
+  const snapshotPath = ".codex/review-history-2026-08-23.md";
+  const expectedIndex = extractResolvedIndexFromSnapshot(
+    read(snapshotPath),
+    snapshotPath,
+    "2026-08-23",
   );
+  assert.equal(state.schemaVersion, 4);
+  assert.equal(state.openFindings.length, 35);
+  assert.equal(state.resolvedIndex.length, 64);
+  assert.equal(new Set(state.resolvedIndex.map((entry) => entry.id)).size, 62);
+  assert.deepEqual(state.resolvedIndex, expectedIndex);
+  assert.deepEqual(state.idConflicts.map((entry) => entry.sourceId).sort(), [
+    "CRIT-ARCH-001",
+    "DOC-ARCH-003",
+    "SMELL-A11Y-003",
+    "STR-ARCH-008",
+  ]);
 });
 
 test("pre-compaction review snapshot remains immutable", () => {

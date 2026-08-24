@@ -10,6 +10,15 @@ part of the default review context.
 |---|---|---|---|
 | `review-history-2026-08-23.md` | 2026-08-23 | `2F0A88F8E96A89AFCCC752DB0CF762891411A5F41F21DFB4C7B259A91A964EE2` | Full pre-compaction schema-v2 state, including resolved sessions, stale coverage, open findings, decisions, and verification evidence. |
 
+## Maintenance
+
+- Immutable snapshots are never edited after their hash is registered.
+- Future reviews append complete dated records to this file.
+- When a finding resolves, remove its active entry and add one compact
+  `resolvedIndex` record that points back to this file or its immutable
+  snapshot. Matching source IDs are never merged without an explicit conflict
+  record.
+
 ## Legacy schema
 
 This file preserves review-state records that predate schema v2. Historical

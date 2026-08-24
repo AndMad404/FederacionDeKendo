@@ -58,7 +58,10 @@ if (isDirectExecution(import.meta.url)) {
   try {
     const input = await readHookInput();
     const result = await evaluateStop(input);
-    if (result.failure) recordHookFailure(result.root, result.failure);
+    if (result.failure && !recordHookFailure(result.root, result.failure)) {
+      result.output.systemMessage =
+        "Completion quality gate still fails and the active review state could not record it. The state was left unchanged; human review is required.";
+    }
     writeHookJson(result.output);
   } catch (error) {
     writeHookJson({

@@ -1,269 +1,146 @@
 # Technical Review State
 
-This file contains only unresolved technical review state. Full findings,
-resolved sessions, stale coverage, and prior verification evidence are routed
-through `.codex/review-history.md` and loaded only when provenance is required.
+This file contains current technical review state and a compact resolved
+provenance index. Full findings, sessions, stale coverage, and verification
+evidence remain in the history files and are loaded only when required.
 
-```yaml
-schema_version: 3
-last_updated: 2026-08-23
-contract: .agents/review-contract.md
-history_index: .codex/review-history.md
-history_snapshot: .codex/review-history-2026-08-23.md
-
-state_rules:
-  - Open entries are leads, not proof of current behavior; reverify the target before acting.
-  - Changed targets invalidate prior coverage until a new bounded review records evidence.
-  - Resolved and superseded records live only in history and are not current coverage.
-  - A hook gate failure remains active until a human resolves or archives it.
-
-coverage: []
-coverage_note: No pre-migration coverage was promoted because the repository changed after many recorded baselines.
-
-id_conflicts:
-  - source_id: SMELL-A11Y-003
-    status: needs_reverification
-    targets:
-      - compact desktop calendar and event controls
-      - mobile hero text contrast
-    rule: Treat these as separate unresolved leads and assign distinct stable IDs only after a bounded re-review.
-
-open_findings:
-  - id: TEST-DATA-001
-    level: SMELL
-    axis: ARCH
-    status: open
-    target: tests/data/gallery-data.test.mjs; tests/data/static-public-content.test.mjs
-    summary: English gallery identity is checked by two source-parsing inventories.
-  - id: SEO-TITLE-WIDTH-001
-    level: SMELL
-    axis: SEO
-    status: open
-    target: generated event route titles
-    summary: Event titles may exceed crawler preview thresholds; remeasure current output before changing copy.
-  - id: SEO-DESC-TRUNC-001
-    level: STRUCTURAL
-    axis: SEO
-    status: open
-    target: generated event route descriptions
-    summary: Some descriptions were mechanically truncated inside a sentence or address.
-  - id: PERF-CWV-001
-    level: SMELL
-    axis: PERF
-    status: open
-    target: repository performance verification
-    summary: No recorded field or automated measurement proves current LCP, INP, or CLS.
-  - id: SEO-EVENTOS-ROOT-001
-    level: STRUCTURAL
-    axis: SEO
-    status: open
-    target: /eventos/
-    summary: The Spanish events directory URL was reported as missing metadata because it returned 404.
-  - id: SEO-SITEMAP-001
-    level: SMELL
-    axis: SEO
-    status: open
-    target: scripts/generate-route-html.mjs
-    summary: Sitemap inclusion may conflict with the temporary global noindex policy.
-  - id: SEO-EVENT-META-001
-    level: STRUCTURAL
-    axis: SEO
-    status: open
-    target: src/app/config/seo.ts
-    summary: Recurring event routes may emit duplicate titles or descriptions.
-  - id: SEO-EVENT-I18N-001
-    level: STRUCTURAL
-    axis: SEO
-    status: open
-    target: localized generated event metadata
-    summary: At least one English route was reported with Spanish title and summary content.
-  - id: PERF-SOCIAL-IMAGE-001
-    level: SMELL
-    axis: PERF
-    status: open
-    target: src/app/config/seo-data.json
-    summary: Social metadata may select an unnecessarily large original image.
-  - id: SEO-INDEX-001
-    level: POLICY
-    axis: SEO
-    status: open_owner_policy
-    target: global indexing policy
-    summary: Indexing remains disabled pending an explicit owner and legal decision.
-  - id: VIS-REG-001
-    level: STRUCTURAL
-    axis: RESPONSIVE
-    status: open
-    target: tests/design/visual-regression.spec.ts-snapshots
-    summary: Historical visual differences require a fresh clean-worktree comparison before any baseline decision.
-  - id: STR-ARCH-015
-    level: STRUCTURAL
-    axis: ARCH
-    status: open
-    target: scripts/sync-calendar-events.mjs
-    summary: Historical events were reported to preserve identity fields but not the entire published snapshot.
-  - id: STR-ARCH-016
-    level: STRUCTURAL
-    axis: ARCH
-    status: open
-    target: calendar historical-change reporting
-    summary: Historical changes and disappearances require deterministic evidence and an approval boundary.
-  - id: SMELL-ARCH-011
-    level: SMELL
-    axis: ARCH
-    status: open
-    target: calendar historical-freeze coverage
-    summary: The freeze test was reported to cover fewer public fields than the persistence contract.
-  - id: STR-ARCH-011
-    level: STRUCTURAL
-    axis: ARCH
-    status: open
-    target: generated acceptance criteria and tests
-    summary: High-risk behavior lacks a complete independently approved acceptance oracle.
-  - id: STR-ARCH-012
-    level: STRUCTURAL
-    axis: ARCH
-    status: open
-    target: multi-file calendar publication
-    summary: Sequential destination replacement may leave registry and generated data inconsistent after partial failure.
-  - id: SMELL-ARCH-008
-    level: SMELL
-    axis: ARCH
-    status: open
-    target: generated-output and browser test names
-    summary: Some test names were reported to claim more than their assertions prove.
-  - id: SMELL-ARCH-009
-    level: SMELL
-    axis: ARCH
-    status: open
-    target: test:generated
-    summary: The generated-output command may read stale dist artifacts when run without a preceding build.
-  - id: SMELL-SEO-005
-    level: SMELL
-    axis: SEO
-    status: open
-    target: custom not-found browser scenario
-    summary: Local browser behavior does not prove deployed HTTP response semantics.
-  - id: STR-RESP-002
-    level: STRUCTURAL
-    axis: RESPONSIVE
-    status: open
-    target: responsive route contracts
-    summary: Historical route coverage did not fully encode bounded desktop sections, horizontal overflow, and mobile reachability.
-  - id: STR-ARCH-010
-    level: STRUCTURAL
-    axis: ARCH
-    status: open
-    target: requirements and automated evidence
-    summary: Requirements lack stable IDs mapped to owner-readable acceptance scenarios and tests.
-  - id: SMELL-ARCH-006
-    level: SMELL
-    axis: ARCH
-    status: open
-    target: event-route browser scenarios
-    summary: Some scenarios depend on mutable generated event slugs, titles, or first-match selection.
-  - id: SMELL-A11Y-002
-    level: SMELL
-    axis: A11Y
-    status: open
-    target: interactive browser coverage
-    summary: Keyboard workflows, modal focus containment, and automated accessibility scans remain incomplete.
-  - id: SMELL-ARCH-007
-    level: SMELL
-    axis: ARCH
-    status: open
-    target: Playwright CI diagnostics
-    summary: Cross-browser coverage and retained HTML or trace artifacts were reported as absent.
-  - id: STR-SEO-002
-    level: STRUCTURAL
-    axis: SEO
-    status: open
-    target: public organization identity and canonical domain policy
-    summary: Official identity and domain claims remain constrained by pending authorization.
-  - id: STR-ARCH-004
-    level: STRUCTURAL
-    axis: ARCH
-    status: open
-    target: phase-control documentation provenance
-    summary: Legacy review could not reproduce roadmap, baseline, and decision-log provenance from the public repository.
-  - id: STR-ARCH-005
-    level: STRUCTURAL
-    axis: ARCH
-    status: open
-    target: private architecture and phase-control documentation
-    summary: Some private architecture records were reported against an obsolete product revision.
-  - id: POL-ARCH-002
-    level: POLICY
-    axis: ARCH
-    status: open
-    target: event and archive layout policy
-    summary: Event layout differs from bounded media routes and requires an explicit product policy before change.
-  - id: SMELL-A11Y-003
-    level: SMELL
-    axis: A11Y
-    status: open_decision_required
-    target: compact desktop event controls
-    summary: Controls satisfy the recorded AA minimum but not the optional 44 px enhanced target policy.
-  - id: MIG-A11Y-001
-    source_id: SMELL-A11Y-003
-    level: SMELL
-    axis: A11Y
-    status: needs_reverification
-    target: mobile hero text contrast
-    summary: The historical state reused an existing ID for a separate reported hero-contrast problem.
-  - id: POL-RESP-010
-    level: POLICY
-    axis: RESPONSIVE
-    status: open
-    target: mobile hero treatment
-    summary: The recorded baseline did not prove the requested contrast and crop improvement.
-  - id: STR-RESP-011
-    level: STRUCTURAL
-    axis: RESPONSIVE
-    status: open
-    target: Home tablet visual baseline
-    summary: The tablet snapshot may predate navigation and containment changes.
-  - id: SMELL-SEO-007
-    level: SMELL
-    axis: SEO
-    status: deferred_presidency_authority
-    target: recurring event detail titles
-    summary: Date disambiguation is deferred to the public identity and editorial authority decision.
-  - id: DOC-ARCH-003
-    level: STRUCTURAL
-    axis: ARCH
-    status: open
-    target: private calendar resilience documentation
-    summary: Phase 6 documentation was reported stale relative to the implemented verification gate.
-  - id: EXT-ARCH-001
-    level: STRUCTURAL
-    axis: ARCH
-    status: open
-    target: external GitHub Actions and Cloudflare publication relationship
-    summary: Local files do not prove that deployment consumes only verified artifacts.
-
-pending_reviews:
-  - id: PEND-SEO-001
-    target: Search Console, Rich Results, and field Core Web Vitals
-    dependency: external Google property access
-  - id: PEND-SEO-002
-    target: dojo identity copy and per-dojo structured data
-    dependency: approved public copy
-  - id: PEND-SEO-003
-    target: provisional identity, official-name cutover, canonical domain, and redirects
-    dependency: legal and owner approval
-  - id: PEND-SEO-004
-    target: production event indexing and analytics baselines
-    dependency: indexing approval and external data
-  - id: PEND-ARCH-001
-    target: state-management architecture decision
-    dependency: a feature that exceeds current local and URL state patterns
-  - id: PEND-ARCH-003
-    target: event registration workflow
-    dependency: product requirements and ownership
-  - id: PEND-ARCH-004
-    target: expanded event editorial page
-    dependency: approved content responsibilities
-  - id: PEND-RESP-001
-    target: exact tablet and mobile inner-viewport geometry
-    dependency: reproducible native viewport evidence
+```json
+{
+  "schemaVersion": 4,
+  "lastUpdated": "2026-08-23",
+  "contract": ".agents/review-contract.md",
+  "historyIndex": ".codex/review-history.md",
+  "historySnapshots": [
+    {"file":".codex/review-history-2026-08-23.md","captured":"2026-08-23","sha256":"2F0A88F8E96A89AFCCC752DB0CF762891411A5F41F21DFB4C7B259A91A964EE2"}
+  ],
+  "stateRules": [
+    "Open entries are leads, not proof of current behavior; reverify the target before acting.",
+    "Changed targets invalidate prior coverage until a new bounded review records evidence.",
+    "Resolved and superseded records are provenance, not current coverage.",
+    "A hook gate failure remains active until a human resolves or archives it.",
+    "When a finding resolves, append its full evidence to history, remove the open entry, and add one compact resolved-index record."
+  ],
+  "coverage": [],
+  "coverageNote": "No pre-migration coverage was promoted because the repository changed after many recorded baselines.",
+  "idConflicts": [
+    {"sourceId":"SMELL-A11Y-003","status":"active_source_id_collision","targets":["compact desktop calendar and event controls","mobile hero text contrast"],"recordKeys":[],"rule":"Treat these as separate unresolved leads; MIG-A11Y-001 owns the hero-contrast lead until bounded re-review assigns a final ID."},
+    {"sourceId":"CRIT-ARCH-001","status":"historical_duplicate_resolved_records","targets":[".github/workflows/correct-calendar-history-range.yml:39"],"recordKeys":["RES-20260823-L0570","RES-20260823-L3113"],"rule":"Preserve every historical record independently; do not infer that matching source IDs describe the same review scope."},
+    {"sourceId":"STR-ARCH-008","status":"historical_duplicate_resolved_records","targets":["src/app/components and src/app/config/i18n.tsx"],"recordKeys":["RES-20260823-L3038","RES-20260823-L3339"],"rule":"Preserve every historical record independently; do not infer that matching source IDs describe the same review scope."},
+    {"sourceId":"DOC-ARCH-003","status":"reopened_after_historical_resolution","targets":["private calendar resilience documentation","../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/calendar-infrastructure-flows.md:159"],"recordKeys":["RES-20260823-L0589"],"rule":"Treat the open entry as the current lead and the resolved record only as provenance for its earlier scope."}
+  ],
+  "openFindings": [
+    {"id":"TEST-DATA-001","level":"SMELL","axis":"ARCH","status":"open","target":"tests/data/gallery-data.test.mjs; tests/data/static-public-content.test.mjs","summary":"English gallery identity is checked by two source-parsing inventories."},
+    {"id":"SEO-TITLE-WIDTH-001","level":"SMELL","axis":"SEO","status":"open","target":"generated event route titles","summary":"Event titles may exceed crawler preview thresholds; remeasure current output before changing copy."},
+    {"id":"SEO-DESC-TRUNC-001","level":"STRUCTURAL","axis":"SEO","status":"open","target":"generated event route descriptions","summary":"Some descriptions were mechanically truncated inside a sentence or address."},
+    {"id":"PERF-CWV-001","level":"SMELL","axis":"PERF","status":"open","target":"repository performance verification","summary":"No recorded field or automated measurement proves current LCP, INP, or CLS."},
+    {"id":"SEO-EVENTOS-ROOT-001","level":"STRUCTURAL","axis":"SEO","status":"open","target":"/eventos/","summary":"The Spanish events directory URL was reported as missing metadata because it returned 404."},
+    {"id":"SEO-SITEMAP-001","level":"SMELL","axis":"SEO","status":"open","target":"scripts/generate-route-html.mjs","summary":"Sitemap inclusion may conflict with the temporary global noindex policy."},
+    {"id":"SEO-EVENT-META-001","level":"STRUCTURAL","axis":"SEO","status":"open","target":"src/app/config/seo.ts","summary":"Recurring event routes may emit duplicate titles or descriptions."},
+    {"id":"SEO-EVENT-I18N-001","level":"STRUCTURAL","axis":"SEO","status":"open","target":"localized generated event metadata","summary":"At least one English route was reported with Spanish title and summary content."},
+    {"id":"PERF-SOCIAL-IMAGE-001","level":"SMELL","axis":"PERF","status":"open","target":"src/app/config/seo-data.json","summary":"Social metadata may select an unnecessarily large original image."},
+    {"id":"SEO-INDEX-001","level":"POLICY","axis":"SEO","status":"open_owner_policy","target":"global indexing policy","summary":"Indexing remains disabled pending an explicit owner and legal decision."},
+    {"id":"VIS-REG-001","level":"STRUCTURAL","axis":"RESPONSIVE","status":"open","target":"tests/design/visual-regression.spec.ts-snapshots","summary":"Historical visual differences require a fresh clean-worktree comparison before any baseline decision."},
+    {"id":"STR-ARCH-015","level":"STRUCTURAL","axis":"ARCH","status":"open","target":"scripts/sync-calendar-events.mjs","summary":"Historical events were reported to preserve identity fields but not the entire published snapshot."},
+    {"id":"STR-ARCH-016","level":"STRUCTURAL","axis":"ARCH","status":"open","target":"calendar historical-change reporting","summary":"Historical changes and disappearances require deterministic evidence and an approval boundary."},
+    {"id":"SMELL-ARCH-011","level":"SMELL","axis":"ARCH","status":"open","target":"calendar historical-freeze coverage","summary":"The freeze test was reported to cover fewer public fields than the persistence contract."},
+    {"id":"STR-ARCH-011","level":"STRUCTURAL","axis":"ARCH","status":"open","target":"generated acceptance criteria and tests","summary":"High-risk behavior lacks a complete independently approved acceptance oracle."},
+    {"id":"STR-ARCH-012","level":"STRUCTURAL","axis":"ARCH","status":"open","target":"multi-file calendar publication","summary":"Sequential destination replacement may leave registry and generated data inconsistent after partial failure."},
+    {"id":"SMELL-ARCH-008","level":"SMELL","axis":"ARCH","status":"open","target":"generated-output and browser test names","summary":"Some test names were reported to claim more than their assertions prove."},
+    {"id":"SMELL-ARCH-009","level":"SMELL","axis":"ARCH","status":"open","target":"test:generated","summary":"The generated-output command may read stale dist artifacts when run without a preceding build."},
+    {"id":"SMELL-SEO-005","level":"SMELL","axis":"SEO","status":"open","target":"custom not-found browser scenario","summary":"Local browser behavior does not prove deployed HTTP response semantics."},
+    {"id":"STR-RESP-002","level":"STRUCTURAL","axis":"RESPONSIVE","status":"open","target":"responsive route contracts","summary":"Historical route coverage did not fully encode bounded desktop sections, horizontal overflow, and mobile reachability."},
+    {"id":"STR-ARCH-010","level":"STRUCTURAL","axis":"ARCH","status":"open","target":"requirements and automated evidence","summary":"Requirements lack stable IDs mapped to owner-readable acceptance scenarios and tests."},
+    {"id":"SMELL-ARCH-006","level":"SMELL","axis":"ARCH","status":"open","target":"event-route browser scenarios","summary":"Some scenarios depend on mutable generated event slugs, titles, or first-match selection."},
+    {"id":"SMELL-A11Y-002","level":"SMELL","axis":"A11Y","status":"open","target":"interactive browser coverage","summary":"Keyboard workflows, modal focus containment, and automated accessibility scans remain incomplete."},
+    {"id":"SMELL-ARCH-007","level":"SMELL","axis":"ARCH","status":"open","target":"Playwright CI diagnostics","summary":"Cross-browser coverage and retained HTML or trace artifacts were reported as absent."},
+    {"id":"STR-SEO-002","level":"STRUCTURAL","axis":"SEO","status":"open","target":"public organization identity and canonical domain policy","summary":"Official identity and domain claims remain constrained by pending authorization."},
+    {"id":"STR-ARCH-004","level":"STRUCTURAL","axis":"ARCH","status":"open","target":"phase-control documentation provenance","summary":"Legacy review could not reproduce roadmap, baseline, and decision-log provenance from the public repository."},
+    {"id":"STR-ARCH-005","level":"STRUCTURAL","axis":"ARCH","status":"open","target":"private architecture and phase-control documentation","summary":"Some private architecture records were reported against an obsolete product revision."},
+    {"id":"POL-ARCH-002","level":"POLICY","axis":"ARCH","status":"open","target":"event and archive layout policy","summary":"Event layout differs from bounded media routes and requires an explicit product policy before change."},
+    {"id":"SMELL-A11Y-003","level":"SMELL","axis":"A11Y","status":"open_decision_required","target":"compact desktop event controls","summary":"Controls satisfy the recorded AA minimum but not the optional 44 px enhanced target policy."},
+    {"id":"MIG-A11Y-001","level":"SMELL","axis":"A11Y","status":"needs_reverification","target":"mobile hero text contrast","summary":"The historical state reused an existing ID for a separate reported hero-contrast problem.","sourceId":"SMELL-A11Y-003"},
+    {"id":"POL-RESP-010","level":"POLICY","axis":"RESPONSIVE","status":"open","target":"mobile hero treatment","summary":"The recorded baseline did not prove the requested contrast and crop improvement."},
+    {"id":"STR-RESP-011","level":"STRUCTURAL","axis":"RESPONSIVE","status":"open","target":"Home tablet visual baseline","summary":"The tablet snapshot may predate navigation and containment changes."},
+    {"id":"SMELL-SEO-007","level":"SMELL","axis":"SEO","status":"deferred_presidency_authority","target":"recurring event detail titles","summary":"Date disambiguation is deferred to the public identity and editorial authority decision."},
+    {"id":"DOC-ARCH-003","level":"STRUCTURAL","axis":"ARCH","status":"open","target":"private calendar resilience documentation","summary":"Phase 6 documentation was reported stale relative to the implemented verification gate."},
+    {"id":"EXT-ARCH-001","level":"STRUCTURAL","axis":"ARCH","status":"open","target":"external GitHub Actions and Cloudflare publication relationship","summary":"Local files do not prove that deployment consumes only verified artifacts."}
+  ],
+  "resolvedIndex": [
+    {"recordKey":"RES-20260823-L0037","id":"TEST-ARCH-001","target":"tests/behavior/events.spec.ts:304-335","summary":"The Behavior suite rechecks route-shell visibility and...","resolutionRef":"worktree SHA256 7150303AFB66F47A3F1590A991B8CF34B8CB7ED8789927A844618F615108C09D","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L0055","id":"TEST-RESP-001","target":"tests/behavior/event-history-filters.spec.ts:80-109","summary":"A Behavior test loops through the entire viewport matrix...","resolutionRef":"worktree SHA256 81BD428CEBE4A92A456D5D24F2B61A5DFF8BFEE25E69C9BD525B8CE8DF173DE5","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L0570","id":"CRIT-ARCH-001","target":".github/workflows/correct-calendar-history-range.yml:39","summary":"The correction workflow downloads artifact calendar-historica...","resolutionRef":"implementation worktree based on f9cdfe61","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L0589","id":"DOC-ARCH-003","target":"../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/calendar-infrastructure-flows.md:159","summary":"The implemented-resilience diagram says applicable future...","resolutionRef":"documentation worktree","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L0639","id":"DOC-ARCH-002","target":"../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/calendar-infrastructure-flows.md:19","summary":"The current-flow diagram shows the retained...","resolutionRef":"documentation worktree","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L0696","id":"DOC-ARCH-001","target":"../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/event-history-roadmap.md:3","summary":"The roadmap states that C2 is pending, while repository...","resolutionRef":"documentation worktree","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L2951","id":"POL-TW-009","target":null,"summary":"The compact-landscape caption now retains the site's 10px...","resolutionRef":"commit 424a6218, FeaturedImage.tsx C514CD983B6A56248FE8F6C8B029EE9D32DCB2E07BAB0598BD09DB67773D9088","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L2965","id":"STR-TW-002","target":null,"summary":"Neutral surface metrics are separated from panel radius and...","resolutionRef":"39386711 dirty worktree from FIX-2026-07-31-02","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L2973","id":"SMELL-TW-001","target":null,"summary":"PageTitle exposes density, decoration, and casing variants;...","resolutionRef":"39386711 dirty worktree from FIX-2026-07-31-02","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L2981","id":"SMELL-TW-002","target":null,"summary":"Unused generic theme families, dark-mode scaffolding, and...","resolutionRef":"39386711 dirty worktree from FIX-2026-07-31-02","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L2989","id":"POL-TW-008","target":null,"summary":"The reviewed no-effect absolute sizing, thumbnail aspect...","resolutionRef":"39386711 dirty worktree from FIX-2026-07-31-02","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L2997","id":"POL-ARCH-003","target":null,"summary":"Footer purpose and contact content now render directly under...","resolutionRef":"39386711 dirty worktree from FIX-2026-07-31-02","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3005","id":"SMELL-ARCH-005","target":null,"summary":"The orphaned ModalShell component was deleted while the...","resolutionRef":"711945b7 dirty worktree from FIX-2026-07-30-01","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3013","id":"POL-TW-007","target":null,"summary":"The unused badgeClass Tailwind class group was removed from...","resolutionRef":"711945b7 dirty worktree from FIX-2026-07-30-01","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3021","id":"POL-TS-001","target":null,"summary":"CALENDAR_EVENTS_PER_PAGE, PreloadImage, and findEventBySlug...","resolutionRef":"711945b7 dirty worktree from FIX-2026-07-30-01","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3029","id":"STR-SEO-001","target":null,"summary":"Every generated event has a dedicated prerendered canonical...","resolutionRef":"0729f5fc dirty worktree recorded in FIX-2026-07-27-03","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3038","id":"STR-ARCH-008","target":null,"summary":"Synchronization uses an opaque truncated SHA-256 UID digest...","resolutionRef":"0729f5fc dirty worktree recorded in FIX-2026-07-27-03","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3046","id":"STR-ARCH-009","target":null,"summary":"Calendar authoring now has explicit draft, recurrence,...","resolutionRef":"0729f5fc dirty worktree recorded in FIX-2026-07-27-03","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3055","id":"STR-ARCH-003","target":null,"summary":"Playwright now covers critical direct routing, hash/modal...","resolutionRef":"0729f5fc dirty worktree recorded in FIX-2026-07-27-03","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3063","id":"SMELL-ARCH-004","target":null,"summary":"Calendar synchronization now runs daily at 09:00 UTC with an...","resolutionRef":"0729f5fc dirty worktree recorded in FIX-2026-07-27-03","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3071","id":"STR-ARCH-001","target":null,"summary":"Ordinary pushes and pull requests now run frozen dependency...","resolutionRef":"32fa7f7d dirty worktree fingerprint recorded in FIX-2026-07-27-02","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3080","id":"CRIT-A11Y-001","target":null,"summary":"Multi-day events now expose separate start and inclusive-end...","resolutionRef":"b3744e7f dirty worktree fingerprints recorded in FIX-2026-07-27-01","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3089","id":"CRIT-A11Y-002","target":null,"summary":"Calendar event times now use site-action-soft and measure...","resolutionRef":"b3744e7f dirty worktree fingerprint 3ADFAF54FD1EE1D24A5BA42CD7D7ABE8F2DFC84AE896DFB56CF63B529AFC3900","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3097","id":"SMELL-A11Y-001","target":null,"summary":"The gallery thumbnail strip now shows position-aware edge...","resolutionRef":"b3744e7f dirty worktree fingerprint 408F8E4DD5ADB99A999032B035827EB26B80CD6EDC50AE78309350887A67DFFD","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3105","id":"POL-ARCH-001","target":null,"summary":"Gallery preview copy and the featured-image accessible...","resolutionRef":"b3744e7f dirty worktree fingerprints recorded in FIX-2026-07-27-01","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3113","id":"CRIT-ARCH-001","target":null,"summary":"The calendar route, navigation entry, prerendered output,...","resolutionRef":"b3744e7f clean worktree and published-site checks recorded in COV-2026-07-27-01","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3121","id":"SMELL-ARCH-003","target":null,"summary":"Calendar and gallery now render shared close and navigation...","resolutionRef":"391c061b dirty worktree fingerprints recorded in COV-2026-07-25-02","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3129","id":"POL-A11Y-001","target":null,"summary":"EventDetailModal now handles ArrowLeft and ArrowRight...","resolutionRef":"3eb99cd0 dirty worktree fingerprints recorded in FIX-2026-07-24-06","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3137","id":"SMELL-REACT-002","target":null,"summary":"Lightbox and FeaturedImage now share transient direction...","resolutionRef":"3eb99cd0 dirty worktree fingerprints recorded in FIX-2026-07-24-05","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3146","id":"SMELL-ARCH-002","target":null,"summary":"Affiliate schedules now normalize slots into ordered...","resolutionRef":"3eb99cd0 dirty worktree fingerprint 98E0B3BB4FE775610AB7EF3D030BB24773A9E03C004D91F2148ECF7A22E142F9","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3154","id":"STR-REACT-001","target":null,"summary":"Lightbox and ModalShell now share modal focus, keyboard,...","resolutionRef":"3eb99cd0 dirty worktree fingerprints recorded in FIX-2026-07-24-03","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3162","id":"STR-ARCH-007","target":null,"summary":"UpcomingEventsSection now consumes shared date-range and...","resolutionRef":"3eb99cd0 dirty worktree fingerprints recorded in FIX-2026-07-24-02","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3170","id":"STR-ARCH-006","target":null,"summary":"CalendarSection now renders one shared section, backdrop,...","resolutionRef":"3eb99cd0 dirty worktree fingerprint DF590806F9617004ADC592875FC4F0184826402230AB1AA22FBAD97E7E74B8E0","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3179","id":"SMELL-ARCH-001","target":null,"summary":"PageTitle now owns the floating placement preset used by...","resolutionRef":"43bc58cf dirty worktree fingerprints recorded in FIX-2026-07-23-02","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3186","id":"POL-TW-006","target":null,"summary":"The calendar month h2 now uses text-lg beneath the shared...","resolutionRef":"43bc58cf dirty worktree fingerprint 7FB7C71115F48410EC68C2C4AFAC084E52F71F647B7EA411246D6261898B0E95","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3193","id":"LEGACY-SEO-001","target":null,"summary":"Legacy unverified: Route manifest, shared head policy, SEO...","resolutionRef":null,"historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3198","id":"LEGACY-REACT-001","target":null,"summary":"Legacy unverified: ScrollToTop was reported updated to...","resolutionRef":null,"historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3203","id":"LEGACY-RESP-001","target":null,"summary":"Legacy unverified: Navbar and gallery-dot controls were...","resolutionRef":null,"historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3208","id":"LEGACY-TW-001","target":null,"summary":"No-effect spacing utilities and equivalent padding/inset...","resolutionRef":null,"historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3217","id":"LEGACY-DESIGN-001","target":null,"summary":"Legacy unverified: rounded-3xl was documented as the...","resolutionRef":null,"historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3222","id":"LEGACY-RESP-002","target":null,"summary":"Legacy unverified: Affiliates pagination was reported to...","resolutionRef":null,"historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3227","id":"CRIT-RESP-001","target":null,"summary":"Compact landscape now hides both the third and fourth...","resolutionRef":"f35c9557 dirty worktree fingerprint a985e5dfe9392042130b9cc66ab0e0697b8bd34105781c707e8b6cba1b582cef","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3234","id":"STR-ARCH-002","target":null,"summary":"Components now use site semantic color tokens plus shared...","resolutionRef":"f35c9557 dirty worktree fingerprint a985e5dfe9392042130b9cc66ab0e0697b8bd34105781c707e8b6cba1b582cef","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3241","id":"STR-TW-001","target":null,"summary":"Base typography now uses direct element rules in the base...","resolutionRef":"f35c9557 dirty worktree fingerprint a985e5dfe9392042130b9cc66ab0e0697b8bd34105781c707e8b6cba1b582cef","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3248","id":"SMELL-RESP-001","target":null,"summary":"tall-md now starts at 641px, removing its overlap with...","resolutionRef":"f35c9557 dirty worktree fingerprint a985e5dfe9392042130b9cc66ab0e0697b8bd34105781c707e8b6cba1b582cef","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3255","id":"POL-TW-001","target":null,"summary":"Redundant sm:rounded-3xl utilities were removed from...","resolutionRef":"f35c9557 dirty worktree","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3260","id":"POL-TW-002","target":null,"summary":"Equal height and width chains were replaced with size...","resolutionRef":"f35c9557 dirty worktree","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3265","id":"POL-TW-003","target":null,"summary":"The equivalent text-[16px] declaration now uses text-base.","resolutionRef":"f35c9557 dirty worktree","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3270","id":"POL-TW-004","target":null,"summary":"The no-effect footer alignment and gallery dimension...","resolutionRef":"f35c9557 dirty worktree","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3275","id":"POL-TW-005","target":null,"summary":"The primary Hero container now uses rounded-3xl at the base...","resolutionRef":"f35c9557 dirty worktree","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3339","id":"STR-ARCH-008","target":"src/app/components and src/app/config/i18n.tsx","summary":"Stable Spanish and English interface copy now lives in the...","resolutionRef":"uncommitted worktree based on 5faf69f7","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3354","id":"STR-REACT-002","target":"src/app/components/CalendarSection.tsx","summary":"CalendarSection composes typed hooks for navigation, swipe,...","resolutionRef":"uncommitted worktree based on 5faf69f7","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3472","id":"STR-RESP-003","target":"src/app/App.tsx:63 and tall-md route containers","summary":"tablet-fit and page-fit replaced the broad tall-md viewport...","resolutionRef":null,"historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3484","id":"STR-ARCH-013","target":"custom responsive variants and route-level component utility chains","summary":"Layout policy is distributed across width, height, and...","resolutionRef":null,"historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3492","id":"STR-ARCH-014","target":"src/app/App.tsx route containment decision and responsive reachability coverage","summary":"The shell infers tablet containment through the negative...","resolutionRef":null,"historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3510","id":"SMELL-A11Y-004","target":"src/app/hooks/useModalBehavior.ts","summary":"The existing lightbox is rendered through a body-level...","resolutionRef":null,"historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3523","id":"SMELL-A11Y-005","target":"src/styles/globals.css root font size and text-only enlargement behavior","summary":"Full-page browser zoom is the supported 200-percent...","resolutionRef":null,"historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3876","id":"STR-SEO-006","target":"src/app/config/seo.ts:157-160; src/app/config/events.ts:1","summary":"SITE_INDEXING_ENABLED and EVENT_INDEXING_ENABLED are false,...","resolutionRef":"owner direction","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3897","id":"STR-SEO-007","target":"src/app/components/PastEventsSection.tsx:30-34","summary":"The archive obtains historical events only after useEffect...","resolutionRef":"worktree","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3915","id":"SMELL-SEO-006","target":"src/app/config/seo.ts:391-426","summary":"The future Event JSON-LD is prepared only for events with...","resolutionRef":"worktree","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L3979","id":"STR-ARCH-017","target":"src/app/utils/calendarEvents.ts:20-58","summary":"Event start and end instants are constructed in the...","resolutionRef":"worktree","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L4002","id":"SMELL-ARCH-012","target":"src/app/utils/localizedEvents.ts:13-23","summary":"Title translations use sequential exact string replacements...","resolutionRef":"worktree","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L4019","id":"STR-ARCH-018","target":"src/app/utils/localizedEvents.ts:21-22","summary":"The ordinal title rule maps only 3 to rd and maps 1 and 2 to...","resolutionRef":"worktree","historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260823-L4065","id":"SMELL-ARCH-013","target":"src/app/utils/calendarDate.js","summary":"Calendar-day addition and chronological sorting had...","resolutionRef":null,"historyFile":".codex/review-history-2026-08-23.md"}
+  ],
+  "pendingReviews": [
+    {"id":"PEND-SEO-001","target":"Search Console, Rich Results, and field Core Web Vitals","dependency":"external Google property access"},
+    {"id":"PEND-SEO-002","target":"dojo identity copy and per-dojo structured data","dependency":"approved public copy"},
+    {"id":"PEND-SEO-003","target":"provisional identity, official-name cutover, canonical domain, and redirects","dependency":"legal and owner approval"},
+    {"id":"PEND-SEO-004","target":"production event indexing and analytics baselines","dependency":"indexing approval and external data"},
+    {"id":"PEND-ARCH-001","target":"state-management architecture decision","dependency":"a feature that exceeds current local and URL state patterns"},
+    {"id":"PEND-ARCH-003","target":"event registration workflow","dependency":"product requirements and ownership"},
+    {"id":"PEND-ARCH-004","target":"expanded event editorial page","dependency":"approved content responsibilities"},
+    {"id":"PEND-RESP-001","target":"exact tablet and mobile inner-viewport geometry","dependency":"reproducible native viewport evidence"}
+  ],
+  "hookFailures": []
+}
 ```

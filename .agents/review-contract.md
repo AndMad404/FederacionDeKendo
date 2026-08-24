@@ -9,11 +9,12 @@ and recorded evidence.
   verification.
 - Never infer repository-wide coverage from an inventory or one axis.
 - Preserve open findings until evidence resolves or invalidates them.
-- `.codex/review-state.md` contains only unresolved findings, pending reviews,
-  current coverage, and unresolved hook failures.
+- `.codex/review-state.md` contains current coverage, unresolved findings,
+  pending reviews, unresolved hook failures, and a compact resolved index.
 - Resolved, stale, superseded, and verbose session records move immediately to
-  the snapshot routed by `.codex/review-history.md`. History never proves
-  current coverage and is loaded only for required provenance.
+  `.codex/review-history.md`; immutable snapshots remain registered in the
+  active state. History never proves current coverage and is loaded only for
+  required provenance.
 
 ## Workflow
 
@@ -26,21 +27,22 @@ and recorded evidence.
 4. Evaluate only the declared axes: `TS`, `REACT`, `TAILWIND`, `ARCH`, `A11Y`,
    `PERF`, `SEO`, or `RESPONSIVE`.
 5. Report findings in order: `CRITICAL`, `STRUCTURAL`, `SMELL`, `POLISH`.
-6. Update active state with concise open entries and current coverage. Archive
-   the full session record rather than appending it to active state.
+6. Update active state with concise open entries and current coverage. Append
+   the full dated session to history rather than expanding active state.
 
 ## Records
 
 Open finding:
 
-```yaml
-- id: AXIS-NNN
-  level: STRUCTURAL
-  axis: ARCH
-  status: open
-  target: exact source or behavior
-  summary: concise verified problem
-  introduced_in: REV-YYYY-MM-DD-NN
+```json
+{
+  "id": "AXIS-NNN",
+  "level": "STRUCTURAL",
+  "axis": "ARCH",
+  "status": "open",
+  "target": "exact source or behavior",
+  "summary": "concise verified problem"
+}
 ```
 
 Keep full problem, fix, deferral cost, evidence, and resolution in the dated
@@ -55,20 +57,25 @@ Cost of deferring: concrete consequence
 
 Current coverage:
 
-```yaml
-- id: COV-YYYY-MM-DD-NN
-  target: exact target or glob
-  axes: [ARCH]
-  included: [evaluated concerns]
-  excluded: [nearby concerns]
-  evidence: [reproducible checks]
-  baseline: { commit: abc1234, worktree: clean }
-  status: current
+```json
+{
+  "id": "COV-YYYY-MM-DD-NN",
+  "target": "exact target or glob",
+  "axes": ["ARCH"],
+  "included": ["evaluated concerns"],
+  "excluded": ["nearby concerns"],
+  "evidence": ["reproducible checks"],
+  "baseline": { "commit": "abc1234", "worktree": "clean" },
+  "status": "current"
+}
 ```
 
 Any target change makes its coverage stale; archive that record and create new
-coverage only after re-review. A resolution requires a verified ref and checks;
-archive the complete finding immediately and remove it from active state.
+coverage only after re-review. A resolution requires a verified ref and checks:
+append the complete finding to history, remove it from `openFindings`, and add a
+compact `resolvedIndex` entry with a unique `recordKey`, target, summary,
+resolution ref, and history file. Serialize active state only through the
+schema-v4 helper; invalid or non-canonical JSON must fail without modifying it.
 
 ## Claim and Decision Gates
 

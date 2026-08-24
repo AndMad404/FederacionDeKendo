@@ -44,12 +44,15 @@ if (isDirectExecution(import.meta.url)) {
     const result = evaluateSubagentReport(input, { enforce });
     if (result.recordFailure) {
       const root = findRepositoryRoot(input.cwd || process.cwd());
-      recordHookFailure(root, {
+      const recorded = recordHookFailure(root, {
         sessionId: input.session_id,
         event: "SubagentStop",
         problem: "Subagent report remained incomplete after one continuation.",
         evidence: result.recordFailure,
       });
+      if (!recorded) {
+        result.systemMessage = `${result.systemMessage} The active review state could not record this failure and was left unchanged.`;
+      }
       delete result.recordFailure;
     }
     writeHookJson(result);

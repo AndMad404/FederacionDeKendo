@@ -26,5 +26,6 @@ local/
 !.codex/hooks.json
 !.codex/hooks/
 !.codex/hooks/**
+!.codex/review-state.mjs
 .codex-remote-attachments/
 AGENTS.md

@@ -8,19 +8,20 @@ Official federation website: React 18, TypeScript, Tailwind CSS 4, and Vite.
   suggestions.
 - Keep scope minimal. Use `.agents/project-map.md` only when the target is not
   known, and expand only when evidence identifies a shared dependency.
-- Preserve unrelated worktree changes. Do not refactor outside the requested
-  concern or create a commit unless requested.
-- Prefer current project patterns. Do not add a methodology, tool, dependency,
-  or abstraction without evidence and owner approval.
+- [CTRL-SCOPE] Preserve unrelated worktree changes. Do not refactor outside the
+  requested concern or create a commit unless requested.
+- [CTRL-OWNER] Prefer current project patterns. Do not add a methodology, tool,
+  dependency, or abstraction without evidence and owner approval.
 - Use current primary sources for external technical claims.
-- Treat legal constraints, public copy, SEO metadata, and owner decisions as
-  hard requirements. Do not add a speculative public page for SEO.
+- [CTRL-PUBLIC-SEO] Treat legal constraints, public copy, SEO metadata, and
+  owner decisions as hard requirements. Do not add a speculative public page
+  for SEO.
 - Never use CSS or Tailwind `!important`. Keep responsive styles mobile-first
   and preserve 44 px targets on touch-capable and hybrid devices.
-- Do not implement visual changes without explicit owner approval. Use the
-  current application plus approved measurements, screenshots, and renders as
-  the baseline; isolate unrelated visual changes and block on every unexpected
-  visual difference.
+- [CTRL-VISUAL] Do not implement visual changes without explicit owner
+  approval. Use the current application plus approved measurements,
+  screenshots, and renders as the baseline; isolate unrelated visual changes
+  and block on every unexpected visual difference.
 - Runtime, tests, builds, workflows, and public operations must never depend on
   private documentation in `../DesarrolloAsistidoIA/`.
 - Use ASCII in repository instructions unless the file requires otherwise.
@@ -44,8 +45,8 @@ the review decision first and then switch responsibility.
 
 - Execute one independently verifiable roadmap phase at a time from its linked
   section. Previous closed phases are not reaudited without a direct blocker.
-- Do not parallelize phases that share files, outputs, or sequential
-  dependencies.
+- [CTRL-PHASE] Do not parallelize phases that share files, outputs, or
+  sequential dependencies.
 - Resolve derivable ambiguity from the routed sources. Ask the owner only when
   a missing choice changes architecture, permissions, credentials, persistence,
   security, operations, notifications, business policy, or a contract.
@@ -58,8 +59,9 @@ the review decision first and then switch responsibility.
 
 ## Review State and Documentation
 
-- `.codex/review-state.md` contains unresolved technical state only. Read it for
-  review work, not ordinary implementation.
+- `.codex/review-state.md` contains current technical state plus a compact
+  resolved-provenance index. Read it for review work, not ordinary
+  implementation.
 - `.codex/review-history.md` routes resolved or superseded provenance. Read a
   history snapshot only when an active finding requires its origin or evidence.
 - After an owner-requested commit resolves a finding or records an approved
@@ -84,6 +86,8 @@ the review decision first and then switch responsibility.
 
 - Run the narrowest directed check first and select final checks through
   `.agents/verification.md`.
-- After editing code or configuration, `corepack pnpm run format:check` must
-  pass; CRLF is required. Report skipped or unavailable checks.
-- Do not claim a deployed problem is fixed from local files alone.
+- [CTRL-FORMAT] After editing code or configuration,
+  `corepack pnpm run format:check` must pass; CRLF is required. Report skipped
+  or unavailable checks.
+- [CTRL-DEPLOY] Do not claim a deployed problem is fixed from local files
+  alone.
