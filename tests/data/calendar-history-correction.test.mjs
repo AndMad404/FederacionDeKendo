@@ -274,6 +274,10 @@ test("range workflow requires an approved report run and an inclusive date range
   assert.match(workflow, /actions\/download-artifact@v5/);
   assert.match(workflow, /correct:calendar-history-range/);
   assert.match(workflow, /sync:approved-historical-galleries/);
+  assert.match(
+    workflow,
+    /rm -f calendar-historical-changes\.json calendar-notifications\.json/,
+  );
   assert.match(workflow, /CALENDAR_ICS_URL/);
   assert.match(workflow, /eventGalleries\.ts/);
   assert.match(workflow, /eventGalleryState\.json/);

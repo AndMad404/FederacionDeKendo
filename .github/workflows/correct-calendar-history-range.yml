@@ -60,6 +60,9 @@ jobs:
       - name: Import approved historical galleries
         run: pnpm run sync:approved-historical-galleries --report calendar-historical-changes.json --from "${{ inputs.from }}" --to "${{ inputs.to }}"
 
+      - name: Remove downloaded reports
+        run: rm -f calendar-historical-changes.json calendar-notifications.json
+
       - name: Directed historical correction tests
         run: node --test tests/data/calendar-history-correction.test.mjs
 
