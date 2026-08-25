@@ -113,11 +113,20 @@ test("changing months resets each month pagination", async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 });
   await openCalendar(page, FIXED_PAGINATION_TIME);
 
-  await expect(page.getByText("Página 1 de 2", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Ver más eventos del mes" }).click();
-  await expect(page.getByText("Página 2 de 2", { exact: true })).toBeVisible();
+  const previousEvents = page.getByRole("button", {
+    name: "Ver eventos anteriores del mes",
+  });
+  const nextEvents = page.getByRole("button", {
+    name: "Ver más eventos del mes",
+  });
+  await expect(previousEvents).toBeDisabled();
+  await expect(nextEvents).toBeEnabled();
+  await nextEvents.click();
+  await expect(previousEvents).toBeEnabled();
+  await expect(nextEvents).toBeDisabled();
 
   await page.getByRole("button", { name: "Ver mes siguiente" }).click();
   await page.getByRole("button", { name: "Ver mes anterior" }).click();
-  await expect(page.getByText("Página 1 de 2", { exact: true })).toBeVisible();
+  await expect(previousEvents).toBeDisabled();
+  await expect(nextEvents).toBeEnabled();
 });

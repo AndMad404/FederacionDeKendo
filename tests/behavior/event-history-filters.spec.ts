@@ -123,33 +123,24 @@ test("preserves filters in pagination and resets to page one when changed", asyn
   page,
 }) => {
   await page.goto("/eventos/pasados/?type=examen");
-  const next = page.getByRole("link", { name: "Siguiente" });
-  await expect(next).toHaveAttribute("href", /pagina\/2\/\?type=examen$/);
+  const next = page.getByRole("button", { name: "Siguiente" });
+  await expect(next).toBeVisible();
   await expect(next.locator("svg")).toHaveCount(1);
-  expect((await next.boundingBox())?.height).toBeGreaterThanOrEqual(44);
+  expect(
+    await next.evaluate((element) => element.getBoundingClientRect().height),
+  ).toBeGreaterThanOrEqual(44);
   await next.click();
   await expect(page).toHaveURL(/pagina\/2\/\?type=examen$/);
-  const previous = page.getByRole("link", { name: "Anterior" });
-  await expect(previous).toHaveAttribute(
-    "href",
-    /eventos\/pasados\/\?type=examen$/,
-  );
+  const previous = page.getByRole("button", { name: "Anterior" });
   await expect(previous.locator("svg")).toHaveCount(1);
   await previous.click();
   await expect(page).toHaveURL(/eventos\/pasados\/\?type=examen$/);
 
   await page.goto("/en/events/past/?type=examen");
-  const englishNext = page.getByRole("link", { name: "Next" });
-  await expect(englishNext).toHaveAttribute(
-    "href",
-    /en\/events\/past\/page\/2\/\?type=examen$/,
-  );
+  const englishNext = page.getByRole("button", { name: "Next" });
   await englishNext.click();
   await expect(page).toHaveURL(/en\/events\/past\/page\/2\/\?type=examen$/);
-  await expect(page.getByRole("link", { name: "Previous" })).toHaveAttribute(
-    "href",
-    /en\/events\/past\/\?type=examen$/,
-  );
+  await expect(page.getByRole("button", { name: "Previous" })).toBeEnabled();
 
   await page.goto("/eventos/pasados/?type=examen");
   await page
