@@ -76,7 +76,22 @@ export async function synchronizeApprovedHistoricalGalleries({
     };
   });
 
-  return synchronizeEventGalleries({ events, ...galleryOptions });
+  const result = await synchronizeEventGalleries({ events, ...galleryOptions });
+  for (const warning of result.warnings) console.warn(warning);
+
+  const missing = events.filter(({ slug }) => !result.galleries[slug]);
+  if (missing.length) {
+    const reasons = new Map(
+      result.alarms.map(({ slug, reason }) => [slug, reason]),
+    );
+    throw new Error(
+      `Approved historical galleries were not imported: ${missing
+        .map(({ slug }) => `${slug} (${reasons.get(slug) ?? "unknown_reason"})`)
+        .join(", ")}.`,
+    );
+  }
+
+  return result;
 }
 
 function parseCliArguments(args) {

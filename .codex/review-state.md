@@ -7,7 +7,7 @@ evidence remain in the history files and are loaded only when required.
 ```json
 {
   "schemaVersion": 4,
-  "lastUpdated": "2026-08-23",
+  "lastUpdated": "2026-08-25",
   "contract": ".agents/review-contract.md",
   "historyIndex": ".codex/review-history.md",
   "historySnapshots": [
@@ -141,6 +141,8 @@ evidence remain in the history files and are loaded only when required.
     {"id":"PEND-ARCH-004","target":"expanded event editorial page","dependency":"approved content responsibilities"},
     {"id":"PEND-RESP-001","target":"exact tablet and mobile inner-viewport geometry","dependency":"reproducible native viewport evidence"}
   ],
-  "hookFailures": []
+  "hookFailures": [
+    {"id":"HOOK-20260825230658033","recordedAt":"2026-08-25T23:06:58.033Z","sessionId":"01a03b08-fdc0-7a83-a94c-557183c9b458","event":"Stop","status":"needs_human_review","problem":"Completion quality gate still failed after one continuation.","evidence":"corepack pnpm run format:check: exit non-zero"}
+  ]
 }
 ```

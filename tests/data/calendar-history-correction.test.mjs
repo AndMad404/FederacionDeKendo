@@ -296,7 +296,7 @@ test("range workflow requires an approved report run and an inclusive date range
   assert.equal(workflow.permissions?.issues, undefined);
 });
 
-test("approved historical gallery sync reads only the selected source album", async () => {
+test("approved historical gallery sync rejects a selected album that imports no images", async () => {
   const files = await fixture();
   const sourcePath = path.join(files.directory, "calendar.ics");
   const report = JSON.parse(await readFile(files.reportPath, "utf8"));
@@ -326,22 +326,25 @@ test("approved historical gallery sync reads only the selected source album", as
   );
   let requestedAlbum;
   try {
-    await synchronizeApprovedHistoricalGalleries({
-      source: sourcePath,
-      reportPath: files.reportPath,
-      from: published.date,
-      to: published.date,
-      galleryOptions: {
-        manifestPath: path.join(files.directory, "eventGalleries.ts"),
-        statePath: path.join(files.directory, "eventGalleryState.json"),
-        imagesRoot: path.join(files.directory, "event-images"),
-        listFolder: async (albumUrl) => {
-          requestedAlbum = albumUrl;
-          return [];
+    await assert.rejects(
+      synchronizeApprovedHistoricalGalleries({
+        source: sourcePath,
+        reportPath: files.reportPath,
+        from: published.date,
+        to: published.date,
+        galleryOptions: {
+          manifestPath: path.join(files.directory, "eventGalleries.ts"),
+          statePath: path.join(files.directory, "eventGalleryState.json"),
+          imagesRoot: path.join(files.directory, "event-images"),
+          listFolder: async (albumUrl) => {
+            requestedAlbum = albumUrl;
+            return [];
+          },
+          downloadFile: async () => Buffer.alloc(0),
         },
-        downloadFile: async () => Buffer.alloc(0),
-      },
-    });
+      }),
+      /Approved historical galleries were not imported.*importacion_invalida/,
+    );
     assert.equal(
       requestedAlbum,
       "https://drive.google.com/drive/folders/approved-album",

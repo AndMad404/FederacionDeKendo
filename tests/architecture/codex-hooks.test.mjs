@@ -39,6 +39,17 @@ function runHook(script, input, args = []) {
   return JSON.parse(result.stdout);
 }
 
+function runWindowsHook(command, input) {
+  const result = spawnSync("cmd.exe", ["/d", "/s", "/c", command], {
+    cwd: process.cwd(),
+    encoding: "utf8",
+    input: JSON.stringify(input),
+  });
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.stderr, "");
+  return JSON.parse(result.stdout);
+}
+
 test("hooks.json configures command handlers and keeps phase-one advisors non-blocking", () => {
   const config = JSON.parse(readFileSync(".codex/hooks.json", "utf8"));
   assert.deepEqual(Object.keys(config.hooks).sort(), [
@@ -52,9 +63,9 @@ test("hooks.json configures command handlers and keeps phase-one advisors non-bl
     for (const group of groups) {
       for (const hook of group.hooks) {
         assert.equal(hook.type, "command");
-        assert.match(hook.commandWindows, /Get-Command node\.exe/);
-        assert.match(hook.commandWindows, /ProgramFiles/);
-        assert.doesNotMatch(hook.commandWindows, /; node \(/);
+        assert.match(hook.commandWindows, /^C:\\Progra~1\\nodejs\\node\.exe /);
+        assert.match(hook.commandWindows, /\.codex\\hooks\\/);
+        assert.doesNotMatch(hook.commandWindows, /powershell/i);
       }
     }
   }
@@ -65,6 +76,20 @@ test("hooks.json configures command handlers and keeps phase-one advisors non-bl
   const prettierIgnore = readFileSync(".prettierignore", "utf8");
   assert.match(prettierIgnore, /^!\.codex\/hooks\.json$/m);
   assert.match(prettierIgnore, /^!\.codex\/hooks\/\*\*$/m);
+});
+
+test("Windows command handlers execute without a nested PowerShell", () => {
+  const config = JSON.parse(readFileSync(".codex/hooks.json", "utf8"));
+  const output = runWindowsHook(
+    config.hooks.PreToolUse[0].hooks[0].commandWindows,
+    {
+      cwd: process.cwd(),
+      hook_event_name: "PreToolUse",
+      tool_name: "Bash",
+      tool_input: { command: "git status" },
+    },
+  );
+  assert.deepEqual(output, {});
 });
 
 test("Stop and SubagentStop command handlers emit valid JSON only", async () => {
