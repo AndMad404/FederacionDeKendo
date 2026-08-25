@@ -68,8 +68,62 @@
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
       "summary": "- Categoría con Bogu y sin Bogu\n- Categoría por equipos",
       "eventType": "torneo",
-      "editorialState": "publicado",
-      "historical": true
+      "editorialState": "pendiente",
+      "historical": true,
+      "pendingRevision": {
+        "id": "1e9f037ab393f9fe6eefe9f87de0f57ffba7cfb0fc0f0717534778cce19c0a69",
+        "reason": "historical_change",
+        "proposed": {
+          "sourceId": "72f0b1f2f02e0f5d73ae28ec",
+          "slug": "2026-08-22-3er-torneo",
+          "archiveEligibleAt": "2026-08-24T06:00:00.000Z",
+          "title": "3er Torneo",
+          "date": "2026-08-22",
+          "startTime": "13:00",
+          "endTime": "17:00",
+          "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
+          "summary": "- Categoría con Bogu y sin Bogu<br>- Categoría por equipos<br><br><a href=\" class=\"pastedDriveLink-0\">",
+          "eventType": "torneo",
+          "timeZone": "America/Costa_Rica"
+        },
+        "evidence": {
+          "sourceId": "72f0b1f2f02e0f5d73ae28ec",
+          "firstDetectedAt": "2026-08-25T16:50:41.934Z",
+          "lastObservedAt": "2026-08-25T16:50:41.934Z",
+          "missingAt": null,
+          "lastReceived": {
+            "sourceId": "72f0b1f2f02e0f5d73ae28ec",
+            "slug": "2026-08-22-3er-torneo",
+            "archiveEligibleAt": "2026-08-24T06:00:00.000Z",
+            "title": "3er Torneo",
+            "date": "2026-08-22",
+            "startTime": "13:00",
+            "endTime": "17:00",
+            "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
+            "summary": "- Categoría con Bogu y sin Bogu<br>- Categoría por equipos<br><br><a href=\" class=\"pastedDriveLink-0\">",
+            "eventType": "torneo",
+            "timeZone": "America/Costa_Rica"
+          },
+          "published": {
+            "sourceId": "72f0b1f2f02e0f5d73ae28ec",
+            "slug": "2026-08-22-3er-torneo",
+            "archiveEligibleAt": "2026-08-24T06:00:00.000Z",
+            "title": "3er Torneo",
+            "date": "2026-08-22",
+            "startTime": "13:00",
+            "endTime": "17:00",
+            "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
+            "summary": "- Categoría con Bogu y sin Bogu\n- Categoría por equipos",
+            "eventType": "torneo",
+            "timeZone": "America/Costa_Rica",
+            "historical": true
+          },
+          "fingerprint": "d8a771cd4b20bd189a6a6424aba82338ed8f858c9536f430c7c2f5921f13bb2e"
+        },
+        "notification": {
+          "evidenceFingerprint": "d8a771cd4b20bd189a6a6424aba82338ed8f858c9536f430c7c2f5921f13bb2e"
+        }
+      }
     },
     {
       "sourceId": "45c4376b5e5e0fcf347835d0",
