@@ -149,6 +149,48 @@ test("preserves filters in pagination and resets to page one when changed", asyn
   await expect(page).toHaveURL(/\/eventos\/pasados\/\?year=2026&type=examen$/);
 });
 
+test("touch swipe paginates the historical archive on mobile", async ({
+  context,
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/eventos/pasados/?type=examen");
+  await expect(page.getByRole("button", { name: "Siguiente" })).toBeEnabled();
+
+  const panel = page.locator("[data-page-content-boundary]");
+  const box = await panel.boundingBox();
+  expect(box).not.toBeNull();
+
+  const session = await context.newCDPSession(page);
+  const y = box!.y + Math.min(box!.height / 2, 240);
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    await session.send("Input.dispatchTouchEvent", {
+      type: "touchStart",
+      touchPoints: [{ x: box!.x + box!.width - 30, y }],
+    });
+    await page.waitForTimeout(30);
+    await session.send("Input.dispatchTouchEvent", {
+      type: "touchMove",
+      touchPoints: [{ x: box!.x + box!.width / 2, y }],
+    });
+    await page.waitForTimeout(30);
+    await session.send("Input.dispatchTouchEvent", {
+      type: "touchMove",
+      touchPoints: [{ x: box!.x + 30, y }],
+    });
+    await page.waitForTimeout(30);
+    await session.send("Input.dispatchTouchEvent", {
+      type: "touchEnd",
+      touchPoints: [],
+    });
+    await page.waitForTimeout(100);
+    if (/pagina\/2\/\?type=examen$/.test(page.url())) break;
+  }
+
+  await expect(page).toHaveURL(/pagina\/2\/\?type=examen$/);
+});
+
 test("filters apply available values and the empty state remains available", async ({
   page,
 }) => {

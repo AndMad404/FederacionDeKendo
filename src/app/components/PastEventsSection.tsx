@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { PAST_EVENTS_PAGE_SIZE } from "../config/events";
 import {
@@ -22,6 +23,7 @@ import { MediaPageBanner } from "./ui/MediaPageBanner";
 import { useLanguage } from "../config/i18n";
 import { getLocalizedEvents } from "../utils/localizedEvents";
 import { useHydratedNow } from "../hooks/useHydratedNow";
+import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
 import { EventSummary } from "./EventSummary";
 import { EventSectionNavigation } from "./events/EventSectionNavigation";
 import { NavigationArrowButton } from "./ui/ModalControls";
@@ -53,6 +55,20 @@ export function PastEventsSection() {
     page * PAST_EVENTS_PAGE_SIZE,
   );
   const eventTypes: ArchiveEventType[] = ["torneo", "examen", "seminario"];
+
+  const navigateToPage = useCallback(
+    (targetPage: number) => {
+      if (targetPage < 1 || targetPage > pageCount) return;
+      navigate(buildArchiveUrl(targetPage, language, filters));
+    },
+    [filters, language, navigate, pageCount],
+  );
+  const { swipeHandlers } = useSwipeNavigation({
+    onSwipeLeft: () => navigateToPage(page + 1),
+    onSwipeRight: () => navigateToPage(page - 1),
+    allowInteractiveStart: true,
+    preventDefaultOnSwipe: true,
+  });
 
   function changeFilter(name: "year" | "type", value: string) {
     navigate(
@@ -90,6 +106,7 @@ export function PastEventsSection() {
         <div
           data-page-content-boundary
           className={`flex w-full touch-pan-y select-none flex-col justify-start gap-3 px-3 py-4 text-center sm:px-2 md:max-w-5xl md:gap-2 md:py-4 xl:min-h-[24.625rem] page-fit:py-[15px] land-sm:gap-2 land-sm:px-2 land-sm:py-2 ${panelSurfaceClass}`}
+          {...swipeHandlers}
         >
           <EventSectionNavigation active="past" />
 
@@ -100,18 +117,14 @@ export function PastEventsSection() {
                 label={copy.archive.previous}
                 disabled={page === 1}
                 className="order-[-1] col-start-1"
-                onClick={() =>
-                  navigate(buildArchiveUrl(page - 1, language, filters))
-                }
+                onClick={() => navigateToPage(page - 1)}
               />
               <NavigationArrowButton
                 direction="next"
                 label={copy.archive.next}
                 disabled={page === pageCount}
                 className="order-1 col-start-4"
-                onClick={() =>
-                  navigate(buildArchiveUrl(page + 1, language, filters))
-                }
+                onClick={() => navigateToPage(page + 1)}
               />
             </nav>
             <label className="relative min-w-0 text-xs font-bold text-site-muted">
@@ -138,7 +151,7 @@ export function PastEventsSection() {
                 onChange={(event) => changeFilter("type", event.target.value)}
                 className={`min-h-11 w-full rounded-lg px-3 py-2 text-center text-sm ${focusRingClass} border border-site-border bg-site-surface text-site-action`}
               >
-                <option value="">{copy.archive.eventType}</option>
+                <option value="">{copy.archive.type}</option>
                 {eventTypes.map((type) => (
                   <option key={type} value={type}>
                     {copy.archive.types[type]}
