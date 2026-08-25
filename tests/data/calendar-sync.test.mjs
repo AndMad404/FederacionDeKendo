@@ -187,6 +187,28 @@ test("accepts matching Drive album links with different query parameters", () =>
   assert.equal(event.summary, "Resultados.");
 });
 
+test("normalizes pasted HTML in public event descriptions", () => {
+  const [properties] = parseVEvents(
+    [
+      "BEGIN:VCALENDAR",
+      "BEGIN:VEVENT",
+      "UID:pasted-html@example.test",
+      "DTSTART;VALUE=DATE:20260822",
+      "SUMMARY:3er Torneo",
+      'DESCRIPTION:- Categoría con Bogu y sin Bogu<br>- Categoría por equipos<br><br><a href=" class="pastedDriveLink-0">',
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ].join("\n"),
+  );
+
+  const event = parseCalendarEvent(properties);
+
+  assert.equal(
+    event.summary,
+    "- Categoría con Bogu y sin Bogu\n- Categoría por equipos",
+  );
+});
+
 test("rejects different Drive album folders", () => {
   const [properties] = parseVEvents(
     [

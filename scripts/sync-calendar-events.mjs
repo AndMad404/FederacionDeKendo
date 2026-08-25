@@ -371,8 +371,14 @@ function parseTechnicalDescription(description, title) {
       .trimEnd();
   });
 
+  const publicDescription = sanitizedPublicLines
+    .join("\n")
+    .replace(/<br\s*\/?\s*>/gi, "\n")
+    .replace(/<[^>]*>/g, "")
+    .trim();
+
   return {
-    publicDescription: sanitizedPublicLines.join("\n").trim() || undefined,
+    publicDescription: publicDescription || undefined,
     albumUrl,
   };
 }
