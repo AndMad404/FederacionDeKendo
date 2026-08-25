@@ -118,6 +118,19 @@ test("C3 accepts multiple fields in canonical order and updates both artifacts c
   }
 });
 
+test("C3 accepts a multi-line approved summary while keeping private values blocked", async () => {
+  const files = await fixture(
+    createReport({ ...proposed, summary: "Primera línea\nSegunda línea" }),
+  );
+  try {
+    await run(files, ["summary"]);
+    const registry = JSON.parse(await readFile(files.registryPath, "utf8"));
+    assert.equal(registry.events[0].summary, "Primera línea\nSegunda línea");
+  } finally {
+    await rm(files.directory, { recursive: true, force: true });
+  }
+});
+
 test("F3: a v4 correction preserves evidence fields and the registry version", async () => {
   const files = await fixture();
   try {

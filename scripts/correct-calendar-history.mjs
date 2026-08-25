@@ -38,18 +38,22 @@ const safeIdentifierPattern = /^[A-Za-z0-9_-]{1,128}$/;
 const forbiddenPrivateText =
   /ALBUM_FOTOS|webcal:|https?:\/\/[^\s]*drive\.google\.com|https?:\/\/[^\s]*\.ics(?:[?#\s]|$)/i;
 
-function containsControlCharacter(value) {
+function containsControlCharacter(value, allowLineBreaks = false) {
   return [...value].some((character) => {
     const codePoint = character.codePointAt(0);
-    return codePoint <= 31 || codePoint === 127;
+    return (
+      (codePoint <= 31 &&
+        (!allowLineBreaks || ![10, 13].includes(codePoint))) ||
+      codePoint === 127
+    );
   });
 }
 
-function assertSafeReportValue(value) {
+function assertSafeReportValue(value, allowLineBreaks = false) {
   if (value === null) return;
   if (
     typeof value !== "string" ||
-    containsControlCharacter(value) ||
+    containsControlCharacter(value, allowLineBreaks) ||
     forbiddenPrivateText.test(value)
   ) {
     throw new Error("Report contains an invalid or private value.");
@@ -58,7 +62,7 @@ function assertSafeReportValue(value) {
 
 function assertFieldValue(field, value, type) {
   if (type === "eliminado") return;
-  assertSafeReportValue(value);
+  assertSafeReportValue(value, field === "summary");
   if (typeof value !== "string")
     throw new Error("Modified fields require a string proposed value.");
   if (field === "slug" && !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value))
@@ -168,7 +172,10 @@ function validateReport(report) {
         throw new Error("Report contains an unknown or ambiguous difference.");
       if (difference.type === "eliminado" && difference.proposed !== null)
         throw new Error("Removed fields must have a null proposed value.");
-      assertSafeReportValue(difference.published);
+      assertSafeReportValue(
+        difference.published,
+        difference.field === "summary",
+      );
       assertFieldValue(difference.field, difference.proposed, difference.type);
       seenFields.add(difference.field);
     }
