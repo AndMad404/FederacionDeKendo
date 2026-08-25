@@ -3,6 +3,13 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import sharp from "sharp";
 
+import {
+  closeSourceModuleLoader,
+  loadSourceModule,
+} from "../helpers/load-source-module.mjs";
+
+test.after(async () => closeSourceModuleLoader());
+
 const read = (file) => readFile(file, "utf8");
 
 test("the default social card is a baseline JPEG for link previews", async () => {
@@ -44,57 +51,46 @@ test("every configured static route has complete public metadata", async () => {
   }
 });
 
-test("Spanish and English localized copy inventories expose the same keys", async () => {
-  const source = await read("src/app/config/i18n.ts");
-  const spanish = source.slice(
-    source.indexOf("  es: {"),
-    source.indexOf("  en: {"),
-  );
-  const english = source.slice(
-    source.indexOf("  en: {"),
-    source.indexOf("} as const;"),
-  );
-  const keys = (block) =>
-    [...block.matchAll(/^ {4}([A-Za-z][A-Za-z0-9]*):/gm)].map(([, key]) => key);
-  assert.ok(keys(spanish).length > 0);
-  assert.deepEqual(keys(english), keys(spanish));
+test("Spanish and English localized copy inventories expose the same sections", async () => {
+  const { COPY } = await loadSourceModule("/src/app/config/i18n.ts");
+  assert.ok(Object.keys(COPY.es).length > 0);
+  assert.deepEqual(Object.keys(COPY.en), Object.keys(COPY.es));
 });
 
 test("every approved dojo record retains required contact and schedule fields", async () => {
-  const source = await read("src/app/data/dojos.ts");
-  const inventory = source.slice(
-    source.indexOf("const DOJOS"),
-    source.indexOf("export function"),
-  );
-  const dojoCount = [...inventory.matchAll(/^ {4}title: /gm)].length;
-  assert.ok(dojoCount > 0);
-  assert.equal([...inventory.matchAll(/^ {4}info: \[/gm)].length, dojoCount);
-  assert.equal(
-    [...inventory.matchAll(/^ {4}schedule: \[/gm)].length,
-    dojoCount,
-  );
-  for (const field of ["icon", "label", "value", "href"]) {
-    assert.ok(new RegExp(`^        ${field}: `, "m").test(inventory), field);
-  }
-  for (const field of ["location", "days", "hours"]) {
-    assert.ok(new RegExp(`^        ${field}: `, "m").test(inventory), field);
+  const { getDojos } = await loadSourceModule("/src/app/data/dojos.ts");
+  for (const language of ["es", "en"]) {
+    const dojos = getDojos(language);
+    assert.ok(dojos.length > 0, language);
+    for (const dojo of dojos) {
+      assert.ok(dojo.title, `${language}: dojo title`);
+      assert.ok(dojo.info.length > 0, `${language}: ${dojo.title} contacts`);
+      assert.ok(
+        dojo.schedule.length > 0,
+        `${language}: ${dojo.title} schedule`,
+      );
+      for (const item of dojo.info) {
+        for (const field of ["icon", "label", "value", "href"]) {
+          assert.ok(item[field], `${language}: ${dojo.title} ${field}`);
+        }
+      }
+      for (const slot of dojo.schedule) {
+        for (const field of ["location", "days", "hours"]) {
+          assert.ok(slot[field], `${language}: ${dojo.title} ${field}`);
+        }
+      }
+    }
   }
 });
 
 test("every editorial gallery record has valid required fields in both languages", async () => {
-  const source = await read("src/app/data/gallery.ts");
-  const spanish = source.slice(
-    source.indexOf("export const GALLERY_IMAGES"),
-    source.indexOf("const ENGLISH_GALLERY_COPY"),
+  const { GALLERY_IMAGES, getGalleryImages } = await loadSourceModule(
+    "/src/app/data/gallery.ts",
   );
-  const english = source.slice(
-    source.indexOf("const ENGLISH_GALLERY_COPY"),
-    source.indexOf("export function"),
-  );
-  const ids = [...spanish.matchAll(/^ {4}id: (\d+),$/gm)].map(([, id]) => id);
+  const ids = GALLERY_IMAGES.map(({ id }) => id);
   assert.ok(ids.length > 0);
   assert.equal(new Set(ids).size, ids.length);
-  for (const field of [
+  const requiredImageFields = [
     "src",
     "srcSet",
     "sizes",
@@ -108,25 +104,18 @@ test("every editorial gallery record has valid required fields in both languages
     "alt",
     "tag",
     "description",
-  ]) {
-    assert.equal(
-      [...spanish.matchAll(new RegExp(`^    ${field}:`, "gm"))].length,
-      ids.length,
-      field,
+  ];
+  for (const language of ["es", "en"]) {
+    const images = getGalleryImages(language);
+    assert.deepEqual(
+      images.map(({ id }) => id),
+      ids,
+      `${language}: gallery identity`,
     );
-  }
-  for (const id of ids) {
-    assert.match(
-      english,
-      new RegExp(`^  ${id}: \\{`, "m"),
-      `English gallery item ${id}`,
-    );
-  }
-  for (const field of ["title", "alt", "tag", "description"]) {
-    assert.equal(
-      [...english.matchAll(new RegExp(`^    ${field}:`, "gm"))].length,
-      ids.length,
-      field,
-    );
+    for (const image of images) {
+      for (const field of requiredImageFields) {
+        assert.ok(image[field], `${language}: image ${image.id} ${field}`);
+      }
+    }
   }
 });

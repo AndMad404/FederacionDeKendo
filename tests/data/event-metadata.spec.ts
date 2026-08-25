@@ -5,9 +5,9 @@ const FIXED_UPCOMING_TIME = new Date("2026-08-09T12:00:00-06:00");
 async function discoverUpcomingEvent(page: Page) {
   await page.clock.setFixedTime(FIXED_UPCOMING_TIME);
   await page.goto("/eventos/");
-  const eventLink = page
-    .getByRole("link", { name: /Ver detalles del evento/ })
-    .first();
+  const eventLink = page.getByRole("link", {
+    name: "Ver detalles del evento Gasshuku Monteverde",
+  });
   const path = await eventLink.getAttribute("href");
   const accessibleName = await eventLink.getAttribute("aria-label");
   return {

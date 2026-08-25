@@ -3,6 +3,16 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import * as ssr from "../../dist-ssr/entry-server.js";
+import {
+  closeSourceModuleLoader,
+  loadSourceModule,
+} from "../helpers/load-source-module.mjs";
+
+test.after(async () => closeSourceModuleLoader());
+
+const { buildEventMetaDescription } = await loadSourceModule(
+  "/src/app/config/seo.ts",
+);
 
 const TERMINAL_PUNCTUATION = /[.!?…]$/u;
 const IRREGULAR_WHITESPACE = /\s{2,}|^\s|\s$/u;
@@ -62,18 +72,6 @@ function assertDescriptionQuality(description, context) {
   );
 }
 
-function getDescriptionBuilder() {
-  assert.equal(
-    typeof ssr.buildEventMetaDescription,
-    "function",
-    "SSR capability missing: export buildEventMetaDescription from entry-server",
-  );
-  return ssr.buildEventMetaDescription;
-}
-
-const hasDescriptionBuilder =
-  typeof ssr.buildEventMetaDescription === "function";
-
 function buildDescription({
   language,
   event = {},
@@ -81,7 +79,7 @@ function buildDescription({
   now = "2026-08-20T12:00:00.000Z",
   overrides,
 }) {
-  return getDescriptionBuilder()({
+  return buildEventMetaDescription({
     event: {
       id: "meta-description-fixture",
       title: "Seminario de kendo",
@@ -163,40 +161,29 @@ test("does not impose the dynamic event limit on curated static descriptions", (
   );
 });
 
-test("exposes the event meta-description builder through the SSR namespace", () => {
-  getDescriptionBuilder();
+test("uses the approved ES/EN fallback when no summary is available", () => {
+  const cases = [
+    {
+      language: "es",
+      expected: "Consulta los detalles oficiales del evento.",
+    },
+    {
+      language: "en",
+      expected: "View the official event details.",
+    },
+  ];
+
+  for (const fixture of cases) {
+    const description = buildDescription(fixture);
+    assert.match(
+      description,
+      new RegExp(fixture.expected.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "u"),
+    );
+    assertDescriptionQuality(description, `${fixture.language} template`);
+  }
 });
 
-test(
-  "uses the approved ES/EN fallback when no summary is available",
-  { skip: !hasDescriptionBuilder },
-  () => {
-    const cases = [
-      {
-        language: "es",
-        expected: "Consulta los detalles oficiales del evento.",
-      },
-      {
-        language: "en",
-        expected: "View the official event details.",
-      },
-    ];
-
-    for (const fixture of cases) {
-      const description = buildDescription(fixture);
-      assert.match(
-        description,
-        new RegExp(
-          fixture.expected.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
-          "u",
-        ),
-      );
-      assertDescriptionQuality(description, `${fixture.language} template`);
-    }
-  },
-);
-
-test("requires event name and date", { skip: !hasDescriptionBuilder }, () => {
+test("requires event name and date", () => {
   for (const [field, value] of [
     ["name", { localizedEvent: { title: "" } }],
     ["date", { event: { date: "" }, localizedEvent: { date: "" } }],
@@ -211,119 +198,100 @@ test("requires event name and date", { skip: !hasDescriptionBuilder }, () => {
   }
 });
 
-test(
-  "includes optional time and short venue only when the complete template fits",
-  { skip: !hasDescriptionBuilder },
-  () => {
-    for (const language of ["es", "en"]) {
-      const withoutOptionals = buildDescription({ language });
-      assert.doesNotMatch(withoutOptionals, /13:00|Tamashii/u);
-      assertDescriptionQuality(
-        withoutOptionals,
-        `${language} future event without optional data`,
-      );
-
-      const withOptionals = buildDescription({
-        language,
-        event: {
-          startTime: "13:00",
-          location: "Tamashii Martial Arts Pinares",
-        },
-      });
-      assert.match(withOptionals, /13:00/u);
-      assert.match(withOptionals, /Tamashii Martial Arts Pinares/u);
-      assertDescriptionQuality(
-        withOptionals,
-        `${language} complete future event`,
-      );
-    }
-
-    const longAddress = buildDescription({
-      language: "es",
-      event: {
-        location:
-          "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, doscientos metros este y doscientos metros norte, Costa Rica",
-      },
-    });
-    assert.match(longAddress, /Tamashii Martial Arts Pinares/u);
-    assert.doesNotMatch(
-      longAddress,
-      /Curridabat|doscientos metros|Costa Rica/u,
+test("includes optional time and short venue only when the complete template fits", () => {
+  for (const language of ["es", "en"]) {
+    const withoutOptionals = buildDescription({ language });
+    assert.doesNotMatch(withoutOptionals, /13:00|Tamashii/u);
+    assertDescriptionQuality(
+      withoutOptionals,
+      `${language} future event without optional data`,
     );
-    assertDescriptionQuality(longAddress, "long address");
-  },
-);
 
-test(
-  "keeps the time while omitting the full postal address",
-  { skip: !hasDescriptionBuilder },
-  () => {
-    const description = buildDescription({
-      language: "en",
+    const withOptionals = buildDescription({
+      language,
       event: {
         startTime: "13:00",
-        location:
-          "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, Postal District, Costa Rica",
+        location: "Tamashii Martial Arts Pinares",
       },
     });
-
-    assert.match(description, /13:00/u);
-    assert.match(description, /Tamashii Martial Arts Pinares/u);
-    assert.doesNotMatch(description, /Curridabat|Postal District|Costa Rica/u);
-    assertDescriptionQuality(description, "time without postal address");
-  },
-);
-
-test(
-  "applies independent valid ES and EN editorial overrides",
-  { skip: !hasDescriptionBuilder },
-  () => {
-    const overrides = {
-      es: "Descripción editorial completa para el evento.",
-      en: "Complete editorial description for the event.",
-    };
-
-    assert.equal(buildDescription({ language: "es", overrides }), overrides.es);
-    assert.equal(buildDescription({ language: "en", overrides }), overrides.en);
-    assert.equal(
-      buildDescription({ language: "es", overrides: { en: overrides.en } }),
-      buildDescription({ language: "es" }),
+    assert.match(withOptionals, /13:00/u);
+    assert.match(withOptionals, /Tamashii Martial Arts Pinares/u);
+    assertDescriptionQuality(
+      withOptionals,
+      `${language} complete future event`,
     );
-    assert.equal(
-      buildDescription({ language: "en", overrides: { es: overrides.es } }),
-      buildDescription({ language: "en" }),
-    );
-  },
-);
+  }
 
-test(
-  "rejects invalid editorial overrides with event and language context",
-  { skip: !hasDescriptionBuilder },
-  () => {
-    const invalid = [
-      ["empty", ""],
-      [
-        "without closing punctuation",
-        "A complete-looking description without a close",
-      ],
-      ["irregular whitespace", "A description  with irregular spacing."],
-    ];
+  const longAddress = buildDescription({
+    language: "es",
+    event: {
+      location:
+        "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, doscientos metros este y doscientos metros norte, Costa Rica",
+    },
+  });
+  assert.match(longAddress, /Tamashii Martial Arts Pinares/u);
+  assert.doesNotMatch(longAddress, /Curridabat|doscientos metros|Costa Rica/u);
+  assertDescriptionQuality(longAddress, "long address");
+});
 
-    for (const language of ["es", "en"]) {
-      for (const [label, override] of invalid) {
-        assert.throws(
-          () =>
-            buildDescription({ language, overrides: { [language]: override } }),
-          (error) => {
-            assert.match(String(error), /meta-description-fixture/u, label);
-            assert.match(String(error), new RegExp(language, "u"), label);
-            return true;
-          },
-        );
-      }
+test("keeps the time while omitting the full postal address", () => {
+  const description = buildDescription({
+    language: "en",
+    event: {
+      startTime: "13:00",
+      location:
+        "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, Postal District, Costa Rica",
+    },
+  });
+
+  assert.match(description, /13:00/u);
+  assert.match(description, /Tamashii Martial Arts Pinares/u);
+  assert.doesNotMatch(description, /Curridabat|Postal District|Costa Rica/u);
+  assertDescriptionQuality(description, "time without postal address");
+});
+
+test("applies independent valid ES and EN editorial overrides", () => {
+  const overrides = {
+    es: "Descripción editorial completa para el evento.",
+    en: "Complete editorial description for the event.",
+  };
+
+  assert.equal(buildDescription({ language: "es", overrides }), overrides.es);
+  assert.equal(buildDescription({ language: "en", overrides }), overrides.en);
+  assert.equal(
+    buildDescription({ language: "es", overrides: { en: overrides.en } }),
+    buildDescription({ language: "es" }),
+  );
+  assert.equal(
+    buildDescription({ language: "en", overrides: { es: overrides.es } }),
+    buildDescription({ language: "en" }),
+  );
+});
+
+test("rejects invalid editorial overrides with event and language context", () => {
+  const invalid = [
+    ["empty", ""],
+    [
+      "without closing punctuation",
+      "A complete-looking description without a close",
+    ],
+    ["irregular whitespace", "A description  with irregular spacing."],
+  ];
+
+  for (const language of ["es", "en"]) {
+    for (const [label, override] of invalid) {
+      assert.throws(
+        () =>
+          buildDescription({ language, overrides: { [language]: override } }),
+        (error) => {
+          assert.match(String(error), /meta-description-fixture/u, label);
+          assert.match(String(error), new RegExp(language, "u"), label);
+          return true;
+        },
+      );
     }
-  },
-);
+  }
+});
 
 test("audits the complete dynamic route description inventory and generated HTML", async () => {
   const routes = ssr.getRouteManifest();

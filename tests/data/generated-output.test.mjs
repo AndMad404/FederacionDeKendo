@@ -14,7 +14,7 @@ async function readDist(relativePath) {
   );
 }
 
-test("generates event HTML with canonical and no structured data while indexing is paused", async () => {
+test("generates one historical event route with its canonical and paused-indexing metadata", async () => {
   const complete = await readDist(
     "eventos/pasados/2026-08-08-examen/index.html",
   );

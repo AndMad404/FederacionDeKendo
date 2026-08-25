@@ -115,69 +115,63 @@ export function EventPage() {
                   {isPast ? copy.event.completed : copy.event.scheduled}
                 </p>
                 <dl className="grid gap-2 text-sm md:grid-cols-2">
-                  <div className="flex items-center gap-2">
+                  <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2">
                     <CalendarDays
-                      className="size-5 shrink-0 text-site-accent-soft"
+                      className="row-span-2 size-5 shrink-0 text-site-accent-soft"
                       aria-hidden="true"
                     />
-                    <div>
-                      <dt className="font-bold">{copy.event.date}</dt>
-                      <dd>{getEventDateLabel(event, language)}</dd>
-                    </div>
+                    <dt className="font-bold">{copy.event.date}</dt>
+                    <dd>{getEventDateLabel(event, language)}</dd>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2">
                     <Clock
-                      className="size-5 shrink-0 text-site-accent-soft"
+                      className="row-span-2 size-5 shrink-0 text-site-accent-soft"
                       aria-hidden="true"
                     />
-                    <div>
-                      <dt className="font-bold">{copy.event.time}</dt>
-                      <dd>{formatEventTime(event, language)}</dd>
-                    </div>
+                    <dt className="font-bold">{copy.event.time}</dt>
+                    <dd>{formatEventTime(event, language)}</dd>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2">
                     <MapPin
-                      className="size-5 shrink-0 text-site-accent-soft"
+                      className="row-span-2 size-5 shrink-0 text-site-accent-soft"
                       aria-hidden="true"
                     />
-                    <div className="min-w-0">
-                      <dt className="font-bold">{copy.event.location}</dt>
-                      <dd>
-                        {event.location && locationUrl ? (
-                          <a
-                            href={locationUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={`underline underline-offset-4 ${focusRingClass}`}
-                          >
-                            {getEventLocationName(event.location)}
-                            <span className="sr-only">
-                              . {copy.common.opensMaps}
-                            </span>
-                          </a>
-                        ) : (
-                          copy.common.toBeConfirmed
-                        )}
-                      </dd>
-                    </div>
+                    <dt className="font-bold">{copy.event.location}</dt>
+                    <dd className="min-w-0">
+                      {event.location && locationUrl ? (
+                        <a
+                          href={locationUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`underline underline-offset-4 ${focusRingClass}`}
+                        >
+                          {getEventLocationName(event.location)}
+                          <span className="sr-only">
+                            . {copy.common.opensMaps}
+                          </span>
+                        </a>
+                      ) : (
+                        copy.common.toBeConfirmed
+                      )}
+                    </dd>
                   </div>
-                  {!isPast ? (
-                    <div className="my-2.5 flex items-center justify-center md:my-0 md:justify-start land-sm:my-0 land-sm:justify-start">
-                      <a
-                        href={getGoogleCalendarUrl(event)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`${secondaryButtonClass} ${focusRingClass}`}
-                      >
-                        <CalendarPlus
-                          className="mr-2 size-4"
-                          aria-hidden="true"
-                        />
-                        {copy.event.addToCalendar}
-                      </a>
-                    </div>
-                  ) : null}
                 </dl>
+                {!isPast ? (
+                  <div className="my-2.5 flex items-center justify-center md:my-0 md:justify-start land-sm:my-0 land-sm:justify-start">
+                    <a
+                      href={getGoogleCalendarUrl(event)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`${secondaryButtonClass} ${focusRingClass}`}
+                    >
+                      <CalendarPlus
+                        className="mr-2 size-4"
+                        aria-hidden="true"
+                      />
+                      {copy.event.addToCalendar}
+                    </a>
+                  </div>
+                ) : null}
 
                 <div className="grid gap-1">
                   <h2 className="font-bold">{copy.event.description}</h2>

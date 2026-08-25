@@ -245,7 +245,7 @@ for (const viewport of [
   });
 }
 
-test("renders the historical archive and a custom not-found view", async ({
+test("renders the historical archive and the local not-found view", async ({
   page,
 }) => {
   const consoleErrors: string[] = [];

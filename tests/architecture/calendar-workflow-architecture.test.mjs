@@ -1,21 +1,16 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
-import path from "node:path";
 import test from "node:test";
 
-const root = process.cwd();
+import {
+  actionSteps,
+  loadYamlDocument,
+  workflowSteps,
+} from "../helpers/load-yaml-document.mjs";
 
-async function workflow(relativePath) {
-  return readFile(path.join(root, relativePath), "utf8");
-}
-
-function assertBefore(source, first, second) {
-  assert.ok(source.indexOf(first) >= 0, `Missing ${first}`);
-  assert.ok(source.indexOf(second) >= 0, `Missing ${second}`);
-  assert.ok(
-    source.indexOf(first) < source.indexOf(second),
-    `${first} must precede ${second}`,
-  );
+function stepIndex(steps, predicate, description) {
+  const index = steps.findIndex(predicate);
+  assert.notEqual(index, -1, `Missing ${description}`);
+  return index;
 }
 
 test("Phase 6: writer workflows run their directed test and shared gate before committing", async () => {
@@ -37,30 +32,49 @@ test("Phase 6: writer workflows run their directed test and shared gate before c
     ],
   ];
 
-  for (const [file, directedTest, commit] of cases) {
-    const source = await workflow(file);
-    assertBefore(source, directedTest, "uses: ./.github/actions/verify-site");
-    assertBefore(source, "uses: ./.github/actions/verify-site", commit);
+  for (const [file, directedTest, commitName] of cases) {
+    const steps = workflowSteps(await loadYamlDocument(file));
+    const directed = stepIndex(
+      steps,
+      (step) => step.run?.includes(directedTest),
+      `${file}: directed test`,
+    );
+    const gate = stepIndex(
+      steps,
+      (step) => step.uses === "./.github/actions/verify-site",
+      `${file}: shared gate`,
+    );
+    const commit = stepIndex(
+      steps,
+      (step) => step.name === commitName,
+      `${file}: commit`,
+    );
+    assert.ok(directed < gate, `${file}: directed test must precede gate`);
+    assert.ok(gate < commit, `${file}: gate must precede commit`);
   }
 });
 
 test("Calendar synchronization only commits staged content changes", async () => {
-  const sync = await workflow(".github/workflows/sync-calendar.yml");
-
-  assertBefore(
-    sync,
-    'git add -A -- "${sync_paths[@]}"',
-    "git diff --cached --quiet",
+  const steps = workflowSteps(
+    await loadYamlDocument(".github/workflows/sync-calendar.yml"),
   );
-  assertBefore(
-    sync,
-    "git diff --cached --quiet",
+  const commit = steps.find((step) => step.name === "Commit calendar changes");
+  assert.ok(commit?.run, "missing calendar commit script");
+  const stage = commit.run.indexOf('git add -A -- "${sync_paths[@]}"');
+  const diff = commit.run.indexOf("git diff --cached --quiet");
+  const write = commit.run.indexOf(
     'git commit -m "chore: sync calendar events"',
   );
+  assert.ok(stage >= 0 && stage < diff && diff < write);
 });
 
 test("Phase 6: the shared gate and human CI coverage remain complete", async () => {
-  const action = await workflow(".github/actions/verify-site/action.yml");
+  const action = await loadYamlDocument(
+    ".github/actions/verify-site/action.yml",
+  );
+  const commands = actionSteps(action)
+    .map((step) => step.run)
+    .filter(Boolean);
   for (const command of [
     "pnpm run typecheck",
     "pnpm run build",
@@ -69,30 +83,50 @@ test("Phase 6: the shared gate and human CI coverage remain complete", async () 
     "pnpm exec playwright install --with-deps chromium",
     "pnpm run test:behavior",
     "pnpm run test:design",
+    "${{ inputs.unit-command }}",
   ]) {
-    assert.match(
-      action,
-      new RegExp(command.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
+    assert.ok(
+      commands.some((run) => run.includes(command)),
+      `Missing ${command}`,
     );
   }
-  assert.match(action, /run: \$\{\{ inputs\.unit-command \}\}/);
 
-  const ci = await workflow(".github/workflows/ci.yml");
-  assert.match(ci, /push:/);
-  assert.match(ci, /pull_request:/);
-  assert.match(ci, /if: github\.actor != 'github-actions\[bot\]'/);
-  assert.match(ci, /uses: \.\/\.github\/actions\/verify-site/);
+  const ci = await loadYamlDocument(".github/workflows/ci.yml");
+  assert.ok(Object.hasOwn(ci.on ?? {}, "push"));
+  assert.ok(Object.hasOwn(ci.on ?? {}, "pull_request"));
+  const jobs = Object.values(ci.jobs ?? {});
+  assert.ok(
+    jobs.some((job) => job.if === "github.actor != 'github-actions[bot]'"),
+  );
+  assert.ok(
+    jobs.some((job) =>
+      job.steps?.some((step) => step.uses === "./.github/actions/verify-site"),
+    ),
+  );
 });
 
 test("Phase 6: historical correction downloads the artifact produced by synchronization", async () => {
-  const sync = await workflow(".github/workflows/sync-calendar.yml");
-  const correction = await workflow(
-    ".github/workflows/correct-calendar-history-range.yml",
+  const syncSteps = workflowSteps(
+    await loadYamlDocument(".github/workflows/sync-calendar.yml"),
+  );
+  const correctionSteps = workflowSteps(
+    await loadYamlDocument(
+      ".github/workflows/correct-calendar-history-range.yml",
+    ),
   );
   const artifactName = "calendar-notification-reports";
-
-  assert.match(sync, new RegExp(`name: ${artifactName}`));
-  assert.match(correction, new RegExp(`name: ${artifactName}`));
-  assert.match(sync, /calendar-historical-changes\.json/);
-  assert.match(correction, /--report calendar-historical-changes\.json/);
+  const upload = syncSteps.find(
+    (step) => step.uses === "actions/upload-artifact@v5",
+  );
+  const download = correctionSteps.find(
+    (step) => step.uses === "actions/download-artifact@v5",
+  );
+  assert.equal(upload?.with?.name, artifactName);
+  assert.equal(download?.with?.name, artifactName);
+  assert.match(upload?.with?.path ?? "", /calendar-historical-changes\.json/);
+  assert.ok(
+    correctionSteps.some((step) =>
+      step.run?.includes("--report calendar-historical-changes.json"),
+    ),
+  );
 });

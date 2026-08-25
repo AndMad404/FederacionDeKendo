@@ -22,6 +22,10 @@ import {
   writeActionSummary,
   writeCalendarNotificationsSummary,
 } from "../../scripts/sync-calendar-events.mjs";
+import {
+  loadYamlDocument,
+  workflowSteps,
+} from "../helpers/load-yaml-document.mjs";
 import { synchronizeEventGalleries } from "../../scripts/sync-event-galleries.mjs";
 import { formatCalendarNotificationEmail } from "../../scripts/write-calendar-notification-email.mjs";
 
@@ -829,13 +833,19 @@ test("C2: synchronization writes a private-safe report while retaining frozen pu
 });
 
 test("C2: workflow uploads the structured report without issue permissions or failure gates", async () => {
-  const workflow = await readFile(
-    path.resolve(".github/workflows/sync-calendar.yml"),
-    "utf8",
+  const workflow = await loadYamlDocument(
+    ".github/workflows/sync-calendar.yml",
   );
-  assert.match(workflow, /actions\/upload-artifact@v5/);
-  assert.match(workflow, /calendar-historical-changes\.json/);
-  assert.doesNotMatch(workflow, /issues:\s*write|exit\s+1/);
+  const steps = workflowSteps(workflow);
+  const upload = steps.find(
+    (step) => step.uses === "actions/upload-artifact@v5",
+  );
+  assert.match(upload?.with?.path ?? "", /calendar-historical-changes\.json/);
+  assert.equal(workflow.permissions?.issues, undefined);
+  assert.equal(
+    steps.some((step) => step.run?.match(/exit\s+1/)),
+    false,
+  );
 });
 
 test("F4: pending revisions emit one redacted actionable notification per evidence fingerprint", () => {

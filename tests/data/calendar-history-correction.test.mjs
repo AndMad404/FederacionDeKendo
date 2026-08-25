@@ -11,6 +11,10 @@ import {
   fingerprintHistoricalSnapshot,
 } from "../../scripts/correct-calendar-history.mjs";
 import {
+  loadYamlDocument,
+  workflowSteps,
+} from "../helpers/load-yaml-document.mjs";
+import {
   applyHistoricalCorrectionsByDateRange,
   parseCliArguments,
 } from "../../scripts/correct-calendar-history-range.mjs";
@@ -263,26 +267,33 @@ test("range correction validates every selected proposal before writing any even
 });
 
 test("range workflow requires an approved report run and an inclusive date range", async () => {
-  const workflow = await readFile(
-    path.resolve(".github/workflows/correct-calendar-history-range.yml"),
-    "utf8",
+  const workflow = await loadYamlDocument(
+    ".github/workflows/correct-calendar-history-range.yml",
   );
-  assert.match(workflow, /workflow_dispatch/);
-  assert.match(workflow, /report_run_id:/);
-  assert.match(workflow, /from:/);
-  assert.match(workflow, /to:/);
-  assert.match(workflow, /actions\/download-artifact@v5/);
-  assert.match(workflow, /correct:calendar-history-range/);
-  assert.match(workflow, /sync:approved-historical-galleries/);
+  const inputs = workflow.on?.workflow_dispatch?.inputs;
+  assert.ok(inputs?.report_run_id);
+  assert.ok(inputs?.from);
+  assert.ok(inputs?.to);
+  const steps = workflowSteps(workflow);
+  assert.ok(steps.some((step) => step.uses === "actions/download-artifact@v5"));
+  const commands = steps
+    .map((step) => step.run)
+    .filter(Boolean)
+    .join("\n");
+  assert.match(commands, /correct:calendar-history-range/);
+  assert.match(commands, /sync:approved-historical-galleries/);
   assert.match(
-    workflow,
+    commands,
     /rm -f calendar-historical-changes\.json calendar-notifications\.json/,
   );
-  assert.match(workflow, /CALENDAR_ICS_URL/);
-  assert.match(workflow, /eventGalleries\.ts/);
-  assert.match(workflow, /eventGalleryState\.json/);
-  assert.doesNotMatch(workflow, /correct:calendar-history-range -- --report/);
-  assert.doesNotMatch(workflow, /issues:\s*write/);
+  assert.ok(
+    Object.values(workflow.jobs ?? {}).some((job) => job.env?.CALENDAR_ICS_URL),
+    "workflow must provide CALENDAR_ICS_URL",
+  );
+  assert.match(commands, /eventGalleries\.ts/);
+  assert.match(commands, /eventGalleryState\.json/);
+  assert.doesNotMatch(commands, /correct:calendar-history-range -- --report/);
+  assert.equal(workflow.permissions?.issues, undefined);
 });
 
 test("approved historical gallery sync reads only the selected source album", async () => {
