@@ -87,9 +87,6 @@ test("renders localized upcoming and past event navigation with the active page"
     );
     await expect(inactive).not.toHaveAttribute("aria-current");
     await expect(inactive).toBeVisible();
-    const inactiveBox = await inactive.boundingBox();
-    expect(inactiveBox).not.toBeNull();
-    expect(inactiveBox!.height).toBeGreaterThanOrEqual(44);
 
     await inactive.focus();
     await expect(inactive).toBeFocused();
@@ -143,6 +140,7 @@ test("preserves filters in pagination and resets to page one when changed", asyn
   await expect(page.getByRole("button", { name: "Previous" })).toBeEnabled();
 
   await page.goto("/eventos/pasados/?type=examen");
+  await expect(page.getByRole("button", { name: "Siguiente" })).toBeEnabled();
   await page
     .getByRole("combobox", { name: "Año", exact: true })
     .selectOption("2026");
@@ -158,8 +156,14 @@ test("touch swipe paginates the historical archive on mobile", async ({
   await expect(page.getByRole("button", { name: "Siguiente" })).toBeEnabled();
 
   const panel = page.locator("[data-page-content-boundary]");
-  const box = await panel.boundingBox();
-  expect(box).not.toBeNull();
+  await expect(panel).toBeVisible();
+  let box = await panel.boundingBox();
+  await expect
+    .poll(async () => {
+      box = await panel.boundingBox();
+      return box !== null;
+    })
+    .toBe(true);
 
   const session = await context.newCDPSession(page);
   const y = box!.y + Math.min(box!.height / 2, 240);

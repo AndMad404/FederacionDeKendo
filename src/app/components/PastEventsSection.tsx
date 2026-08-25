@@ -1,4 +1,3 @@
-import { useCallback } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { PAST_EVENTS_PAGE_SIZE } from "../config/events";
 import {
@@ -56,13 +55,10 @@ export function PastEventsSection() {
   );
   const eventTypes: ArchiveEventType[] = ["torneo", "examen", "seminario"];
 
-  const navigateToPage = useCallback(
-    (targetPage: number) => {
-      if (targetPage < 1 || targetPage > pageCount) return;
-      navigate(buildArchiveUrl(targetPage, language, filters));
-    },
-    [filters, language, navigate, pageCount],
-  );
+  const navigateToPage = (targetPage: number) => {
+    if (targetPage < 1 || targetPage > pageCount) return;
+    navigate(buildArchiveUrl(targetPage, language, filters));
+  };
   const { swipeHandlers } = useSwipeNavigation({
     onSwipeLeft: () => navigateToPage(page + 1),
     onSwipeRight: () => navigateToPage(page - 1),
