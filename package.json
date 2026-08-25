@@ -38,6 +38,7 @@
     "apply:calendar-decision": "node scripts/apply-calendar-editorial-decision.mjs",
     "correct:calendar-history": "node scripts/correct-calendar-history.mjs",
     "correct:calendar-history-range": "node scripts/correct-calendar-history-range.mjs",
+    "sync:approved-historical-galleries": "node scripts/sync-approved-historical-galleries.mjs",
     "images:responsive": "node scripts/generate-responsive-images.mjs && node scripts/generate-gallery-asset-hashes.mjs",
     "images:optimize-delivered": "node scripts/optimize-delivered-images.mjs"
   },

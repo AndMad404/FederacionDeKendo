@@ -172,7 +172,7 @@ test("accepts matching Drive album links with different query parameters", () =>
       "UID:album@example.test",
       "DTSTART;VALUE=DATE:20260822",
       "SUMMARY:3er Torneo",
-      "DESCRIPTION:Resultados.\\nhttps://drive.google.com/drive/folders/same-folder?usp=drive_link\\n---\\nALBUM_FOTOS: https://drive.google.com/drive/folders/same-folder",
+      'DESCRIPTION:Resultados.\\n<a href="https://drive.google.com/drive/folders/same-folder?usp=drive_link" class="pastedDriveLink-0">Álbum</a>\\n---\\nALBUM_FOTOS: https://drive.google.com/drive/folders/same-folder',
       "END:VEVENT",
       "END:VCALENDAR",
     ].join("\n"),

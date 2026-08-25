@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -13,6 +14,7 @@ import {
   applyHistoricalCorrectionsByDateRange,
   parseCliArguments,
 } from "../../scripts/correct-calendar-history-range.mjs";
+import { synchronizeApprovedHistoricalGalleries } from "../../scripts/sync-approved-historical-galleries.mjs";
 import {
   detectHistoricalChanges,
   mergeRegistry,
@@ -258,8 +260,67 @@ test("range workflow requires an approved report run and an inclusive date range
   assert.match(workflow, /to:/);
   assert.match(workflow, /actions\/download-artifact@v5/);
   assert.match(workflow, /correct:calendar-history-range/);
+  assert.match(workflow, /sync:approved-historical-galleries/);
+  assert.match(workflow, /CALENDAR_ICS_URL/);
+  assert.match(workflow, /eventGalleries\.ts/);
+  assert.match(workflow, /eventGalleryState\.json/);
   assert.doesNotMatch(workflow, /correct:calendar-history-range -- --report/);
   assert.doesNotMatch(workflow, /issues:\s*write/);
+});
+
+test("approved historical gallery sync reads only the selected source album", async () => {
+  const files = await fixture();
+  const sourcePath = path.join(files.directory, "calendar.ics");
+  const report = JSON.parse(await readFile(files.reportPath, "utf8"));
+  report.historicalChanges[0].sourceId = createHash("sha256")
+    .update("stable-source")
+    .digest("hex")
+    .slice(0, 24);
+  await writeFile(files.reportPath, `${JSON.stringify(report, null, 2)}\n`);
+  await writeFile(
+    sourcePath,
+    [
+      "BEGIN:VCALENDAR",
+      "BEGIN:VEVENT",
+      "UID:stable-source",
+      "DTSTART;VALUE=DATE:20260110",
+      "SUMMARY:Seminario corregido",
+      "DESCRIPTION:Texto actualizado\\nhttps://drive.google.com/drive/folders/approved-album",
+      "END:VEVENT",
+      "BEGIN:VEVENT",
+      "UID:other-source",
+      "DTSTART;VALUE=DATE:20250101",
+      "SUMMARY:Otro",
+      "DESCRIPTION:https://drive.google.com/drive/folders/other-album",
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ].join("\n"),
+  );
+  let requestedAlbum;
+  try {
+    await synchronizeApprovedHistoricalGalleries({
+      source: sourcePath,
+      reportPath: files.reportPath,
+      from: published.date,
+      to: published.date,
+      galleryOptions: {
+        manifestPath: path.join(files.directory, "eventGalleries.ts"),
+        statePath: path.join(files.directory, "eventGalleryState.json"),
+        imagesRoot: path.join(files.directory, "event-images"),
+        listFolder: async (albumUrl) => {
+          requestedAlbum = albumUrl;
+          return [];
+        },
+        downloadFile: async () => Buffer.alloc(0),
+      },
+    });
+    assert.equal(
+      requestedAlbum,
+      "https://drive.google.com/drive/folders/approved-album",
+    );
+  } finally {
+    await rm(files.directory, { recursive: true, force: true });
+  }
 });
 
 test("range CLI accepts pnpm arguments with or without a literal separator", () => {

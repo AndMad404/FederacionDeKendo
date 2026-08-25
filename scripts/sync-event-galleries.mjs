@@ -250,7 +250,8 @@ export async function synchronizeEventGalleries({
     const phaseRank = { first: 1, final: 2 };
     if (
       (phaseRank[previousCheckPhase] ?? 0) >=
-      (phaseRank[galleryCheckPhase] ?? 0)
+        (phaseRank[galleryCheckPhase] ?? 0) &&
+      !event.albumUrl
     ) {
       continue;
     }

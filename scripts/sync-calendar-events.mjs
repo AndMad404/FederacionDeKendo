@@ -52,7 +52,9 @@ const inferredEventTypes = [
 const googleDriveFolderUrl =
   /^https:\/\/drive\.google\.com\/drive\/folders\/[A-Za-z0-9_-]+(?:[/?#].*)?$/;
 const embeddedGoogleDriveFolderUrl =
-  /https:\/\/drive\.google\.com\/drive\/folders\/[A-Za-z0-9_-]+(?:[/?#][^\s]*)?/g;
+  /https:\/\/drive\.google\.com\/drive\/folders\/[A-Za-z0-9_-]+(?:[/?#][^\s"'<>\])}]*)?/g;
+const embeddedGoogleDriveFolderAnchor =
+  /<a\b[^>]*\bhref=["'](https:\/\/drive\.google\.com\/drive\/folders\/[A-Za-z0-9_-]+(?:[/?#][^\s"']*)?)["'][^>]*>[\s\S]*?<\/a>/gi;
 const albumUrlSymbol = Symbol("privateAlbumUrl");
 export const MASS_DISAPPEARANCE_MINIMUM = 2;
 export const MASS_DISAPPEARANCE_RATIO = 0.5;
@@ -346,9 +348,11 @@ function parseTechnicalDescription(description, title) {
   }
 
   const sanitizedPublicLines = publicLines.map((line) => {
-    const matches = [...line.matchAll(embeddedGoogleDriveFolderUrl)].map(
-      (match) => match[0],
-    );
+    const anchorMatches = [...line.matchAll(embeddedGoogleDriveFolderAnchor)];
+    const matches = [
+      ...anchorMatches.map((match) => match[1]),
+      ...line.matchAll(embeddedGoogleDriveFolderUrl).map((match) => match[0]),
+    ];
     for (const match of matches) {
       if (
         albumUrl &&
@@ -358,8 +362,12 @@ function parseTechnicalDescription(description, title) {
       }
       albumUrl = match;
     }
+    const withoutAlbumAnchors = anchorMatches.reduce(
+      (text, match) => text.replace(match[0], ""),
+      line,
+    );
     return matches
-      .reduce((text, match) => text.replace(match, ""), line)
+      .reduce((text, match) => text.replace(match, ""), withoutAlbumAnchors)
       .trimEnd();
   });
 
@@ -1194,7 +1202,7 @@ ${events
 `;
 }
 
-async function readCalendarSource(source) {
+export async function readCalendarSource(source) {
   if (/^https?:\/\//i.test(source)) {
     const response = await fetch(source);
     if (!response.ok) {

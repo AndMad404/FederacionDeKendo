@@ -28,6 +28,8 @@ jobs:
   correct-history:
     name: Apply approved historical range
     runs-on: ubuntu-latest
+    env:
+      CALENDAR_ICS_URL: ${{ secrets.CALENDAR_ICS_URL }}
 
     steps:
       - name: Checkout repository
@@ -55,6 +57,9 @@ jobs:
       - name: Apply approved historical range
         run: pnpm run correct:calendar-history-range --report calendar-historical-changes.json --from "${{ inputs.from }}" --to "${{ inputs.to }}"
 
+      - name: Import approved historical galleries
+        run: pnpm run sync:approved-historical-galleries --report calendar-historical-changes.json --from "${{ inputs.from }}" --to "${{ inputs.to }}"
+
       - name: Directed historical correction tests
         run: node --test tests/data/calendar-history-correction.test.mjs
 
@@ -68,7 +73,12 @@ jobs:
           sync_paths=(
             src/app/data/calendarEvents.ts
             src/app/data/calendarEventRegistry.json
+            src/app/data/eventGalleries.ts
+            src/app/data/eventGalleryState.json
           )
+          if [[ -d public/images/events ]] || git ls-files --error-unmatch public/images/events >/dev/null 2>&1; then
+            sync_paths+=(public/images/events)
+          fi
           if [[ -z "$(git status --porcelain -- "${sync_paths[@]}")" ]]; then
             echo "No approved historical changes to commit."
             exit 0

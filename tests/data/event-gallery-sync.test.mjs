@@ -362,3 +362,33 @@ test("imports content uploaded between the 24-hour check and the 48-hour deadlin
     await rm(context.directory, { recursive: true, force: true });
   }
 });
+
+test("imports an album added after the final absent-gallery check", async () => {
+  const files = [{ name: "1.jpg", id: "one", buffer: await image("red") }];
+  const context = await fixture(files);
+  const event = { slug: "2026-01-01-evento", title: "Evento" };
+  try {
+    await synchronizeEventGalleries({
+      ...context.options,
+      events: [{ ...event, galleryCheckPhase: "final" }],
+    });
+
+    const imported = await synchronizeEventGalleries({
+      ...context.options,
+      events: [
+        {
+          ...event,
+          galleryCheckPhase: "final",
+          albumUrl: "https://drive.google.com/drive/folders/publicAlbum",
+        },
+      ],
+      listFolder: async () => files,
+      downloadFile: async (file) => file.buffer,
+    });
+
+    assert.equal(imported.importedCount, 1);
+    assert.equal(imported.galleries[event.slug].images.length, 1);
+  } finally {
+    await rm(context.directory, { recursive: true, force: true });
+  }
+});
