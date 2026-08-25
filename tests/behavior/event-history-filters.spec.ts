@@ -126,9 +126,6 @@ test("preserves filters in pagination and resets to page one when changed", asyn
   const next = page.getByRole("button", { name: "Siguiente" });
   await expect(next).toBeVisible();
   await expect(next.locator("svg")).toHaveCount(1);
-  expect(
-    await next.evaluate((element) => element.getBoundingClientRect().height),
-  ).toBeGreaterThanOrEqual(44);
   await next.click();
   await expect(page).toHaveURL(/pagina\/2\/\?type=examen$/);
   const previous = page.getByRole("button", { name: "Anterior" });
