@@ -52,5 +52,70 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "sizes": "(max-width: 640px) 100vw, 960px"
       }
     ]
+  },
+  "2026-08-22-3er-torneo": {
+    "fingerprint": "5cbd7351da72eb1e6102d6c0ca7ff00c14d4ce7be66701295d787af74361734d",
+    "images": [
+      {
+        "order": 1,
+        "alt": "Federaciones de Asociaciones de Kendo - 3er Torneo 2026-08-22",
+        "width": 720,
+        "height": 1560,
+        "src": "/images/events/2026-08-22-3er-torneo/photo-1-720.webp",
+        "srcSet": {
+          "webp": "/images/events/2026-08-22-3er-torneo/photo-1-480.webp 480w, /images/events/2026-08-22-3er-torneo/photo-1-720.webp 720w",
+          "avif": "/images/events/2026-08-22-3er-torneo/photo-1-480.avif 480w, /images/events/2026-08-22-3er-torneo/photo-1-720.avif 720w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 2,
+        "alt": "Federaciones de Asociaciones de Kendo - 3er Torneo 2026-08-22",
+        "width": 1445,
+        "height": 1600,
+        "src": "/images/events/2026-08-22-3er-torneo/photo-2-1445.webp",
+        "srcSet": {
+          "webp": "/images/events/2026-08-22-3er-torneo/photo-2-480.webp 480w, /images/events/2026-08-22-3er-torneo/photo-2-960.webp 960w, /images/events/2026-08-22-3er-torneo/photo-2-1445.webp 1445w",
+          "avif": "/images/events/2026-08-22-3er-torneo/photo-2-480.avif 480w, /images/events/2026-08-22-3er-torneo/photo-2-960.avif 960w, /images/events/2026-08-22-3er-torneo/photo-2-1445.avif 1445w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 3,
+        "alt": "Federaciones de Asociaciones de Kendo - 3er Torneo 2026-08-22",
+        "width": 1600,
+        "height": 1493,
+        "src": "/images/events/2026-08-22-3er-torneo/photo-3-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/2026-08-22-3er-torneo/photo-3-480.webp 480w, /images/events/2026-08-22-3er-torneo/photo-3-960.webp 960w, /images/events/2026-08-22-3er-torneo/photo-3-1600.webp 1600w",
+          "avif": "/images/events/2026-08-22-3er-torneo/photo-3-480.avif 480w, /images/events/2026-08-22-3er-torneo/photo-3-960.avif 960w, /images/events/2026-08-22-3er-torneo/photo-3-1600.avif 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 4,
+        "alt": "Federaciones de Asociaciones de Kendo - 3er Torneo 2026-08-22",
+        "width": 1600,
+        "height": 901,
+        "src": "/images/events/2026-08-22-3er-torneo/photo-4-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/2026-08-22-3er-torneo/photo-4-480.webp 480w, /images/events/2026-08-22-3er-torneo/photo-4-960.webp 960w, /images/events/2026-08-22-3er-torneo/photo-4-1600.webp 1600w",
+          "avif": "/images/events/2026-08-22-3er-torneo/photo-4-480.avif 480w, /images/events/2026-08-22-3er-torneo/photo-4-960.avif 960w, /images/events/2026-08-22-3er-torneo/photo-4-1600.avif 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 5,
+        "alt": "Federaciones de Asociaciones de Kendo - 3er Torneo 2026-08-22",
+        "width": 1600,
+        "height": 900,
+        "src": "/images/events/2026-08-22-3er-torneo/photo-5-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/2026-08-22-3er-torneo/photo-5-480.webp 480w, /images/events/2026-08-22-3er-torneo/photo-5-960.webp 960w, /images/events/2026-08-22-3er-torneo/photo-5-1600.webp 1600w",
+          "avif": "/images/events/2026-08-22-3er-torneo/photo-5-480.avif 480w, /images/events/2026-08-22-3er-torneo/photo-5-960.avif 960w, /images/events/2026-08-22-3er-torneo/photo-5-1600.avif 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      }
+    ]
   }
 };

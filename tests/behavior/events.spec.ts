@@ -4,7 +4,7 @@ const FIXED_UPCOMING_TIME = new Date("2026-08-23T12:00:00-06:00");
 const TOURNAMENT_EVENT_PATH = "/eventos/2026-08-22-3er-torneo/";
 const GASSHUKU_EVENT_PATH = "/eventos/2026-09-12-gasshuku-monteverde/";
 const HISTORICAL_EVENT_PATH = "/eventos/pasados/2026-08-08-examen/";
-const HISTORICAL_EVENT_WITHOUT_GALLERY_PATH =
+const HISTORICAL_TOURNAMENT_PATH =
   "/eventos/pasados/2026-08-22-3er-torneo/";
 const FIXED_HISTORICAL_TIME = new Date("2026-08-24T12:00:00-06:00");
 
@@ -158,11 +158,11 @@ test("moves an event from upcoming to history after its local date expires", asy
   ).toHaveCount(0);
 });
 
-test("historical event details preserve complete information without a gallery manifest", async ({
+test("historical tournament details preserve complete information with its gallery", async ({
   page,
 }) => {
   await page.clock.setFixedTime(FIXED_HISTORICAL_TIME);
-  await page.goto(HISTORICAL_EVENT_WITHOUT_GALLERY_PATH);
+  await page.goto(HISTORICAL_TOURNAMENT_PATH);
 
   await expect(page.getByText("Actividad finalizada")).toBeVisible();
   await expect(page.getByText("3er Torneo", { exact: true })).toBeVisible();
@@ -173,8 +173,11 @@ test("historical event details preserve complete information without a gallery m
     page.getByText("Categoría con Bogu y sin Bogu", { exact: false }),
   ).toBeVisible();
   await expect(
-    page.getByRole("region", { name: /Fotografías del evento/ }),
-  ).toHaveCount(0);
+    page.getByRole("region", { name: "Fotografías del evento 3er Torneo" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /Abrir Fotografía/ }),
+  ).toHaveCount(1);
 });
 
 for (const viewport of [
