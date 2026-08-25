@@ -1,9 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { PAST_EVENTS_PAGE_SIZE } from "../config/events";
 import {
   focusRingClass,
-  navigationArrowButtonClass,
   panelSurfaceClass,
   primaryButtonClass,
 } from "../styles/shared";
@@ -26,6 +24,7 @@ import { getLocalizedEvents } from "../utils/localizedEvents";
 import { useHydratedNow } from "../hooks/useHydratedNow";
 import { EventSummary } from "./EventSummary";
 import { EventSectionNavigation } from "./events/EventSectionNavigation";
+import { NavigationArrowButton } from "./ui/ModalControls";
 
 export function PastEventsSection() {
   const { language, copy } = useLanguage();
@@ -49,7 +48,6 @@ export function PastEventsSection() {
     Math.ceil(events.length / PAST_EVENTS_PAGE_SIZE),
   );
   const page = Math.min(requestedPage, pageCount);
-  const pageLabel = `${copy.archive.page} ${page} ${copy.archive.of} ${pageCount}`;
   const pageEvents = events.slice(
     (page - 1) * PAST_EVENTS_PAGE_SIZE,
     page * PAST_EVENTS_PAGE_SIZE,
@@ -170,25 +168,22 @@ export function PastEventsSection() {
             aria-label={copy.archive.pagination}
             className="mt-auto flex items-center justify-center gap-3"
           >
-            {page > 1 ? (
-              <Link
-                to={buildArchiveUrl(page - 1, language, filters)}
-                aria-label={copy.archive.previous}
-                className={`${navigationArrowButtonClass} ${focusRingClass}`}
-              >
-                <ChevronLeft className="size-5 md:size-6" aria-hidden="true" />
-              </Link>
-            ) : null}
-            <span className="text-sm font-semibold">{pageLabel}</span>
-            {page < pageCount ? (
-              <Link
-                to={buildArchiveUrl(page + 1, language, filters)}
-                aria-label={copy.archive.next}
-                className={`${navigationArrowButtonClass} ${focusRingClass}`}
-              >
-                <ChevronRight className="size-5 md:size-6" aria-hidden="true" />
-              </Link>
-            ) : null}
+            <NavigationArrowButton
+              direction="previous"
+              label={copy.archive.previous}
+              disabled={page === 1}
+              onClick={() =>
+                navigate(buildArchiveUrl(page - 1, language, filters))
+              }
+            />
+            <NavigationArrowButton
+              direction="next"
+              label={copy.archive.next}
+              disabled={page === pageCount}
+              onClick={() =>
+                navigate(buildArchiveUrl(page + 1, language, filters))
+              }
+            />
           </nav>
         </div>
       </div>
