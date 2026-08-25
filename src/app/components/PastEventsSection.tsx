@@ -93,7 +93,7 @@ export function PastEventsSection() {
         >
           <EventSectionNavigation active="past" />
 
-          <div className="grid grid-cols-2 items-end gap-3 md:mx-auto md:w-fit md:grid-cols-[auto_auto]">
+          <div className="grid w-full grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-end gap-2 md:mx-auto md:w-fit md:grid-cols-[auto_auto_auto]">
             <label className="relative min-w-0 text-xs font-bold text-site-muted">
               <select
                 name="year"
@@ -126,29 +126,28 @@ export function PastEventsSection() {
                 ))}
               </select>
             </label>
+            <nav
+              aria-label={copy.archive.pagination}
+              className="flex items-center justify-center gap-2"
+            >
+              <NavigationArrowButton
+                direction="previous"
+                label={copy.archive.previous}
+                disabled={page === 1}
+                onClick={() =>
+                  navigate(buildArchiveUrl(page - 1, language, filters))
+                }
+              />
+              <NavigationArrowButton
+                direction="next"
+                label={copy.archive.next}
+                disabled={page === pageCount}
+                onClick={() =>
+                  navigate(buildArchiveUrl(page + 1, language, filters))
+                }
+              />
+            </nav>
           </div>
-
-          <nav
-            aria-label={copy.archive.pagination}
-            className="flex items-center justify-center gap-4"
-          >
-            <NavigationArrowButton
-              direction="previous"
-              label={copy.archive.previous}
-              disabled={page === 1}
-              onClick={() =>
-                navigate(buildArchiveUrl(page - 1, language, filters))
-              }
-            />
-            <NavigationArrowButton
-              direction="next"
-              label={copy.archive.next}
-              disabled={page === pageCount}
-              onClick={() =>
-                navigate(buildArchiveUrl(page + 1, language, filters))
-              }
-            />
-          </nav>
 
           {pageEvents.length ? (
             <ul className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
