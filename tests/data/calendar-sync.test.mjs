@@ -9,6 +9,7 @@ import sharp from "sharp";
 import {
   assertSafeCalendarInput,
   createCanonicalSlug,
+  getPrivateAlbumUrl,
   MASS_DISAPPEARANCE_MINIMUM,
   MASS_DISAPPEARANCE_RATIO,
   mergeRegistry,
@@ -161,6 +162,46 @@ test("omits an event and warns when title or date is missing", () => {
     warnings.some((warning) => warning.includes("date")),
     true,
   );
+});
+
+test("accepts matching Drive album links with different query parameters", () => {
+  const [properties] = parseVEvents(
+    [
+      "BEGIN:VCALENDAR",
+      "BEGIN:VEVENT",
+      "UID:album@example.test",
+      "DTSTART;VALUE=DATE:20260822",
+      "SUMMARY:3er Torneo",
+      "DESCRIPTION:Resultados.\\nhttps://drive.google.com/drive/folders/same-folder?usp=drive_link\\n---\\nALBUM_FOTOS: https://drive.google.com/drive/folders/same-folder",
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ].join("\n"),
+  );
+
+  const event = parseCalendarEvent(properties);
+
+  assert.equal(
+    getPrivateAlbumUrl(event),
+    "https://drive.google.com/drive/folders/same-folder?usp=drive_link",
+  );
+  assert.equal(event.summary, "Resultados.");
+});
+
+test("rejects different Drive album folders", () => {
+  const [properties] = parseVEvents(
+    [
+      "BEGIN:VCALENDAR",
+      "BEGIN:VEVENT",
+      "UID:albums@example.test",
+      "DTSTART;VALUE=DATE:20260822",
+      "SUMMARY:3er Torneo",
+      "DESCRIPTION:https://drive.google.com/drive/folders/first-folder\\nhttps://drive.google.com/drive/folders/second-folder",
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ].join("\n"),
+  );
+
+  assert.throws(() => parseCalendarEvent(properties), /Multiple album URLs/);
 });
 
 test("Given a pending event, When its title changes, Then its identity remains editable", () => {

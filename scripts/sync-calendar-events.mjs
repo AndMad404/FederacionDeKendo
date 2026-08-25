@@ -115,6 +115,10 @@ export function getPrivateAlbumUrl(event) {
   return event?.[albumUrlSymbol];
 }
 
+function getGoogleDriveFolderId(url) {
+  return new URL(url).pathname.split("/").at(-1);
+}
+
 function unfoldIcsLines(icsText) {
   return icsText
     .replace(/\r\n/g, "\n")
@@ -346,7 +350,10 @@ function parseTechnicalDescription(description, title) {
       (match) => match[0],
     );
     for (const match of matches) {
-      if (albumUrl && albumUrl !== match) {
+      if (
+        albumUrl &&
+        getGoogleDriveFolderId(albumUrl) !== getGoogleDriveFolderId(match)
+      ) {
         throw new Error(`Multiple album URLs for ${title}.`);
       }
       albumUrl = match;
