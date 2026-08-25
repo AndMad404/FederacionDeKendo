@@ -30,7 +30,7 @@ import { HistoricalEventGallery } from "./HistoricalEventGallery";
 import { useHydratedNow } from "../hooks/useHydratedNow";
 import { EventSummary } from "./EventSummary";
 
-const SOCIAL_PREVIEW_VERSION = "20260824";
+const SOCIAL_PREVIEW_VERSION = "20260825";
 
 async function shareEvent(title: string, url: string) {
   if (navigator.share) {

@@ -100,7 +100,7 @@ test("uses the JPEG social card in generated Open Graph metadata", async () => {
   assert.match(gallery, /<html lang="es" prefix="og: https:\/\/ogp\.me\/ns#">/);
   assert.match(
     gallery,
-    /property="og:image" content="https:\/\/fak-kendo\.pages\.dev\/images\/social\/kendo-social-card-20260812\.jpg"/,
+    /property="og:image" content="https:\/\/fak-kendo\.pages\.dev\/images\/social\/kendo-social-card-20260825\.jpg"/,
   );
   assert.match(gallery, /property="og:image:type" content="image\/jpeg"/);
 });
@@ -131,7 +131,7 @@ test("omits sitemap images when no route is indexable", async () => {
   for (const html of [home, calendar]) {
     assert.match(
       html,
-      /og:image" content="https:\/\/fak-kendo\.pages\.dev\/images\/social\/kendo-social-card-20260812\.jpg"/,
+      /og:image" content="https:\/\/fak-kendo\.pages\.dev\/images\/social\/kendo-social-card-20260825\.jpg"/,
     );
     assert.match(html, /og:image:type" content="image\/jpeg"/);
     assert.match(html, /og:image:width" content="1200"/);

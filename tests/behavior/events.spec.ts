@@ -118,7 +118,7 @@ test("shares the canonical page and displays the complete description", async ({
     new URL(
       await page.evaluate(() => navigator.clipboard.readText()),
     ).searchParams.get("share"),
-  ).toBe("20260824");
+  ).toBe("20260825");
 
   await expect(
     page.getByRole("heading", { name: "Descripción", level: 2 }).locator("+ p"),

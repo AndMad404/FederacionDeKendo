@@ -1,8 +1,19 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import sharp from "sharp";
 
 const read = (file) => readFile(file, "utf8");
+
+test("the default social card is a baseline JPEG for link previews", async () => {
+  const seo = JSON.parse(await read("src/app/config/seo-data.json"));
+  const metadata = await sharp(`public${seo.defaultImage}`).metadata();
+
+  assert.equal(metadata.format, "jpeg");
+  assert.equal(metadata.width, seo.defaultImageWidth);
+  assert.equal(metadata.height, seo.defaultImageHeight);
+  assert.equal(metadata.isProgressive, false);
+});
 
 test("every configured static route has complete public metadata", async () => {
   const seo = JSON.parse(await read("src/app/config/seo-data.json"));

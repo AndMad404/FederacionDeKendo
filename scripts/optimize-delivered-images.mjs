@@ -4,8 +4,8 @@ import sharp from "sharp";
 const MAX_BYTES = 100_000;
 const targets = [
   {
-    path: "public/images/social/kendo-social-card-20260812.jpg",
-    outputPath: "public/images/social/kendo-social-card-20260812.webp",
+    path: "public/images/social/kendo-social-card-20260825.jpg",
+    outputPath: "public/images/social/kendo-social-card-20260825.webp",
     format: "webp",
   },
   {
