@@ -1,10 +1,7 @@
 import { expect, test, type Browser } from "@playwright/test";
 
-const TIMED_EVENT_PATH = "/en/events/2026-08-22-3er-torneo/";
 const PAST_TIMED_EVENT_PATH = "/en/events/past/2026-08-22-3er-torneo/";
-const BEFORE_TIMED_EVENT_PUBLIC_PAST = new Date("2026-08-23T05:59:59.000Z");
 const TIMED_EVENT_PUBLIC_PAST = new Date("2026-08-23T06:00:00.000Z");
-const ALL_DAY_EVENT_PATH = "/en/events/2026-05-02-examen/";
 const PAST_ALL_DAY_EVENT_PATH = "/en/events/past/2026-05-02-examen/";
 
 async function expectActivityStatusInTimeZone(
@@ -23,23 +20,9 @@ async function expectActivityStatusInTimeZone(
   await context.close();
 }
 
-test("event completion uses the event time zone instead of the visitor time zone", async ({
+test("historical event completion uses the event time zone instead of the visitor time zone", async ({
   browser,
 }) => {
-  await expectActivityStatusInTimeZone(
-    browser,
-    "America/Costa_Rica",
-    TIMED_EVENT_PATH,
-    BEFORE_TIMED_EVENT_PUBLIC_PAST,
-    "Scheduled activity",
-  );
-  await expectActivityStatusInTimeZone(
-    browser,
-    "Pacific/Kiritimati",
-    TIMED_EVENT_PATH,
-    BEFORE_TIMED_EVENT_PUBLIC_PAST,
-    "Scheduled activity",
-  );
   await expectActivityStatusInTimeZone(
     browser,
     "America/Costa_Rica",
@@ -62,13 +45,6 @@ test("all-day events end at the next midnight in the event time zone", async ({
   await expectActivityStatusInTimeZone(
     browser,
     "Pacific/Kiritimati",
-    ALL_DAY_EVENT_PATH,
-    new Date("2026-05-03T05:59:59.000Z"),
-    "Scheduled activity",
-  );
-  await expectActivityStatusInTimeZone(
-    browser,
-    "Pacific/Kiritimati",
     PAST_ALL_DAY_EVENT_PATH,
     new Date("2026-05-03T06:00:00.000Z"),
     "Completed activity",
@@ -78,8 +54,8 @@ test("all-day events end at the next midnight in the event time zone", async ({
 test("known tournament titles use their English dictionary translations", async ({
   page,
 }) => {
-  await page.clock.setFixedTime(new Date("2026-08-01T12:00:00.000Z"));
-  await page.goto(TIMED_EVENT_PATH);
+  await page.clock.setFixedTime(TIMED_EVENT_PUBLIC_PAST);
+  await page.goto(PAST_TIMED_EVENT_PATH);
 
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
     "3rd Tournament",

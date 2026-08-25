@@ -50,7 +50,12 @@ test("hooks.json configures command handlers and keeps phase-one advisors non-bl
   ]);
   for (const groups of Object.values(config.hooks)) {
     for (const group of groups) {
-      for (const hook of group.hooks) assert.equal(hook.type, "command");
+      for (const hook of group.hooks) {
+        assert.equal(hook.type, "command");
+        assert.match(hook.commandWindows, /Get-Command node\.exe/);
+        assert.match(hook.commandWindows, /ProgramFiles/);
+        assert.doesNotMatch(hook.commandWindows, /; node \(/);
+      }
     }
   }
   assert.match(config.hooks.PreToolUse[0].hooks[0].command, /--advisory$/);
