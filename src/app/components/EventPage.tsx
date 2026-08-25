@@ -30,6 +30,8 @@ import { HistoricalEventGallery } from "./HistoricalEventGallery";
 import { useHydratedNow } from "../hooks/useHydratedNow";
 import { EventSummary } from "./EventSummary";
 
+const SOCIAL_PREVIEW_VERSION = "20260824";
+
 async function shareEvent(title: string, url: string) {
   if (navigator.share) {
     try {
@@ -65,10 +67,9 @@ export function EventPage() {
   const eventTitle = event.title;
 
   async function handleShare() {
-    const result = await shareEvent(
-      eventTitle,
-      new URL(canonicalPath, window.location.origin).toString(),
-    );
+    const shareUrl = new URL(canonicalPath, window.location.origin);
+    shareUrl.searchParams.set("share", SOCIAL_PREVIEW_VERSION);
+    const result = await shareEvent(eventTitle, shareUrl.toString());
     if (result === "copied") {
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2200);
