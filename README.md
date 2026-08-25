@@ -42,17 +42,20 @@ Vite mostrara en la terminal la direccion local de la aplicacion.
 
 ## Comandos principales
 
-| Comando                               | Proposito                                                           |
-| ------------------------------------- | ------------------------------------------------------------------- |
-| `corepack pnpm run dev`               | Inicia el entorno de desarrollo.                                    |
-| `corepack pnpm run build`             | Genera el bundle, el render SSR y las paginas prerenderizadas.      |
-| `corepack pnpm run preview`           | Sirve localmente el build de produccion.                            |
-| `corepack pnpm run typecheck`         | Comprueba los tipos de TypeScript.                                  |
-| `corepack pnpm run lint`              | Ejecuta ESLint sin permitir advertencias.                           |
-| `corepack pnpm run format:check`      | Comprueba el formato con Prettier.                                  |
-| `corepack pnpm run test:all`          | Ejecuta las suites de arquitectura, datos, comportamiento y diseno. |
-| `corepack pnpm run test:visual`       | Ejecuta las comparaciones visuales aprobadas en Windows.            |
-| `corepack pnpm run images:responsive` | Regenera las variantes responsive de las imagenes.                  |
+Ejecuta cada script con `corepack pnpm run <nombre>`.
+
+| Script              | Proposito                                                           |
+| ------------------- | ------------------------------------------------------------------- |
+| `dev`               | Inicia el entorno de desarrollo.                                    |
+| `build`             | Genera el bundle, el render SSR y las paginas prerenderizadas.      |
+| `preview`           | Sirve localmente el build de produccion.                            |
+| `check`             | Ejecuta todas las comprobaciones de calidad y pruebas no visuales.  |
+| `typecheck`         | Comprueba los tipos de TypeScript.                                  |
+| `lint`              | Ejecuta ESLint sin permitir advertencias.                           |
+| `format:check`      | Comprueba el formato con Prettier.                                  |
+| `test:all`          | Ejecuta las suites de arquitectura, datos, comportamiento y diseno. |
+| `test:visual`       | Ejecuta las comparaciones visuales aprobadas en Windows.            |
+| `images:responsive` | Regenera las variantes responsive y los hashes de las imagenes.     |
 
 La estrategia completa, los viewports cubiertos y el procedimiento para
 actualizar capturas estan documentados en [TESTING.md](TESTING.md).
@@ -85,7 +88,7 @@ Para comprobar la aplicacion completa:
 
 ```bash
 corepack pnpm run build
-corepack pnpm run test:all
+corepack pnpm run check
 ```
 
 Las pruebas se dividen por responsabilidad:

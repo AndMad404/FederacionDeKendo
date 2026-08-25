@@ -13,6 +13,7 @@
     "format:check": "prettier . --check --ignore-unknown",
     "setup:git-hooks": "node scripts/setup-git-hooks.mjs",
     "lint": "eslint . --max-warnings=0",
+    "check": "pnpm run typecheck && pnpm run lint && pnpm run format:check && pnpm run test:all",
     "preview": "vite preview",
     "test:architecture": "node --test tests/architecture/*.test.mjs",
     "test:codex-hooks": "node --test tests/architecture/codex-hooks.test.mjs",
