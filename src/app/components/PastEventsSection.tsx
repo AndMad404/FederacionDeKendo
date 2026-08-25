@@ -128,6 +128,28 @@ export function PastEventsSection() {
             </label>
           </div>
 
+          <nav
+            aria-label={copy.archive.pagination}
+            className="flex items-center justify-center gap-4"
+          >
+            <NavigationArrowButton
+              direction="previous"
+              label={copy.archive.previous}
+              disabled={page === 1}
+              onClick={() =>
+                navigate(buildArchiveUrl(page - 1, language, filters))
+              }
+            />
+            <NavigationArrowButton
+              direction="next"
+              label={copy.archive.next}
+              disabled={page === pageCount}
+              onClick={() =>
+                navigate(buildArchiveUrl(page + 1, language, filters))
+              }
+            />
+          </nav>
+
           {pageEvents.length ? (
             <ul className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
               {pageEvents.map((event) => (
@@ -163,28 +185,6 @@ export function PastEventsSection() {
               {copy.archive.empty}
             </p>
           )}
-
-          <nav
-            aria-label={copy.archive.pagination}
-            className="mt-auto flex items-center justify-center gap-3"
-          >
-            <NavigationArrowButton
-              direction="previous"
-              label={copy.archive.previous}
-              disabled={page === 1}
-              onClick={() =>
-                navigate(buildArchiveUrl(page - 1, language, filters))
-              }
-            />
-            <NavigationArrowButton
-              direction="next"
-              label={copy.archive.next}
-              disabled={page === pageCount}
-              onClick={() =>
-                navigate(buildArchiveUrl(page + 1, language, filters))
-              }
-            />
-          </nav>
         </div>
       </div>
     </section>
