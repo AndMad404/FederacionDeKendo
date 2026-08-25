@@ -86,10 +86,14 @@ test("renders localized upcoming and past event navigation with the active page"
       "page",
     );
     await expect(inactive).not.toHaveAttribute("aria-current");
-    expect((await inactive.boundingBox())?.height).toBeGreaterThanOrEqual(44);
+    await expect(inactive).toBeVisible();
+    const inactiveBox = await inactive.boundingBox();
+    expect(inactiveBox).not.toBeNull();
+    expect(inactiveBox!.height).toBeGreaterThanOrEqual(44);
 
     await inactive.focus();
-    await page.keyboard.press("Enter");
+    await expect(inactive).toBeFocused();
+    await inactive.press("Enter");
     await expect(page).toHaveURL(new RegExp(`${inactivePath}$`));
   }
 });
