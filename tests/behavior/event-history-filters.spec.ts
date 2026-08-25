@@ -125,16 +125,19 @@ test("preserves filters in pagination and resets to page one when changed", asyn
   await page.goto("/eventos/pasados/?type=examen");
   const next = page.getByRole("button", { name: "Siguiente" });
   await expect(next).toBeVisible();
+  await expect(next).toBeEnabled();
   await expect(next.locator("svg")).toHaveCount(1);
   await next.click();
   await expect(page).toHaveURL(/pagina\/2\/\?type=examen$/);
   const previous = page.getByRole("button", { name: "Anterior" });
+  await expect(previous).toBeEnabled();
   await expect(previous.locator("svg")).toHaveCount(1);
   await previous.click();
   await expect(page).toHaveURL(/eventos\/pasados\/\?type=examen$/);
 
   await page.goto("/en/events/past/?type=examen");
   const englishNext = page.getByRole("button", { name: "Next" });
+  await expect(englishNext).toBeEnabled();
   await englishNext.click();
   await expect(page).toHaveURL(/en\/events\/past\/page\/2\/\?type=examen$/);
   await expect(page.getByRole("button", { name: "Previous" })).toBeEnabled();
