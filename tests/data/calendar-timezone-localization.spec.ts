@@ -1,30 +1,93 @@
 import { expect, test, type Browser } from "@playwright/test";
+import { existsSync, readFileSync } from "node:fs";
+import path from "node:path";
+import { CALENDAR_EVENTS } from "../../src/app/data/calendarEvents";
+import type { CalendarEvent } from "../../src/app/types";
+import { addCalendarDays } from "../../src/app/utils/calendarDate.js";
+import { calculatePublicPastAt } from "../../src/app/utils/eventArchive.js";
 
-const TIMED_EVENT_PUBLIC_PAST = new Date("2026-08-23T06:00:00.000Z");
-const BEFORE_TIMED_EVENT_PUBLIC_PAST = new Date("2026-08-23T05:59:59.000Z");
-const ALL_DAY_EVENT_PUBLIC_PAST = new Date("2026-05-03T06:00:00.000Z");
-const BEFORE_ALL_DAY_EVENT_PUBLIC_PAST = new Date("2026-05-03T05:59:59.000Z");
-const buildNow = new Date();
-const timedEventArchived = buildNow >= TIMED_EVENT_PUBLIC_PAST;
-const allDayEventArchived = buildNow >= ALL_DAY_EVENT_PUBLIC_PAST;
-const TIMED_EVENT_PATH = timedEventArchived
-  ? "/en/events/past/2026-08-22-3er-torneo/"
-  : "/en/events/2026-08-22-3er-torneo/";
-const ALL_DAY_EVENT_PATH = allDayEventArchived
-  ? "/en/events/past/2026-05-02-examen/"
-  : "/en/events/2026-05-02-examen/";
-const timedEventNow = timedEventArchived
-  ? TIMED_EVENT_PUBLIC_PAST
-  : BEFORE_TIMED_EVENT_PUBLIC_PAST;
-const allDayEventNow = allDayEventArchived
-  ? ALL_DAY_EVENT_PUBLIC_PAST
-  : BEFORE_ALL_DAY_EVENT_PUBLIC_PAST;
-const timedEventStatus = timedEventArchived
-  ? "Completed activity"
-  : "Scheduled activity";
-const allDayEventStatus = allDayEventArchived
-  ? "Completed activity"
-  : "Scheduled activity";
+interface TranslationRecord {
+  source: { title: string; summary?: string };
+  translation: { title: string; summary?: string };
+}
+
+const eventTranslations = JSON.parse(
+  readFileSync(path.resolve("src/app/data/eventTranslations.json"), "utf8"),
+) as Record<string, TranslationRecord>;
+
+function getValidEnglishTranslation(event: CalendarEvent) {
+  const record = eventTranslations[event.id];
+  return record?.source.title === event.title &&
+    record.source.summary === event.summary
+    ? record.translation
+    : undefined;
+}
+
+function requireEvent(
+  description: string,
+  predicate: (event: CalendarEvent) => boolean,
+) {
+  const event = CALENDAR_EVENTS.find(predicate);
+  if (!event) throw new Error(`Missing ${description} test fixture.`);
+  return event;
+}
+
+function getLastEventDate(event: CalendarEvent) {
+  return event.endDate && !event.startTime && !event.endTime
+    ? addCalendarDays(event.endDate, -1)
+    : (event.endDate ?? event.date);
+}
+
+function routeOutputExists(routePath: string) {
+  return existsSync(
+    path.resolve("dist", ...routePath.split("/").filter(Boolean), "index.html"),
+  );
+}
+
+function getGeneratedFixture(event: CalendarEvent) {
+  const currentPath = `/en/events/${event.id}/`;
+  const pastPath = `/en/events/past/${event.id}/`;
+  const currentExists = routeOutputExists(currentPath);
+  const pastExists = routeOutputExists(pastPath);
+  if (currentExists === pastExists) {
+    throw new Error(`Expected one generated English route for ${event.id}.`);
+  }
+
+  const publicPastAt = calculatePublicPastAt(
+    getLastEventDate(event),
+    event.timeZone,
+  );
+  const archived = pastExists;
+  return {
+    event,
+    path: archived ? pastPath : currentPath,
+    now: new Date(publicPastAt.getTime() + (archived ? 0 : -1_000)),
+    status: archived ? "Completed activity" : "Scheduled activity",
+  };
+}
+
+const timedEvent = requireEvent(
+  "translated timed tournament",
+  (event) =>
+    event.eventType === "torneo" &&
+    Boolean(event.startTime) &&
+    Boolean(event.endTime) &&
+    Boolean(getValidEnglishTranslation(event)),
+);
+const allDayEvent = requireEvent(
+  "translated single-day all-day event",
+  (event) =>
+    !event.startTime &&
+    !event.endTime &&
+    !event.endDate &&
+    Boolean(getValidEnglishTranslation(event)),
+);
+const timedFixture = getGeneratedFixture(timedEvent);
+const allDayFixture = getGeneratedFixture(allDayEvent);
+const translatedTimedEvent = getValidEnglishTranslation(timedEvent);
+if (!translatedTimedEvent) {
+  throw new Error(`Missing English translation for ${timedEvent.id}.`);
+}
 
 async function expectActivityStatusInTimeZone(
   browser: Browser,
@@ -48,16 +111,16 @@ test("event completion uses the event time zone instead of the visitor time zone
   await expectActivityStatusInTimeZone(
     browser,
     "America/Costa_Rica",
-    TIMED_EVENT_PATH,
-    timedEventNow,
-    timedEventStatus,
+    timedFixture.path,
+    timedFixture.now,
+    timedFixture.status,
   );
   await expectActivityStatusInTimeZone(
     browser,
     "Pacific/Kiritimati",
-    TIMED_EVENT_PATH,
-    timedEventNow,
-    timedEventStatus,
+    timedFixture.path,
+    timedFixture.now,
+    timedFixture.status,
   );
 });
 
@@ -67,19 +130,19 @@ test("all-day events end at the next midnight in the event time zone", async ({
   await expectActivityStatusInTimeZone(
     browser,
     "Pacific/Kiritimati",
-    ALL_DAY_EVENT_PATH,
-    allDayEventNow,
-    allDayEventStatus,
+    allDayFixture.path,
+    allDayFixture.now,
+    allDayFixture.status,
   );
 });
 
 test("known tournament titles use their English dictionary translations", async ({
   page,
 }) => {
-  await page.clock.setFixedTime(timedEventNow);
-  await page.goto(TIMED_EVENT_PATH);
+  await page.clock.setFixedTime(timedFixture.now);
+  await page.goto(timedFixture.path);
 
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "3rd Tournament",
+    translatedTimedEvent.title,
   );
 });
