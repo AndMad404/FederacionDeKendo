@@ -99,7 +99,7 @@ export function PastEventsSection() {
                 direction="previous"
                 label={copy.archive.previous}
                 disabled={page === 1}
-                className="col-start-1"
+                className="order-[-1] col-start-1"
                 onClick={() =>
                   navigate(buildArchiveUrl(page - 1, language, filters))
                 }
@@ -108,7 +108,7 @@ export function PastEventsSection() {
                 direction="next"
                 label={copy.archive.next}
                 disabled={page === pageCount}
-                className="col-start-4"
+                className="order-1 col-start-4"
                 onClick={() =>
                   navigate(buildArchiveUrl(page + 1, language, filters))
                 }
