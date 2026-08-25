@@ -207,7 +207,7 @@ export const COPY = {
       location: "Ubicación",
       description: "Descripción",
       backToCalendar: "Volver al calendario",
-      viewArchive: "Antiguos eventos",
+      viewArchive: "Eventos pasados",
       directions: "Cómo llegar",
       viewDetailsLabel: "Consultar detalles del evento",
       addToCalendar: "Añade a tu calendario",
