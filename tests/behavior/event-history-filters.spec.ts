@@ -1,10 +1,24 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator } from "@playwright/test";
 
 const ARCHIVE_TIME = new Date("2028-01-01T12:00:00-06:00");
 
 test.beforeEach(async ({ page }) => {
   await page.clock.setFixedTime(ARCHIVE_TIME);
 });
+
+async function getVisibleBoundingBox(locator: Locator) {
+  await expect(locator).toBeVisible();
+
+  let box = await locator.boundingBox();
+  await expect
+    .poll(async () => {
+      box = await locator.boundingBox();
+      return box !== null;
+    })
+    .toBe(true);
+
+  return box!;
+}
 
 test("persists combined filters on reload and localized routes", async ({
   page,
@@ -102,18 +116,16 @@ test("aligns the calendar and historical content panels on the reference desktop
   await page.setViewportSize({ width: 1366, height: 768 });
 
   await page.goto("/eventos/");
-  const calendarTop = await page
-    .locator("[data-page-content-boundary]")
-    .boundingBox();
+  const calendarTop = await getVisibleBoundingBox(
+    page.locator("[data-page-content-boundary]"),
+  );
 
   await page.goto("/eventos/pasados/");
-  const archiveTop = await page
-    .locator("[data-page-content-boundary]")
-    .boundingBox();
+  const archiveTop = await getVisibleBoundingBox(
+    page.locator("[data-page-content-boundary]"),
+  );
 
-  expect(calendarTop).not.toBeNull();
-  expect(archiveTop).not.toBeNull();
-  expect(Math.abs(calendarTop!.y - archiveTop!.y)).toBeLessThanOrEqual(1);
+  expect(Math.abs(calendarTop.y - archiveTop.y)).toBeLessThanOrEqual(1);
 });
 
 test("preserves filters in pagination and resets to page one when changed", async ({
