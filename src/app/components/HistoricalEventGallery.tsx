@@ -4,8 +4,9 @@ import { EVENT_GALLERIES } from "../data/eventGalleries";
 import { useCarousel } from "../hooks/useCarousel";
 import { useGalleryLightbox } from "../hooks/useGalleryLightbox";
 import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
-import { focusRingClass, galleryThumbnailActiveClass } from "../styles/shared";
+import { focusRingClass } from "../styles/shared";
 import type { GalleryImage } from "../types";
+import { GalleryThumbnails } from "./gallery/GalleryThumbnails";
 import { NavigationArrowButton } from "./ui/ModalControls";
 
 const Lightbox = lazy(() =>
@@ -39,7 +40,13 @@ export function HistoricalEventGallery({
       alt: `Fotografía ${image.order} del evento ${eventTitle}`,
     }));
   }, [eventId, eventTitle]);
-  const { index, prev, next, goTo } = useCarousel(images.length);
+  const firstLandscapeIndex = images.findIndex(
+    (image) => image.width >= image.height,
+  );
+  const { index, prev, next, goTo } = useCarousel(
+    images.length,
+    firstLandscapeIndex >= 0 ? firstLandscapeIndex : 0,
+  );
   const {
     closeLightbox,
     lightboxImage,
@@ -54,7 +61,6 @@ export function HistoricalEventGallery({
     allowInteractiveStart: true,
     preventDefaultOnSwipe: true,
   });
-
   if (!images.length) return null;
   const featured = images[index];
   const openFeatured = (event: MouseEvent<HTMLButtonElement>) => {
@@ -122,34 +128,13 @@ export function HistoricalEventGallery({
         ) : null}
       </figure>
       {images.length > 1 ? (
-        <div
-          role="group"
-          aria-label="Seleccionar fotografía"
-          className="grid h-14 grid-flow-col auto-cols-[22%] justify-center gap-2 overflow-x-auto sm:auto-cols-[17%] sm:h-16 md:h-20"
-        >
-          {images.map((image, imageIndex) => (
-            <button
-              key={image.id}
-              type="button"
-              aria-label={`Ver ${image.alt}`}
-              aria-current={imageIndex === index ? "true" : undefined}
-              onClick={() => goTo(imageIndex)}
-              className={`group cursor-pointer overflow-hidden rounded-lg border-2 border-transparent ${imageIndex === index ? galleryThumbnailActiveClass : ""} ${focusRingClass}`}
-            >
-              <img
-                src={image.thumbnailSrc}
-                srcSet={image.thumbnailSrcSet}
-                sizes="80px"
-                alt=""
-                width={image.thumbnailWidth}
-                height={image.thumbnailHeight}
-                loading="lazy"
-                decoding="async"
-                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:transform-none"
-              />
-            </button>
-          ))}
-        </div>
+        <GalleryThumbnails
+          images={images}
+          activeIndex={index}
+          ariaLabel="Seleccionar fotografía"
+          centerWhenContained
+          onSelect={goTo}
+        />
       ) : null}
       {lightboxImage ? (
         <Suspense fallback={null}>

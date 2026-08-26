@@ -10,7 +10,6 @@ import { EventPage } from "./app/components/EventPage";
 import { PastEventsSection } from "./app/components/PastEventsSection";
 
 export {
-  buildEventMetaDescription,
   getRouteHeadDescriptors,
   getEventRedirects,
   getRouteManifest,

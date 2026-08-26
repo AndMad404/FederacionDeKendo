@@ -4,7 +4,6 @@ import {
   focusRingClass,
   panelSurfaceClass,
   primaryButtonClass,
-  secondaryButtonClass,
 } from "../styles/shared";
 import { getEventDateLabel } from "../utils/calendarEventPresentation";
 import {
@@ -23,6 +22,10 @@ import { MediaPageBanner } from "./ui/MediaPageBanner";
 import { useLanguage } from "../config/i18n";
 import { getLocalizedEvents } from "../utils/localizedEvents";
 import { useHydratedNow } from "../hooks/useHydratedNow";
+import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
+import { EventSummary } from "./EventSummary";
+import { EventSectionNavigation } from "./events/EventSectionNavigation";
+import { NavigationArrowButton } from "./ui/ModalControls";
 
 export function PastEventsSection() {
   const { language, copy } = useLanguage();
@@ -46,13 +49,22 @@ export function PastEventsSection() {
     Math.ceil(events.length / PAST_EVENTS_PAGE_SIZE),
   );
   const page = Math.min(requestedPage, pageCount);
-  const pageLabel = `${copy.archive.page} ${page} ${copy.archive.of} ${pageCount}`;
   const pageEvents = events.slice(
     (page - 1) * PAST_EVENTS_PAGE_SIZE,
     page * PAST_EVENTS_PAGE_SIZE,
   );
-  const calendarPath = language === "en" ? "/en/events/" : "/eventos/";
   const eventTypes: ArchiveEventType[] = ["torneo", "examen", "seminario"];
+
+  const navigateToPage = (targetPage: number) => {
+    if (targetPage < 1 || targetPage > pageCount) return;
+    navigate(buildArchiveUrl(targetPage, language, filters));
+  };
+  const { swipeHandlers } = useSwipeNavigation({
+    onSwipeLeft: () => navigateToPage(page + 1),
+    onSwipeRight: () => navigateToPage(page - 1),
+    allowInteractiveStart: true,
+    preventDefaultOnSwipe: true,
+  });
 
   function changeFilter(name: "year" | "type", value: string) {
     navigate(
@@ -86,17 +98,31 @@ export function PastEventsSection() {
         }}
       />
 
-      <div className="relative z-20 -mt-11 flex min-h-0 flex-1 items-start justify-center px-3 pb-0 pt-3 sm:-mt-13 sm:px-4 sm:pb-0 sm:pt-4 tall-md:p-4 land-sm:px-3 land-sm:pb-0 land-sm:pt-3 land-compact:-mt-8">
+      <div className="relative z-20 -mt-11 flex min-h-0 flex-1 items-start justify-center px-3 pb-0 pt-3 sm:-mt-13 sm:px-4 sm:pb-0 sm:pt-4 tall-md:p-4 page-fit:absolute page-fit:inset-0 page-fit:mt-0 page-fit:items-start page-fit:px-4 page-fit:pb-4 page-fit:pt-20 land-sm:px-2 land-sm:pb-0 land-sm:pt-2 land-compact:-mt-8">
         <div
-          className={`flex w-full max-w-5xl flex-col gap-3 p-4 ${panelSurfaceClass}`}
+          data-page-content-boundary
+          className={`flex w-full touch-pan-y select-none flex-col justify-start gap-3 px-3 py-4 text-center sm:px-2 md:max-w-5xl md:gap-2 md:py-4 xl:min-h-[24.625rem] page-fit:py-[15px] land-sm:gap-2 land-sm:px-2 land-sm:py-2 ${panelSurfaceClass}`}
+          {...swipeHandlers}
         >
-          <div className="grid grid-cols-2 items-end gap-3 md:mx-auto md:w-fit md:grid-cols-[auto_auto]">
-            <Link
-              to={calendarPath}
-              className={`col-span-2 justify-self-center ${secondaryButtonClass} ${focusRingClass}`}
-            >
-              {copy.archive.upcomingEvents}
-            </Link>
+          <EventSectionNavigation active="past" />
+
+          <div className="grid w-full grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)_auto] items-end gap-2 md:mx-auto md:w-fit md:grid-cols-[auto_auto_auto_auto]">
+            <nav aria-label={copy.archive.pagination} className="contents">
+              <NavigationArrowButton
+                direction="previous"
+                label={copy.archive.previous}
+                disabled={page === 1}
+                className="order-[-1] col-start-1"
+                onClick={() => navigateToPage(page - 1)}
+              />
+              <NavigationArrowButton
+                direction="next"
+                label={copy.archive.next}
+                disabled={page === pageCount}
+                className="order-1 col-start-4"
+                onClick={() => navigateToPage(page + 1)}
+              />
+            </nav>
             <label className="relative min-w-0 text-xs font-bold text-site-muted">
               <select
                 name="year"
@@ -121,7 +147,7 @@ export function PastEventsSection() {
                 onChange={(event) => changeFilter("type", event.target.value)}
                 className={`min-h-11 w-full rounded-lg px-3 py-2 text-center text-sm ${focusRingClass} border border-site-border bg-site-surface text-site-action`}
               >
-                <option value="">{copy.archive.eventType}</option>
+                <option value="">{copy.archive.type}</option>
                 {eventTypes.map((type) => (
                   <option key={type} value={type}>
                     {copy.archive.types[type]}
@@ -143,9 +169,14 @@ export function PastEventsSection() {
                       {getEventDateLabel(event, language)}
                     </p>
                     <h2 className="mt-1 font-bold">{event.title}</h2>
-                    <p className="mt-1 line-clamp-2 text-sm text-site-muted">
-                      {event.summary ?? copy.common.informationPending}
-                    </p>
+                    <div className="mt-1">
+                      <EventSummary
+                        summary={
+                          event.summary ?? copy.common.informationPending
+                        }
+                        compact
+                      />
+                    </div>
                   </div>
                   <Link
                     to={getEventPath(event, language)}
@@ -161,29 +192,6 @@ export function PastEventsSection() {
               {copy.archive.empty}
             </p>
           )}
-
-          <nav
-            aria-label={copy.archive.pagination}
-            className="mt-auto flex items-center justify-center gap-3"
-          >
-            {page > 1 ? (
-              <Link
-                to={buildArchiveUrl(page - 1, language, filters)}
-                className={`${secondaryButtonClass} ${focusRingClass}`}
-              >
-                {copy.archive.previous}
-              </Link>
-            ) : null}
-            <span className="text-sm font-semibold">{pageLabel}</span>
-            {page < pageCount ? (
-              <Link
-                to={buildArchiveUrl(page + 1, language, filters)}
-                className={`${secondaryButtonClass} ${focusRingClass}`}
-              >
-                {copy.archive.next}
-              </Link>
-            ) : null}
-          </nav>
         </div>
       </div>
     </section>

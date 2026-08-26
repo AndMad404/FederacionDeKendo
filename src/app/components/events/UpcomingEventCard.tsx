@@ -72,7 +72,7 @@ export function UpcomingEventCard({ event, index }: UpcomingEventCardProps) {
           rel="noopener noreferrer"
           aria-label={`${copy.calendar.openLocationLabel} ${event.title} ${copy.calendar.mapsPreposition} Google Maps`}
           aria-describedby={locationDescriptionId}
-          className={`col-start-1 row-start-2 w-fit justify-self-center ${actionClass} ${focusRingClass}`}
+          className={`col-start-1 row-start-2 w-fit justify-self-start ${actionClass} ${focusRingClass}`}
         >
           <MapPin
             className="mr-1.5 size-3.5 shrink-0 text-site-accent"

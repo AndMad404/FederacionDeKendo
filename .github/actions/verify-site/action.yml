@@ -19,18 +19,24 @@ runs:
     - name: Typecheck
       shell: bash
       run: pnpm run typecheck
-    - name: Unit tests
-      shell: bash
-      run: ${{ inputs.unit-command }}
     - name: Build
       shell: bash
       run: pnpm run build
+    - name: Architecture and Node data tests
+      shell: bash
+      run: ${{ inputs.unit-command }}
     - name: Generated output tests
       shell: bash
       run: pnpm run test:generated
     - name: Install Playwright Chromium
       shell: bash
       run: pnpm exec playwright install --with-deps chromium
-    - name: Browser tests
+    - name: Data browser tests
       shell: bash
-      run: pnpm run test:e2e
+      run: pnpm exec playwright test tests/data
+    - name: Behavior tests
+      shell: bash
+      run: pnpm run test:behavior
+    - name: Design contract tests
+      shell: bash
+      run: pnpm run test:design

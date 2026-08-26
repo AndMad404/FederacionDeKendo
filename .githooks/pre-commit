@@ -1,5 +1,7 @@
 #!/bin/sh
 
+node scripts/normalize-line-endings.mjs --check || exit 1
+
 if [ -f ./node_modules/.bin/prettier.cmd ]; then
   ./node_modules/.bin/prettier.cmd . --check --ignore-unknown
 elif [ -x ./node_modules/.bin/prettier ]; then

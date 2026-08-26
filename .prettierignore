@@ -22,6 +22,10 @@ src/app/data/eventGalleryState.json
 # Local and tool-managed state
 local/
 .agents/
-.codex/
+.codex/*
+!.codex/hooks.json
+!.codex/hooks/
+!.codex/hooks/**
+!.codex/review-state.mjs
 .codex-remote-attachments/
 AGENTS.md

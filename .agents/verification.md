@@ -4,6 +4,8 @@ Use the narrowest verification that proves the requested change.
 
 Use the repository package manager, `pnpm`. If it is not available directly in Windows PowerShell, prefix the same command with `corepack` (for example, `corepack pnpm run build`).
 
+Tests that execute OS-exclusive primitives must run only on that OS. Cross-platform structural guarantees must continue to be validated statically in CI.
+
 ## Mandatory Delivery Gate
 
 Before reporting an implementation as ready, select every applicable check in
@@ -88,7 +90,7 @@ not prove visual correctness.
 
 ### Automated design-contract gate
 
-`tests/e2e/geometry-contract.spec.ts` is the default executable contract for
+`tests/design/geometry-contract.spec.ts` is the default executable contract for
 the approved application design:
 
 - It discovers every generated `dist/**/index.html` route automatically and
@@ -100,7 +102,7 @@ the approved application design:
   390x844, 768x1024, and 1366x768.
 - Representative checks assert approved padding, margins, gaps, containment,
   content presence, link/image validity, unique IDs, and accessible control names.
-- The values in `tests/e2e/design-contract.ts` describe the owner-approved
+- The values in `tests/design/design-contract.ts` describe the owner-approved
   current application. Changing a value requires the same explicit approval
   as changing the corresponding visual implementation.
 
@@ -108,7 +110,7 @@ Run the complete gate with:
 
 ```powershell
 pnpm run build
-pnpm run test:e2e
+pnpm run test:design
 ```
 
 The platform-sensitive screenshot collection remains available as a directed

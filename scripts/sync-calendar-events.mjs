@@ -13,6 +13,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import {
   calculateArchiveEligibleAt,
   calculateGalleryCheckAt,
+  calculateGalleryDeadlineAt,
   getArchiveEligibleAt,
   isArchiveEligible,
 } from "../src/app/utils/eventArchive.js";
@@ -51,7 +52,9 @@ const inferredEventTypes = [
 const googleDriveFolderUrl =
   /^https:\/\/drive\.google\.com\/drive\/folders\/[A-Za-z0-9_-]+(?:[/?#].*)?$/;
 const embeddedGoogleDriveFolderUrl =
-  /https:\/\/drive\.google\.com\/drive\/folders\/[A-Za-z0-9_-]+(?:[/?#][^\s]*)?/g;
+  /https:\/\/drive\.google\.com\/drive\/folders\/[A-Za-z0-9_-]+(?:[/?#][^\s"'<>\])}]*)?/g;
+const embeddedGoogleDriveFolderAnchor =
+  /<a\b[^>]*\bhref=["'](https:\/\/drive\.google\.com\/drive\/folders\/[A-Za-z0-9_-]+(?:[/?#][^\s"']*)?)["'][^>]*>[\s\S]*?<\/a>/gi;
 const albumUrlSymbol = Symbol("privateAlbumUrl");
 export const MASS_DISAPPEARANCE_MINIMUM = 2;
 export const MASS_DISAPPEARANCE_RATIO = 0.5;
@@ -112,6 +115,10 @@ const driveUrl =
 
 export function getPrivateAlbumUrl(event) {
   return event?.[albumUrlSymbol];
+}
+
+function getGoogleDriveFolderId(url) {
+  return new URL(url).pathname.split("/").at(-1);
 }
 
 function unfoldIcsLines(icsText) {
@@ -341,24 +348,44 @@ function parseTechnicalDescription(description, title) {
   }
 
   const sanitizedPublicLines = publicLines.map((line) => {
-    const matches = [...line.matchAll(embeddedGoogleDriveFolderUrl)].map(
-      (match) => match[0],
-    );
+    const anchorMatches = [...line.matchAll(embeddedGoogleDriveFolderAnchor)];
+    const matches = [
+      ...anchorMatches.map((match) => match[1]),
+      ...line.matchAll(embeddedGoogleDriveFolderUrl).map((match) => match[0]),
+    ];
     for (const match of matches) {
-      if (albumUrl && albumUrl !== match) {
+      if (
+        albumUrl &&
+        getGoogleDriveFolderId(albumUrl) !== getGoogleDriveFolderId(match)
+      ) {
         throw new Error(`Multiple album URLs for ${title}.`);
       }
       albumUrl = match;
     }
+    const withoutAlbumAnchors = anchorMatches.reduce(
+      (text, match) => text.replace(match[0], ""),
+      line,
+    );
     return matches
-      .reduce((text, match) => text.replace(match, ""), line)
+      .reduce((text, match) => text.replace(match, ""), withoutAlbumAnchors)
       .trimEnd();
   });
 
+  const publicDescription = normalizePublicDescription(
+    sanitizedPublicLines.join("\n"),
+  );
+
   return {
-    publicDescription: sanitizedPublicLines.join("\n").trim() || undefined,
+    publicDescription: publicDescription || undefined,
     albumUrl,
   };
+}
+
+export function normalizePublicDescription(description) {
+  return description
+    .replace(/<br\s*\/?\s*>/gi, "\n")
+    .replace(/<[^>]*>/g, "")
+    .trim();
 }
 
 function inferEventType(title) {
@@ -1186,7 +1213,7 @@ ${events
 `;
 }
 
-async function readCalendarSource(source) {
+export async function readCalendarSource(source) {
   if (/^https?:\/\//i.test(source)) {
     const response = await fetch(source);
     if (!response.ok) {
@@ -1425,22 +1452,30 @@ export async function synchronizeCalendar({
   let registry = mergeRegistry(previousRegistry, parsed, now);
 
   const galleryEvents = registry.events
-    .filter((event) => {
+    .map((event) => {
       const lastEventDate =
         event.endDate && !event.startTime && !event.endTime
           ? addCalendarDays(event.endDate, -1)
           : (event.endDate ?? event.date);
-      return (
-        calculateGalleryCheckAt(lastEventDate, event.timeZone).getTime() <=
-        now.getTime()
+      const firstCheckAt = calculateGalleryCheckAt(
+        lastEventDate,
+        event.timeZone,
       );
+      if (firstCheckAt.getTime() > now.getTime()) return undefined;
+      const deadlineAt = calculateGalleryDeadlineAt(
+        lastEventDate,
+        event.timeZone,
+      );
+      return {
+        slug: event.slug,
+        title: event.title,
+        date: event.date,
+        albumUrl: getPrivateAlbumUrl(currentBySourceId.get(event.sourceId)),
+        galleryCheckPhase:
+          deadlineAt.getTime() <= now.getTime() ? "final" : "first",
+      };
     })
-    .map((event) => ({
-      slug: event.slug,
-      title: event.title,
-      date: event.date,
-      albumUrl: getPrivateAlbumUrl(currentBySourceId.get(event.sourceId)),
-    }));
+    .filter(Boolean);
   let galleryResult;
   if (galleryEvents.length || galleryOptions?.force) {
     galleryResult = await synchronizeEventGalleries({

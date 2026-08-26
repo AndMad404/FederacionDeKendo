@@ -25,7 +25,6 @@ export function CalendarMonth({
     (pageIndex + 1) * CALENDAR_EVENTS_PER_PAGE,
   );
   const headingId = `calendar-month-${group.monthKey}`;
-  const pageLabel = `${copy.calendar.page} ${pageIndex + 1} ${copy.calendar.of} ${pageCount}`;
 
   return (
     <section aria-labelledby={headingId} className="flex flex-col gap-2">
@@ -50,12 +49,6 @@ export function CalendarMonth({
             disabled={pageIndex === 0}
             onClick={() => onPageChange(pageIndex - 1)}
           />
-          <p
-            className="min-w-24 text-center text-sm font-semibold"
-            aria-live="polite"
-          >
-            {pageLabel}
-          </p>
           <NavigationArrowButton
             direction="next"
             label={copy.calendar.nextEvents}

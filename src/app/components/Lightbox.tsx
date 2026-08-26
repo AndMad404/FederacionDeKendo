@@ -180,7 +180,7 @@ export function Lightbox({
                 event.stopPropagation();
                 handlePrev();
               }}
-              className="justify-self-end sm:justify-self-center lg:absolute lg:left-3 lg:top-1/2 lg:-translate-y-1/2 land-sm:absolute land-sm:left-3 land-sm:top-1/2 land-sm:-translate-y-1/2"
+              className="justify-self-end sm:justify-self-center lg:absolute lg:left-3 lg:top-1/2 lg:-translate-y-1/2 lg:enabled:hover:-translate-y-1/2 lg:enabled:active:-translate-y-1/2 land-sm:absolute land-sm:left-3 land-sm:top-1/2 land-sm:-translate-y-1/2 land-sm:enabled:hover:-translate-y-1/2 land-sm:enabled:active:-translate-y-1/2"
             />
             <div
               className={`col-span-2 row-start-2 grid h-[9.5rem] w-full min-w-0 max-w-full grid-rows-[auto_auto_minmax(0,1fr)_auto] items-center overflow-hidden px-4 py-3 text-center sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:max-w-none sm:items-center sm:px-5 sm:py-4 lg:absolute lg:bottom-3 lg:left-1/2 lg:h-28 lg:w-[min(36rem,calc(100%_-_6rem))] lg:-translate-x-1/2 lg:grid-cols-[minmax(0,1fr)_auto] lg:grid-rows-[auto_auto] lg:gap-x-4 lg:gap-y-1 lg:px-3 lg:py-2 lg:text-left land-sm:absolute land-sm:bottom-3 land-sm:left-1/2 land-sm:h-24 land-sm:w-[min(30rem,calc(100%_-_6rem))] land-sm:-translate-x-1/2 land-sm:grid-cols-[minmax(0,1fr)_auto] land-sm:grid-rows-[auto_auto] land-sm:gap-x-4 land-sm:gap-y-1 land-sm:px-3 land-sm:py-2 land-sm:text-left ${panelSurfaceClass}`}
@@ -219,7 +219,7 @@ export function Lightbox({
                 event.stopPropagation();
                 handleNext();
               }}
-              className="justify-self-start sm:col-start-3 sm:justify-self-center lg:absolute lg:right-3 lg:top-1/2 lg:-translate-y-1/2 land-sm:absolute land-sm:right-3 land-sm:top-1/2 land-sm:-translate-y-1/2"
+              className="justify-self-start sm:col-start-3 sm:justify-self-center lg:absolute lg:right-3 lg:top-1/2 lg:-translate-y-1/2 lg:enabled:hover:-translate-y-1/2 lg:enabled:active:-translate-y-1/2 land-sm:absolute land-sm:right-3 land-sm:top-1/2 land-sm:-translate-y-1/2 land-sm:enabled:hover:-translate-y-1/2 land-sm:enabled:active:-translate-y-1/2"
             />
           </div>
         ) : (

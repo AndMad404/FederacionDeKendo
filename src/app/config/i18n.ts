@@ -156,7 +156,7 @@ export const COPY = {
       shareEvent: "Compartir evento",
     },
     calendar: {
-      title: "Eventos",
+      title: "Próximos eventos",
       description: "Torneos, exámenes y actividades de kendo.",
       empty: "No hay próximos eventos publicados.",
       pastEvents: "Eventos pasados",
@@ -182,7 +182,7 @@ export const COPY = {
     },
     affiliates: {
       title: "Dojos afiliados",
-      description: "Dojos afiliados donde practicar kendo.",
+      description: "A encuentra donde practicar kendo.",
       pagination: "Paginación de dojos afiliados",
       previousPage: "Página anterior de dojos",
       nextPage: "Página siguiente de dojos",
@@ -207,7 +207,7 @@ export const COPY = {
       location: "Ubicación",
       description: "Descripción",
       backToCalendar: "Volver al calendario",
-      viewArchive: "Antiguos eventos",
+      viewArchive: "Eventos pasados",
       directions: "Cómo llegar",
       viewDetailsLabel: "Consultar detalles del evento",
       addToCalendar: "Añade a tu calendario",
@@ -293,7 +293,7 @@ export const COPY = {
       shareEvent: "Share event",
     },
     calendar: {
-      title: "Events calendar",
+      title: "Upcoming events",
       description: "Kendo tournaments, examinations, and activities.",
       empty: "There are no upcoming published events.",
       pastEvents: "Past events",

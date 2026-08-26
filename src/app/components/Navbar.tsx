@@ -4,11 +4,14 @@ import { ChevronDown, Menu, X } from "lucide-react";
 import { focusRingClass } from "../styles/shared";
 import { getLocalizedPath, useLanguage } from "../config/i18n";
 
+const navInteractionClass =
+  "transition-[background-color,border-color,color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-sm focus-visible:-translate-y-0.5 focus-visible:shadow-sm active:translate-y-0 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:focus-visible:translate-y-0 motion-reduce:active:scale-100";
+
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `text-lg tracking-wide transition-colors duration-200 land-sm:text-base ${focusRingClass} ${
+  `inline-flex items-center text-lg tracking-wide ${navInteractionClass} land-sm:text-base ${focusRingClass} ${
     isActive
       ? "border-b-2 border-site-accent pb-0.5 text-site-on-dark"
-      : "text-site-on-dark/85 hover:text-site-on-dark"
+      : "text-site-on-dark"
   }`;
 
 export function Navbar() {
@@ -118,18 +121,19 @@ export function Navbar() {
             className={
               mobile
                 ? "mt-2 flex flex-col items-center gap-2 border-y border-site-on-dark/20 py-2"
-                : "absolute left-1/2 top-full z-10 mt-2 min-w-52 -translate-x-1/2 rounded-lg border border-site-on-dark/20 bg-site-navy p-2 shadow-lg before:absolute before:-top-2 before:left-0 before:h-2 before:w-full before:content-['']"
+                : "nav-calendar-menu absolute left-1/2 top-full z-10 mt-2 min-w-52 -translate-x-1/2 rounded-lg border border-site-on-dark/20 bg-site-navy p-2 shadow-lg before:absolute before:-top-2 before:left-0 before:h-2 before:w-full before:content-['']"
             }
           >
             {calendarPaths.map((path, index) => (
               <li key={path} className={mobile ? undefined : "w-full"}>
                 <NavLink
                   to={path}
+                  end
                   className={({ isActive }) =>
-                    `block min-h-11 rounded-md px-4 py-2.5 text-base transition-colors ${focusRingClass} ${
+                    `block min-h-11 rounded-md px-4 py-2.5 text-base ${navInteractionClass} ${focusRingClass} ${
                       isActive
-                        ? "bg-site-on-dark text-site-navy"
-                        : "text-site-on-dark/85 hover:bg-site-on-dark/10 hover:text-site-on-dark"
+                        ? "bg-site-on-dark text-site-navy shadow-sm"
+                        : "text-site-on-dark/85 hover:bg-site-on-dark/15 hover:text-site-on-dark"
                     }`
                   }
                 >
@@ -193,7 +197,7 @@ export function Navbar() {
           <button
             ref={menuButtonRef}
             type="button"
-            className={`inline-flex size-11 shrink-0 items-center justify-center rounded-lg border border-white/70 bg-white/10 text-white transition-colors hover:border-white hover:bg-white/20 hover:text-white md:hidden ${focusRingClass}`}
+            className={`inline-flex size-11 shrink-0 items-center justify-center rounded-lg border border-white/70 bg-white/10 text-white hover:border-white hover:bg-white/20 hover:text-white ${navInteractionClass} md:hidden ${focusRingClass}`}
             aria-controls="mobile-menu"
             aria-expanded={open}
             aria-label={open ? copy.nav.close : copy.nav.open}
@@ -213,7 +217,7 @@ export function Navbar() {
         {open && (
           <ul
             id="mobile-menu"
-            className="flex flex-col items-center gap-5 bg-site-navy px-6 py-5 text-center md:hidden"
+            className="flex flex-col items-center gap-5 bg-site-navy px-6 pb-5 pt-0 text-center md:hidden"
           >
             {copy.nav.links.map((link) =>
               link.id === "calendar" ? (
@@ -231,17 +235,13 @@ export function Navbar() {
                 </li>
               ),
             )}
-            <li className="mt-1 w-full border-t border-site-on-dark/20 pt-4">
-              <div className="flex items-center justify-center gap-3">
-                <span className="text-sm font-semibold text-site-on-dark/85">
-                  {copy.nav.language}
-                </span>
-                <LanguageSelector
-                  pathname={pathname}
-                  language={language}
-                  onNavigate={() => setOpenPath(null)}
-                />
-              </div>
+            <li>
+              <LanguageSelector
+                pathname={pathname}
+                language={language}
+                labels="full"
+                onNavigate={() => setOpenPath(null)}
+              />
             </li>
           </ul>
         )}
@@ -253,10 +253,12 @@ export function Navbar() {
 function LanguageSelector({
   pathname,
   language,
+  labels = "abbreviated",
   onNavigate,
 }: {
   pathname: string;
   language: "es" | "en";
+  labels?: "abbreviated" | "full";
   onNavigate?: () => void;
 }) {
   const { copy } = useLanguage();
@@ -281,13 +283,17 @@ function LanguageSelector({
                 : copy.nav.switchToEnglish
             }
             onClick={onNavigate}
-            className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-md px-2 text-sm font-bold transition-colors ${focusRingClass} ${
+            className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-md px-2 text-sm font-bold ${navInteractionClass} ${focusRingClass} ${
               active
                 ? "bg-site-on-dark text-site-navy shadow-sm"
                 : "text-site-on-dark/85 hover:bg-site-on-dark/15 hover:text-site-on-dark"
             }`}
           >
-            {option.toUpperCase()}
+            {labels === "full"
+              ? option === "es"
+                ? "Español"
+                : "English"
+              : option.toUpperCase()}
           </Link>
         );
       })}

@@ -1,4 +1,4 @@
-name: Apply recorded calendar editorial decision
+name: Confirm or reject pending calendar event deletion
 
 on:
   workflow_dispatch:
