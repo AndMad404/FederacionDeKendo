@@ -3,6 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 const FIXED_UPCOMING_TIME = new Date("2026-08-09T12:00:00-06:00");
 const FIXED_HISTORICAL_TIME = new Date("2026-08-24T12:00:00-06:00");
 const HISTORICAL_EVENT_PATH = "/eventos/pasados/2026-08-08-examen/";
+const PORTRAIT_FIRST_EVENT_PATH = "/eventos/pasados/2026-08-22-3er-torneo/";
 
 async function discoverUpcomingEvent(page: Page) {
   await page.clock.setFixedTime(FIXED_UPCOMING_TIME);
@@ -44,6 +45,24 @@ test("mobile event actions and optional description follow the base layout", asy
       (heading) => getComputedStyle(heading.parentElement!).marginTop,
     ),
   ).toBe("0px");
+});
+
+test("historical gallery starts with the first landscape image", async ({
+  page,
+}) => {
+  await page.clock.setFixedTime(FIXED_HISTORICAL_TIME);
+  await page.goto(PORTRAIT_FIRST_EVENT_PATH);
+
+  await expect(
+    page.getByRole("img", {
+      name: "Fotografía 3 del evento 3er Torneo",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", {
+      name: "Ver Fotografía 1 del evento 3er Torneo",
+    }),
+  ).not.toHaveAttribute("aria-current", "true");
 });
 
 for (const viewport of [

@@ -39,7 +39,13 @@ export function HistoricalEventGallery({
       alt: `Fotografía ${image.order} del evento ${eventTitle}`,
     }));
   }, [eventId, eventTitle]);
-  const { index, prev, next, goTo } = useCarousel(images.length);
+  const firstLandscapeIndex = images.findIndex(
+    (image) => image.width >= image.height,
+  );
+  const { index, prev, next, goTo } = useCarousel(
+    images.length,
+    firstLandscapeIndex >= 0 ? firstLandscapeIndex : 0,
+  );
   const {
     closeLightbox,
     lightboxImage,
