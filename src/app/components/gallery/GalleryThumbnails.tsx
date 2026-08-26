@@ -47,12 +47,14 @@ function Thumbnail({ image, isActive, buttonRef, onClick }: ThumbnailProps) {
 interface GalleryThumbnailsProps {
   images: GalleryImage[];
   activeIndex: number;
+  ariaLabel?: string;
   onSelect: (index: number) => void;
 }
 
 export function GalleryThumbnails({
   images,
   activeIndex,
+  ariaLabel,
   onSelect,
 }: GalleryThumbnailsProps) {
   const { copy } = useLanguage();
@@ -91,7 +93,7 @@ export function GalleryThumbnails({
       <div
         ref={stripRef}
         role="group"
-        aria-label={copy.gallery.thumbnails}
+        aria-label={ariaLabel ?? copy.gallery.thumbnails}
         className="grid h-14 w-full touch-manipulation scroll-smooth grid-flow-col auto-cols-[22%] gap-1.5 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden motion-reduce:scroll-auto sm:h-16 sm:auto-cols-[calc((100%_-_2.5rem)_/_6)] sm:gap-2 md:h-20"
       >
         {images.map((image, index) => (

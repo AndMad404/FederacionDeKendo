@@ -60,7 +60,7 @@ test("historical gallery starts with the first landscape image", async ({
   ).toBeVisible();
   await expect(
     page.getByRole("button", {
-      name: "Ver Fotografía 1 del evento 3er Torneo",
+      name: "Ver imagen: Fotografía 1",
     }),
   ).not.toHaveAttribute("aria-current", "true");
 });
