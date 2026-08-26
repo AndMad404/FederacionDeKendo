@@ -78,19 +78,28 @@ test("hooks.json configures command handlers and keeps phase-one advisors non-bl
   assert.match(prettierIgnore, /^!\.codex\/hooks\/\*\*$/m);
 });
 
-test("Windows command handlers execute without a nested PowerShell", () => {
-  const config = JSON.parse(readFileSync(".codex/hooks.json", "utf8"));
-  const output = runWindowsHook(
-    config.hooks.PreToolUse[0].hooks[0].commandWindows,
-    {
-      cwd: process.cwd(),
-      hook_event_name: "PreToolUse",
-      tool_name: "Bash",
-      tool_input: { command: "git status" },
-    },
-  );
-  assert.deepEqual(output, {});
-});
+test(
+  "Windows command handlers execute without a nested PowerShell",
+  {
+    skip:
+      process.platform !== "win32"
+        ? "Solo Windows: requiere cmd.exe"
+        : false,
+  },
+  () => {
+    const config = JSON.parse(readFileSync(".codex/hooks.json", "utf8"));
+    const output = runWindowsHook(
+      config.hooks.PreToolUse[0].hooks[0].commandWindows,
+      {
+        cwd: process.cwd(),
+        hook_event_name: "PreToolUse",
+        tool_name: "Bash",
+        tool_input: { command: "git status" },
+      },
+    );
+    assert.deepEqual(output, {});
+  },
+);
 
 test("Stop and SubagentStop command handlers emit valid JSON only", async () => {
   const subagentOutput = runHook(

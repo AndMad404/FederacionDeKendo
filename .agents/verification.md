@@ -4,6 +4,8 @@ Use the narrowest verification that proves the requested change.
 
 Use the repository package manager, `pnpm`. If it is not available directly in Windows PowerShell, prefix the same command with `corepack` (for example, `corepack pnpm run build`).
 
+Tests that execute OS-exclusive primitives must run only on that OS. Cross-platform structural guarantees must continue to be validated statically in CI.
+
 ## Mandatory Delivery Gate
 
 Before reporting an implementation as ready, select every applicable check in
