@@ -82,9 +82,7 @@ test(
   "Windows command handlers execute without a nested PowerShell",
   {
     skip:
-      process.platform !== "win32"
-        ? "Solo Windows: requiere cmd.exe"
-        : false,
+      process.platform !== "win32" ? "Solo Windows: requiere cmd.exe" : false,
   },
   () => {
     const config = JSON.parse(readFileSync(".codex/hooks.json", "utf8"));
