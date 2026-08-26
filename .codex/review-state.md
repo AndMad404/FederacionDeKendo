@@ -11,7 +11,7 @@ evidence remain in the history files and are loaded only when required.
   "contract": ".agents/review-contract.md",
   "historyIndex": ".codex/review-history.md",
   "historySnapshots": [
-    {"file":".codex/review-history-2026-08-23.md","captured":"2026-08-23","sha256":"2F0A88F8E96A89AFCCC752DB0CF762891411A5F41F21DFB4C7B259A91A964EE2"}
+    {"file":".codex/review-history-2026-08-23.md","captured":"2026-08-23","sha256":"9D15B171CD1E78BB6172665093E80F77BB693925D13FE455D7BE1BFE15F369EC"}
   ],
   "stateRules": [
     "Open entries are leads, not proof of current behavior; reverify the target before acting.",

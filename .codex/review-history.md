@@ -8,7 +8,7 @@ part of the default review context.
 
 | Snapshot | Captured | SHA-256 | Purpose |
 |---|---|---|---|
-| `review-history-2026-08-23.md` | 2026-08-23 | `2F0A88F8E96A89AFCCC752DB0CF762891411A5F41F21DFB4C7B259A91A964EE2` | Full pre-compaction schema-v2 state, including resolved sessions, stale coverage, open findings, decisions, and verification evidence. |
+| `review-history-2026-08-23.md` | 2026-08-23 | `9D15B171CD1E78BB6172665093E80F77BB693925D13FE455D7BE1BFE15F369EC` | Full pre-compaction schema-v2 state, including resolved sessions, stale coverage, open findings, decisions, and verification evidence. |
 
 ## Maintenance
 

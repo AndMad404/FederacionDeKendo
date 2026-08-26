@@ -12,7 +12,7 @@ const HEADER = [
   "This file contains current technical review state and a compact resolved",
   "provenance index. Full findings, sessions, stale coverage, and verification",
   "evidence remain in the history files and are loaded only when required.",
-].join("\r\n");
+].join("\n");
 
 const TOP_LEVEL_FIELDS = [
   "schemaVersion",
@@ -357,9 +357,9 @@ export function serializeReviewStateMarkdown(state) {
     lines.push(`  ]${comma}`);
   });
   lines.push("}");
-  const json = lines.join("\r\n");
-  const document = `${HEADER}\r\n\r\n\`\`\`json\r\n${json}\r\n\`\`\`\r\n`;
-  const normalizedBytes = Buffer.byteLength(document.replaceAll("\r\n", "\n"));
+  const json = lines.join("\n");
+  const document = `${HEADER}\n\n\`\`\`json\n${json}\n\`\`\`\n`;
+  const normalizedBytes = Buffer.byteLength(document);
   if (normalizedBytes > MAX_GIT_NORMALIZED_BYTES) {
     fail(
       `canonical document is ${normalizedBytes} bytes; maximum is ${MAX_GIT_NORMALIZED_BYTES}`,

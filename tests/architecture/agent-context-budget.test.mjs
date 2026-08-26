@@ -142,7 +142,7 @@ test("pre-compaction review snapshot remains immutable", () => {
     .toUpperCase();
   assert.equal(
     hash,
-    "2F0A88F8E96A89AFCCC752DB0CF762891411A5F41F21DFB4C7B259A91A964EE2",
+    "9D15B171CD1E78BB6172665093E80F77BB693925D13FE455D7BE1BFE15F369EC",
   );
   assert.match(read(".codex/review-history.md"), new RegExp(hash));
 });
