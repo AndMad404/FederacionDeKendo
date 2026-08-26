@@ -85,6 +85,7 @@ export function EventPage() {
         className="relative z-10 min-h-28 shrink-0 overflow-hidden land-compact:min-h-20"
         titleId="event-page-title"
         title={event.title}
+        titleCasing="normal"
         allowTitleWrap
         adaptiveHeight
         description={event.type ?? copy.event.defaultType}

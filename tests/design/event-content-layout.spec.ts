@@ -65,6 +65,30 @@ test("historical gallery starts with the first landscape image", async ({
   ).not.toHaveAttribute("aria-current", "true");
 });
 
+test("historical tournament thumbnails are centered when they fit", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await page.clock.setFixedTime(FIXED_HISTORICAL_TIME);
+  await page.goto(PORTRAIT_FIRST_EVENT_PATH);
+
+  const strip = page.getByRole("group", { name: "Seleccionar fotografía" });
+  const buttons = strip.getByRole("button");
+  const geometry = await strip.evaluate((element) => {
+    const thumbnails = Array.from(element.querySelectorAll("button"));
+    const stripBox = element.getBoundingClientRect();
+    const firstBox = thumbnails[0].getBoundingClientRect();
+    const lastBox = thumbnails.at(-1)!.getBoundingClientRect();
+    return {
+      leftGap: firstBox.left - stripBox.left,
+      rightGap: stripBox.right - lastBox.right,
+    };
+  });
+
+  await expect(buttons).toHaveCount(5);
+  expect(geometry.leftGap).toBeCloseTo(geometry.rightGap, 0);
+});
+
 for (const viewport of [
   { width: 360, height: 800 },
   { width: 390, height: 844 },

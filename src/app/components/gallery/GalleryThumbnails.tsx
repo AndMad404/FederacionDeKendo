@@ -48,6 +48,7 @@ interface GalleryThumbnailsProps {
   images: GalleryImage[];
   activeIndex: number;
   ariaLabel?: string;
+  centerWhenContained?: boolean;
   onSelect: (index: number) => void;
 }
 
@@ -55,6 +56,7 @@ export function GalleryThumbnails({
   images,
   activeIndex,
   ariaLabel,
+  centerWhenContained = false,
   onSelect,
 }: GalleryThumbnailsProps) {
   const { copy } = useLanguage();
@@ -94,7 +96,11 @@ export function GalleryThumbnails({
         ref={stripRef}
         role="group"
         aria-label={ariaLabel ?? copy.gallery.thumbnails}
-        className="grid h-14 w-full touch-manipulation scroll-smooth grid-flow-col auto-cols-[22%] gap-1.5 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden motion-reduce:scroll-auto sm:h-16 sm:auto-cols-[calc((100%_-_2.5rem)_/_6)] sm:gap-2 md:h-20"
+        className={`h-14 w-full touch-manipulation scroll-smooth gap-1.5 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden motion-reduce:scroll-auto sm:h-16 sm:gap-2 md:h-20 ${
+          centerWhenContained
+            ? "flex justify-start [&>button]:w-[22%] [&>button]:flex-none sm:justify-center sm:[&>button]:w-[calc((100%_-_2.5rem)_/_6)]"
+            : "grid grid-flow-col auto-cols-[22%] sm:auto-cols-[calc((100%_-_2.5rem)_/_6)]"
+        }`}
       >
         {images.map((image, index) => (
           <Thumbnail

@@ -19,6 +19,7 @@ interface MediaPageBannerProps {
   className: string;
   titleId: string;
   title: ReactNode;
+  titleCasing?: "uppercase" | "normal";
   allowTitleWrap?: boolean;
   adaptiveHeight?: boolean;
   description: ReactNode;
@@ -29,6 +30,7 @@ export function MediaPageBanner({
   className,
   titleId,
   title,
+  titleCasing = "uppercase",
   allowTitleWrap = false,
   adaptiveHeight = false,
   description,
@@ -73,6 +75,7 @@ export function MediaPageBanner({
           allowWrap={allowTitleWrap}
           tone="media"
           density="flush"
+          casing={titleCasing}
         >
           {title}
         </PageTitle>

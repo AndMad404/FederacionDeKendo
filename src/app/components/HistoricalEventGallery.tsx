@@ -132,6 +132,7 @@ export function HistoricalEventGallery({
           images={images}
           activeIndex={index}
           ariaLabel="Seleccionar fotografía"
+          centerWhenContained
           onSelect={goTo}
         />
       ) : null}
