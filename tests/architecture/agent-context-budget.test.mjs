@@ -53,7 +53,7 @@ const CRITICAL_CONTROLS = {
   "CTRL-PHASE":
     "Do not parallelize phases that share files, outputs, or sequential dependencies.",
   "CTRL-FORMAT":
-    "After editing code or configuration, `corepack pnpm run format:check` must pass; CRLF is required. Report skipped or unavailable checks.",
+    "After editing code or configuration, `corepack pnpm run format:check` must pass; LF is required. Report skipped or unavailable checks.",
   "CTRL-DEPLOY":
     "Do not claim a deployed problem is fixed from local files alone.",
 };

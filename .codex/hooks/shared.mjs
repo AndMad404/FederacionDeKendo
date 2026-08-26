@@ -122,15 +122,16 @@ export async function loadSessionState(sessionId) {
   }
 }
 
-function commandName(command) {
-  if (process.platform === "win32" && command === "corepack") {
-    return `${command}.cmd`;
-  }
-  return command;
-}
-
 function runCommand(command, args, cwd) {
-  const result = spawnSync(commandName(command), args, {
+  const usesWindowsCommandShim =
+    process.platform === "win32" && command === "corepack";
+  const executable = usesWindowsCommandShim
+    ? (process.env.ComSpec ?? "cmd.exe")
+    : command;
+  const executableArgs = usesWindowsCommandShim
+    ? ["/d", "/s", "/c", `${command}.cmd`, ...args]
+    : args;
+  const result = spawnSync(executable, executableArgs, {
     cwd,
     encoding: "utf8",
     shell: false,

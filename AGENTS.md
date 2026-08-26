@@ -87,7 +87,7 @@ the review decision first and then switch responsibility.
 - Run the narrowest directed check first and select final checks through
   `.agents/verification.md`.
 - [CTRL-FORMAT] After editing code or configuration,
-  `corepack pnpm run format:check` must pass; CRLF is required. Report skipped
+  `corepack pnpm run format:check` must pass; LF is required. Report skipped
   or unavailable checks.
 - [CTRL-DEPLOY] Do not claim a deployed problem is fixed from local files
   alone.
