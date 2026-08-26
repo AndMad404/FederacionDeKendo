@@ -129,6 +129,36 @@ test("Stop and SubagentStop command handlers emit valid JSON only", async () => 
   assert.equal(stopOutput.decision, undefined);
 });
 
+test("line-ending check detects CRLF without mutating it and the formatter repairs it", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "line-ending-check-"));
+  const fixturePath = path.join(root, "fixture.txt");
+  const script = path.resolve("scripts/normalize-line-endings.mjs");
+  try {
+    spawnSync("git", ["init", "--quiet"], { cwd: root });
+    writeFileSync(path.join(root, ".gitattributes"), "* text eol=lf\n");
+    writeFileSync(fixturePath, "first\nsecond\n");
+    spawnSync("git", ["add", "."], { cwd: root });
+    writeFileSync(fixturePath, "first\r\nsecond\r\n");
+
+    const check = spawnSync(process.execPath, [script, "--check"], {
+      cwd: root,
+      encoding: "utf8",
+    });
+    assert.equal(check.status, 1);
+    assert.match(check.stderr, /fixture\.txt/);
+    assert.equal(readFileSync(fixturePath, "utf8"), "first\r\nsecond\r\n");
+
+    const format = spawnSync(process.execPath, [script], {
+      cwd: root,
+      encoding: "utf8",
+    });
+    assert.equal(format.status, 0, format.stderr);
+    assert.equal(readFileSync(fixturePath, "utf8"), "first\nsecond\n");
+  } finally {
+    rmSync(root, { force: true, recursive: true });
+  }
+});
+
 test("second failures stay in compact active review state", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "codex-hook-review-"));
   try {
