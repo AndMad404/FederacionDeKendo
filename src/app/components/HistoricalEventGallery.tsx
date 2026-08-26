@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef } from "react";
 import type { MouseEvent } from "react";
 import { EVENT_GALLERIES } from "../data/eventGalleries";
 import { useCarousel } from "../hooks/useCarousel";
@@ -60,6 +60,37 @@ export function HistoricalEventGallery({
     allowInteractiveStart: true,
     preventDefaultOnSwipe: true,
   });
+  const thumbnailStripRef = useRef<HTMLDivElement | null>(null);
+  const thumbnailButtonRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const previousIndexRef = useRef(index);
+
+  useEffect(() => {
+    const strip = thumbnailStripRef.current;
+    const activeButton = thumbnailButtonRefs.current[index];
+    if (!strip || !activeButton) return;
+
+    const previousIndex = previousIndexRef.current;
+    previousIndexRef.current = index;
+    if (previousIndex === index) return;
+
+    const lastIndex = images.length - 1;
+    if (previousIndex === lastIndex && index === 0) {
+      strip.scrollTo({ left: 0 });
+      return;
+    }
+
+    if (previousIndex === 0 && index === lastIndex) {
+      strip.scrollTo({
+        left: strip.scrollWidth - strip.clientWidth,
+      });
+      return;
+    }
+
+    const columnGap = Number.parseFloat(getComputedStyle(strip).columnGap) || 0;
+    const step = activeButton.getBoundingClientRect().width + columnGap;
+    const direction = index > previousIndex ? 1 : -1;
+    strip.scrollBy({ left: direction * step });
+  }, [images.length, index]);
 
   if (!images.length) return null;
   const featured = images[index];
@@ -129,13 +160,17 @@ export function HistoricalEventGallery({
       </figure>
       {images.length > 1 ? (
         <div
+          ref={thumbnailStripRef}
           role="group"
           aria-label="Seleccionar fotografía"
-          className="grid h-14 grid-flow-col auto-cols-[22%] justify-center gap-2 overflow-x-auto sm:auto-cols-[17%] sm:h-16 md:h-20"
+          className="grid h-14 touch-manipulation scroll-smooth grid-flow-col auto-cols-[22%] gap-2 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden motion-reduce:scroll-auto sm:h-16 sm:auto-cols-[17%] md:h-20"
         >
           {images.map((image, imageIndex) => (
             <button
               key={image.id}
+              ref={(node) => {
+                thumbnailButtonRefs.current[imageIndex] = node;
+              }}
               type="button"
               aria-label={`Ver ${image.alt}`}
               aria-current={imageIndex === index ? "true" : undefined}

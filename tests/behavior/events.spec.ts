@@ -247,6 +247,28 @@ for (const viewport of [
   });
 }
 
+test("historical tournament thumbnails follow carousel navigation on mobile", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.clock.setFixedTime(FIXED_HISTORICAL_TIME);
+  await page.goto(HISTORICAL_TOURNAMENT_PATH);
+
+  const gallery = page.getByRole("region", {
+    name: /Fotografías del evento/,
+  });
+  const thumbnails = gallery.getByRole("group", {
+    name: "Seleccionar fotografía",
+  });
+  await expect(thumbnails).toBeVisible();
+  expect(await thumbnails.evaluate((strip) => strip.scrollLeft)).toBe(0);
+
+  await gallery.getByRole("button", { name: "Fotografía siguiente" }).click();
+  await expect
+    .poll(() => thumbnails.evaluate((strip) => strip.scrollLeft))
+    .toBeGreaterThan(0);
+});
+
 test("renders the historical archive and the local not-found view", async ({
   page,
 }) => {

@@ -73,6 +73,29 @@ test("isolates the open lightbox from the application", async ({ page }) => {
   await expect(dialog).toBeVisible();
 });
 
+test("keeps desktop lightbox arrows centered across hover and press states", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1366, height: 768 });
+  const { dialog } = await openLightbox(page);
+  const nextButton = dialog.getByRole("button", { name: "Imagen siguiente" });
+  const initialBox = await nextButton.boundingBox();
+
+  await nextButton.hover();
+  await expect
+    .poll(async () => (await nextButton.boundingBox())?.y)
+    .toBe(initialBox?.y);
+
+  await nextButton.dispatchEvent("pointerdown", {
+    pointerId: 1,
+    pointerType: "mouse",
+    button: 0,
+  });
+  await expect
+    .poll(async () => (await nextButton.boundingBox())?.y)
+    .toBe(initialBox?.y);
+});
+
 test("restores the application after closing the lightbox", async ({
   page,
 }) => {
