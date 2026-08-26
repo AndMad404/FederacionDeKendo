@@ -7,7 +7,7 @@ evidence remain in the history files and are loaded only when required.
 ```json
 {
   "schemaVersion": 4,
-  "lastUpdated": "2026-08-25",
+  "lastUpdated": "2026-08-26",
   "contract": ".agents/review-contract.md",
   "historyIndex": ".codex/review-history.md",
   "historySnapshots": [
@@ -142,7 +142,8 @@ evidence remain in the history files and are loaded only when required.
     {"id":"PEND-RESP-001","target":"exact tablet and mobile inner-viewport geometry","dependency":"reproducible native viewport evidence"}
   ],
   "hookFailures": [
-    {"id":"HOOK-20260825230658033","recordedAt":"2026-08-25T23:06:58.033Z","sessionId":"01a03b08-fdc0-7a83-a94c-557183c9b458","event":"Stop","status":"needs_human_review","problem":"Completion quality gate still failed after one continuation.","evidence":"corepack pnpm run format:check: exit non-zero"}
+    {"id":"HOOK-20260825230658033","recordedAt":"2026-08-25T23:06:58.033Z","sessionId":"01a03b08-fdc0-7a83-a94c-557183c9b458","event":"Stop","status":"needs_human_review","problem":"Completion quality gate still failed after one continuation.","evidence":"corepack pnpm run format:check: exit non-zero"},
+    {"id":"HOOK-20260826015046998","recordedAt":"2026-08-26T01:50:46.998Z","sessionId":"01a03b08-fdc0-7a83-a94c-557183c9b458","event":"Stop","status":"needs_human_review","problem":"Completion quality gate still failed after one continuation.","evidence":"corepack pnpm run format:check: exit non-zero"}
   ]
 }
 ```

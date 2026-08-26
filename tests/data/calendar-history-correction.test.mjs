@@ -135,6 +135,26 @@ test("C3 accepts a multi-line approved summary while keeping private values bloc
   }
 });
 
+test("C3 normalizes approved calendar HTML before publishing a summary", async () => {
+  const files = await fixture(
+    createReport({
+      ...proposed,
+      summary:
+        '- Categoría con Bogu<br>- Categoría por equipos<br><br><a href=" class="pastedDriveLink-0">',
+    }),
+  );
+  try {
+    await run(files, ["summary"]);
+    const registry = JSON.parse(await readFile(files.registryPath, "utf8"));
+    assert.equal(
+      registry.events[0].summary,
+      "- Categoría con Bogu\n- Categoría por equipos",
+    );
+  } finally {
+    await rm(files.directory, { recursive: true, force: true });
+  }
+});
+
 test("F3: a v4 correction preserves evidence fields and the registry version", async () => {
   const files = await fixture();
   try {

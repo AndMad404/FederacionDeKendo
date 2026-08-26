@@ -5,6 +5,7 @@ import {
   HISTORICAL_COMPARISON_FIELDS,
   fingerprintHistoricalProposal,
   fingerprintHistoricalSnapshot,
+  normalizePublicDescription,
   serializeCalendarEvents,
   writeAtomically,
 } from "./sync-calendar-events.mjs";
@@ -304,7 +305,11 @@ export async function applyHistoricalCorrections({
           ...new Set([...(corrected.aliases ?? []), corrected.slug]),
         ];
       if (difference.type === "eliminado") delete corrected[field];
-      else corrected[field] = difference.proposed;
+      else
+        corrected[field] =
+          field === "summary"
+            ? normalizePublicDescription(difference.proposed)
+            : difference.proposed;
     }
     correctedBySourceId.set(sourceId, corrected);
     results.push({

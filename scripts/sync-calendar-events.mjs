@@ -371,16 +371,21 @@ function parseTechnicalDescription(description, title) {
       .trimEnd();
   });
 
-  const publicDescription = sanitizedPublicLines
-    .join("\n")
-    .replace(/<br\s*\/?\s*>/gi, "\n")
-    .replace(/<[^>]*>/g, "")
-    .trim();
+  const publicDescription = normalizePublicDescription(
+    sanitizedPublicLines.join("\n"),
+  );
 
   return {
     publicDescription: publicDescription || undefined,
     albumUrl,
   };
+}
+
+export function normalizePublicDescription(description) {
+  return description
+    .replace(/<br\s*\/?\s*>/gi, "\n")
+    .replace(/<[^>]*>/g, "")
+    .trim();
 }
 
 function inferEventType(title) {
