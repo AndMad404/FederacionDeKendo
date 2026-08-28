@@ -6,6 +6,10 @@ Official federation website: React 18, TypeScript, Tailwind CSS 4, and Vite.
 
 - Read relevant sources before claiming or editing; separate verified facts from
   suggestions.
+- For documentary, methodological, continuity, or otherwise unroutable work,
+  start at `context-index.md`. Use `$context-librarian` only to discover or read
+  minimal canonical context and `$indexation-librarian` to change indexes or
+  profiles. Go directly to a known technical contract.
 - Keep scope minimal. Use `.agents/project-map.md` only when the target is not
   known, and expand only when evidence identifies a shared dependency.
 - [CTRL-SCOPE] Preserve unrelated worktree changes. Do not refactor outside the

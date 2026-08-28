@@ -2,12 +2,6 @@
 
 Use these prompts as starting points for Codex work in this repo.
 
-The owner also maintains a companion visual reference,
-`Guia_rapida_ahorro_tokens_Codex.docx`. It is a memory aid, not an
-authoritative project input. Do not load it unless the user asks. When the
-scope-discovery recipes below change materially, flag the visual reference for
-manual synchronization.
-
 ## Discover Scope Without Editing
 
 ```text
