@@ -4,14 +4,56 @@ Purpose: route a request to the smallest canonical source without scanning the
 repository or preloading sibling contracts. This file describes where to look;
 it does not prove product behavior or replace the selected owner.
 
-| Concern                          | Canonical entry                                                      | Read when                                                                                                       | Do not read when                                                             | Next route                                                                    |
-| -------------------------------- | -------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| Repository governance            | `AGENTS.md`                                                          | The request needs standing product rules, responsibility selection, or completion requirements.                 | A known specialized contract already governs the task.                       | Use only the contract selected by its task router.                            |
-| Unknown technical scope          | `.agents/project-map.md`                                             | The request describes behavior, routes, files, or checks without a known technical path.                        | The target file, route, or owning contract is already known.                 | Read only the primary files and directed checks selected by the matching row. |
-| Implementation                   | `.agents/implementation-contract.md`                                 | Product code or configuration will be changed.                                                                  | The task is read-only review, documentation, or verification selection.      | Follow dependencies explicitly required by that contract.                     |
-| Review                           | `.agents/review-contract.md`                                         | The user asks for a technical review or findings.                                                               | The task already authorizes a known implementation.                          | Read review state only as directed by the contract.                           |
-| Verification                     | `.agents/verification.md`                                            | Checks must be selected or visual evidence must be validated.                                                   | A narrower directed check is already known and sufficient.                   | Expand only when the selected gate requires it.                               |
-| Private Federation documentation | `../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/index.md` | The request concerns private architecture notes, decisions, roadmaps, methodology, or case-study documentation. | The request is ordinary product implementation with a known technical route. | Let the private index select one owning document.                             |
+## Repository governance
+
+- **Canonical entry:** `AGENTS.md`
+- **Read when:** The request needs standing product rules, responsibility
+  selection, or completion requirements.
+- **Do not read when:** A known specialized contract already governs the task.
+- **Next route:** Use only the contract selected by its task router.
+
+## Unknown technical scope
+
+- **Canonical entry:** `.agents/project-map.md`
+- **Read when:** The request describes behavior, routes, files, or checks
+  without a known technical path.
+- **Do not read when:** The target file, route, or owning contract is already
+  known.
+- **Next route:** Read only the primary files and directed checks selected by
+  the matching route.
+
+## Implementation
+
+- **Canonical entry:** `.agents/implementation-contract.md`
+- **Read when:** Product code or configuration will be changed.
+- **Do not read when:** The task is read-only review, documentation, or
+  verification selection.
+- **Next route:** Follow dependencies explicitly required by that contract.
+
+## Review
+
+- **Canonical entry:** `.agents/review-contract.md`
+- **Read when:** The user asks for a technical review or findings.
+- **Do not read when:** The task already authorizes a known implementation.
+- **Next route:** Read review state only as directed by the contract.
+
+## Verification
+
+- **Canonical entry:** `.agents/verification.md`
+- **Read when:** Checks must be selected or visual evidence must be validated.
+- **Do not read when:** A narrower directed check is already known and
+  sufficient.
+- **Next route:** Expand only when the selected gate requires it.
+
+## Private Federation documentation
+
+- **Canonical entry:**
+  `../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/index.md`
+- **Read when:** The request concerns private architecture notes, decisions,
+  roadmaps, methodology, or case-study documentation.
+- **Do not read when:** The request is ordinary product implementation with a
+  known technical route.
+- **Next route:** Let the private index select one owning document.
 
 ## Reading boundaries
 
