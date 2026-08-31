@@ -6,6 +6,7 @@ import { useCarousel } from "../hooks/useCarousel";
 import { useGalleryLightbox } from "../hooks/useGalleryLightbox";
 import { PageTitle } from "./PageTitle";
 import { useLanguage } from "../config/i18n";
+import { useIsHydrated } from "../hooks/useHydratedNow";
 
 const Lightbox = lazy(() =>
   import("./Lightbox").then((module) => ({ default: module.Lightbox })),
@@ -13,6 +14,7 @@ const Lightbox = lazy(() =>
 
 export function GallerySection() {
   const { language, copy } = useLanguage();
+  const isHydrated = useIsHydrated();
   const images = useMemo(() => getGalleryImages(language), [language]);
   const { index, prev, next, goTo } = useCarousel(images.length);
   const {
@@ -29,6 +31,7 @@ export function GallerySection() {
   return (
     <section
       aria-labelledby="gallery-title"
+      data-interactive-ready={isHydrated ? "gallery" : undefined}
       className="relative my-2 overflow-hidden rounded-xl bg-site-canvas tall-md:h-[calc(100%_-_1rem)] tall-md:min-h-0 land-sm:mt-[11px]"
     >
       <PageTitle

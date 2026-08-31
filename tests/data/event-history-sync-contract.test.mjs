@@ -321,7 +321,7 @@ test("F1: approvals, rejections, stale decisions, reappearances, and removed rec
   );
 });
 
-test("F3: pending revisions retain deterministic, redacted evidence across observations", () => {
+test("F3: pending revisions are byte-stable for identical evidence", () => {
   const changed = {
     ...historicalSnapshot,
     title: "Propuesta con enlace privado",
@@ -355,8 +355,9 @@ test("F3: pending revisions retain deterministic, redacted evidence across obser
   );
   assert.equal(
     second.pendingRevision.evidence.lastObservedAt,
-    "2026-03-02T00:00:00.000Z",
+    first.pendingRevision.evidence.lastObservedAt,
   );
+  assert.deepEqual(second, first);
   assert.equal(
     first.pendingRevision.evidence.fingerprint,
     second.pendingRevision.evidence.fingerprint,
@@ -369,6 +370,115 @@ test("F3: pending revisions retain deterministic, redacted evidence across obser
     JSON.stringify(second.pendingRevision.evidence),
     /drive\.google\.com|private-folder|private\.ics|token=secret/,
   );
+
+  const recorded = recordCalendarNotifications(
+    { version: 4, events: [first] },
+    createCalendarNotifications({ version: 4, events: [first] }),
+  );
+  const third = mergeRegistry(
+    recorded,
+    [changed],
+    new Date("2026-03-03T00:00:00.000Z"),
+  );
+  assert.deepEqual(third, recorded);
+  assert.equal(createCalendarNotifications(third).notifications.length, 0);
+});
+
+test("F3: rejected absences remain resolved until reappearance or new evidence", () => {
+  const present = {
+    ...historicalSnapshot,
+    sourceId: "present-source",
+    slug: "2026-01-11-present",
+    aliases: undefined,
+  };
+  const firstRegistry = mergeRegistry(
+    { version: 4, events: [historicalSnapshot, present] },
+    [present],
+    new Date("2026-03-01T00:00:00.000Z"),
+  );
+  const pending = firstRegistry.events.find(
+    ({ sourceId }) => sourceId === historicalSnapshot.sourceId,
+  );
+  const firstReport = createCalendarNotifications(firstRegistry);
+  const notified = recordCalendarNotifications(firstRegistry, firstReport);
+  const rejected = applyEditorialDecision(notified, {
+    sourceId: pending.sourceId,
+    revisionId: pending.pendingRevision.id,
+    evidenceFingerprint: pending.pendingRevision.evidence.fingerprint,
+    action: "reject_deletion",
+    decisionRecordId: "presidencia-2026-03-03-idempotence",
+    actorRole: "presidencia",
+    decidedAt: "2026-03-03T00:00:00.000Z",
+  });
+
+  const stillAbsent = mergeRegistry(
+    rejected,
+    [present],
+    new Date("2026-03-04T00:00:00.000Z"),
+  );
+  assert.deepEqual(stillAbsent, rejected);
+  assert.equal(
+    createCalendarNotifications(stillAbsent).notifications.length,
+    0,
+  );
+  assert.equal(
+    serializeCalendarEvents(stillAbsent.events),
+    serializeCalendarEvents(rejected.events),
+  );
+
+  const reappeared = mergeRegistry(
+    stillAbsent,
+    [historicalSnapshot, present],
+    new Date("2026-03-05T00:00:00.000Z"),
+  );
+  const restored = reappeared.events.find(
+    ({ sourceId }) => sourceId === historicalSnapshot.sourceId,
+  );
+  assert.equal(restored.editorialDecision, undefined);
+
+  const absentAgain = mergeRegistry(
+    reappeared,
+    [present],
+    new Date("2026-03-06T00:00:00.000Z"),
+  );
+  const reopened = absentAgain.events.find(
+    ({ sourceId }) => sourceId === historicalSnapshot.sourceId,
+  );
+  assert.equal(reopened.editorialState, "pendiente");
+  assert.notEqual(
+    reopened.pendingRevision.evidence.firstDetectedAt,
+    pending.pendingRevision.evidence.firstDetectedAt,
+  );
+  assert.equal(
+    createCalendarNotifications(absentAgain).notifications.length,
+    1,
+  );
+});
+
+test("F3: materially different evidence creates a new fingerprint and notification", () => {
+  const first = mergeRegistry(
+    { version: 4, events: [historicalSnapshot] },
+    [{ ...historicalSnapshot, title: "Primera correccion" }],
+    new Date("2026-03-01T00:00:00.000Z"),
+  );
+  const recorded = recordCalendarNotifications(
+    first,
+    createCalendarNotifications(first),
+  );
+  const second = mergeRegistry(
+    recorded,
+    [{ ...historicalSnapshot, title: "Segunda correccion" }],
+    new Date("2026-03-02T00:00:00.000Z"),
+  );
+  assert.notEqual(
+    second.events[0].pendingRevision.evidence.fingerprint,
+    first.events[0].pendingRevision.evidence.fingerprint,
+  );
+  assert.equal(
+    second.events[0].pendingRevision.evidence.lastObservedAt,
+    "2026-03-02T00:00:00.000Z",
+  );
+  assert.equal(createCalendarNotifications(second).notifications.length, 1);
 });
 
 test("F3: a deletion decision retains the linked pending evidence", () => {
