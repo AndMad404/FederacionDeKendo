@@ -55,6 +55,14 @@ it does not prove product behavior or replace the selected owner.
   known technical route.
 - **Next route:** Let the private index select one owning document.
 
+## Mechanical exploration
+- **Canonical entry:** `context-library/index.md`
+- **Read when:** Only a topic, area, or approximate filename is known and no
+  curated route locates it.
+- **Do not read when:** The path or owning contract is already known.
+- **Next route:** Open only the relevant shard; existence does not prove
+  ownership, meaning, or current behavior.
+
 ## Reading boundaries
 
 - Do not preload `.agents/`, `.codex/`, routes, tests, or private documentation.
