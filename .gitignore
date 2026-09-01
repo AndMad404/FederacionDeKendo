@@ -36,6 +36,9 @@ tmp/
 # Codex local attachments
 .codex-remote-attachments/
 
+# Local development context inventory
+context-library/
+
 # Static hosting / deploy
 .vercel/
 .netlify/
