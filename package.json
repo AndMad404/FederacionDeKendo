@@ -37,6 +37,7 @@
     "test:unit:without-history-correction": "node --test tests/data/calendar-sync.test.mjs tests/data/event-gallery-sync.test.mjs tests/data/event-history-filters.test.mjs tests/data/event-history-sync-contract.test.mjs tests/data/gallery-data.test.mjs tests/architecture/calendar-workflow-architecture.test.mjs",
     "test:event-galleries": "node --test tests/data/event-gallery-sync.test.mjs",
     "typecheck": "tsc --noEmit",
+    "verify:site": "node scripts/verify-site.mjs",
     "sync:calendar": "node scripts/sync-calendar-events.mjs",
     "apply:calendar-decision": "node scripts/apply-calendar-editorial-decision.mjs",
     "correct:calendar-history": "node scripts/correct-calendar-history.mjs",

@@ -1,5 +1,5 @@
 {
-  "description": "Project supervision hooks for Codex audit and quality workflows.",
+  "description": "Minimal project hooks for the Federacion-specific completion gate.",
   "hooks": {
     "SessionStart": [
       {
@@ -10,49 +10,7 @@
             "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/session-start.mjs\"",
             "commandWindows": "C:\\Progra~1\\nodejs\\node.exe .codex\\hooks\\session-start.mjs",
             "timeout": 15,
-            "statusMessage": "Recording the project supervision baseline",
-            "additionalContextLimit": 400
-          }
-        ]
-      }
-    ],
-    "SubagentStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/subagent-start.mjs\"",
-            "commandWindows": "C:\\Progra~1\\nodejs\\node.exe .codex\\hooks\\subagent-start.mjs",
-            "timeout": 10,
-            "statusMessage": "Loading the subagent review contract",
-            "additionalContextLimit": 600
-          }
-        ]
-      }
-    ],
-    "SubagentStop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/subagent-stop.mjs\" --advisory",
-            "commandWindows": "C:\\Progra~1\\nodejs\\node.exe .codex\\hooks\\subagent-stop.mjs --advisory",
-            "timeout": 10,
-            "statusMessage": "Checking the subagent report"
-          }
-        ]
-      }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "Bash|apply_patch|Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/pre-tool-use.mjs\" --advisory",
-            "commandWindows": "C:\\Progra~1\\nodejs\\node.exe .codex\\hooks\\pre-tool-use.mjs --advisory",
-            "timeout": 10,
-            "statusMessage": "Checking project-sensitive operations",
+            "statusMessage": "Recording the Federacion quality baseline",
             "additionalContextLimit": 300
           }
         ]
@@ -66,7 +24,7 @@
             "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/stop-quality-gate.mjs\"",
             "commandWindows": "C:\\Progra~1\\nodejs\\node.exe .codex\\hooks\\stop-quality-gate.mjs",
             "timeout": 180,
-            "statusMessage": "Running the Codex completion quality gate"
+            "statusMessage": "Running the Federacion completion quality gate"
           }
         ]
       }

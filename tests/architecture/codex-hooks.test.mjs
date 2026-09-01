@@ -11,8 +11,6 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { evaluateToolUse } from "../../.codex/hooks/pre-tool-use.mjs";
-import { evaluateSubagentReport } from "../../.codex/hooks/subagent-stop.mjs";
 import { evaluateStop } from "../../.codex/hooks/stop-quality-gate.mjs";
 import {
   captureRelevantFingerprint,
@@ -50,15 +48,9 @@ function runWindowsHook(command, input) {
   return JSON.parse(result.stdout);
 }
 
-test("hooks.json configures command handlers and keeps phase-one advisors non-blocking", () => {
+test("hooks.json keeps only the Federacion baseline and quality gate", () => {
   const config = JSON.parse(readFileSync(".codex/hooks.json", "utf8"));
-  assert.deepEqual(Object.keys(config.hooks).sort(), [
-    "PreToolUse",
-    "SessionStart",
-    "Stop",
-    "SubagentStart",
-    "SubagentStop",
-  ]);
+  assert.deepEqual(Object.keys(config.hooks).sort(), ["SessionStart", "Stop"]);
   for (const groups of Object.values(config.hooks)) {
     for (const group of groups) {
       for (const hook of group.hooks) {
@@ -69,8 +61,6 @@ test("hooks.json configures command handlers and keeps phase-one advisors non-bl
       }
     }
   }
-  assert.match(config.hooks.PreToolUse[0].hooks[0].command, /--advisory$/);
-  assert.match(config.hooks.SubagentStop[0].hooks[0].command, /--advisory$/);
   assert.doesNotMatch(config.hooks.Stop[0].hooks[0].command, /--advisory/);
 
   const prettierIgnore = readFileSync(".prettierignore", "utf8");
@@ -79,41 +69,37 @@ test("hooks.json configures command handlers and keeps phase-one advisors non-bl
 });
 
 test(
-  "Windows command handlers execute without a nested PowerShell",
+  "minimal Windows command handlers execute without a nested PowerShell",
   {
     skip:
       process.platform !== "win32" ? "Solo Windows: requiere cmd.exe" : false,
   },
   () => {
     const config = JSON.parse(readFileSync(".codex/hooks.json", "utf8"));
-    const output = runWindowsHook(
-      config.hooks.PreToolUse[0].hooks[0].commandWindows,
+    const sessionId = `minimal-windows-${process.pid}`;
+    const startOutput = runWindowsHook(
+      config.hooks.SessionStart[0].hooks[0].commandWindows,
       {
         cwd: process.cwd(),
-        hook_event_name: "PreToolUse",
-        tool_name: "Bash",
-        tool_input: { command: "git status" },
+        hook_event_name: "SessionStart",
+        session_id: sessionId,
       },
     );
-    assert.deepEqual(output, {});
+    assert.equal(startOutput.hookSpecificOutput.hookEventName, "SessionStart");
+    const stopOutput = runWindowsHook(
+      config.hooks.Stop[0].hooks[0].commandWindows,
+      {
+        cwd: process.cwd(),
+        hook_event_name: "Stop",
+        session_id: sessionId,
+        stop_hook_active: false,
+      },
+    );
+    assert.equal(typeof stopOutput, "object");
   },
 );
 
-test("Stop and SubagentStop command handlers emit valid JSON only", async () => {
-  const subagentOutput = runHook(
-    "subagent-stop.mjs",
-    {
-      cwd: process.cwd(),
-      hook_event_name: "SubagentStop",
-      last_assistant_message: "Incomplete",
-      session_id: "json-contract",
-      stop_hook_active: false,
-    },
-    ["--advisory"],
-  );
-  assert.equal(subagentOutput.continue, true);
-  assert.equal(subagentOutput.decision, undefined);
-
+test("Stop command handler emits valid JSON only", async () => {
   const stopSessionId = "json-contract-stop";
   await saveSessionState(stopSessionId, {
     fingerprint: captureRelevantFingerprint(process.cwd()),
@@ -224,60 +210,11 @@ test("hook failure recording rejects invalid state without modifying it", () => 
   }
 });
 
-test("PreToolUse advisory output uses supported context fields", () => {
-  const output = evaluateToolUse({
-    tool_input: { command: "git push origin main" },
-  });
-  assert.equal(output.hookSpecificOutput.hookEventName, "PreToolUse");
-  assert.match(output.hookSpecificOutput.additionalContext, /git push/);
-  assert.equal(output.hookSpecificOutput.permissionDecision, undefined);
-  assert.equal(output.systemMessage, undefined);
-});
-
 test("hook context limits stay below the persistent-context budget", () => {
   const config = JSON.parse(readFileSync(".codex/hooks.json", "utf8"));
   assert.ok(
     config.hooks.SessionStart[0].hooks[0].additionalContextLimit <= 400,
   );
-  assert.ok(config.hooks.PreToolUse[0].hooks[0].additionalContextLimit <= 300);
-  assert.ok(
-    config.hooks.SubagentStart[0].hooks[0].additionalContextLimit <= 600,
-  );
-});
-
-test("PreToolUse enforcement uses the supported deny schema", () => {
-  const output = evaluateToolUse(
-    { tool_input: { command: "git commit -m test" } },
-    { enforce: true },
-  );
-  assert.deepEqual(
-    Object.keys(output.hookSpecificOutput).sort(),
-    ["hookEventName", "permissionDecision", "permissionDecisionReason"].sort(),
-  );
-  assert.equal(output.hookSpecificOutput.permissionDecision, "deny");
-});
-
-test("SubagentStop stays advisory in phase one", () => {
-  const output = evaluateSubagentReport({ last_assistant_message: "Done." });
-  assert.equal(output.continue, true);
-  assert.match(output.systemMessage, /Advisory mode/);
-  assert.equal(output.decision, undefined);
-});
-
-test("SubagentStop enforcement continues only once", () => {
-  const first = evaluateSubagentReport(
-    { last_assistant_message: "Done.", stop_hook_active: false },
-    { enforce: true },
-  );
-  assert.equal(first.decision, "block");
-
-  const second = evaluateSubagentReport(
-    { last_assistant_message: "Still incomplete.", stop_hook_active: true },
-    { enforce: true },
-  );
-  assert.equal(second.continue, true);
-  assert.equal(second.decision, undefined);
-  assert.match(second.recordFailure, /missing/);
 });
 
 test("Stop blocks once and then records a human-review failure", async () => {

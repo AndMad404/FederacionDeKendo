@@ -17,6 +17,12 @@ If any required check fails or cannot run, report the change as incomplete,
 name the exact check and reason, and do not present the code as ready to ship.
 The final report must list the checks that passed.
 
+Run the complete shared gate with `pnpm run verify:site`. It executes its
+checks sequentially, repeats the formatting check at the end, rejects flaky
+Playwright results, and verifies that tracked or unignored workspace content
+did not change during verification. Any edit after the gate starts invalidates
+all of its results; inspect the diff and rerun the complete gate.
+
 ## Default Commands
 
 For TypeScript or React changes:

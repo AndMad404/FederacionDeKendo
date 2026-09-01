@@ -48,7 +48,7 @@ jobs:
       - name: Verify generated site
         uses: ./.github/actions/verify-site
         with:
-          unit-command: pnpm run test:unit:without-sync
+          unit-script: test:unit:without-sync
 
       - name: Emit verification failure notification
         if: ${{ failure() && steps.sync.outcome == 'success' }}

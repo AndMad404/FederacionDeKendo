@@ -69,7 +69,7 @@ jobs:
       - name: Verify generated site
         uses: ./.github/actions/verify-site
         with:
-          unit-command: pnpm run test:unit:without-history-correction
+          unit-script: test:unit:without-history-correction
 
       - name: Commit approved historical range
         run: |
