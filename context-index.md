@@ -56,6 +56,7 @@ it does not prove product behavior or replace the selected owner.
 - **Next route:** Let the private index select one owning document.
 
 ## Mechanical exploration
+
 - **Canonical entry:** `context-library/index.md`
 - **Read when:** Only a topic, area, or approximate filename is known and no
   curated route locates it.
