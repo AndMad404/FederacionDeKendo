@@ -12,107 +12,25 @@ import path from "node:path";
 import test from "node:test";
 
 import { evaluateStop } from "../../.codex/hooks/stop-quality-gate.mjs";
+import { recordHookFailure } from "../../.codex/hooks/shared.mjs";
 import {
-  captureRelevantFingerprint,
-  recordHookFailure,
-  saveSessionState,
-} from "../../.codex/hooks/shared.mjs";
+  recordFailure as recordSupervisionFailure,
+  runCompletionChecks as runSupervisionChecks,
+} from "../../.codex/supervision.mjs";
 import {
   parseReviewStateMarkdown,
   serializeReviewStateMarkdown,
 } from "../../.codex/review-state.mjs";
 
-function runHook(script, input, args = []) {
-  const result = spawnSync(
-    process.execPath,
-    [`.codex/hooks/${script}`, ...args],
-    {
-      cwd: process.cwd(),
-      encoding: "utf8",
-      input: JSON.stringify(input),
-    },
-  );
-  assert.equal(result.status, 0, result.stderr);
-  assert.equal(result.stderr, "");
-  return JSON.parse(result.stdout);
-}
-
-function runWindowsHook(command, input) {
-  const result = spawnSync("cmd.exe", ["/d", "/s", "/c", command], {
-    cwd: process.cwd(),
-    encoding: "utf8",
-    input: JSON.stringify(input),
-  });
-  assert.equal(result.status, 0, result.stderr);
-  assert.equal(result.stderr, "");
-  return JSON.parse(result.stdout);
-}
-
-test("hooks.json keeps only the Federacion baseline and quality gate", () => {
+test("hooks.json delegates the lifecycle to global supervision", () => {
   const config = JSON.parse(readFileSync(".codex/hooks.json", "utf8"));
-  assert.deepEqual(Object.keys(config.hooks).sort(), ["SessionStart", "Stop"]);
-  for (const groups of Object.values(config.hooks)) {
-    for (const group of groups) {
-      for (const hook of group.hooks) {
-        assert.equal(hook.type, "command");
-        assert.match(hook.commandWindows, /^C:\\Progra~1\\nodejs\\node\.exe /);
-        assert.match(hook.commandWindows, /\.codex\\hooks\\/);
-        assert.doesNotMatch(hook.commandWindows, /powershell/i);
-      }
-    }
-  }
-  assert.doesNotMatch(config.hooks.Stop[0].hooks[0].command, /--advisory/);
+  assert.deepEqual(config.hooks, {});
+  assert.equal(typeof runSupervisionChecks, "function");
+  assert.equal(typeof recordSupervisionFailure, "function");
 
   const prettierIgnore = readFileSync(".prettierignore", "utf8");
   assert.match(prettierIgnore, /^!\.codex\/hooks\.json$/m);
   assert.match(prettierIgnore, /^!\.codex\/hooks\/\*\*$/m);
-});
-
-test(
-  "minimal Windows command handlers execute without a nested PowerShell",
-  {
-    skip:
-      process.platform !== "win32" ? "Solo Windows: requiere cmd.exe" : false,
-  },
-  () => {
-    const config = JSON.parse(readFileSync(".codex/hooks.json", "utf8"));
-    const sessionId = `minimal-windows-${process.pid}`;
-    const startOutput = runWindowsHook(
-      config.hooks.SessionStart[0].hooks[0].commandWindows,
-      {
-        cwd: process.cwd(),
-        hook_event_name: "SessionStart",
-        session_id: sessionId,
-      },
-    );
-    assert.equal(startOutput.hookSpecificOutput.hookEventName, "SessionStart");
-    const stopOutput = runWindowsHook(
-      config.hooks.Stop[0].hooks[0].commandWindows,
-      {
-        cwd: process.cwd(),
-        hook_event_name: "Stop",
-        session_id: sessionId,
-        stop_hook_active: false,
-      },
-    );
-    assert.equal(typeof stopOutput, "object");
-  },
-);
-
-test("Stop command handler emits valid JSON only", async () => {
-  const stopSessionId = "json-contract-stop";
-  await saveSessionState(stopSessionId, {
-    fingerprint: captureRelevantFingerprint(process.cwd()),
-    root: process.cwd(),
-  });
-  const stopOutput = runHook("stop-quality-gate.mjs", {
-    cwd: process.cwd(),
-    hook_event_name: "Stop",
-    session_id: stopSessionId,
-    stop_hook_active: true,
-  });
-  assert.equal(typeof stopOutput, "object");
-  assert.equal(stopOutput.decision, undefined);
 });
 
 test("line-ending check detects CRLF without mutating it and the formatter repairs it", () => {
@@ -210,13 +128,6 @@ test("hook failure recording rejects invalid state without modifying it", () => 
   }
 });
 
-test("hook context limits stay below the persistent-context budget", () => {
-  const config = JSON.parse(readFileSync(".codex/hooks.json", "utf8"));
-  assert.ok(
-    config.hooks.SessionStart[0].hooks[0].additionalContextLimit <= 400,
-  );
-});
-
 test("Stop blocks once and then records a human-review failure", async () => {
   const dependencies = {
     root: "C:/repo",
@@ -224,9 +135,9 @@ test("Stop blocks once and then records a human-review failure", async () => {
     captureFingerprint: () => "after",
     runChecks: () => [
       {
-        command: "corepack pnpm run format:check",
+        command: "corepack pnpm run lint",
         ok: false,
-        output: "Formatting failed",
+        output: "Lint failed",
       },
     ],
   };

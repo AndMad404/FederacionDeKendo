@@ -95,3 +95,39 @@ SESSION_STATE:
     - architecture decision record comparing local state, URL state, Context, Zustand and Redux Toolkit
     - visual migration plan for semantic colors, reusable surface patterns, typography roles and interactive-control primitives
 ```
+
+## 2026-09-02 - Resolved completion-hook failures
+
+Baseline: `952d350bbf86` with a dirty worktree containing pre-existing,
+unrelated changes.
+
+Verification: `corepack pnpm run format:check` exited 0 on 2026-09-02 and
+reported that all matched files use Prettier code style.
+
+### HOOK-20260825230658033
+
+- Recorded at: `2026-08-25T23:06:58.033Z`
+- Session: `01a03b08-fdc0-7a83-a94c-557183c9b458`
+- Event: `Stop`
+- Previous status: `needs_human_review`
+- Problem: Completion quality gate still failed after one continuation.
+- Original evidence: `corepack pnpm run format:check` exited non-zero.
+- Resolution: The previously failing formatting gate now passes across the
+  repository. The historical event remains preserved here, while it is no
+  longer an unresolved hook failure.
+- Resolution ref: `952d350bbf86` dirty worktree;
+  `corepack pnpm run format:check` exit 0 on 2026-09-02.
+
+### HOOK-20260826015046998
+
+- Recorded at: `2026-08-26T01:50:46.998Z`
+- Session: `01a03b08-fdc0-7a83-a94c-557183c9b458`
+- Event: `Stop`
+- Previous status: `needs_human_review`
+- Problem: Completion quality gate still failed after one continuation.
+- Original evidence: `corepack pnpm run format:check` exited non-zero.
+- Resolution: The previously failing formatting gate now passes across the
+  repository. The historical event remains preserved here, while it is no
+  longer an unresolved hook failure.
+- Resolution ref: `952d350bbf86` dirty worktree;
+  `corepack pnpm run format:check` exit 0 on 2026-09-02.

@@ -7,7 +7,7 @@ evidence remain in the history files and are loaded only when required.
 ```json
 {
   "schemaVersion": 4,
-  "lastUpdated": "2026-08-26",
+  "lastUpdated": "2026-09-02",
   "contract": ".agents/review-contract.md",
   "historyIndex": ".codex/review-history.md",
   "historySnapshots": [
@@ -129,7 +129,9 @@ evidence remain in the history files and are loaded only when required.
     {"recordKey":"RES-20260823-L3979","id":"STR-ARCH-017","target":"src/app/utils/calendarEvents.ts:20-58","summary":"Event start and end instants are constructed in the...","resolutionRef":"worktree","historyFile":".codex/review-history-2026-08-23.md"},
     {"recordKey":"RES-20260823-L4002","id":"SMELL-ARCH-012","target":"src/app/utils/localizedEvents.ts:13-23","summary":"Title translations use sequential exact string replacements...","resolutionRef":"worktree","historyFile":".codex/review-history-2026-08-23.md"},
     {"recordKey":"RES-20260823-L4019","id":"STR-ARCH-018","target":"src/app/utils/localizedEvents.ts:21-22","summary":"The ordinal title rule maps only 3 to rd and maps 1 and 2 to...","resolutionRef":"worktree","historyFile":".codex/review-history-2026-08-23.md"},
-    {"recordKey":"RES-20260823-L4065","id":"SMELL-ARCH-013","target":"src/app/utils/calendarDate.js","summary":"Calendar-day addition and chronological sorting had...","resolutionRef":null,"historyFile":".codex/review-history-2026-08-23.md"}
+    {"recordKey":"RES-20260823-L4065","id":"SMELL-ARCH-013","target":"src/app/utils/calendarDate.js","summary":"Calendar-day addition and chronological sorting had...","resolutionRef":null,"historyFile":".codex/review-history-2026-08-23.md"},
+    {"recordKey":"RES-20260902-HOOK0001","id":"HOOK-20260825230658033","target":".codex completion quality gate (Stop event)","summary":"The previously failing repository formatting gate now passes.","resolutionRef":"952d350bbf86 dirty worktree; corepack pnpm run format:check exit 0 on 2026-09-02","historyFile":".codex/review-history.md"},
+    {"recordKey":"RES-20260902-HOOK0002","id":"HOOK-20260826015046998","target":".codex completion quality gate (Stop event)","summary":"The previously failing repository formatting gate now passes.","resolutionRef":"952d350bbf86 dirty worktree; corepack pnpm run format:check exit 0 on 2026-09-02","historyFile":".codex/review-history.md"}
   ],
   "pendingReviews": [
     {"id":"PEND-SEO-001","target":"Search Console, Rich Results, and field Core Web Vitals","dependency":"external Google property access"},
@@ -141,9 +143,6 @@ evidence remain in the history files and are loaded only when required.
     {"id":"PEND-ARCH-004","target":"expanded event editorial page","dependency":"approved content responsibilities"},
     {"id":"PEND-RESP-001","target":"exact tablet and mobile inner-viewport geometry","dependency":"reproducible native viewport evidence"}
   ],
-  "hookFailures": [
-    {"id":"HOOK-20260825230658033","recordedAt":"2026-08-25T23:06:58.033Z","sessionId":"01a03b08-fdc0-7a83-a94c-557183c9b458","event":"Stop","status":"needs_human_review","problem":"Completion quality gate still failed after one continuation.","evidence":"corepack pnpm run format:check: exit non-zero"},
-    {"id":"HOOK-20260826015046998","recordedAt":"2026-08-26T01:50:46.998Z","sessionId":"01a03b08-fdc0-7a83-a94c-557183c9b458","event":"Stop","status":"needs_human_review","problem":"Completion quality gate still failed after one continuation.","evidence":"corepack pnpm run format:check: exit non-zero"}
-  ]
+  "hookFailures": []
 }
 ```

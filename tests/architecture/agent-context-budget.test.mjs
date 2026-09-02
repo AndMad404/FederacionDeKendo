@@ -118,6 +118,26 @@ test("active review state is canonical and indexes every explicit resolution", (
     snapshotPath,
     "2026-08-23",
   );
+  expectedIndex.push(
+    {
+      recordKey: "RES-20260902-HOOK0001",
+      id: "HOOK-20260825230658033",
+      target: ".codex completion quality gate (Stop event)",
+      summary: "The previously failing repository formatting gate now passes.",
+      resolutionRef:
+        "952d350bbf86 dirty worktree; corepack pnpm run format:check exit 0 on 2026-09-02",
+      historyFile: ".codex/review-history.md",
+    },
+    {
+      recordKey: "RES-20260902-HOOK0002",
+      id: "HOOK-20260826015046998",
+      target: ".codex completion quality gate (Stop event)",
+      summary: "The previously failing repository formatting gate now passes.",
+      resolutionRef:
+        "952d350bbf86 dirty worktree; corepack pnpm run format:check exit 0 on 2026-09-02",
+      historyFile: ".codex/review-history.md",
+    },
+  );
   assert.equal(state.schemaVersion, 4);
   assert.equal(
     new Set(state.openFindings.map((entry) => entry.id)).size,

@@ -1,33 +1,4 @@
 {
-  "description": "Minimal project hooks for the Federacion-specific completion gate.",
-  "hooks": {
-    "SessionStart": [
-      {
-        "matcher": "startup|resume|clear|compact",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/session-start.mjs\"",
-            "commandWindows": "C:\\Progra~1\\nodejs\\node.exe .codex\\hooks\\session-start.mjs",
-            "timeout": 15,
-            "statusMessage": "Recording the Federacion quality baseline",
-            "additionalContextLimit": 300
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/stop-quality-gate.mjs\"",
-            "commandWindows": "C:\\Progra~1\\nodejs\\node.exe .codex\\hooks\\stop-quality-gate.mjs",
-            "timeout": 180,
-            "statusMessage": "Running the Federacion completion quality gate"
-          }
-        ]
-      }
-    ]
-  }
+  "description": "Lifecycle hooks are global; Federacion contributes only .codex/supervision.mjs.",
+  "hooks": {}
 }

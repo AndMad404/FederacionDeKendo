@@ -37,17 +37,20 @@ export function verificationSteps(unitScript = "test:unit") {
     throw new Error(`Unsupported unit script: ${unitScript}`);
   }
   return [
-    ["run", "lint"],
-    ["run", "format:check"],
-    ["run", "typecheck"],
-    ["run", "build"],
-    ["run", unitScript],
-    ["run", "test:generated"],
-    ["exec", "playwright", "install", "--with-deps", "chromium"],
-    ["exec", "playwright", "test", "tests/data"],
-    ["run", "test:behavior"],
-    ["run", "test:design"],
-    ["run", "format:check"],
+    ["pnpm", "run", "format:line-endings:check"],
+    ["pnpm", "run", "lint"],
+    ["pnpm", "run", "format:check"],
+    ["git", "diff", "--check"],
+    ["git", "diff", "--cached", "--check"],
+    ["pnpm", "run", "typecheck"],
+    ["pnpm", "run", "build"],
+    ["pnpm", "run", unitScript],
+    ["pnpm", "run", "test:generated"],
+    ["pnpm", "exec", "playwright", "install", "--with-deps", "chromium"],
+    ["pnpm", "exec", "playwright", "test", "tests/data"],
+    ["pnpm", "run", "test:behavior"],
+    ["pnpm", "run", "test:design"],
+    ["pnpm", "run", "format:check"],
   ];
 }
 
@@ -58,15 +61,16 @@ function parseUnitScript(args) {
   return args[index + 1];
 }
 
-function runStep(root, args) {
-  const command = `pnpm ${args.join(" ")}`;
+function runStep(root, [tool, ...args]) {
+  const command = `${tool} ${args.join(" ")}`;
   console.log(`\n> ${command}`);
-  const executable =
-    process.platform === "win32" ? (process.env.ComSpec ?? "cmd.exe") : "pnpm";
-  const executableArgs =
-    process.platform === "win32"
-      ? ["/d", "/s", "/c", "pnpm.cmd", ...args]
-      : args;
+  const usesWindowsPnpm = process.platform === "win32" && tool === "pnpm";
+  const executable = usesWindowsPnpm
+    ? (process.env.ComSpec ?? "cmd.exe")
+    : tool;
+  const executableArgs = usesWindowsPnpm
+    ? ["/d", "/s", "/c", "pnpm.cmd", ...args]
+    : args;
   const result = spawnSync(executable, executableArgs, {
     cwd: root,
     shell: false,
@@ -88,7 +92,7 @@ export function runVerification({
   let stepError;
 
   try {
-    for (const args of verificationSteps(unitScript)) executeStep(root, args);
+    for (const step of verificationSteps(unitScript)) executeStep(root, step);
   } catch (error) {
     stepError = error;
   }

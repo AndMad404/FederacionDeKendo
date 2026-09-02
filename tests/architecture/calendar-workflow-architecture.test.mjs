@@ -81,17 +81,20 @@ test("Phase 6: the shared gate and human CI coverage remain complete", async () 
 
   const { verificationSteps } = await import("../../scripts/verify-site.mjs");
   assert.deepEqual(verificationSteps(), [
-    ["run", "lint"],
-    ["run", "format:check"],
-    ["run", "typecheck"],
-    ["run", "build"],
-    ["run", "test:unit"],
-    ["run", "test:generated"],
-    ["exec", "playwright", "install", "--with-deps", "chromium"],
-    ["exec", "playwright", "test", "tests/data"],
-    ["run", "test:behavior"],
-    ["run", "test:design"],
-    ["run", "format:check"],
+    ["pnpm", "run", "format:line-endings:check"],
+    ["pnpm", "run", "lint"],
+    ["pnpm", "run", "format:check"],
+    ["git", "diff", "--check"],
+    ["git", "diff", "--cached", "--check"],
+    ["pnpm", "run", "typecheck"],
+    ["pnpm", "run", "build"],
+    ["pnpm", "run", "test:unit"],
+    ["pnpm", "run", "test:generated"],
+    ["pnpm", "exec", "playwright", "install", "--with-deps", "chromium"],
+    ["pnpm", "exec", "playwright", "test", "tests/data"],
+    ["pnpm", "run", "test:behavior"],
+    ["pnpm", "run", "test:design"],
+    ["pnpm", "run", "format:check"],
   ]);
   assert.throws(
     () => verificationSteps("arbitrary-command"),
