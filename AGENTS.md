@@ -92,7 +92,8 @@ the review decision first and then switch responsibility.
   `.agents/verification.md`.
 - [CTRL-FORMAT] After editing code or configuration, run
   `corepack pnpm run format`; LF and the repository's Prettier standard are
-  required. `corepack pnpm run lint` must also pass. Report skipped or
+  required. Run `corepack pnpm run lint:fix`; every remaining ESLint error must
+  be resolved. Report skipped or
   unavailable checks.
 - [CTRL-DEPLOY] Do not claim a deployed problem is fixed from local files
   alone.

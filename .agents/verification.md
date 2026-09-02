@@ -23,6 +23,12 @@ Playwright results, and verifies that tracked or unignored workspace content
 did not change during verification. Any edit after the gate starts invalidates
 all of its results; inspect the diff and rerun the complete gate.
 
+Local completion supervision runs `pnpm run format` and `pnpm run lint:fix`, so
+routine agent work is normalized automatically. The shared gate intentionally
+keeps `format:check` and `lint` because CI and release verification must detect
+drift without modifying the checkout. ESLint findings without an automatic fix
+remain blocking.
+
 ## Default Commands
 
 For TypeScript or React changes:

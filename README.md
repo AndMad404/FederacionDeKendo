@@ -52,6 +52,8 @@ Ejecuta cada script con `corepack pnpm run <nombre>`.
 | `check`             | Ejecuta todas las comprobaciones de calidad y pruebas no visuales.  |
 | `typecheck`         | Comprueba los tipos de TypeScript.                                  |
 | `lint`              | Ejecuta ESLint sin permitir advertencias.                           |
+| `lint:fix`          | Aplica las correcciones seguras disponibles de ESLint.              |
+| `format`            | Normaliza LF y aplica el formato canonico con Prettier.             |
 | `format:check`      | Comprueba el formato con Prettier.                                  |
 | `test:all`          | Ejecuta las suites de arquitectura, datos, comportamiento y diseno. |
 | `test:visual`       | Ejecuta las comparaciones visuales aprobadas en Windows.            |
@@ -79,10 +81,13 @@ desarrollo crea la aplicacion dentro de un contenedor vacio.
 Antes de proponer un cambio, ejecuta como minimo los controles rapidos:
 
 ```bash
+corepack pnpm run format
 corepack pnpm run typecheck
-corepack pnpm run lint
-corepack pnpm run format:check
+corepack pnpm run lint:fix
 ```
+
+El gate compartido conserva `format:check` y `lint` como comprobaciones no
+mutantes para CI y verificacion de entrega.
 
 Para comprobar la aplicacion completa:
 

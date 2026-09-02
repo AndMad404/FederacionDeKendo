@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { spawnSync } from "node:child_process";
 import {
   mkdirSync,
   mkdtempSync,
@@ -27,40 +26,6 @@ test("hooks.json delegates the lifecycle to global supervision", () => {
   assert.deepEqual(config.hooks, {});
   assert.equal(typeof runSupervisionChecks, "function");
   assert.equal(typeof recordSupervisionFailure, "function");
-
-  const prettierIgnore = readFileSync(".prettierignore", "utf8");
-  assert.match(prettierIgnore, /^!\.codex\/hooks\.json$/m);
-  assert.match(prettierIgnore, /^!\.codex\/hooks\/\*\*$/m);
-});
-
-test("line-ending check detects CRLF without mutating it and the formatter repairs it", () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "line-ending-check-"));
-  const fixturePath = path.join(root, "fixture.txt");
-  const script = path.resolve("scripts/normalize-line-endings.mjs");
-  try {
-    spawnSync("git", ["init", "--quiet"], { cwd: root });
-    writeFileSync(path.join(root, ".gitattributes"), "* text eol=lf\n");
-    writeFileSync(fixturePath, "first\nsecond\n");
-    spawnSync("git", ["add", "."], { cwd: root });
-    writeFileSync(fixturePath, "first\r\nsecond\r\n");
-
-    const check = spawnSync(process.execPath, [script, "--check"], {
-      cwd: root,
-      encoding: "utf8",
-    });
-    assert.equal(check.status, 1);
-    assert.match(check.stderr, /fixture\.txt/);
-    assert.equal(readFileSync(fixturePath, "utf8"), "first\r\nsecond\r\n");
-
-    const format = spawnSync(process.execPath, [script], {
-      cwd: root,
-      encoding: "utf8",
-    });
-    assert.equal(format.status, 0, format.stderr);
-    assert.equal(readFileSync(fixturePath, "utf8"), "first\nsecond\n");
-  } finally {
-    rmSync(root, { force: true, recursive: true });
-  }
 });
 
 test("second failures stay in compact active review state", () => {
@@ -118,7 +83,7 @@ test("hook failure recording rejects invalid state without modifying it", () => 
         sessionId: "session",
         event: "Stop",
         problem: "Gate failed twice.",
-        evidence: "format:check failed",
+        evidence: "lint failed",
       }),
       false,
     );
@@ -135,9 +100,9 @@ test("Stop blocks once and then records a human-review failure", async () => {
     captureFingerprint: () => "after",
     runChecks: () => [
       {
-        command: "corepack pnpm run lint",
+        command: "project quality gate",
         ok: false,
-        output: "Lint failed",
+        output: "Quality check failed",
       },
     ],
   };

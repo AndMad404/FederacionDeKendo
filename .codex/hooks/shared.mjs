@@ -147,7 +147,7 @@ function runCommand(command, args, cwd) {
 export function runCompletionChecks(root) {
   return [
     runCommand("corepack", ["pnpm", "run", "format"], root),
-    runCommand("corepack", ["pnpm", "run", "lint"], root),
+    runCommand("corepack", ["pnpm", "run", "lint:fix"], root),
     runCommand("git", ["diff", "--check"], root),
     runCommand("git", ["diff", "--cached", "--check"], root),
   ];

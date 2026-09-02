@@ -17,7 +17,7 @@ Use the repository's instructions as the source of truth; do not duplicate them 
    - verification: `.agents/verification.md`
 4. For a reusable owner prompt, select and adapt the smallest recipe in `.agents/prompt-recipes.md`.
 5. Preserve unrelated worktree changes. Do not make visual changes without explicit owner approval.
-6. Select the narrowest verification from `.agents/verification.md`. Always run `corepack pnpm run format:check` after edits to code or configuration.
+6. Select the narrowest verification from `.agents/verification.md`. Run `corepack pnpm run format` and `corepack pnpm run lint:fix` after edits to code or configuration; the repository completion hook also applies both automatically. Resolve every ESLint finding that cannot be fixed safely.
 
 ## CI and line endings
 
@@ -25,7 +25,7 @@ When a GitHub Actions, formatting, hook, or line-ending failure is reported:
 
 1. Read the failing step's complete output and reproduce that exact command before changing configuration.
 2. Use `git ls-files --eol` to distinguish index and worktree endings. The repository-wide canonical format is LF; do not add path-specific CRLF exceptions.
-3. Run `corepack pnpm run format:line-endings` for tracked CRLF files, then `corepack pnpm run format:check`. Do not suppress Git warnings or ignore end-of-line differences to hide an unresolved mismatch.
+3. Run `corepack pnpm run format`; it normalizes tracked line endings to LF before applying Prettier. Use `corepack pnpm run format:check` only when reproducing the non-mutating project or CI gate. Do not suppress Git warnings or ignore end-of-line differences to hide an unresolved mismatch.
 4. If a canonical document or immutable snapshot is byte-sensitive, update its serializer first. Recalculate its hash and references only with explicit owner authorization, then verify the content is still canonically serialized.
 5. Distinguish application failures from environment failures. Retry a required build with the necessary sandbox permission when local file access caused the failure; do not present that retry as a code fix.
 6. On Windows, verify hooks using their actual Node launcher. A `.cmd` shim may require `cmd.exe`; a manually successful PowerShell command does not prove the hook process can launch it.
