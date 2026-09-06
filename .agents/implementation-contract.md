@@ -93,7 +93,7 @@ apply instead of inventing values.
 
 ## Images
 
-- For gallery/image changes, inspect `src/app/data/gallery.ts`, image files under `public/images`, and the responsive-image script.
+- For gallery/image changes, inspect `src/app/data/gallery.ts` and the image files under `public/images`.
 - Keep `width`, `height`, `alt`, `srcSet`, and `sizes` aligned with the actual asset set.
 
 ## After Editing

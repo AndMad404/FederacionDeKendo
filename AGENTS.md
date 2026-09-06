@@ -27,20 +27,20 @@ Official federation website: React 18, TypeScript, Tailwind CSS 4, and Vite.
   screenshots, and renders as the baseline; isolate unrelated visual changes
   and block on every unexpected visual difference.
 - Runtime, tests, builds, workflows, and public operations must never depend on
-  private documentation in `../DesarrolloAsistidoIA/`.
+  private documentation or machine-local configuration.
 - Use ASCII in repository instructions unless the file requires otherwise.
 
 ## Task Router
+
+### Responsibility contracts
 
 Load only the contract for the active responsibility:
 
 - Review: `.agents/review-contract.md`
 - Implementation: `.agents/implementation-contract.md`
 - Verification selection: `.agents/verification.md`
-- Prompt generation: `.agents/prompt-recipes.md`
 - Unknown technical scope: `.agents/project-map.md`
-- Private documentation: start at
-  `../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/index.md`
+- Optional private context: `.agents/private-context.md`, when available.
 
 Do not preload these files together. If review leads to implementation, finish
 the review decision first and then switch responsibility.
@@ -54,24 +54,12 @@ the review decision first and then switch responsibility.
 - Resolve derivable ambiguity from the routed sources. Ask the owner only when
   a missing choice changes architecture, permissions, credentials, persistence,
   security, operations, notifications, business policy, or a contract.
-- Use the canonical roadmap recipe and its compactness and executability gate
-  in `.agents/prompt-recipes.md`; do not reconstruct persistent context inside a
-  generated prompt.
-- Use a fresh task only when the primary responsibility changes. A direct fix
-  to the current result remains in the same task. Hook events such as
-  `SessionStart` are automatic and must not become user tasks or messages.
 
-## Review State and Documentation
+## Contributions
 
-- `.codex/review-state.md` contains current technical state plus a compact
-  resolved-provenance index. Read it for review work, not ordinary
-  implementation.
-- `.codex/review-history.md` routes resolved or superseded provenance. Read a
-  history snapshot only when an active finding requires its origin or evidence.
-- After an owner-requested commit resolves a finding or records an approved
-  decision, follow the review contract and update only the canonical private
-  document selected by its index.
 - Follow `CONTRIBUTING.md` for requested commit messages.
+- Keep internal history, prompt recipes and personal methodology outside the
+  public repository. Optional private context never blocks public operations.
 
 ## Product Invariants
 

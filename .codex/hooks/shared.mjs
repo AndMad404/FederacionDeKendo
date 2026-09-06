@@ -154,9 +154,15 @@ export function runCompletionChecks(root) {
 }
 
 export function recordHookFailure(root, failure) {
-  const reviewStatePath = path.join(root, ".codex", "review-state.md");
-  if (!existsSync(reviewStatePath)) return false;
   try {
+    const locationFile = path.join(root, ".codex", "review-state-path.txt");
+    const configuredPath = existsSync(locationFile)
+      ? readFileSync(locationFile, "utf8").trim()
+      : "";
+    const reviewStatePath = configuredPath
+      ? path.resolve(root, configuredPath)
+      : path.join(root, ".codex", "review-state.md");
+    if (!existsSync(reviewStatePath)) return false;
     const timestamp = new Date().toISOString();
     updateReviewStateAtomically(reviewStatePath, (state) => {
       const baseId = `HOOK-${timestamp.replace(/\D/g, "")}`;

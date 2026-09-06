@@ -7,7 +7,7 @@ evidence remain in the history files and are loaded only when required.
 ```json
 {
   "schemaVersion": 4,
-  "lastUpdated": "2026-09-02",
+  "lastUpdated": "2026-09-06",
   "contract": ".agents/review-contract.md",
   "historyIndex": ".codex/review-history.md",
   "historySnapshots": [
@@ -143,6 +143,8 @@ evidence remain in the history files and are loaded only when required.
     {"id":"PEND-ARCH-004","target":"expanded event editorial page","dependency":"approved content responsibilities"},
     {"id":"PEND-RESP-001","target":"exact tablet and mobile inner-viewport geometry","dependency":"reproducible native viewport evidence"}
   ],
-  "hookFailures": []
+  "hookFailures": [
+    {"id":"HOOK-20260906064559885","recordedAt":"2026-09-06T06:45:59.885Z","sessionId":"01a07568-72c9-7380-ae5e-ca73625790f7","event":"Stop","status":"needs_human_review","problem":"Completion quality gate still failed after one continuation.","evidence":"C:\\Progra~1\\nodejs\\node.exe --test .codex/context-librarian/evaluations.test.mjs .codex/context-librarian/session-context.test.mjs .codex/indexation-librarian/context-scope-static-benchmark.test.mjs .codex/indexation-librarian/inventory-generator.test.mjs .codex/indexation-librarian/inventory-integrity.test.mjs .codex/indexation-librarian/stop-maintenance.test.mjs: Could not find '.codex/context-librarian/evaluations.test.mjs, .codex/context-librarian/session-context.test.mjs, .codex/indexation-librarian/context-scope-static-benchmark.test.mjs, .codex/indexation-librarian/inventory-generator.test.mjs, .codex/indexation-librarian/inventory-integrity.test.mjs, .codex/indexation-librarian/stop-maintenance.test.mjs'"}
+  ]
 }
 ```

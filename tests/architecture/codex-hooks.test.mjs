@@ -9,6 +9,7 @@ import {
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
+import { createReviewStateFixture } from "../fixtures/review-state.mjs";
 
 import { evaluateStop } from "../../.codex/hooks/stop-quality-gate.mjs";
 import { recordHookFailure } from "../../.codex/hooks/shared.mjs";
@@ -32,9 +33,7 @@ test("second failures stay in compact active review state", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "codex-hook-review-"));
   try {
     mkdirSync(path.join(root, ".codex"));
-    const fixture = parseReviewStateMarkdown(
-      readFileSync(".codex/review-state.md", "utf8"),
-    );
+    const fixture = createReviewStateFixture();
     fixture.hookFailures = [];
     writeFileSync(
       path.join(root, ".codex", "review-state.md"),

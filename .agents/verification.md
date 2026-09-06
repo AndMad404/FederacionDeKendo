@@ -44,11 +44,11 @@ For build-only/static output changes:
 pnpm run build
 ```
 
-For responsive image pipeline changes:
+After replacing responsive image assets:
 
 ```powershell
-pnpm run images:responsive
 pnpm run build
+pnpm run test:data:node
 ```
 
 ## SEO and Generated HTML Checks

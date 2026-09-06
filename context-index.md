@@ -45,15 +45,13 @@ it does not prove product behavior or replace the selected owner.
   sufficient.
 - **Next route:** Expand only when the selected gate requires it.
 
-## Private Federation documentation
+## Optional private context
 
-- **Canonical entry:**
-  `../DesarrolloAsistidoIA/projects/federacion-de-kendo/docs/index.md`
-- **Read when:** The request concerns private architecture notes, decisions,
-  roadmaps, methodology, or case-study documentation.
-- **Do not read when:** The request is ordinary product implementation with a
-  known technical route.
-- **Next route:** Let the private index select one owning document.
+- **Canonical entry:** `.agents/private-context.md`, if present locally.
+- **Read when:** The owner requests internal planning, review history or prompts.
+- **Do not read when:** Working on public build, tests, runtime or deployment.
+- **Next route:** Select only the linked private owner. Its absence does not
+  prevent public repository work.
 
 ## Mechanical exploration
 

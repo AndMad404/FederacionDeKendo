@@ -44,20 +44,19 @@ Vite mostrara en la terminal la direccion local de la aplicacion.
 
 Ejecuta cada script con `corepack pnpm run <nombre>`.
 
-| Script              | Proposito                                                           |
-| ------------------- | ------------------------------------------------------------------- |
-| `dev`               | Inicia el entorno de desarrollo.                                    |
-| `build`             | Genera el bundle, el render SSR y las paginas prerenderizadas.      |
-| `preview`           | Sirve localmente el build de produccion.                            |
-| `check`             | Ejecuta todas las comprobaciones de calidad y pruebas no visuales.  |
-| `typecheck`         | Comprueba los tipos de TypeScript.                                  |
-| `lint`              | Ejecuta ESLint sin permitir advertencias.                           |
-| `lint:fix`          | Aplica las correcciones seguras disponibles de ESLint.              |
-| `format`            | Normaliza LF y aplica el formato canonico con Prettier.             |
-| `format:check`      | Comprueba el formato con Prettier.                                  |
-| `test:all`          | Ejecuta las suites de arquitectura, datos, comportamiento y diseno. |
-| `test:visual`       | Ejecuta las comparaciones visuales aprobadas en Windows.            |
-| `images:responsive` | Regenera las variantes responsive y los hashes de las imagenes.     |
+| Script         | Proposito                                                           |
+| -------------- | ------------------------------------------------------------------- |
+| `dev`          | Inicia el entorno de desarrollo.                                    |
+| `build`        | Genera el bundle, el render SSR y las paginas prerenderizadas.      |
+| `preview`      | Sirve localmente el build de produccion.                            |
+| `check`        | Ejecuta todas las comprobaciones de calidad y pruebas no visuales.  |
+| `typecheck`    | Comprueba los tipos de TypeScript.                                  |
+| `lint`         | Ejecuta ESLint sin permitir advertencias.                           |
+| `lint:fix`     | Aplica las correcciones seguras disponibles de ESLint.              |
+| `format`       | Normaliza LF y aplica el formato canonico con Prettier.             |
+| `format:check` | Comprueba el formato con Prettier.                                  |
+| `test:all`     | Ejecuta las suites de arquitectura, datos, comportamiento y diseno. |
+| `test:visual`  | Ejecuta las comparaciones visuales aprobadas en Windows.            |
 
 La estrategia completa, los viewports cubiertos y el procedimiento para
 actualizar capturas estan documentados en [TESTING.md](TESTING.md).
@@ -113,7 +112,8 @@ Windows y el entorno Ubuntu de CI.
 - Los eventos se sincronizan mediante `corepack pnpm run sync:calendar` y los
   workflows de GitHub Actions.
 - Los datos de dojos viven en `src/app/data/dojos.ts`.
-- La galeria principal vive en `src/app/data/gallery.ts`.
+- La galeria principal vive en `src/app/data/gallery.ts` y usa los activos
+  versionados en `public/images/gallery/`.
 - Las galerias de eventos viven en `src/app/data/eventGalleries.ts`.
 
 Los cambios de rutas, SEO, calendario o imagenes deben verificarse tambien en

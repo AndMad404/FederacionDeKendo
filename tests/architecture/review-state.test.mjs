@@ -11,7 +11,7 @@ import {
   validateReviewState,
 } from "../../.codex/review-state.mjs";
 
-const canonical = readFileSync(".codex/review-state.md", "utf8");
+import { reviewStateMarkdown as canonical } from "../fixtures/review-state.mjs";
 
 function copyState() {
   return structuredClone(parseReviewStateMarkdown(canonical));
@@ -60,20 +60,20 @@ test("schema rejects duplicate active and resolved record identities", () => {
 test("schema requires explicit declarations for historical and reopened collisions", () => {
   const undeclaredHistorical = copyState();
   undeclaredHistorical.idConflicts = undeclaredHistorical.idConflicts.filter(
-    (entry) => entry.sourceId !== "CRIT-ARCH-001",
+    (entry) => entry.sourceId !== "EXAMPLE-DUPLICATE",
   );
   assert.throws(
     () => validateReviewState(undeclaredHistorical),
-    /duplicate resolved id CRIT-ARCH-001/,
+    /duplicate resolved id EXAMPLE-DUPLICATE/,
   );
 
   const undeclaredReopen = copyState();
   undeclaredReopen.idConflicts = undeclaredReopen.idConflicts.filter(
-    (entry) => entry.sourceId !== "DOC-ARCH-003",
+    (entry) => entry.sourceId !== "EXAMPLE-REOPENED",
   );
   assert.throws(
     () => validateReviewState(undeclaredReopen),
-    /open and resolved id DOC-ARCH-003/,
+    /open and resolved id EXAMPLE-REOPENED/,
   );
 });
 

@@ -39,6 +39,15 @@ tmp/
 # Local development context inventory
 context-library/
 
+# Private documentation and machine-local routing
+.agents/private-context.md
+.agents/prompt-recipes.md
+.codex/review-state-path.txt
+.codex/review-state.md
+.codex/review-history*.md
+skills/federacion-workflow/
+roadmap.md
+
 # Static hosting / deploy
 .vercel/
 .netlify/
