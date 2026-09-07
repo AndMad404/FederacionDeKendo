@@ -44,7 +44,7 @@ const TEXT_EXTENSIONS = new Set([
   ".yml",
 ]);
 const PRIVATE_MARKERS = [
-  "DesarrolloAsistidoIA",
+  "Prometheus",
   "Prometheus",
   "federacion-workflow",
   "context-librarian",
