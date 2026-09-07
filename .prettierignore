@@ -19,13 +19,5 @@ src/app/data/calendarEvents.ts
 src/app/data/eventGalleries.ts
 src/app/data/eventGalleryState.json
 
-# Local and tool-managed state
+# Local state
 local/
-.agents/
-.codex/*
-!.codex/hooks.json
-!.codex/hooks/
-!.codex/hooks/**
-!.codex/review-state.mjs
-.codex-remote-attachments/
-AGENTS.md

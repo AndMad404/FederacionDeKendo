@@ -1,4 +1,0 @@
-{
-  "description": "Lifecycle hooks are global; Federacion contributes only .codex/supervision.mjs.",
-  "hooks": {}
-}

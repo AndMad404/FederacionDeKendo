@@ -33,20 +33,8 @@ vitest-report/
 # Temporary PDF generation and browser captures
 tmp/
 
-# Codex local attachments
+# Codex app attachments remain machine-local and unversioned.
 .codex-remote-attachments/
-
-# Local development context inventory
-context-library/
-
-# Private documentation and machine-local routing
-.agents/private-context.md
-.agents/prompt-recipes.md
-.codex/review-state-path.txt
-.codex/review-state.md
-.codex/review-history*.md
-skills/federacion-workflow/
-roadmap.md
 
 # Static hosting / deploy
 .vercel/

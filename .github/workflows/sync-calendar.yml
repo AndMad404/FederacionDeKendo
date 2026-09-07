@@ -65,7 +65,7 @@ jobs:
           CALENDAR_NOTIFICATIONS_REPORT_PATH: ${{ runner.temp }}/calendar-notifications.json
           CALENDAR_NOTIFICATION_EMAIL_PATH: ${{ runner.temp }}/calendar-notification-email.txt
           CALENDAR_ALERT_SMTP_USERNAME: ${{ secrets.CALENDAR_ALERT_SMTP_USERNAME }}
-          CALENDAR_ALERT_RECIPIENT: andresgmr1@gmail.com
+          CALENDAR_ALERT_RECIPIENT: ${{ secrets.CALENDAR_ALERT_RECIPIENT }}
 
       - name: Send calendar notification email
         if: ${{ always() && steps.calendar_notification_email.outputs.send == 'true' }}
@@ -77,7 +77,7 @@ jobs:
         env:
           CALENDAR_ALERT_SMTP_USERNAME: ${{ secrets.CALENDAR_ALERT_SMTP_USERNAME }}
           CALENDAR_ALERT_SMTP_APP_PASSWORD: ${{ secrets.CALENDAR_ALERT_SMTP_APP_PASSWORD }}
-          CALENDAR_ALERT_RECIPIENT: andresgmr1@gmail.com
+          CALENDAR_ALERT_RECIPIENT: ${{ secrets.CALENDAR_ALERT_RECIPIENT }}
           CALENDAR_NOTIFICATION_EMAIL_PATH: ${{ runner.temp }}/calendar-notification-email.txt
 
       - name: Upload calendar notification reports

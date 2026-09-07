@@ -17,7 +17,6 @@
     "check": "pnpm run typecheck && pnpm run lint && pnpm run format:check && pnpm run test:all",
     "preview": "vite preview",
     "test:architecture": "node --test tests/architecture/*.test.mjs",
-    "test:codex-hooks": "node --test tests/architecture/codex-hooks.test.mjs",
     "test:data:node": "node --test tests/data/*.test.mjs",
     "test:data": "pnpm run test:data:node && playwright test tests/data",
     "test:behavior": "playwright test tests/behavior",

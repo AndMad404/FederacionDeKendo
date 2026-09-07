@@ -129,7 +129,7 @@ redondeos de subpixel. Los valores CSS aprobados siguen siendo explicitos.
 - `tests/design/`: medidas, responsive, controles tactiles y capturas manuales.
 - `playwright.config.ts`: suite predeterminada de CI.
 - `playwright.visual.config.ts`: suite visual de Windows.
-- `.agents/verification.md`: criterios de verificacion para implementaciones.
+- `scripts/verify-site.mjs`: gate completo y no mutante de entrega.
 
 Las pruebas de tooling usan datos ficticios versionados en `tests/fixtures/`.
 No leen historial de revisiones ni documentos privados. Los requisitos de
