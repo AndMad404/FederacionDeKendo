@@ -61,7 +61,7 @@ jobs:
       - name: Verify generated site
         uses: ./.github/actions/verify-site
         with:
-          unit-command: pnpm run test:unit:without-sync
+          unit-script: test:unit:without-sync
       - name: Commit recorded decision
         run: |
           git add src/app/data/calendarEventRegistry.json src/app/data/calendarEvents.ts

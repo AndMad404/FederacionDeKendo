@@ -593,7 +593,7 @@ export function mergeRegistry(
           JSON.stringify(currentEvent[field]),
       );
       if (matchesPublished) {
-        const { pendingRevision, ...restored } = published;
+        const { pendingRevision, editorialDecision, ...restored } = published;
         return { ...restored, editorialState: "publicado" };
       }
       return createPendingRevision(
@@ -626,7 +626,7 @@ export function mergeRegistry(
           : legacyCompatibleEvent;
       if (event.editorialState === "eliminado") return published;
       if (event.editorialState === "pendiente") return published;
-      return createPendingRevision(
+      const pending = createPendingRevision(
         published,
         undefined,
         event.historical === true || isArchiveEligible(event, now)
@@ -635,6 +635,14 @@ export function mergeRegistry(
         now,
         event.pendingRevision,
       );
+      if (
+        event.editorialDecision?.action === "reject_deletion" &&
+        event.editorialDecision.evidenceFingerprint ===
+          pending.pendingRevision.evidence.fingerprint
+      ) {
+        return published;
+      }
+      return pending;
     });
   const merged = [...reconciledCurrentEvents, ...retainedEvents];
   assertUniqueCurrentSlugs(merged);
@@ -712,9 +720,14 @@ function createPendingRevision(
   now = new Date(),
   previousRevision,
 ) {
+  const published = Object.fromEntries(
+    Object.entries(publishedEvent).filter(
+      ([field]) => !["pendingRevision", "editorialDecision"].includes(field),
+    ),
+  );
   const id = editorialRevisionId(proposedEvent, reason);
   const observedAt = now.toISOString();
-  const published = evidenceSnapshot(publishedEvent);
+  const publishedEvidence = evidenceSnapshot(published);
   const proposed = evidenceSnapshot(proposedEvent);
   const firstDetectedAt =
     previousRevision?.id === id
@@ -732,7 +745,7 @@ function createPendingRevision(
     lastObservedAt: observedAt,
     missingAt,
     lastReceived,
-    published,
+    published: publishedEvidence,
   };
   const fingerprint = fingerprintEditorialEvidence({
     sourceId: evidence.sourceId,
@@ -741,8 +754,11 @@ function createPendingRevision(
     published: evidence.published,
     proposed: evidence.lastReceived,
   });
+  if (previousRevision?.evidence?.fingerprint === fingerprint) {
+    return publishedEvent;
+  }
   return {
-    ...publishedEvent,
+    ...published,
     editorialState: "pendiente",
     pendingRevision: {
       id,

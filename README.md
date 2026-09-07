@@ -44,18 +44,22 @@ Vite mostrara en la terminal la direccion local de la aplicacion.
 
 Ejecuta cada script con `corepack pnpm run <nombre>`.
 
-| Script              | Proposito                                                           |
-| ------------------- | ------------------------------------------------------------------- |
-| `dev`               | Inicia el entorno de desarrollo.                                    |
-| `build`             | Genera el bundle, el render SSR y las paginas prerenderizadas.      |
-| `preview`           | Sirve localmente el build de produccion.                            |
-| `check`             | Ejecuta todas las comprobaciones de calidad y pruebas no visuales.  |
-| `typecheck`         | Comprueba los tipos de TypeScript.                                  |
-| `lint`              | Ejecuta ESLint sin permitir advertencias.                           |
-| `format:check`      | Comprueba el formato con Prettier.                                  |
-| `test:all`          | Ejecuta las suites de arquitectura, datos, comportamiento y diseno. |
-| `test:visual`       | Ejecuta las comparaciones visuales aprobadas en Windows.            |
-| `images:responsive` | Regenera las variantes responsive y los hashes de las imagenes.     |
+| Script                      | Proposito                                                               |
+| --------------------------- | ----------------------------------------------------------------------- |
+| `dev`                       | Inicia el entorno de desarrollo.                                        |
+| `build`                     | Genera el bundle, el render SSR y las paginas prerenderizadas.          |
+| `preview`                   | Sirve localmente el build de produccion.                                |
+| `check`                     | Ejecuta tipos, lint, formato y todas las suites no visuales.            |
+| `verify:site`               | Ejecuta el gate completo, no mutante, usado para verificar una entrega. |
+| `typecheck`                 | Comprueba los tipos de TypeScript.                                      |
+| `lint`                      | Ejecuta ESLint sin permitir advertencias.                               |
+| `lint:fix`                  | Aplica las correcciones seguras disponibles de ESLint.                  |
+| `format`                    | Normaliza LF y aplica el formato canonico con Prettier.                 |
+| `format:check`              | Comprueba el formato con Prettier.                                      |
+| `format:line-endings:check` | Comprueba los finales de linea sin modificar archivos.                  |
+| `test:unit`                 | Ejecuta los contratos de arquitectura y datos basados en Node.js.       |
+| `test:all`                  | Ejecuta las suites de arquitectura, datos, comportamiento y diseno.     |
+| `test:visual`               | Ejecuta por separado las comparaciones visuales aprobadas en Windows.   |
 
 La estrategia completa, los viewports cubiertos y el procedimiento para
 actualizar capturas estan documentados en [TESTING.md](TESTING.md).
@@ -76,20 +80,30 @@ desarrollo crea la aplicacion dentro de un contenedor vacio.
 
 ## Pruebas y calidad
 
-Antes de proponer un cambio, ejecuta como minimo los controles rapidos:
+Durante el desarrollo, ejecuta como minimo los controles rapidos y no
+mutantes:
 
 ```bash
-corepack pnpm run typecheck
-corepack pnpm run lint
+corepack pnpm run format:line-endings:check
 corepack pnpm run format:check
+corepack pnpm run lint
+corepack pnpm run typecheck
 ```
 
-Para comprobar la aplicacion completa:
+Usa `format` y `lint:fix` cuando quieras aplicar correcciones locales. El
+repositorio no instala hooks de Git: la verificacion se concentra en scripts
+reproducibles y en CI.
+
+Antes de entregar un cambio, ejecuta el gate completo:
 
 ```bash
-corepack pnpm run build
-corepack pnpm run check
+corepack pnpm run verify:site
 ```
+
+Este comando comprueba finales de linea, lint, formato, diffs, tipos, build,
+pruebas unitarias, HTML generado y suites de Playwright. Tambien verifica que
+el proceso no haya modificado el workspace. La instalacion de Chromium y sus
+dependencias forma parte del gate y puede requerir acceso a la red.
 
 Las pruebas se dividen por responsabilidad:
 
@@ -108,7 +122,8 @@ Windows y el entorno Ubuntu de CI.
 - Los eventos se sincronizan mediante `corepack pnpm run sync:calendar` y los
   workflows de GitHub Actions.
 - Los datos de dojos viven en `src/app/data/dojos.ts`.
-- La galeria principal vive en `src/app/data/gallery.ts`.
+- La galeria principal vive en `src/app/data/gallery.ts` y usa los activos
+  versionados en `public/images/gallery/`.
 - Las galerias de eventos viven en `src/app/data/eventGalleries.ts`.
 
 Los cambios de rutas, SEO, calendario o imagenes deben verificarse tambien en
@@ -116,7 +131,6 @@ el HTML generado por el build.
 
 ## Contribuciones
 
-Consulta [CONTRIBUTING.md](CONTRIBUTING.md) para conocer los controles de
-pre-commit y la convencion de mensajes de commit. No se requiere un archivo de
-variables de entorno para ejecutar el sitio localmente con los datos
-versionados.
+Consulta [CONTRIBUTING.md](CONTRIBUTING.md) para conocer la convencion de
+mensajes de commit. No se requiere un archivo de variables de entorno para
+ejecutar el sitio localmente con los datos versionados.

@@ -21,7 +21,7 @@ import {
 import { MediaPageBanner } from "./ui/MediaPageBanner";
 import { useLanguage } from "../config/i18n";
 import { getLocalizedEvents } from "../utils/localizedEvents";
-import { useHydratedNow } from "../hooks/useHydratedNow";
+import { useHydratedNow, useIsHydrated } from "../hooks/useHydratedNow";
 import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
 import { EventSummary } from "./EventSummary";
 import { EventSectionNavigation } from "./events/EventSectionNavigation";
@@ -31,6 +31,7 @@ export function PastEventsSection() {
   const { language, copy } = useLanguage();
   const { pathname, search } = useLocation();
   const navigate = useNavigate();
+  const isHydrated = useIsHydrated();
   const now = useHydratedNow();
   const requestedPage = getArchivePageFromPathname(pathname) ?? 1;
   const historicalEvents = now ? getPastEvents(now) : [];
@@ -75,6 +76,7 @@ export function PastEventsSection() {
   return (
     <section
       aria-labelledby="past-events-title"
+      data-interactive-ready={isHydrated ? "past-events" : undefined}
       className="relative my-2 flex w-full flex-col overflow-hidden rounded-xl bg-site-canvas tall-md:h-[calc(100%_-_1rem)] tall-md:min-h-0"
     >
       <MediaPageBanner

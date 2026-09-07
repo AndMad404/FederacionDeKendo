@@ -1,4 +1,5 @@
 import { expect, test, type Locator } from "@playwright/test";
+import { expectInteractiveReady } from "../helpers/interactive-ready";
 
 const ARCHIVE_TIME = new Date("2028-01-01T12:00:00-06:00");
 
@@ -132,6 +133,7 @@ test("preserves filters in pagination and resets to page one when changed", asyn
   page,
 }) => {
   await page.goto("/eventos/pasados/?type=examen");
+  await expectInteractiveReady(page, "past-events");
   const next = page.getByRole("button", { name: "Siguiente" });
   await expect(next).toBeVisible();
   await expect(next).toBeEnabled();
@@ -145,6 +147,7 @@ test("preserves filters in pagination and resets to page one when changed", asyn
   await expect(page).toHaveURL(/eventos\/pasados\/\?type=examen$/);
 
   await page.goto("/en/events/past/?type=examen");
+  await expectInteractiveReady(page, "past-events");
   const englishNext = page.getByRole("button", { name: "Next" });
   await expect(englishNext).toBeEnabled();
   await englishNext.click();
@@ -152,6 +155,7 @@ test("preserves filters in pagination and resets to page one when changed", asyn
   await expect(page.getByRole("button", { name: "Previous" })).toBeEnabled();
 
   await page.goto("/eventos/pasados/?type=examen");
+  await expectInteractiveReady(page, "past-events");
   await expect(page.getByRole("button", { name: "Siguiente" })).toBeEnabled();
   await page
     .getByRole("combobox", { name: "Año", exact: true })

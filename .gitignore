@@ -33,7 +33,7 @@ vitest-report/
 # Temporary PDF generation and browser captures
 tmp/
 
-# Codex local attachments
+# Codex app attachments remain machine-local and unversioned.
 .codex-remote-attachments/
 
 # Static hosting / deploy

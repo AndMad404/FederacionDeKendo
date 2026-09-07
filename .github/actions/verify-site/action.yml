@@ -2,41 +2,14 @@ name: Verify site
 description: Run the shared site verification gate on the current workspace.
 
 inputs:
-  unit-command:
-    description: Command for the unit-test portion of this gate.
+  unit-script:
+    description: Approved package script for the unit-test portion of this gate.
     required: false
-    default: pnpm run test:unit
+    default: test:unit
 
 runs:
   using: composite
   steps:
-    - name: Lint
+    - name: Run immutable site verification gate
       shell: bash
-      run: pnpm run lint
-    - name: Check formatting
-      shell: bash
-      run: pnpm run format:check
-    - name: Typecheck
-      shell: bash
-      run: pnpm run typecheck
-    - name: Build
-      shell: bash
-      run: pnpm run build
-    - name: Architecture and Node data tests
-      shell: bash
-      run: ${{ inputs.unit-command }}
-    - name: Generated output tests
-      shell: bash
-      run: pnpm run test:generated
-    - name: Install Playwright Chromium
-      shell: bash
-      run: pnpm exec playwright install --with-deps chromium
-    - name: Data browser tests
-      shell: bash
-      run: pnpm exec playwright test tests/data
-    - name: Behavior tests
-      shell: bash
-      run: pnpm run test:behavior
-    - name: Design contract tests
-      shell: bash
-      run: pnpm run test:design
+      run: pnpm run verify:site -- --unit-script "${{ inputs.unit-script }}"

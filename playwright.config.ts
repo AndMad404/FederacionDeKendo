@@ -5,8 +5,9 @@ export default defineConfig({
   testIgnore: ["**/*.test.mjs", "**/visual-regression.spec.ts"],
   snapshotPathTemplate: "{testDir}/{testFilePath}-snapshots/{arg}{ext}",
   fullyParallel: true,
+  failOnFlakyTests: true,
   forbidOnly: Boolean(process.env.CI),
-  retries: process.env.CI ? 2 : 0,
+  retries: 2,
   reporter: process.env.CI ? "github" : "list",
   expect: {
     toHaveScreenshot: {

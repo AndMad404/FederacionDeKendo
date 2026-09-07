@@ -5,13 +5,13 @@ const subscribe = () => () => undefined;
 const getClientSnapshot = () => true;
 const getServerSnapshot = () => false;
 
+export function useIsHydrated(): boolean {
+  return useSyncExternalStore(subscribe, getClientSnapshot, getServerSnapshot);
+}
+
 export function useHydratedNow(): Date | undefined {
   const prerenderedAt = useContext(PrerenderedAtContext);
-  const hydrated = useSyncExternalStore(
-    subscribe,
-    getClientSnapshot,
-    getServerSnapshot,
-  );
+  const hydrated = useIsHydrated();
   const [now] = useState(() => new Date());
 
   return hydrated ? now : prerenderedAt ? new Date(prerenderedAt) : undefined;

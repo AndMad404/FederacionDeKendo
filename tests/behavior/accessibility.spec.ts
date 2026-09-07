@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { expectInteractiveReady } from "../helpers/interactive-ready";
 
 const FIXED_TEST_TIME = new Date("2026-08-12T12:00:00-06:00");
 const REPRESENTATIVE_ROUTES = [
@@ -35,6 +36,7 @@ test("the open gallery lightbox has no detectable WCAG A or AA violations", asyn
 }) => {
   await page.clock.setFixedTime(FIXED_TEST_TIME);
   await page.goto("/galeria/");
+  await expectInteractiveReady(page, "gallery");
   await page.locator(".gallery-featured-frame > button").click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await expectNoAutomatedViolations(page);

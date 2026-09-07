@@ -75,21 +75,31 @@ test("Phase 6: the shared gate and human CI coverage remain complete", async () 
   const commands = actionSteps(action)
     .map((step) => step.run)
     .filter(Boolean);
-  for (const command of [
-    "pnpm run typecheck",
-    "pnpm run build",
-    "pnpm run test:generated",
-    "pnpm exec playwright test tests/data",
-    "pnpm exec playwright install --with-deps chromium",
-    "pnpm run test:behavior",
-    "pnpm run test:design",
-    "${{ inputs.unit-command }}",
-  ]) {
-    assert.ok(
-      commands.some((run) => run.includes(command)),
-      `Missing ${command}`,
-    );
-  }
+  assert.equal(commands.length, 1);
+  assert.match(commands[0], /pnpm run verify:site/);
+  assert.match(commands[0], /inputs\.unit-script/);
+
+  const { verificationSteps } = await import("../../scripts/verify-site.mjs");
+  assert.deepEqual(verificationSteps(), [
+    ["pnpm", "run", "format:line-endings:check"],
+    ["pnpm", "run", "lint"],
+    ["pnpm", "run", "format:check"],
+    ["git", "diff", "--check"],
+    ["git", "diff", "--cached", "--check"],
+    ["pnpm", "run", "typecheck"],
+    ["pnpm", "run", "build"],
+    ["pnpm", "run", "test:unit"],
+    ["pnpm", "run", "test:generated"],
+    ["pnpm", "exec", "playwright", "install", "--with-deps", "chromium"],
+    ["pnpm", "exec", "playwright", "test", "tests/data"],
+    ["pnpm", "run", "test:behavior"],
+    ["pnpm", "run", "test:design"],
+    ["pnpm", "run", "format:check"],
+  ]);
+  assert.throws(
+    () => verificationSteps("arbitrary-command"),
+    /Unsupported unit script/,
+  );
 
   const ci = await loadYamlDocument(".github/workflows/ci.yml");
   assert.ok(Object.hasOwn(ci.on ?? {}, "push"));
