@@ -115,7 +115,7 @@ export function EventPage() {
                 <p className="text-sm font-bold uppercase tracking-wider text-site-accent">
                   {isPast ? copy.event.completed : copy.event.scheduled}
                 </p>
-                <dl className="grid gap-2 text-sm md:grid-cols-2">
+                <dl className="grid gap-2 text-sm land-sm:grid-cols-2 land-tall:grid-cols-2">
                   <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2">
                     <CalendarDays
                       className="row-span-2 size-5 shrink-0 text-site-accent-soft"
@@ -156,23 +156,26 @@ export function EventPage() {
                       )}
                     </dd>
                   </div>
+                  {!isPast ? (
+                    <div className="flex items-center justify-center land-sm:justify-start land-tall:justify-start">
+                      <dt className="sr-only">{copy.event.addToCalendar}</dt>
+                      <dd>
+                        <a
+                          href={getGoogleCalendarUrl(event)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`${secondaryButtonClass} ${focusRingClass}`}
+                        >
+                          <CalendarPlus
+                            className="mr-2 size-4"
+                            aria-hidden="true"
+                          />
+                          {copy.event.addToCalendar}
+                        </a>
+                      </dd>
+                    </div>
+                  ) : null}
                 </dl>
-                {!isPast ? (
-                  <div className="my-2.5 flex items-center justify-center md:my-0 md:justify-start land-sm:my-0 land-sm:justify-start">
-                    <a
-                      href={getGoogleCalendarUrl(event)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`${secondaryButtonClass} ${focusRingClass}`}
-                    >
-                      <CalendarPlus
-                        className="mr-2 size-4"
-                        aria-hidden="true"
-                      />
-                      {copy.event.addToCalendar}
-                    </a>
-                  </div>
-                ) : null}
 
                 <div className="grid gap-1">
                   <h2 className="font-bold">{copy.event.description}</h2>

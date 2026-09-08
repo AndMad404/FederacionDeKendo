@@ -63,6 +63,36 @@ test("scheduled event pages offer an add-to-calendar button", async ({
   expect(new URL(href!).searchParams.get("text")).toBe(title);
 });
 
+for (const viewport of [
+  { name: "mobile 360x800 portrait", width: 360, height: 800, columns: 1 },
+  { name: "mobile 390x844 portrait", width: 390, height: 844, columns: 1 },
+  { name: "tablet 768x1024 portrait", width: 768, height: 1024, columns: 1 },
+  { name: "desktop 1366x768 landscape", width: 1366, height: 768, columns: 2 },
+]) {
+  test(`scheduled event details use a ${viewport.columns}-column ${viewport.name} grid`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport);
+    const { path } = await discoverUpcomingEvent(page);
+    await page.goto(path);
+
+    const addToCalendar = page.getByRole("link", {
+      name: "Añade a tu calendario",
+    });
+    const details = addToCalendar.locator("xpath=ancestor::dl");
+    await expect(details).toHaveCount(1);
+    await expect(details.locator(":scope > div")).toHaveCount(4);
+    await expect
+      .poll(() =>
+        details.evaluate(
+          (element) =>
+            getComputedStyle(element).gridTemplateColumns.split(" ").length,
+        ),
+      )
+      .toBe(viewport.columns);
+  });
+}
+
 test("accepts only current canonical event routes", async ({ page }) => {
   await page.goto("/eventos/examen-2026-08-08/");
   await expect(page.getByText(/página que buscas no existe/i)).toBeVisible();
