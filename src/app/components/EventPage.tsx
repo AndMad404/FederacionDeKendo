@@ -157,9 +157,9 @@ export function EventPage() {
                     </dd>
                   </div>
                   {!isPast ? (
-                    <div className="flex items-center justify-center land-sm:justify-start land-tall:justify-start">
+                    <div>
                       <dt className="sr-only">{copy.event.addToCalendar}</dt>
-                      <dd>
+                      <dd className="my-2.5 flex items-center justify-center md:my-0 land-sm:my-0 land-sm:justify-start land-tall:justify-start">
                         <a
                           href={getGoogleCalendarUrl(event)}
                           target="_blank"
