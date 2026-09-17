@@ -36,6 +36,10 @@ tmp/
 # Codex app attachments remain machine-local and unversioned.
 .codex-remote-attachments/
 
+# Private assisted-development context remains machine-local and unversioned.
+/context-index.md
+/context-library/
+
 # Static hosting / deploy
 .vercel/
 .netlify/

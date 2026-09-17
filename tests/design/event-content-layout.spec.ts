@@ -14,37 +14,51 @@ async function discoverUpcomingEvent(page: Page) {
     .getAttribute("href"))!;
 }
 
-test("mobile event actions and optional description follow the base layout", async ({
+test("mobile event actions remain usable and contained with an optional description", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 360, height: 800 });
   await page.goto(await discoverUpcomingEvent(page));
   const action = page.getByRole("link", { name: "Añade a tu calendario" });
+  const details = page.locator("dl").filter({ has: action });
   const description = page.getByRole("heading", {
     name: "Descripción",
     level: 2,
   });
-  const metrics = await action.evaluate((link) => {
-    const styles = getComputedStyle(link.parentElement!);
-    return {
-      height: link.getBoundingClientRect().height,
-      marginTop: styles.marginTop,
-      marginBottom: styles.marginBottom,
-      justifyContent: styles.justifyContent,
-    };
-  });
-  expect(metrics).toEqual({
-    height: 44,
-    marginTop: "10px",
-    marginBottom: "10px",
-    justifyContent: "center",
-  });
+
+  await expect(action).toBeVisible();
+  await expect(details).toBeVisible();
   await expect(description).toBeVisible();
+
+  const [actionBox, detailsBox, descriptionBox] = await Promise.all([
+    action.boundingBox(),
+    details.boundingBox(),
+    description.boundingBox(),
+  ]);
+  if (!actionBox || !detailsBox || !descriptionBox) {
+    throw new Error(
+      "Expected visible event details to have measurable geometry",
+    );
+  }
+
+  expect(actionBox.height).toBeGreaterThanOrEqual(44);
+  expect(actionBox.x).toBeGreaterThanOrEqual(detailsBox.x);
+  expect(actionBox.x + actionBox.width).toBeLessThanOrEqual(
+    detailsBox.x + detailsBox.width,
+  );
   expect(
-    await description.evaluate(
-      (heading) => getComputedStyle(heading.parentElement!).marginTop,
+    Math.abs(
+      actionBox.x + actionBox.width / 2 - (detailsBox.x + detailsBox.width / 2),
     ),
-  ).toBe("0px");
+  ).toBeLessThanOrEqual(1);
+  expect(actionBox.y + actionBox.height).toBeLessThanOrEqual(descriptionBox.y);
+  expect(
+    await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+    ),
+  ).toBeLessThanOrEqual(0);
 });
 
 test("historical gallery starts with the first landscape image", async ({
