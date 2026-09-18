@@ -97,7 +97,7 @@ function buildDescription({
   });
 }
 
-test("assigns the Federation as organizer except for #EventoExterno descriptions", () => {
+test("assigns the Federation as organizer except for #EventoExterno events", () => {
   const organizationId = "https://fak-kendo.org/#organization";
 
   assert.deepEqual(

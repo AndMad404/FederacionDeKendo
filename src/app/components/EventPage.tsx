@@ -16,7 +16,7 @@ import {
   primaryButtonClass,
   secondaryButtonClass,
 } from "../styles/shared";
-import { isPastEvent } from "../utils/calendarEvents";
+import { isExternalEvent, isPastEvent } from "../utils/calendarEvents";
 import {
   formatEventTime,
   getEventDateLabel,
@@ -88,7 +88,11 @@ export function EventPage() {
         titleCasing="normal"
         allowTitleWrap
         adaptiveHeight
-        description={event.type ?? copy.event.defaultType}
+        description={
+          event.eventType
+            ? copy.archive.types[event.eventType]
+            : (event.type ?? copy.event.defaultType)
+        }
         image={{
           src: "/images/calendar/kendo-calendar-1600.webp",
           sources: [
@@ -188,7 +192,9 @@ export function EventPage() {
               <aside className="grid self-center gap-3 rounded-xl bg-site-media p-4 land-sm:gap-2">
                 {!isPast ? (
                   <p className="text-sm leading-relaxed">
-                    {copy.event.audienceNotice}
+                    {isExternalEvent(event)
+                      ? copy.event.externalAudienceNotice
+                      : copy.event.audienceNotice}
                   </p>
                 ) : null}
                 <div className="grid gap-2">

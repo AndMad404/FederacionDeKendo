@@ -8,6 +8,11 @@ export interface UpcomingEventGroup {
 }
 
 const DEFAULT_EVENT_TIME_ZONE = "America/Costa_Rica";
+const EXTERNAL_EVENT_MARKER = /(?:^|\s)#EventoExterno\b/iu;
+
+export function isExternalEvent(event: { summary?: string }) {
+  return EXTERNAL_EVENT_MARKER.test(event.summary ?? "");
+}
 
 function parseDateParts(date: string) {
   const [year, month, day] = date.split("-").map(Number);

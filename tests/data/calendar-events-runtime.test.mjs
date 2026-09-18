@@ -59,3 +59,15 @@ test("public history keeps its separate next-midnight boundary", async () => {
     true,
   );
 });
+
+test("identifies #EventoExterno markers in the event description", async () => {
+  const { isExternalEvent } = await loadSourceModule(
+    "/src/app/utils/calendarEvents.ts",
+  );
+
+  assert.equal(
+    isExternalEvent({ summary: "#EventoExterno Seminario de CLAK" }),
+    true,
+  );
+  assert.equal(isExternalEvent({ summary: "Seminario" }), false);
+});

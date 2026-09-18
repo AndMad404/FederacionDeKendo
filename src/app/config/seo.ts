@@ -1,6 +1,7 @@
 import seoData from "./seo-data.json";
 import { GALLERY_IMAGES, getGalleryImages } from "../data/gallery";
 import { CALENDAR_EVENTS } from "../data/calendarEvents";
+import { isExternalEvent } from "../utils/calendarEvents";
 import { EVENT_INDEXING_ENABLED, PAST_EVENTS_PAGE_SIZE } from "./events";
 import {
   findEventByPathname,
@@ -212,13 +213,11 @@ function normalizeDescription(text: string) {
 
 const EXPLICIT_FOREIGN_COUNTRY_PATTERN =
   /\b(?:alemania|argentina|australia|belice|belize|bolivia|brasil|brazil|canada|chile|china|colombia|corea|cuba|dominican republic|ecuador|el salvador|espana|estados unidos|francia|germany|guatemala|honduras|italia|italy|japan|japon|korea|mexico|nicaragua|panama|paraguay|peru|portugal|puerto rico|reino unido|republica dominicana|spain|taiwan|united kingdom|united states|uruguay|venezuela)\b/u;
-const EXTERNAL_EVENT_MARKER = /(?:^|\s)#EventoExterno\b/iu;
-
 export function getEventOrganizerReference(
   event: { summary?: string },
   organizationId: string,
 ) {
-  if (EXTERNAL_EVENT_MARKER.test(event.summary ?? "")) return undefined;
+  if (isExternalEvent(event)) return undefined;
 
   return { "@id": organizationId };
 }

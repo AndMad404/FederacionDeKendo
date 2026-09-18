@@ -18,6 +18,13 @@ Revisar en modo de solo lectura los avisos existentes de GitHub y Cloudflare.
 Presentar canal, destinatario y condiciones antes de modificar alertas.
 Se conserva la publicacion automatica; no se activa un gate de despliegue.
 
+## Decisiones cerradas
+
+- 2026-09-18: Las fichas de eventos vigentes informan acceso gratuito y
+  condiciones de participacion; si la descripcion contiene `#EventoExterno`,
+  derivan precios, requisitos e inscripcion a la organizacion externa. El aviso
+  no se muestra en eventos pasados.
+
 ## Separacion del tooling privado - 2026-09-06
 
 La instrumentacion asistida privada, sus contratos, estado, hooks, indices y
