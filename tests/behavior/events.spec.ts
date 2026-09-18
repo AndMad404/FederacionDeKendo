@@ -194,7 +194,9 @@ test("historical tournament details preserve complete information with its galle
   await page.goto(HISTORICAL_TOURNAMENT_PATH);
 
   await expect(page.getByText("Actividad finalizada")).toBeVisible();
-  await expect(page.getByText("3er Torneo", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "3er Torneo", exact: true }),
+  ).toBeVisible();
   await expect(
     page.getByText("Tamashii Martial Arts Pinares", { exact: false }),
   ).toBeVisible();

@@ -26,9 +26,11 @@ import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
 import { EventSummary } from "./EventSummary";
 import { EventSectionNavigation } from "./events/EventSectionNavigation";
 import { NavigationArrowButton } from "./ui/ModalControls";
+import { Breadcrumbs } from "./Breadcrumbs";
 
 export function PastEventsSection() {
   const { language, copy } = useLanguage();
+  const english = language === "en";
   const { pathname, search } = useLocation();
   const navigate = useNavigate();
   const isHydrated = useIsHydrated();
@@ -106,6 +108,31 @@ export function PastEventsSection() {
           className={`flex w-full touch-pan-y select-none flex-col justify-start gap-3 px-3 py-4 text-center sm:px-2 md:max-w-5xl md:gap-2 md:py-4 xl:min-h-[24.625rem] page-fit:py-[15px] land-sm:gap-2 land-sm:px-2 land-sm:py-2 ${panelSurfaceClass}`}
           {...swipeHandlers}
         >
+          <Breadcrumbs
+            ariaLabel={english ? "Breadcrumb" : "Migas de navegación"}
+            items={[
+              {
+                label: english ? "Home" : "Inicio",
+                to: english ? "/en/" : "/",
+              },
+              {
+                label: english ? "Events" : "Eventos",
+                to: english ? "/en/events/" : "/eventos/",
+              },
+              {
+                label: copy.archive.title,
+                ...(page > 1
+                  ? {
+                      to: english ? "/en/events/past/" : "/eventos/pasados/",
+                    }
+                  : {}),
+              },
+              ...(page > 1
+                ? [{ label: `${english ? "Page" : "Página"} ${page}` }]
+                : []),
+            ]}
+          />
+
           <EventSectionNavigation active="past" />
 
           <div className="grid w-full grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)_auto] items-end gap-2 md:mx-auto md:w-fit md:grid-cols-[auto_auto_auto_auto]">

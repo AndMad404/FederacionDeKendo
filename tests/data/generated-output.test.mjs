@@ -192,6 +192,36 @@ test("redirects legacy calendar and archived event URLs to their canonical route
   );
 });
 
+test("publishes visible and structured breadcrumbs on deep routes", async () => {
+  const pastEvent = await readDist(
+    "eventos/pasados/2026-08-08-examen/index.html",
+  );
+  const englishPastEvent = await readDist(
+    "en/events/past/2026-08-08-examen/index.html",
+  );
+  const archivePageTwo = await readDist("eventos/pasados/pagina/2/index.html");
+
+  assert.match(pastEvent, /aria-label="Migas de navegación"/);
+  assert.match(pastEvent, /href="\/eventos\/"/);
+  assert.match(pastEvent, /href="\/eventos\/pasados\/"/);
+  assert.match(pastEvent, /"@type":"BreadcrumbList"/);
+  assert.match(
+    pastEvent,
+    /"item":"https:\/\/fak-kendo\.org\/eventos\/pasados\/2026-08-08-examen\/"/,
+  );
+
+  assert.match(englishPastEvent, /aria-label="Breadcrumb"/);
+  assert.match(englishPastEvent, /href="\/en\/events\/"/);
+  assert.match(englishPastEvent, /href="\/en\/events\/past\/"/);
+  assert.match(englishPastEvent, /"name":"Past events"/);
+
+  assert.match(archivePageTwo, /aria-current="page"[^>]*>P\u00e1gina 2</);
+  assert.match(archivePageTwo, /"name":"Página 2"/);
+  assert.match(
+    archivePageTwo,
+    /"item":"https:\/\/fak-kendo\.org\/eventos\/pasados\/pagina\/2\/"/,
+  );
+});
 test("shares one deterministic prerender timestamp across generated routes", async () => {
   const home = await readDist("index.html");
   const archive = await readDist("eventos/pasados/index.html");
