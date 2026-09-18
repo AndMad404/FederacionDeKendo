@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "notifications": [
+    {
+      "id": "14482dd5dcd113db5eb54d53ba3c2a0e34fb89abd9c63b283213a4ae874f1b8a",
+      "kind": "revision_pendiente",
+      "identity": {
+        "slug": "2026-05-29-clak-seminario-instructores-chile",
+        "title": "CLAK Seminario Instructores CHILE",
+        "date": "2026-05-29"
+      },
+      "temporality": "historico",
+      "cause": "La fuente propone cambios a un evento historico publicado.",
+      "actionRequired": "Revisar las diferencias antes de cualquier correccion humana posterior.",
+      "before": {
+        "sourceId": "462f5f7da99a1d17474471bd",
+        "slug": "2026-05-29-clak-seminario-instructores-chile",
+        "archiveEligibleAt": "2026-06-02T06:00:00.000Z",
+        "title": "CLAK Seminario Instructores CHILE",
+        "date": "2026-05-29",
+        "endDate": "2026-06-01",
+        "eventType": "seminario",
+        "timeZone": "America/Costa_Rica",
+        "historical": true
+      },
+      "after": {
+        "sourceId": "462f5f7da99a1d17474471bd",
+        "slug": "2026-05-29-eventoexterno-clak-seminario-instructores-chile",
+        "archiveEligibleAt": "2026-06-02T06:00:00.000Z",
+        "title": "#EventoExterno CLAK Seminario Instructores CHILE",
+        "date": "2026-05-29",
+        "endDate": "2026-06-01",
+        "eventType": "seminario",
+        "timeZone": "America/Costa_Rica"
+      },
+      "execution": {
+        "origin": "github_actions",
+        "runId": "35373268453",
+        "attempt": "1",
+        "trigger": "workflow_dispatch"
+      },
+      "fingerprints": {
+        "revisionId": "6a4e3def05f968a4ab6cf53105181c6e8a3ece66a924940f21c3548d2f4318a7",
+        "evidenceFingerprint": "14482dd5dcd113db5eb54d53ba3c2a0e34fb89abd9c63b283213a4ae874f1b8a"
+      }
+    },
+    {
+      "id": "ed75f352536158f83222ddaefaf32e58e60c26d80d9b06344c3701f15947f775",
+      "kind": "verificacion_fallida",
+      "identity": null,
+      "temporality": "ejecucion_actual",
+      "cause": "Verification failed: post-sync verification.",
+      "actionRequired": "Corregir la verificacion fallida y reejecutar; no publicar ni aprobar cambios a partir de esta ejecucion.",
+      "before": null,
+      "after": null,
+      "execution": {
+        "origin": "github_actions",
+        "runId": "35373268453",
+        "attempt": "1",
+        "trigger": "workflow_dispatch"
+      },
+      "fingerprints": {
+        "revisionId": null,
+        "evidenceFingerprint": null,
+        "failureFingerprint": "ed75f352536158f83222ddaefaf32e58e60c26d80d9b06344c3701f15947f775"
+      }
+    }
+  ]
+}

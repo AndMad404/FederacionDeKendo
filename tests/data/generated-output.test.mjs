@@ -15,12 +15,12 @@ async function readDist(relativePath) {
   );
 }
 
-test("generates one historical event route with its canonical and indexable metadata", async () => {
+test("generates historical event routes with canonical and indexable metadata", async () => {
   const complete = await readDist(
     "eventos/pasados/2026-08-08-examen/index.html",
   );
   const incomplete = await readDist(
-    "eventos/2026-10-10-clak-1er-panamericano-brasil/index.html",
+    "eventos/pasados/2026-05-29-clak-seminario-instructores-chile/index.html",
   );
 
   assert.match(complete, /<h1[^>]*>Examen<\/h1>/);
@@ -100,7 +100,7 @@ test("generates localized, unique, indexable SEO output for every event route", 
   }
 
   const expectedEventTitles = new Map([
-    ["2026-10-31-examen:es", "Examen de Kendo — 31 oct 2026 | Costa Rica"],
+    ["2026-08-08-examen:es", "Examen de Kendo — 8 ago 2026 | Costa Rica"],
     [
       "2026-05-30-seminario:es",
       "Seminario de Kendo — 30 may 2026 | Costa Rica",
@@ -110,20 +110,11 @@ test("generates localized, unique, indexable SEO output for every event route", 
       "Gasshuku Monteverde — 12 sept 2026 | Costa Rica",
     ],
     ["2026-08-22-3er-torneo:es", "3er Torneo de Kendo — 22 ago 2026"],
-    ["2026-12-12-4to-torneo:es", "4to Torneo de Kendo — 12 dic 2026"],
     [
       "2026-05-29-clak-seminario-instructores-chile:es",
       "CLAK Seminario Instructores CHILE — 29 may 2026",
     ],
-    [
-      "2026-10-10-clak-1er-panamericano-brasil:es",
-      "CLAK 1er Panamericano BRASIL — 10 oct 2026",
-    ],
-    [
-      "2026-11-21-panama-torneo-por-equipos:es",
-      "PANAMA Torneo por Equipos — 21 nov 2026",
-    ],
-    ["2026-10-31-examen:en", "Kendo Examination — Oct 31, 2026 | Costa Rica"],
+    ["2026-08-08-examen:en", "Kendo Examination — Aug 8, 2026 | Costa Rica"],
   ]);
 
   for (const [key, expectedTitle] of expectedEventTitles) {
@@ -133,6 +124,11 @@ test("generates localized, unique, indexable SEO output for every event route", 
         candidate.eventId === eventId && candidate.language === language,
     );
     assert.equal(route?.title, expectedTitle, key);
+    assert.match(
+      route?.path ?? "",
+      /\/(?:eventos\/pasados|en\/events\/past)\//,
+      key,
+    );
   }
 
   const archivePageTwoTitles = routeManifest

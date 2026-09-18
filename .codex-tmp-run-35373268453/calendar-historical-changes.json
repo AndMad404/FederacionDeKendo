@@ -1,0 +1,32 @@
+{
+  "version": 2,
+  "historicalChanges": [
+    {
+      "sourceId": "462f5f7da99a1d17474471bd",
+      "publicIdentity": {
+        "slug": "2026-05-29-clak-seminario-instructores-chile",
+        "title": "CLAK Seminario Instructores CHILE",
+        "date": "2026-05-29"
+      },
+      "differences": [
+        {
+          "field": "slug",
+          "published": "2026-05-29-clak-seminario-instructores-chile",
+          "proposed": "2026-05-29-eventoexterno-clak-seminario-instructores-chile",
+          "type": "modificado"
+        },
+        {
+          "field": "title",
+          "published": "CLAK Seminario Instructores CHILE",
+          "proposed": "#EventoExterno CLAK Seminario Instructores CHILE",
+          "type": "modificado"
+        }
+      ],
+      "publishedFingerprint": "6ce7710b6fe1f68713e36865f96c371c838a0ac86826b603a4e7eea9898e63fd",
+      "proposalFingerprint": "25e929d4caa962749761a30c8d325291be1f8b2a0843a434e35fa6eb373bf580",
+      "revisionId": "6a4e3def05f968a4ab6cf53105181c6e8a3ece66a924940f21c3548d2f4318a7",
+      "evidenceFingerprint": "14482dd5dcd113db5eb54d53ba3c2a0e34fb89abd9c63b283213a4ae874f1b8a"
+    }
+  ],
+  "galleryChanges": []
+}
