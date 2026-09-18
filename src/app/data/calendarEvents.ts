@@ -67,6 +67,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: "2026-10-10-clak-1er-panamericano-brasil",
     archiveEligibleAt: "2026-10-13T06:00:00.000Z",
+    sourceUpdatedAt: "2026-05-18T19:19:09.000Z",
     title: "CLAK 1er Panamericano BRASIL",
     date: "2026-10-10",
     endDate: "2026-10-12",
@@ -76,6 +77,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: "2026-10-31-examen",
     archiveEligibleAt: "2026-11-02T06:00:00.000Z",
+    sourceUpdatedAt: "2026-07-24T17:14:09.000Z",
     title: "Examen",
     date: "2026-10-31",
     startTime: "13:00",
@@ -88,6 +90,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: "2026-11-21-panama-torneo-por-equipos",
     archiveEligibleAt: "2026-11-23T06:00:00.000Z",
+    sourceUpdatedAt: "2026-07-24T17:16:22.000Z",
     title: "PANAMA Torneo por Equipos",
     date: "2026-11-21",
     summary: "Torneo por Equipos en Panamá. Invitación de Shinsei Panamá.",
@@ -97,6 +100,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: "2026-12-12-4to-torneo",
     archiveEligibleAt: "2026-12-14T06:00:00.000Z",
+    sourceUpdatedAt: "2026-07-24T17:16:47.000Z",
     title: "4to Torneo",
     date: "2026-12-12",
     startTime: "13:00",
@@ -109,6 +113,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: "2027-01-30-examen",
     archiveEligibleAt: "2027-02-01T06:00:00.000Z",
+    sourceUpdatedAt: "2026-07-24T17:17:03.000Z",
     title: "Examen",
     date: "2027-01-30",
     startTime: "13:00",
@@ -121,6 +126,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: "2027-04-03-5to-torneo",
     archiveEligibleAt: "2027-04-05T06:00:00.000Z",
+    sourceUpdatedAt: "2026-07-24T17:17:23.000Z",
     title: "5to Torneo",
     date: "2027-04-03",
     startTime: "13:00",
@@ -133,6 +139,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: "2027-05-01-examen",
     archiveEligibleAt: "2027-05-03T06:00:00.000Z",
+    sourceUpdatedAt: "2026-07-24T17:17:56.000Z",
     title: "Examen",
     date: "2027-05-01",
     startTime: "13:00",
@@ -145,6 +152,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: "2027-07-31-examen",
     archiveEligibleAt: "2027-08-02T06:00:00.000Z",
+    sourceUpdatedAt: "2026-07-24T17:18:10.000Z",
     title: "Examen",
     date: "2027-07-31",
     startTime: "13:00",
@@ -157,6 +165,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: "2027-08-14-6to-torneo",
     archiveEligibleAt: "2027-08-16T06:00:00.000Z",
+    sourceUpdatedAt: "2026-07-24T17:18:28.000Z",
     title: "6to Torneo",
     date: "2027-08-14",
     startTime: "13:00",
@@ -169,6 +178,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: "2027-10-30-examen",
     archiveEligibleAt: "2027-11-01T06:00:00.000Z",
+    sourceUpdatedAt: "2026-07-24T17:18:42.000Z",
     title: "Examen",
     date: "2027-10-30",
     startTime: "13:00",
@@ -181,6 +191,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: "2027-12-11-7mo-torneo",
     archiveEligibleAt: "2027-12-13T06:00:00.000Z",
+    sourceUpdatedAt: "2026-07-24T17:19:00.000Z",
     title: "7mo Torneo",
     date: "2027-12-11",
     startTime: "13:00",
