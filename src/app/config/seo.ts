@@ -619,74 +619,6 @@ function getRouteImageMetadata() {
   };
 }
 
-function buildBreadcrumbStructuredData(
-  meta: RouteMeta,
-  canonicalUrl: string,
-): StructuredData | null {
-  const english = meta.language === "en";
-  const home = {
-    name: english ? "Home" : "Inicio",
-    path: english ? "/en/" : "/",
-  };
-  const events = {
-    name: english ? "Events" : "Eventos",
-    path: english ? "/en/events/" : "/eventos/",
-  };
-  const archive = {
-    name: english ? "Past events" : "Eventos pasados",
-    path: english ? "/en/events/past/" : "/eventos/pasados/",
-  };
-
-  let items: Array<{ name: string; path: string }> = [];
-
-  if (meta.component === "event" && meta.eventId) {
-    const event = CALENDAR_EVENTS.find(
-      (candidate) => candidate.id === meta.eventId,
-    );
-    const localizedEvent = event
-      ? getLocalizedEvent(event, meta.language)
-      : undefined;
-    if (!localizedEvent) return null;
-
-    const isPastRoute = meta.path.includes(
-      english ? "/en/events/past/" : "/eventos/pasados/",
-    );
-    items = [
-      home,
-      events,
-      ...(isPastRoute ? [archive] : []),
-      { name: localizedEvent.title, path: meta.path },
-    ];
-  } else if (meta.component === "pastEvents") {
-    const page = meta.archivePage ?? 1;
-    items = [
-      home,
-      events,
-      archive,
-      ...(page > 1
-        ? [
-            {
-              name: `${english ? "Page" : "Página"} ${page}`,
-              path: meta.path,
-            },
-          ]
-        : []),
-    ];
-  }
-
-  if (items.length < 2) return null;
-
-  return {
-    "@type": "BreadcrumbList",
-    "@id": `${canonicalUrl}#breadcrumb`,
-    itemListElement: items.map((item, index) => ({
-      "@type": "ListItem",
-      position: index + 1,
-      name: item.name,
-      item: absoluteUrl(item.path),
-    })),
-  };
-}
 function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
   if (meta.suppressStructuredData) return null;
 
@@ -708,7 +640,6 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
   }
 
   const image = getRouteImageMetadata();
-  const breadcrumbData = buildBreadcrumbStructuredData(meta, canonicalUrl);
   const routeEntities =
     ROUTE_STRUCTURED_DATA_BUILDERS[meta.component]?.(meta, canonicalUrl) ?? [];
   if (meta.component === "event" && meta.eventId) {
@@ -795,13 +726,6 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
         about: {
           "@id": organizationId,
         },
-        ...(breadcrumbData
-          ? {
-              breadcrumb: {
-                "@id": `${canonicalUrl}#breadcrumb`,
-              },
-            }
-          : {}),
         primaryImageOfPage: {
           "@type": "ImageObject",
           url: image.url,
@@ -813,7 +737,6 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
           ? { mainEntity: mainEntityReferences }
           : {}),
       },
-      ...(breadcrumbData ? [breadcrumbData] : []),
       ...routeEntities,
     ],
   };

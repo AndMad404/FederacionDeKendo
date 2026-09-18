@@ -29,7 +29,6 @@ import { MediaPageBanner } from "./ui/MediaPageBanner";
 import { HistoricalEventGallery } from "./HistoricalEventGallery";
 import { useHydratedNow } from "../hooks/useHydratedNow";
 import { EventSummary } from "./EventSummary";
-import { Breadcrumbs } from "./Breadcrumbs";
 
 const SOCIAL_PREVIEW_VERSION = "20260825";
 
@@ -108,28 +107,6 @@ export function EventPage() {
 
       <div className="relative z-20 -mt-11 grid w-full justify-items-stretch gap-3 px-3 pb-2.5 pt-3 sm:-mt-13 sm:px-4 sm:pb-2.5 sm:pt-4 tall-md:py-4 tall-md:pb-2.5 lg:px-0 land-sm:gap-2 land-sm:px-3 land-sm:pb-2.5 land-sm:pt-3 land-compact:-mt-8">
         <div className="mx-auto grid w-full max-w-5xl gap-3 land-sm:gap-2">
-          <Breadcrumbs
-            ariaLabel={english ? "Breadcrumb" : "Migas de navegación"}
-            items={[
-              {
-                label: english ? "Home" : "Inicio",
-                to: english ? "/en/" : "/",
-              },
-              {
-                label: english ? "Events" : "Eventos",
-                to: english ? "/en/events/" : "/eventos/",
-              },
-              ...(isPast
-                ? [
-                    {
-                      label: english ? "Past events" : "Eventos pasados",
-                      to: english ? "/en/events/past/" : "/eventos/pasados/",
-                    },
-                  ]
-                : []),
-              { label: event.title },
-            ]}
-          />
           <article
             className={`grid gap-3 px-5 py-3 md:px-5 md:py-3 land-sm:gap-2 land-sm:p-3 ${panelSurfaceClass}`}
           >

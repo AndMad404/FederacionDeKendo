@@ -198,6 +198,9 @@ test("historical tournament details preserve complete information with its galle
     page.getByRole("heading", { name: "3er Torneo", exact: true }),
   ).toBeVisible();
   await expect(
+    page.getByRole("navigation", { name: "Migas de navegación" }),
+  ).toHaveCount(0);
+  await expect(
     page.getByText("Tamashii Martial Arts Pinares", { exact: false }),
   ).toBeVisible();
   await expect(
