@@ -35,7 +35,8 @@ test("generates one historical event route with its canonical and indexable meta
 });
 
 test("generates localized, unique, indexable SEO output for every event route", async () => {
-  const eventRoutes = getRouteManifest().filter(
+  const routeManifest = getRouteManifest();
+  const eventRoutes = routeManifest.filter(
     (route) => route.component === "event",
   );
 
@@ -78,6 +79,74 @@ test("generates localized, unique, indexable SEO output for every event route", 
       .filter((route) => route.language === language)
       .map((route) => getRouteSeoPayload(route).title);
     assert.equal(new Set(titles).size, titles.length);
+  }
+
+  const expectedStaticTitles = new Map([
+    ["/", "Federación de Asociaciones de Kendo | Costa Rica"],
+    ["/eventos/", "Eventos de Kendo en Costa Rica"],
+    ["/galeria/", "Galería de Kendo | Costa Rica"],
+    ["/afiliados/", "Dojos de Kendo en Costa Rica"],
+    ["/eventos/pasados/", "Eventos pasados de Kendo | Costa Rica"],
+    ["/en/", "Federation of Kendo Associations | Costa Rica"],
+    ["/en/events/", "Kendo Events in Costa Rica"],
+    ["/en/gallery/", "Kendo Gallery | Costa Rica"],
+    ["/en/affiliates/", "Kendo Dojos in Costa Rica"],
+    ["/en/events/past/", "Past Kendo Events | Costa Rica"],
+  ]);
+
+  for (const [path, expectedTitle] of expectedStaticTitles) {
+    const route = routeManifest.find((candidate) => candidate.path === path);
+    assert.equal(route?.title, expectedTitle, path);
+  }
+
+  const expectedEventTitles = new Map([
+    ["2026-10-31-examen:es", "Examen de Kendo — 31 oct 2026 | Costa Rica"],
+    [
+      "2026-05-30-seminario:es",
+      "Seminario de Kendo — 30 may 2026 | Costa Rica",
+    ],
+    [
+      "2026-09-12-gasshuku-monteverde:es",
+      "Gasshuku Monteverde — 12 sept 2026 | Costa Rica",
+    ],
+    ["2026-08-22-3er-torneo:es", "3er Torneo de Kendo — 22 ago 2026"],
+    ["2026-12-12-4to-torneo:es", "4to Torneo de Kendo — 12 dic 2026"],
+    [
+      "2026-05-29-clak-seminario-instructores-chile:es",
+      "CLAK Seminario Instructores CHILE — 29 may 2026",
+    ],
+    [
+      "2026-10-10-clak-1er-panamericano-brasil:es",
+      "CLAK 1er Panamericano BRASIL — 10 oct 2026",
+    ],
+    [
+      "2026-11-21-panama-torneo-por-equipos:es",
+      "PANAMA Torneo por Equipos — 21 nov 2026",
+    ],
+    ["2026-10-31-examen:en", "Kendo Examination — Oct 31, 2026 | Costa Rica"],
+  ]);
+
+  for (const [key, expectedTitle] of expectedEventTitles) {
+    const [eventId, language] = key.split(":");
+    const route = eventRoutes.find(
+      (candidate) =>
+        candidate.eventId === eventId && candidate.language === language,
+    );
+    assert.equal(route?.title, expectedTitle, key);
+  }
+
+  const archivePageTwoTitles = routeManifest
+    .filter(
+      (route) => route.component === "pastEvents" && route.archivePage === 2,
+    )
+    .map((route) => route.title);
+  assert.deepEqual(archivePageTwoTitles, [
+    "Eventos pasados de Kendo — página 2 | Costa Rica",
+    "Past Kendo Events — page 2 | Costa Rica",
+  ]);
+
+  for (const route of routeManifest) {
+    assert.ok(route.title.length <= 60, `${route.path}: ${route.title}`);
   }
 });
 

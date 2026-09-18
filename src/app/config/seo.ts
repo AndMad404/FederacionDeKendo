@@ -210,6 +210,76 @@ function normalizeDescription(text: string) {
     .trim();
 }
 
+const EXPLICIT_FOREIGN_COUNTRY_PATTERN =
+  /\b(?:alemania|argentina|australia|belice|belize|bolivia|brasil|brazil|canada|chile|china|colombia|corea|cuba|dominican republic|ecuador|el salvador|espana|estados unidos|francia|germany|guatemala|honduras|italia|italy|japan|japon|korea|mexico|nicaragua|panama|paraguay|peru|portugal|puerto rico|reino unido|republica dominicana|spain|taiwan|united kingdom|united states|uruguay|venezuela)\b/u;
+
+interface EventSeoTitleInput {
+  event: (typeof CALENDAR_EVENTS)[number];
+  localizedEvent: (typeof CALENDAR_EVENTS)[number];
+  language: Language;
+}
+
+function hasExplicitInternationalLocation({
+  event,
+  localizedEvent,
+}: Pick<EventSeoTitleInput, "event" | "localizedEvent">) {
+  const locationEvidence = [
+    event.title,
+    localizedEvent.title,
+    event.location,
+    localizedEvent.location,
+    event.summary,
+    localizedEvent.summary,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLocaleLowerCase("en-US");
+
+  return EXPLICIT_FOREIGN_COUNTRY_PATTERN.test(locationEvidence);
+}
+
+function improveGenericEventTitle(title: string, language: Language) {
+  if (language === "en") {
+    if (/^Examination$/iu.test(title)) return "Kendo Examination";
+    if (/^Seminar$/iu.test(title)) return "Kendo Seminar";
+    return title.replace(
+      /^(\d+(?:st|nd|rd|th)) Tournament$/iu,
+      "$1 Kendo Tournament",
+    );
+  }
+
+  if (/^Examen$/iu.test(title)) return "Examen de Kendo";
+  if (/^Seminario$/iu.test(title)) return "Seminario de Kendo";
+  return title.replace(
+    /^(\d+(?:er|do|ro|to|mo|vo)) Torneo$/iu,
+    "$1 Torneo de Kendo",
+  );
+}
+
+export function buildEventSeoTitle({
+  event,
+  localizedEvent,
+  language,
+}: EventSeoTitleInput) {
+  const title = improveGenericEventTitle(
+    normalizeDescription(localizedEvent.title),
+    language,
+  );
+  const date = new Intl.DateTimeFormat(language === "en" ? "en-US" : "es-CR", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${event.date}T00:00:00Z`));
+  const isLocalExamOrSeminar =
+    (event.eventType === "examen" || event.eventType === "seminario") &&
+    !hasExplicitInternationalLocation({ event, localizedEvent });
+
+  return `${title} — ${date}${isLocalExamOrSeminar ? " | Costa Rica" : ""}`;
+}
+
 function ensureTerminalPunctuation(text: string) {
   const normalized = normalizeDescription(text);
   return /[.!?…]$/u.test(normalized) ? normalized : `${normalized}.`;
@@ -455,7 +525,7 @@ function createEventRouteMeta(
         : undefined,
     component: "event",
     eventId: event.id,
-    title: `${localizedEvent.title} — ${formatEventDate(event.date, language)} | ${SITE_NAME}`,
+    title: buildEventSeoTitle({ event, localizedEvent, language }),
     description: buildEventMetaDescription({
       event,
       localizedEvent,
@@ -489,8 +559,8 @@ function createArchiveRouteMeta(
     component: "pastEvents",
     archivePage: page,
     title: english
-      ? `Past events${page > 1 ? ` — page ${page}` : ""} | ${SITE_NAME}`
-      : `Eventos pasados${page > 1 ? ` — página ${page}` : ""} | ${SITE_NAME}`,
+      ? `Past Kendo Events${page > 1 ? ` — page ${page}` : ""} | Costa Rica`
+      : `Eventos pasados de Kendo${page > 1 ? ` — página ${page}` : ""} | Costa Rica`,
     description:
       page > 1
         ? `${archiveDescription} ${english ? "Page" : "Página"} ${page}.`
