@@ -109,9 +109,14 @@ function renderRouteHtml(route) {
     `<div id="root">${bodyHtml}</div>`,
   );
 
+  html = html.replace(
+    /(<title>[\s\S]*?<\/title>)/i,
+    `$1\n${managedHead(route)}`,
+  );
+
   return html.replace(
     "</head>",
-    `    <meta name="app-prerendered-at" content="${prerenderedAt}" />\n${managedHead(route)}\n  </head>`,
+    `    <meta name="app-prerendered-at" content="${prerenderedAt}" />\n  </head>`,
   );
 }
 
