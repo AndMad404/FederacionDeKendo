@@ -15,6 +15,7 @@ import {
   mergeRegistry,
   parseCalendarEvent,
   parseVEvents,
+  serializeCalendarEvents,
   synchronizeCalendar,
 } from "../../scripts/sync-calendar-events.mjs";
 import {
@@ -88,6 +89,39 @@ test("creates the same opaque 24-character sourceId for the same UID", async () 
   assert.equal(first.sourceId, "aac691754e9f35832d4dfec4");
   assert.match(first.sourceId, /^[a-f0-9]{24}$/);
   assert.equal(first.sourceId.includes("exam-1@example.test"), false);
+});
+
+test("captures LAST-MODIFIED as sourceUpdatedAt without falling back to DTSTAMP", () => {
+  const properties = parseVEvents(
+    [
+      "BEGIN:VCALENDAR",
+      "BEGIN:VEVENT",
+      "UID:last-modified@example.test",
+      "DTSTART;VALUE=DATE:20260822",
+      "SUMMARY:3er Torneo",
+      "LAST-MODIFIED:20260917T123456Z",
+      "DTSTAMP:20260918T010203Z",
+      "END:VEVENT",
+      "BEGIN:VEVENT",
+      "UID:dtstamp-only@example.test",
+      "DTSTART;VALUE=DATE:20261031",
+      "SUMMARY:Examen",
+      "DTSTAMP:20260918T020304Z",
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ].join("\n"),
+  );
+
+  const withLastModified = parseCalendarEvent(properties[0]);
+  const withDtstampOnly = parseCalendarEvent(properties[1]);
+
+  assert.equal(withLastModified.sourceUpdatedAt, "2026-09-17T12:34:56.000Z");
+  assert.equal(withDtstampOnly.sourceUpdatedAt, undefined);
+
+  const generated = serializeCalendarEvents([
+    { ...withLastModified, editorialState: "publicado" },
+  ]);
+  assert.match(generated, /sourceUpdatedAt: "2026-09-17T12:34:56\.000Z"/);
 });
 
 test("stores the exclusive DTEND for all-day ranges", async () => {
