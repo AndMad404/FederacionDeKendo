@@ -87,7 +87,10 @@ test("indexes all public routes, events, and archives in the sitemap", async () 
   assert.match(sitemap, /<loc>https:\/\/fak-kendo\.org\/<\/loc>/);
   assert.match(sitemap, /<loc>https:\/\/fak-kendo\.org\/eventos\/<\/loc>/);
   assert.match(sitemap, /<loc>https:\/\/fak-kendo\.org\/en\/<\/loc>/);
-  assert.match(sitemap, /<loc>https:\/\/fak-kendo\.org\/eventos\/pasados\/<\/loc>/);
+  assert.match(
+    sitemap,
+    /<loc>https:\/\/fak-kendo\.org\/eventos\/pasados\/<\/loc>/,
+  );
   assert.match(
     sitemap,
     /<loc>https:\/\/fak-kendo\.org\/eventos\/pasados\/2026-08-08-examen\/<\/loc>/,
