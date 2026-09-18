@@ -166,9 +166,10 @@ assertSeoData(seoData);
 const DATA: SeoData = seoData as SeoData;
 
 const SITE_URL = DATA.siteUrl.replace(/\/$/, "");
-// Public indexing remains paused until the owner separately approves the
-// canonical domain, legal identity, and launch policy.
-const SITE_INDEXING_ENABLED = false;
+// The owner approved fak-kendo.org as the canonical production domain and
+// authorized the public SEO launch on 2026-09-17. Route-level approvals remain
+// explicit so event and archive pages can keep their separate editorial gate.
+const SITE_INDEXING_ENABLED = true;
 const SITE_NAME = DATA.siteName;
 const DEFAULT_SITE_DESCRIPTION = DATA.defaultDescription;
 const DEFAULT_SOCIAL_IMAGE_ALT = DATA.defaultImageAlt;
@@ -755,6 +756,19 @@ export function getRouteHeadDescriptors(meta: RouteMeta): HeadDescriptor[] {
     ].map(([property, content]) => ({
       tag: "meta" as const,
       attributes: { property, content },
+    })),
+  );
+
+  descriptors.push(
+    ...[
+      ["twitter:card", "summary_large_image"],
+      ["twitter:title", seo.title],
+      ["twitter:description", seo.description],
+      ["twitter:image", seo.image.url],
+      ["twitter:image:alt", seo.image.alt],
+    ].map(([name, content]) => ({
+      tag: "meta" as const,
+      attributes: { name, content },
     })),
   );
 

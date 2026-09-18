@@ -26,7 +26,7 @@ test("generates one historical event route with its canonical and paused-indexin
   assert.match(complete, /name="robots" content="noindex, follow"/);
   assert.match(
     complete,
-    /rel="canonical" href="https:\/\/fak-kendo\.pages\.dev\/eventos\/pasados\/2026-08-08-examen\/"/,
+    /rel="canonical" href="https:\/\/fak-kendo\.org\/eventos\/pasados\/2026-08-08-examen\/"/,
   );
   assert.doesNotMatch(complete, /application\/ld\+json/);
   assert.doesNotMatch(incomplete, /application\/ld\+json/);
@@ -56,13 +56,13 @@ test("generates localized, unique, paused-indexing SEO output for every event ro
     assert.ok(html.includes(`property="og:url" content="${seo.canonicalUrl}"`));
     assert.ok(
       html.includes(
-        `hreflang="es-CR" href="https://fak-kendo.pages.dev${spanishPath}"`,
+        `hreflang="es-CR" href="https://fak-kendo.org${spanishPath}"`,
       ),
     );
     if (englishPath) {
       assert.ok(
         html.includes(
-          `hreflang="en" href="https://fak-kendo.pages.dev${englishPath}"`,
+          `hreflang="en" href="https://fak-kendo.org${englishPath}"`,
         ),
       );
     } else {
@@ -79,19 +79,19 @@ test("generates localized, unique, paused-indexing SEO output for every event ro
   }
 });
 
-test("excludes noindex routes from the sitemap", async () => {
+test("indexes approved public routes and excludes paused routes from the sitemap", async () => {
   const sitemap = await readDist("sitemap.xml");
   const home = await readDist("index.html");
   const calendar = await readDist("eventos/index.html");
-  assert.doesNotMatch(sitemap, /<loc>/);
-  assert.match(home, /name="robots" content="noindex, follow"/);
-  assert.match(calendar, /name="robots" content="noindex, follow"/);
-  assert.match(
-    home,
-    /rel="canonical" href="https:\/\/fak-kendo\.pages\.dev\/"/,
-  );
-  assert.doesNotMatch(home, /application\/ld\+json/);
-  assert.doesNotMatch(calendar, /application\/ld\+json/);
+  assert.match(sitemap, /<loc>https:\/\/fak-kendo\.org\/<\/loc>/);
+  assert.match(sitemap, /<loc>https:\/\/fak-kendo\.org\/eventos\/<\/loc>/);
+  assert.match(sitemap, /<loc>https:\/\/fak-kendo\.org\/en\/<\/loc>/);
+  assert.doesNotMatch(sitemap, /eventos\/pasados|\/eventos\/20\d{2}-/);
+  assert.match(home, /name="robots" content="index, follow"/);
+  assert.match(calendar, /name="robots" content="index, follow"/);
+  assert.match(home, /rel="canonical" href="https:\/\/fak-kendo\.org\/"/);
+  assert.match(home, /application\/ld\+json/);
+  assert.match(calendar, /application\/ld\+json/);
 });
 
 test("uses the JPEG social card in generated Open Graph metadata", async () => {
@@ -100,9 +100,10 @@ test("uses the JPEG social card in generated Open Graph metadata", async () => {
   assert.match(gallery, /<html lang="es" prefix="og: https:\/\/ogp\.me\/ns#">/);
   assert.match(
     gallery,
-    /property="og:image" content="https:\/\/fak-kendo\.pages\.dev\/images\/social\/kendo-social-card-20260825\.jpg"/,
+    /property="og:image" content="https:\/\/fak-kendo\.org\/images\/social\/kendo-social-card-20260917\.jpg"/,
   );
   assert.match(gallery, /property="og:image:type" content="image\/jpeg"/);
+  assert.match(gallery, /name="twitter:card" content="summary_large_image"/);
 });
 
 test("keeps the sitemap synchronized with indexable generated routes only", async () => {
@@ -118,20 +119,25 @@ test("keeps the sitemap synchronized with indexable generated routes only", asyn
   assert.deepEqual(sitemapUrls, routeUrls);
 });
 
-test("omits sitemap images when no route is indexable", async () => {
+test("publishes sitemap images for approved routes", async () => {
   const sitemap = await readDist("sitemap.xml");
   const sitemapImageUrls = [
     ...sitemap.matchAll(/<image:loc>([^<]+)<\/image:loc>/g),
   ].map(([, url]) => url);
 
-  assert.deepEqual(sitemapImageUrls, []);
+  assert.ok(sitemapImageUrls.length > 0);
+  assert.ok(
+    sitemapImageUrls.includes(
+      "https://fak-kendo.org/images/hero/kendo-hero-formacion-960.webp?v=20260704-0120",
+    ),
+  );
 
   const home = await readDist("index.html");
   const calendar = await readDist("eventos/index.html");
   for (const html of [home, calendar]) {
     assert.match(
       html,
-      /og:image" content="https:\/\/fak-kendo\.pages\.dev\/images\/social\/kendo-social-card-20260825\.jpg"/,
+      /og:image" content="https:\/\/fak-kendo\.org\/images\/social\/kendo-social-card-20260917\.jpg"/,
     );
     assert.match(html, /og:image:type" content="image\/jpeg"/);
     assert.match(html, /og:image:width" content="1200"/);
@@ -194,15 +200,15 @@ test("generates localized English routes with reciprocal language metadata", asy
   assert.match(home, /href="\/en\/events\/"/);
   assert.match(
     home,
-    /rel="alternate" hreflang="es-CR" href="https:\/\/fak-kendo\.pages\.dev\/"/,
+    /rel="alternate" hreflang="es-CR" href="https:\/\/fak-kendo\.org\/"/,
   );
   assert.match(
     home,
-    /rel="alternate" hreflang="en" href="https:\/\/fak-kendo\.pages\.dev\/en\/"/,
+    /rel="alternate" hreflang="en" href="https:\/\/fak-kendo\.org\/en\/"/,
   );
   assert.match(event, /<h1[^>]*>Examination<\/h1>/);
   assert.match(event, /Examinations from 8th to 2nd kyu/);
-  assert.doesNotMatch(sitemap, /<loc>/);
+  assert.match(sitemap, /<loc>https:\/\/fak-kendo\.org\/en\/<\/loc>/);
 });
 
 test("publishes English event routes only when their editorial translation is valid", async () => {
