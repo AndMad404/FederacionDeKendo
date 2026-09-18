@@ -64,7 +64,7 @@ function managedHead(route) {
       const attributes = Object.entries(descriptor.attributes)
         .map(([name, value]) => `${name}="${escapeAttribute(value)}"`)
         .join(" ");
-      const opening = `${descriptor.tag} data-route-seo ${attributes}`;
+      const opening = `${descriptor.tag} ${attributes}`;
 
       if (descriptor.tag === "script") {
         return `    <${opening}>${descriptor.text ?? ""}</script>`;
