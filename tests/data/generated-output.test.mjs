@@ -14,7 +14,7 @@ async function readDist(relativePath) {
   );
 }
 
-test("generates one historical event route with its canonical and paused-indexing metadata", async () => {
+test("generates one historical event route with its canonical and indexable metadata", async () => {
   const complete = await readDist(
     "eventos/pasados/2026-08-08-examen/index.html",
   );
@@ -23,16 +23,17 @@ test("generates one historical event route with its canonical and paused-indexin
   );
 
   assert.match(complete, /<h1[^>]*>Examen<\/h1>/);
-  assert.match(complete, /name="robots" content="noindex, follow"/);
+  assert.match(complete, /name="robots" content="index, follow"/);
   assert.match(
     complete,
     /rel="canonical" href="https:\/\/fak-kendo\.org\/eventos\/pasados\/2026-08-08-examen\/"/,
   );
-  assert.doesNotMatch(complete, /application\/ld\+json/);
-  assert.doesNotMatch(incomplete, /application\/ld\+json/);
+  assert.match(complete, /application\/ld\+json/);
+  assert.match(incomplete, /name="robots" content="index, follow"/);
+  assert.match(incomplete, /application\/ld\+json/);
 });
 
-test("generates localized, unique, paused-indexing SEO output for every event route", async () => {
+test("generates localized, unique, indexable SEO output for every event route", async () => {
   const eventRoutes = getRouteManifest().filter(
     (route) => route.component === "event",
   );
@@ -45,13 +46,13 @@ test("generates localized, unique, paused-indexing SEO output for every event ro
     const englishPath =
       route.language === "en" ? route.path : route.alternatePath;
 
-    assert.equal(seo.robots, "noindex, follow");
+    assert.equal(seo.robots, "index, follow");
     assert.ok(seo.canonicalUrl);
     assert.ok(html.includes(`<title>${seo.title}</title>`));
     assert.ok(html.includes(`name="description" content="${seo.description}"`));
     assert.ok(seo.description.length <= 155);
     assert.doesNotMatch(seo.description, /\s{2,}|\*\s*$/);
-    assert.ok(html.includes('name="robots" content="noindex, follow"'));
+    assert.ok(html.includes('name="robots" content="index, follow"'));
     assert.ok(html.includes(`rel="canonical" href="${seo.canonicalUrl}"`));
     assert.ok(html.includes(`property="og:url" content="${seo.canonicalUrl}"`));
     assert.ok(
@@ -68,7 +69,7 @@ test("generates localized, unique, paused-indexing SEO output for every event ro
     } else {
       assert.doesNotMatch(html, /hreflang="en"/);
     }
-    assert.doesNotMatch(html, /application\/ld\+json/);
+    assert.match(html, /application\/ld\+json/);
   }
 
   for (const language of ["es", "en"]) {
@@ -79,14 +80,18 @@ test("generates localized, unique, paused-indexing SEO output for every event ro
   }
 });
 
-test("indexes approved public routes and excludes paused routes from the sitemap", async () => {
+test("indexes all public routes, events, and archives in the sitemap", async () => {
   const sitemap = await readDist("sitemap.xml");
   const home = await readDist("index.html");
   const calendar = await readDist("eventos/index.html");
   assert.match(sitemap, /<loc>https:\/\/fak-kendo\.org\/<\/loc>/);
   assert.match(sitemap, /<loc>https:\/\/fak-kendo\.org\/eventos\/<\/loc>/);
   assert.match(sitemap, /<loc>https:\/\/fak-kendo\.org\/en\/<\/loc>/);
-  assert.doesNotMatch(sitemap, /eventos\/pasados|\/eventos\/20\d{2}-/);
+  assert.match(sitemap, /<loc>https:\/\/fak-kendo\.org\/eventos\/pasados\/<\/loc>/);
+  assert.match(
+    sitemap,
+    /<loc>https:\/\/fak-kendo\.org\/eventos\/pasados\/2026-08-08-examen\/<\/loc>/,
+  );
   assert.match(home, /name="robots" content="index, follow"/);
   assert.match(calendar, /name="robots" content="index, follow"/);
   assert.match(home, /rel="canonical" href="https:\/\/fak-kendo\.org\/"/);
@@ -119,6 +124,13 @@ test("keeps the sitemap synchronized with indexable generated routes only", asyn
   assert.deepEqual(sitemapUrls, routeUrls);
 });
 
+test("keeps every generated public route indexable", () => {
+  const nonIndexableRoutes = getRouteManifest()
+    .filter((route) => getRouteSeoPayload(route).robots !== "index, follow")
+    .map((route) => route.path);
+
+  assert.deepEqual(nonIndexableRoutes, []);
+});
 test("publishes sitemap images for approved routes", async () => {
   const sitemap = await readDist("sitemap.xml");
   const sitemapImageUrls = [
@@ -145,13 +157,13 @@ test("publishes sitemap images for approved routes", async () => {
   }
 });
 
-test("keeps both calendar archive views noindex and structured-data-free", async () => {
+test("keeps both calendar archive views indexable with structured data", async () => {
   const pastEvents = await readDist("eventos/pasados/index.html");
   const englishPastEvents = await readDist("en/events/past/index.html");
 
   for (const html of [pastEvents, englishPastEvents]) {
-    assert.match(html, /name="robots" content="noindex, follow"/);
-    assert.doesNotMatch(html, /application\/ld\+json/);
+    assert.match(html, /name="robots" content="index, follow"/);
+    assert.match(html, /application\/ld\+json/);
   }
 });
 

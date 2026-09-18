@@ -501,7 +501,7 @@ function createArchiveRouteMeta(
     imageHeight: calendarMeta.imageHeight,
     imageType: calendarMeta.imageType,
     schemaType: "CollectionPage",
-    indexable: false,
+    indexable: true,
     noindex: false,
     canonicalWhileNoindex: true,
   };
