@@ -89,6 +89,9 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2026-11-21-panama-torneo-por-equipos",
+    aliases: [
+      "2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario"
+    ],
     archiveEligibleAt: "2026-11-23T06:00:00.000Z",
     sourceUpdatedAt: "2026-07-24T17:16:22.000Z",
     title: "PANAMA Torneo por Equipos",
