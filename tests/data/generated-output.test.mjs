@@ -330,7 +330,7 @@ test("redirects legacy calendar and archived event URLs to their canonical route
   );
 });
 
-test("publishes visible and structured breadcrumbs on deep routes", async () => {
+test("publishes event breadcrumbs and keeps archive breadcrumbs structured only", async () => {
   const pastEvent = await readDist(
     "eventos/pasados/2026-08-08-examen/index.html",
   );
@@ -353,7 +353,7 @@ test("publishes visible and structured breadcrumbs on deep routes", async () => 
   assert.match(englishPastEvent, /href="\/en\/events\/past\/"/);
   assert.match(englishPastEvent, /"name":"Past events"/);
 
-  assert.match(archivePageTwo, /aria-current="page"[^>]*>P\u00e1gina 2</);
+  assert.doesNotMatch(archivePageTwo, /aria-label="Migas de navegación"/);
   assert.match(archivePageTwo, /"name":"Página 2"/);
   assert.match(
     archivePageTwo,

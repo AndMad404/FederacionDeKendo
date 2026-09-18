@@ -312,6 +312,9 @@ test("renders the historical archive and the local not-found view", async ({
   await expect(
     page.getByRole("heading", { name: "Eventos pasados", level: 1 }),
   ).toBeVisible();
+  await expect(
+    page.getByRole("navigation", { name: "Migas de navegación" }),
+  ).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Anterior" })).toBeDisabled();
   await expect(page.getByRole("button", { name: "Siguiente" })).toBeEnabled();
 
