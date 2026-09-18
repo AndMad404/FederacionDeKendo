@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import {
+  CALENDAR_EVENTS,
   getEventRedirects,
   getRouteHeadDescriptors,
   getRouteManifest,
@@ -25,6 +26,36 @@ function escapeAttribute(value) {
 
 function escapeText(value) {
   return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;");
+}
+
+function latestIsoTimestamp(values) {
+  const timestamps = values
+    .filter(Boolean)
+    .map((value) => new Date(value).getTime())
+    .filter((value) => Number.isFinite(value));
+
+  return timestamps.length
+    ? new Date(Math.max(...timestamps)).toISOString()
+    : undefined;
+}
+
+function getRouteLastModified(route) {
+  if (route.component !== "event" || !route.eventId) return undefined;
+
+  const event = CALENDAR_EVENTS.find(
+    (candidate) => candidate.id === route.eventId,
+  );
+  if (!event) return undefined;
+
+  const isPast =
+    route.path.includes("/eventos/pasados/") ||
+    route.path.includes("/en/events/past/");
+
+  return latestIsoTimestamp(
+    isPast
+      ? [event.sourceUpdatedAt, event.archiveEligibleAt]
+      : [event.sourceUpdatedAt],
+  );
 }
 
 function managedHead(route) {
@@ -138,10 +169,14 @@ const sitemap = [
   '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">',
   ...routes.flatMap((route) => {
     const seo = getRouteSeoPayload(route);
+    const lastModified = getRouteLastModified(route);
     return seo.robots === "index, follow" && seo.canonicalUrl
       ? [
           "  <url>",
           `    <loc>${escapeText(seo.canonicalUrl)}</loc>`,
+          ...(lastModified
+            ? [`    <lastmod>${escapeText(lastModified)}</lastmod>`]
+            : []),
           ...getRouteSitemapImageUrls(route).flatMap((imageUrl) => [
             "    <image:image>",
             `      <image:loc>${escapeText(imageUrl)}</image:loc>`,
