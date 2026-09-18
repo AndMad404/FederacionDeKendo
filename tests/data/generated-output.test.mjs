@@ -34,6 +34,31 @@ test("generates historical event routes with canonical and indexable metadata", 
   assert.match(incomplete, /application\/ld\+json/);
 });
 
+test("identifies the Federation as organizer for every non-external event", () => {
+  const organizationId = "https://fak-kendo.org/#organization";
+  const eventRoutes = getRouteManifest().filter(
+    (route) => route.component === "event" && route.language === "es",
+  );
+
+  for (const route of eventRoutes) {
+    const event = CALENDAR_EVENTS.find(
+      (candidate) => candidate.id === route.eventId,
+    );
+    const graph = getRouteSeoPayload(route).structuredData?.["@graph"];
+    const structuredEvent = Array.isArray(graph)
+      ? graph.find((entity) => entity?.["@type"] === "Event")
+      : undefined;
+    const external = /(?:^|\s)#EventoExterno\b/iu.test(event?.summary ?? "");
+
+    assert.ok(structuredEvent, `${route.path}: Event JSON-LD is missing`);
+    assert.deepEqual(
+      structuredEvent.organizer,
+      external ? undefined : { "@id": organizationId },
+      `${route.path}: unexpected organizer`,
+    );
+  }
+});
+
 test("generates localized, unique, indexable SEO output for every event route", async () => {
   const routeManifest = getRouteManifest();
   const eventRoutes = routeManifest.filter(

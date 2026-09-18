@@ -212,6 +212,16 @@ function normalizeDescription(text: string) {
 
 const EXPLICIT_FOREIGN_COUNTRY_PATTERN =
   /\b(?:alemania|argentina|australia|belice|belize|bolivia|brasil|brazil|canada|chile|china|colombia|corea|cuba|dominican republic|ecuador|el salvador|espana|estados unidos|francia|germany|guatemala|honduras|italia|italy|japan|japon|korea|mexico|nicaragua|panama|paraguay|peru|portugal|puerto rico|reino unido|republica dominicana|spain|taiwan|united kingdom|united states|uruguay|venezuela)\b/u;
+const EXTERNAL_EVENT_MARKER = /(?:^|\s)#EventoExterno\b/iu;
+
+export function getEventOrganizerReference(
+  event: { summary?: string },
+  organizationId: string,
+) {
+  if (EXTERNAL_EVENT_MARKER.test(event.summary ?? "")) return undefined;
+
+  return { "@id": organizationId };
+}
 
 interface EventSeoTitleInput {
   event: (typeof CALENDAR_EVENTS)[number];
@@ -659,6 +669,7 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
         : event.endTime
           ? `${event.date}T${event.endTime}:00-06:00`
           : undefined;
+      const organizer = getEventOrganizerReference(event, organizationId);
       routeEntities.push({
         "@type": "Event",
         "@id": `${canonicalUrl}#event`,
@@ -684,6 +695,7 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
               },
             }
           : {}),
+        ...(organizer ? { organizer } : {}),
         image: [image.url],
         url: canonicalUrl,
       });

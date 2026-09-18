@@ -10,9 +10,8 @@ import {
 
 test.after(async () => closeSourceModuleLoader());
 
-const { buildEventMetaDescription } = await loadSourceModule(
-  "/src/app/config/seo.ts",
-);
+const { buildEventMetaDescription, getEventOrganizerReference } =
+  await loadSourceModule("/src/app/config/seo.ts");
 
 const TERMINAL_PUNCTUATION = /[.!?…]$/u;
 const IRREGULAR_WHITESPACE = /\s{2,}|^\s|\s$/u;
@@ -97,6 +96,25 @@ function buildDescription({
     overrides,
   });
 }
+
+test("assigns the Federation as organizer except for #EventoExterno descriptions", () => {
+  const organizationId = "https://fak-kendo.org/#organization";
+
+  assert.deepEqual(
+    getEventOrganizerReference(
+      { summary: "Seminario organizado por la Federación." },
+      organizationId,
+    ),
+    { "@id": organizationId },
+  );
+  assert.equal(
+    getEventOrganizerReference(
+      { summary: "#EventoExterno Seminario organizado por CLAK." },
+      organizationId,
+    ),
+    undefined,
+  );
+});
 
 test("keeps the ten approved static ES/EN descriptions consistent across config, SEO payload, and HTML", async (t) => {
   const config = await readSeoConfig();
