@@ -4,38 +4,24 @@ import type { Language } from "../config/i18n";
 import { isPastEvent } from "./calendarEvents";
 export { getArchivePagePath } from "./eventArchiveRoutes.js";
 
-const EVENT_VANITY_SLUGS: Readonly<Record<string, string>> = {
-  "2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario":
-    "2026-11-21-panama-torneo-por-equipos",
-};
-
-export function getEventPublicSlug(event: Pick<CalendarEvent, "id">) {
-  return EVENT_VANITY_SLUGS[event.id] ?? event.id;
-}
-
 export function getEventPath(
   event: CalendarEvent,
   language: Language = "es",
   now = new Date(),
 ) {
   const archived = isPastEvent(event, now);
-  const slug = getEventPublicSlug(event);
-
   if (language === "en") {
     return archived
-      ? `/en/events/past/${slug}/`
-      : `/en/events/${slug}/`;
+      ? `/en/events/past/${event.id}/`
+      : `/en/events/${event.id}/`;
   }
 
-  return archived ? `/eventos/pasados/${slug}/` : `/eventos/${slug}/`;
+  return archived ? `/eventos/pasados/${event.id}/` : `/eventos/${event.id}/`;
 }
 
 function findEventBySlug(slug: string) {
   return CALENDAR_EVENTS.find(
-    (event) =>
-      event.id === slug ||
-      getEventPublicSlug(event) === slug ||
-      event.aliases?.includes(slug),
+    (event) => event.id === slug || event.aliases?.includes(slug),
   );
 }
 

@@ -514,20 +514,12 @@ export function getEventRedirects() {
         englishPath !== `/en/events/${event.id}/`
           ? [{ from: `/en/events/${event.id}/`, to: englishPath }]
           : []),
-        ...(event.aliases ?? []).flatMap((alias) => {
-          const spanishAliasPath = `/eventos/${alias}/`;
-          const englishAliasPath = `/en/events/${alias}/`;
-
-          return [
-            ...(spanishAliasPath !== spanishPath
-              ? [{ from: spanishAliasPath, to: spanishPath }]
-              : []),
-            ...(getEventTranslationStatus(event) === "valid" &&
-            englishAliasPath !== englishPath
-              ? [{ from: englishAliasPath, to: englishPath }]
-              : []),
-          ];
-        }),
+        ...(event.aliases ?? []).flatMap((alias) => [
+          { from: `/eventos/${alias}/`, to: spanishPath },
+          ...(getEventTranslationStatus(event) === "valid"
+            ? [{ from: `/en/events/${alias}/`, to: englishPath }]
+            : []),
+        ]),
       ];
     }),
   ];
