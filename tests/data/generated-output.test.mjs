@@ -164,7 +164,10 @@ test("generates localized, unique, indexable SEO output for every event route", 
       candidate.eventId === panamaEventId && candidate.language === "es",
   );
 
-  assert.equal(panamaRoute?.path, `/eventos/${panamaVanitySlug}/`);
+  assert.equal(
+    panamaRoute?.path,
+    `/eventos/${panamaVanitySlug}/`,
+  );
   const archivePageTwoTitles = routeManifest
     .filter(
       (route) => route.component === "pastEvents" && route.archivePage === 2,
