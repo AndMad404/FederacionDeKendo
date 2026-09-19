@@ -109,7 +109,9 @@ test("touch swipe uses the same one-month navigation on mobile", async ({
   ).toBeVisible();
 });
 
-test("changing months resets each month pagination", async ({ page }) => {
+test("changing months keeps pagination controls hidden for single-page months", async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 360, height: 800 });
   await openCalendar(page, FIXED_PAGINATION_TIME);
 
@@ -119,14 +121,18 @@ test("changing months resets each month pagination", async ({ page }) => {
   const nextEvents = page.getByRole("button", {
     name: "Ver más eventos del mes",
   });
-  await expect(previousEvents).toBeDisabled();
-  await expect(nextEvents).toBeEnabled();
-  await nextEvents.click();
-  await expect(previousEvents).toBeEnabled();
-  await expect(nextEvents).toBeDisabled();
+
+  await expect(previousEvents).toHaveCount(0);
+  await expect(nextEvents).toHaveCount(0);
 
   await page.getByRole("button", { name: "Ver mes siguiente" }).click();
+  await expect(previousEvents).toHaveCount(0);
+  await expect(nextEvents).toHaveCount(0);
+
   await page.getByRole("button", { name: "Ver mes anterior" }).click();
-  await expect(previousEvents).toBeDisabled();
-  await expect(nextEvents).toBeEnabled();
+  await expect(
+    calendarNavigation(page).getByText("Mayo 2026", { exact: true }),
+  ).toBeVisible();
+  await expect(previousEvents).toHaveCount(0);
+  await expect(nextEvents).toHaveCount(0);
 });
