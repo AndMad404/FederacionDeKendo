@@ -69,6 +69,11 @@ test("Spanish and English localized copy inventories expose the same sections", 
   const { COPY } = await loadSourceModule("/src/app/config/i18n.ts");
   assert.ok(Object.keys(COPY.es).length > 0);
   assert.deepEqual(Object.keys(COPY.en), Object.keys(COPY.es));
+  assert.equal(
+    COPY.es.common.toBeConfirmed,
+    "Ubicación pendiente de confirmar",
+  );
+  assert.equal(COPY.en.common.toBeConfirmed, "Location to be confirmed");
 });
 
 test("every approved dojo record retains required contact and schedule fields", async () => {
