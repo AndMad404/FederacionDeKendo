@@ -25,7 +25,11 @@
       "archiveEligibleAt": "2026-06-02T06:00:00.000Z",
       "eventType": "seminario",
       "historical": true,
-      "editorialState": "publicado"
+      "editorialState": "publicado",
+      "summary": "#EventoExterno",
+      "aliases": [
+        "2026-05-30-federacion-seminario-y-reunion"
+      ]
     },
     {
       "sourceId": "9c63151cacb01bef733c39cb",
@@ -36,10 +40,7 @@
       "archiveEligibleAt": "2026-06-01T06:00:00.000Z",
       "eventType": "seminario",
       "historical": true,
-      "aliases": [
-        "2026-05-30-federacion-seminario-y-reunion"
-      ],
-      "editorialState": "publicado"
+      "editorialState": "eliminado"
     },
     {
       "sourceId": "89d31aa2d6937a78b1866283",
@@ -119,13 +120,13 @@
       "aliases": [
         "2026-11-21-panama-torneo-por-equipos"
       ],
-      "title": "PANAMA 5ta Copa Shogun Torneo por Equipos y Seminario",
+      "title": "PANAMÁ 5ta Copa Shogun Torneo por Equipos y Seminario",
       "date": "2026-11-21",
       "timeZone": "America/Costa_Rica",
       "archiveEligibleAt": "2026-11-23T06:00:00.000Z",
-      "summary": "Torneo por Equipos en Panamá. Invitación de Shinsei Panamá.",
       "eventType": "torneo",
-      "editorialState": "publicado"
+      "editorialState": "publicado",
+      "summary": "#EventoExterno: Invitación del Dojo Shinsei Panamá a la 5ta Copa Shogun :\nTorneo por equipos, práctica libre y seminario."
     },
     {
       "sourceId": "d5e995f4e75da854e455e4a5",

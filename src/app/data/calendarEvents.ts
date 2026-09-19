@@ -13,19 +13,12 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2026-05-29-clak-seminario-instructores-chile",
+    aliases: ["2026-05-30-federacion-seminario-y-reunion"],
     archiveEligibleAt: "2026-06-02T06:00:00.000Z",
     title: "CLAK Seminario Instructores CHILE",
     date: "2026-05-29",
     endDate: "2026-06-01",
-    eventType: "seminario",
-    timeZone: "America/Costa_Rica"
-  },
-  {
-    id: "2026-05-30-seminario",
-    aliases: ["2026-05-30-federacion-seminario-y-reunion"],
-    archiveEligibleAt: "2026-06-01T06:00:00.000Z",
-    title: "Seminario",
-    date: "2026-05-30",
+    summary: "#EventoExterno",
     eventType: "seminario",
     timeZone: "America/Costa_Rica"
   },
@@ -89,14 +82,12 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   },
   {
     id: "2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario",
-    aliases: [
-      "2026-11-21-panama-torneo-por-equipos"
-    ],
+    aliases: ["2026-11-21-panama-torneo-por-equipos"],
     archiveEligibleAt: "2026-11-23T06:00:00.000Z",
     sourceUpdatedAt: "2026-07-24T17:16:22.000Z",
-    title: "PANAMA 5ta Copa Shogun Torneo por Equipos y Seminario",
+    title: "PANAMÁ 5ta Copa Shogun Torneo por Equipos y Seminario",
     date: "2026-11-21",
-    summary: "Torneo por Equipos en Panamá. Invitación de Shinsei Panamá.",
+    summary: "#EventoExterno: Invitación del Dojo Shinsei Panamá a la 5ta Copa Shogun :\nTorneo por equipos, práctica libre y seminario.",
     eventType: "torneo",
     timeZone: "America/Costa_Rica"
   },

@@ -20,7 +20,7 @@ test("generates historical event routes with canonical and indexable metadata", 
     "eventos/pasados/2026-08-08-examen/index.html",
   );
   const incomplete = await readDist(
-    "eventos/pasados/2026-05-29-clak-seminario-instructores-chile/index.html",
+    "eventos/pasados/2026-05-30-seminario/index.html",
   );
 
   assert.match(complete, /<h1[^>]*>Examen<\/h1>/);
@@ -30,6 +30,7 @@ test("generates historical event routes with canonical and indexable metadata", 
     /rel="canonical" href="https:\/\/fak-kendo\.org\/eventos\/pasados\/2026-08-08-examen\/"/,
   );
   assert.match(complete, /application\/ld\+json/);
+  assert.match(incomplete, /<h1[^>]*>CLAK Seminario Instructores CHILE<\/h1>/);
   assert.match(incomplete, /name="robots" content="index, follow"/);
   assert.match(incomplete, /application\/ld\+json/);
 });
@@ -127,10 +128,6 @@ test("generates localized, unique, indexable SEO output for every event route", 
   const expectedEventTitles = new Map([
     ["2026-08-08-examen:es", "Examen de Kendo — 8 ago 2026 | Costa Rica"],
     [
-      "2026-05-30-seminario:es",
-      "Seminario de Kendo — 30 may 2026 | Costa Rica",
-    ],
-    [
       "2026-09-12-gasshuku-monteverde:es",
       "Gasshuku Monteverde — 12 sept 2026 | Costa Rica",
     ],
@@ -138,6 +135,10 @@ test("generates localized, unique, indexable SEO output for every event route", 
     [
       "2026-05-29-clak-seminario-instructores-chile:es",
       "CLAK Seminario Instructores CHILE — 29 may 2026",
+    ],
+    [
+      "2026-05-29-clak-seminario-instructores-chile:en",
+      "CLAK Instructor Seminar CHILE — May 29, 2026",
     ],
     ["2026-08-08-examen:en", "Kendo Examination — Aug 8, 2026 | Costa Rica"],
   ]);
@@ -158,18 +159,19 @@ test("generates localized, unique, indexable SEO output for every event route", 
 
   const panamaEventId =
     "2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario";
+  const panamaVanitySlug = "2026-11-21-panama-torneo-por-equipos";
   const expectedPanamaRoutes = new Map([
     [
       "es",
       {
-        path: `/eventos/${panamaEventId}/`,
+        path: `/eventos/${panamaVanitySlug}/`,
         title: "PANAMA 5ta Copa Shogun — 21 nov 2026",
       },
     ],
     [
       "en",
       {
-        path: `/en/events/${panamaEventId}/`,
+        path: `/en/events/${panamaVanitySlug}/`,
         title: "PANAMA 5th Shogun Cup — Nov 21, 2026",
       },
     ],
@@ -378,11 +380,27 @@ test("redirects legacy calendar and archived event URLs to their canonical route
   );
   assert.match(
     redirects,
-    /^\/eventos\/2026-11-21-panama-torneo-por-equipos\/ \/eventos\/2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario\/ 301$/m,
+    /^\/eventos\/2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario\/ \/eventos\/2026-11-21-panama-torneo-por-equipos\/ 301$/m,
   );
   assert.match(
     redirects,
-    /^\/en\/events\/2026-11-21-panama-torneo-por-equipos\/ \/en\/events\/2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario\/ 301$/m,
+    /^\/en\/events\/2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario\/ \/en\/events\/2026-11-21-panama-torneo-por-equipos\/ 301$/m,
+  );
+  assert.match(
+    redirects,
+    /^\/eventos\/2026-05-29-clak-seminario-instructores-chile\/ \/eventos\/pasados\/2026-05-30-seminario\/ 301$/m,
+  );
+  assert.match(
+    redirects,
+    /^\/eventos\/pasados\/2026-05-29-clak-seminario-instructores-chile\/ \/eventos\/pasados\/2026-05-30-seminario\/ 301$/m,
+  );
+  assert.match(
+    redirects,
+    /^\/en\/events\/2026-05-29-clak-seminario-instructores-chile\/ \/en\/events\/past\/2026-05-30-seminario\/ 301$/m,
+  );
+  assert.match(
+    redirects,
+    /^\/en\/events\/past\/2026-05-29-clak-seminario-instructores-chile\/ \/en\/events\/past\/2026-05-30-seminario\/ 301$/m,
   );
 });
 

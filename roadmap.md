@@ -20,10 +20,16 @@ Se conserva la publicacion automatica; no se activa un gate de despliegue.
 
 ## Decisiones cerradas
 
-- 2026-09-18: El evento "PANAMA 5ta Copa Shogun Torneo por Equipos y
-  Seminario" usa su titulo actualizado como URL canonica. La URL anterior
-  `/eventos/2026-11-21-panama-torneo-por-equipos/` se conserva como redirect
-  301; no se agrego automatizacion adicional para cambios de slug.
+- 2026-09-18: CLAK Seminario Instructores CHILE conserva
+  `/eventos/pasados/2026-05-30-seminario/` como vanity historico estable.
+  La identidad larga del Calendar redirige 301 al vanity, tambien en ingles;
+  el registro generico duplicado del 30 de mayo queda retirado y
+  `#EventoExterno` permanece en la descripcion.
+
+- 2026-09-18: El evento de Panama conserva el vanity estable
+  `/eventos/2026-11-21-panama-torneo-por-equipos/` como URL canonica; la
+  identidad larga derivada del titulo redirige 301 al vanity. La misma regla
+  aplica a su ruta inglesa.
 - 2026-09-18: Las fichas de eventos vigentes informan acceso gratuito y
   condiciones de participacion; si la descripcion contiene `#EventoExterno`,
   derivan precios, requisitos e inscripcion a la organizacion externa. El aviso

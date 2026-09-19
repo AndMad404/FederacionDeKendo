@@ -506,25 +506,41 @@ export function getEventRedirects() {
     ...CALENDAR_EVENTS.flatMap((event) => {
       const spanishPath = getEventPath(event, "es");
       const englishPath = getEventPath(event, "en");
-      return [
-        ...(spanishPath !== `/eventos/${event.id}/`
-          ? [{ from: `/eventos/${event.id}/`, to: spanishPath }]
-          : []),
-        ...(getEventTranslationStatus(event) === "valid" &&
-        englishPath !== `/en/events/${event.id}/`
-          ? [{ from: `/en/events/${event.id}/`, to: englishPath }]
-          : []),
-        ...(event.aliases ?? []).flatMap((alias) => [
-          { from: `/eventos/${alias}/`, to: spanishPath },
-          ...(getEventTranslationStatus(event) === "valid"
-            ? [{ from: `/en/events/${alias}/`, to: englishPath }]
-            : []),
+      const archived = spanishPath.startsWith("/eventos/pasados/");
+      const englishArchived = englishPath.startsWith("/en/events/past/");
+      const aliases = event.aliases ?? [];
+
+      const spanishSources = new Set([
+        `/eventos/${event.id}/`,
+        ...(archived ? [`/eventos/pasados/${event.id}/`] : []),
+        ...aliases.flatMap((alias) => [
+          `/eventos/${alias}/`,
+          ...(archived ? [`/eventos/pasados/${alias}/`] : []),
         ]),
+      ]);
+
+      const englishSources = new Set([
+        `/en/events/${event.id}/`,
+        ...(englishArchived ? [`/en/events/past/${event.id}/`] : []),
+        ...aliases.flatMap((alias) => [
+          `/en/events/${alias}/`,
+          ...(englishArchived ? [`/en/events/past/${alias}/`] : []),
+        ]),
+      ]);
+
+      return [
+        ...[...spanishSources]
+          .filter((from) => from !== spanishPath)
+          .map((from) => ({ from, to: spanishPath })),
+        ...(getEventTranslationStatus(event) === "valid"
+          ? [...englishSources]
+              .filter((from) => from !== englishPath)
+              .map((from) => ({ from, to: englishPath }))
+          : []),
       ];
     }),
   ];
 }
-
 function createEventRouteMeta(
   event: (typeof CALENDAR_EVENTS)[number],
   language: Language,

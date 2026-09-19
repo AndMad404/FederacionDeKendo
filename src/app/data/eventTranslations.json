@@ -1,18 +1,27 @@
 {
   "2026-05-02-examen": {
-    "source": { "title": "Examen" },
-    "translation": { "title": "Examination" }
+    "source": {
+      "title": "Examen"
+    },
+    "translation": {
+      "title": "Examination"
+    }
   },
   "2026-05-29-clak-seminario-instructores-chile": {
-    "source": { "title": "CLAK Seminario Instructores CHILE" },
-    "translation": { "title": "CLAK Instructor Seminar CHILE" }
-  },
-  "2026-05-30-seminario": {
-    "source": { "title": "Seminario" },
-    "translation": { "title": "Seminar" }
+    "source": {
+      "title": "CLAK Seminario Instructores CHILE",
+      "summary": "#EventoExterno"
+    },
+    "translation": {
+      "title": "CLAK Instructor Seminar CHILE",
+      "summary": "#EventoExterno"
+    }
   },
   "2026-08-08-examen": {
-    "source": { "title": "Examen", "summary": "Exámenes de 8vo a 2do kyu" },
+    "source": {
+      "title": "Examen",
+      "summary": "Exámenes de 8vo a 2do kyu"
+    },
     "translation": {
       "title": "Examination",
       "summary": "Examinations from 8th to 2nd kyu"
@@ -39,11 +48,18 @@
     }
   },
   "2026-10-10-clak-1er-panamericano-brasil": {
-    "source": { "title": "CLAK 1er Panamericano BRASIL" },
-    "translation": { "title": "CLAK 1st Pan American Championship BRASIL" }
+    "source": {
+      "title": "CLAK 1er Panamericano BRASIL"
+    },
+    "translation": {
+      "title": "CLAK 1st Pan American Championship BRASIL"
+    }
   },
   "2026-10-31-examen": {
-    "source": { "title": "Examen", "summary": "Exámenes de 8vo a 2do kyu" },
+    "source": {
+      "title": "Examen",
+      "summary": "Exámenes de 8vo a 2do kyu"
+    },
     "translation": {
       "title": "Examination",
       "summary": "Examinations from 8th to 2nd kyu"
@@ -51,12 +67,12 @@
   },
   "2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario": {
     "source": {
-      "title": "PANAMA 5ta Copa Shogun Torneo por Equipos y Seminario",
-      "summary": "Torneo por Equipos en Panamá. Invitación de Shinsei Panamá."
+      "title": "PANAMÁ 5ta Copa Shogun Torneo por Equipos y Seminario",
+      "summary": "#EventoExterno: Invitación del Dojo Shinsei Panamá a la 5ta Copa Shogun :\nTorneo por equipos, práctica libre y seminario."
     },
     "translation": {
       "title": "PANAMA 5th Shogun Cup Team Tournament and Seminar",
-      "summary": "Team tournament in Panama, hosted by Shinsei Panama."
+      "summary": "#EventoExterno: Invitation from Shinsei Panama Dojo to the 5th Shogun Cup:\nTeam tournament, open practice, and seminar."
     }
   },
   "2026-12-12-4to-torneo": {
@@ -70,7 +86,10 @@
     }
   },
   "2027-01-30-examen": {
-    "source": { "title": "Examen", "summary": "Exámenes de 8vo a 2do kyu" },
+    "source": {
+      "title": "Examen",
+      "summary": "Exámenes de 8vo a 2do kyu"
+    },
     "translation": {
       "title": "Examination",
       "summary": "Examinations from 8th to 2nd kyu"
@@ -87,14 +106,20 @@
     }
   },
   "2027-05-01-examen": {
-    "source": { "title": "Examen", "summary": "Exámenes de 8vo a 2do kyu" },
+    "source": {
+      "title": "Examen",
+      "summary": "Exámenes de 8vo a 2do kyu"
+    },
     "translation": {
       "title": "Examination",
       "summary": "Examinations from 8th to 2nd kyu"
     }
   },
   "2027-07-31-examen": {
-    "source": { "title": "Examen", "summary": "Exámenes de 8vo a 2do kyu" },
+    "source": {
+      "title": "Examen",
+      "summary": "Exámenes de 8vo a 2do kyu"
+    },
     "translation": {
       "title": "Examination",
       "summary": "Examinations from 8th to 2nd kyu"
@@ -111,7 +136,10 @@
     }
   },
   "2027-10-30-examen": {
-    "source": { "title": "Examen", "summary": "Exámenes de 8vo a 2do kyu" },
+    "source": {
+      "title": "Examen",
+      "summary": "Exámenes de 8vo a 2do kyu"
+    },
     "translation": {
       "title": "Examination",
       "summary": "Examinations from 8th to 2nd kyu"
