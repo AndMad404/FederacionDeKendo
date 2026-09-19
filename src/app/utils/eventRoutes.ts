@@ -22,9 +22,7 @@ export function getEventPath(
   const slug = getEventPublicSlug(event);
 
   if (language === "en") {
-    return archived
-      ? `/en/events/past/${slug}/`
-      : `/en/events/${slug}/`;
+    return archived ? `/en/events/past/${slug}/` : `/en/events/${slug}/`;
   }
 
   return archived ? `/eventos/pasados/${slug}/` : `/eventos/${slug}/`;
