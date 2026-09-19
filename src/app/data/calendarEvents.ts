@@ -88,13 +88,13 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
     timeZone: "America/Costa_Rica"
   },
   {
-    id: "2026-11-21-panama-torneo-por-equipos",
+    id: "2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario",
     aliases: [
-      "2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario"
+      "2026-11-21-panama-torneo-por-equipos"
     ],
     archiveEligibleAt: "2026-11-23T06:00:00.000Z",
     sourceUpdatedAt: "2026-07-24T17:16:22.000Z",
-    title: "PANAMA Torneo por Equipos",
+    title: "PANAMA 5ta Copa Shogun Torneo por Equipos y Seminario",
     date: "2026-11-21",
     summary: "Torneo por Equipos en Panamá. Invitación de Shinsei Panamá.",
     eventType: "torneo",

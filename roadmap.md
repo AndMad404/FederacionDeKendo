@@ -20,6 +20,10 @@ Se conserva la publicacion automatica; no se activa un gate de despliegue.
 
 ## Decisiones cerradas
 
+- 2026-09-18: El evento "PANAMA 5ta Copa Shogun Torneo por Equipos y
+  Seminario" usa su titulo actualizado como URL canonica. La URL anterior
+  `/eventos/2026-11-21-panama-torneo-por-equipos/` se conserva como redirect
+  301; no se agrego automatizacion adicional para cambios de slug.
 - 2026-09-18: Las fichas de eventos vigentes informan acceso gratuito y
   condiciones de participacion; si la descripcion contiene `#EventoExterno`,
   derivan precios, requisitos e inscripcion a la organizacion externa. El aviso
