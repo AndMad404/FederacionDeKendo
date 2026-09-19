@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
-const SITE_ORIGIN = "https://fak-kendo.pages.dev";
+const SITE_ORIGIN = "https://fak-kendo.org";
 const LEGACY_PATHS = new Set(["/calendario/"]);
 const LINK_PATTERN = /^- \[([^\]]+)\]\((https:\/\/[^)]+)\)(?:: (.+))?$/;
 

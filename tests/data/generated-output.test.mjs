@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
+  CALENDAR_EVENTS,
   getEventRedirects,
   getRouteManifest,
   getRouteSeoPayload,
@@ -14,26 +15,54 @@ async function readDist(relativePath) {
   );
 }
 
-test("generates one historical event route with its canonical and paused-indexing metadata", async () => {
+test("generates historical event routes with canonical and indexable metadata", async () => {
   const complete = await readDist(
     "eventos/pasados/2026-08-08-examen/index.html",
   );
   const incomplete = await readDist(
-    "eventos/2026-10-10-clak-1er-panamericano-brasil/index.html",
+    "eventos/pasados/2026-05-30-seminario/index.html",
   );
 
   assert.match(complete, /<h1[^>]*>Examen<\/h1>/);
-  assert.match(complete, /name="robots" content="noindex, follow"/);
+  assert.match(complete, /name="robots" content="index, follow"/);
   assert.match(
     complete,
-    /rel="canonical" href="https:\/\/fak-kendo\.pages\.dev\/eventos\/pasados\/2026-08-08-examen\/"/,
+    /rel="canonical" href="https:\/\/fak-kendo\.org\/eventos\/pasados\/2026-08-08-examen\/"/,
   );
-  assert.doesNotMatch(complete, /application\/ld\+json/);
-  assert.doesNotMatch(incomplete, /application\/ld\+json/);
+  assert.match(complete, /application\/ld\+json/);
+  assert.match(incomplete, /<h1[^>]*>CLAK Seminario Instructores CHILE<\/h1>/);
+  assert.match(incomplete, /name="robots" content="index, follow"/);
+  assert.match(incomplete, /application\/ld\+json/);
 });
 
-test("generates localized, unique, paused-indexing SEO output for every event route", async () => {
+test("identifies the Federation as organizer for every non-external event", () => {
+  const organizationId = "https://fak-kendo.org/#organization";
   const eventRoutes = getRouteManifest().filter(
+    (route) => route.component === "event" && route.language === "es",
+  );
+
+  for (const route of eventRoutes) {
+    const event = CALENDAR_EVENTS.find(
+      (candidate) => candidate.id === route.eventId,
+    );
+    const graph = getRouteSeoPayload(route).structuredData?.["@graph"];
+    const structuredEvent = Array.isArray(graph)
+      ? graph.find((entity) => entity?.["@type"] === "Event")
+      : undefined;
+    const external = /(?:^|\s)#EventoExterno\b/iu.test(event?.summary ?? "");
+
+    assert.ok(structuredEvent, `${route.path}: Event JSON-LD is missing`);
+    assert.deepEqual(
+      structuredEvent.organizer,
+      external ? undefined : { "@id": organizationId },
+      `${route.path}: unexpected organizer`,
+    );
+  }
+});
+
+test("generates localized, unique, indexable SEO output for every event route", async () => {
+  const routeManifest = getRouteManifest();
+  const eventRoutes = routeManifest.filter(
     (route) => route.component === "event",
   );
 
@@ -45,30 +74,30 @@ test("generates localized, unique, paused-indexing SEO output for every event ro
     const englishPath =
       route.language === "en" ? route.path : route.alternatePath;
 
-    assert.equal(seo.robots, "noindex, follow");
+    assert.equal(seo.robots, "index, follow");
     assert.ok(seo.canonicalUrl);
     assert.ok(html.includes(`<title>${seo.title}</title>`));
     assert.ok(html.includes(`name="description" content="${seo.description}"`));
     assert.ok(seo.description.length <= 155);
     assert.doesNotMatch(seo.description, /\s{2,}|\*\s*$/);
-    assert.ok(html.includes('name="robots" content="noindex, follow"'));
+    assert.ok(html.includes('name="robots" content="index, follow"'));
     assert.ok(html.includes(`rel="canonical" href="${seo.canonicalUrl}"`));
     assert.ok(html.includes(`property="og:url" content="${seo.canonicalUrl}"`));
     assert.ok(
       html.includes(
-        `hreflang="es-CR" href="https://fak-kendo.pages.dev${spanishPath}"`,
+        `hreflang="es-CR" href="https://fak-kendo.org${spanishPath}"`,
       ),
     );
     if (englishPath) {
       assert.ok(
         html.includes(
-          `hreflang="en" href="https://fak-kendo.pages.dev${englishPath}"`,
+          `hreflang="en" href="https://fak-kendo.org${englishPath}"`,
         ),
       );
     } else {
       assert.doesNotMatch(html, /hreflang="en"/);
     }
-    assert.doesNotMatch(html, /application\/ld\+json/);
+    assert.match(html, /application\/ld\+json/);
   }
 
   for (const language of ["es", "en"]) {
@@ -77,21 +106,120 @@ test("generates localized, unique, paused-indexing SEO output for every event ro
       .map((route) => getRouteSeoPayload(route).title);
     assert.equal(new Set(titles).size, titles.length);
   }
+
+  const expectedStaticTitles = new Map([
+    ["/", "Federación de Asociaciones de Kendo | Costa Rica"],
+    ["/eventos/", "Eventos de Kendo en Costa Rica"],
+    ["/galeria/", "Galería de Kendo | Costa Rica"],
+    ["/afiliados/", "Dojos de Kendo en Costa Rica"],
+    ["/eventos/pasados/", "Eventos pasados de Kendo | Costa Rica"],
+    ["/en/", "Federation of Kendo Associations | Costa Rica"],
+    ["/en/events/", "Kendo Events in Costa Rica"],
+    ["/en/gallery/", "Kendo Gallery | Costa Rica"],
+    ["/en/affiliates/", "Kendo Dojos in Costa Rica"],
+    ["/en/events/past/", "Past Kendo Events | Costa Rica"],
+  ]);
+
+  for (const [path, expectedTitle] of expectedStaticTitles) {
+    const route = routeManifest.find((candidate) => candidate.path === path);
+    assert.equal(route?.title, expectedTitle, path);
+  }
+
+  const expectedEventTitles = new Map([
+    ["2026-08-08-examen:es", "Examen de Kendo — 8 ago 2026 | Costa Rica"],
+    [
+      "2026-09-12-gasshuku-monteverde:es",
+      "Gasshuku Monteverde — 12 sept 2026 | Costa Rica",
+    ],
+    ["2026-08-22-3er-torneo:es", "3er Torneo de Kendo — 22 ago 2026"],
+    [
+      "2026-05-29-clak-seminario-instructores-chile:es",
+      "CLAK Seminario Instructores CHILE — 29 may 2026",
+    ],
+    [
+      "2026-05-29-clak-seminario-instructores-chile:en",
+      "CLAK Instructor Seminar CHILE — May 29, 2026",
+    ],
+    ["2026-08-08-examen:en", "Kendo Examination — Aug 8, 2026 | Costa Rica"],
+  ]);
+
+  for (const [key, expectedTitle] of expectedEventTitles) {
+    const [eventId, language] = key.split(":");
+    const route = eventRoutes.find(
+      (candidate) =>
+        candidate.eventId === eventId && candidate.language === language,
+    );
+    assert.equal(route?.title, expectedTitle, key);
+    assert.match(
+      route?.path ?? "",
+      /\/(?:eventos\/pasados|en\/events\/past)\//,
+      key,
+    );
+  }
+
+  const panamaEventId =
+    "2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario";
+  const panamaVanitySlug = "2026-11-21-panama-torneo-por-equipos";
+  const expectedPanamaRoutes = new Map([
+    [
+      "es",
+      {
+        path: `/eventos/${panamaVanitySlug}/`,
+        title: "PANAMA 5ta Copa Shogun — 21 nov 2026",
+      },
+    ],
+    [
+      "en",
+      {
+        path: `/en/events/${panamaVanitySlug}/`,
+        title: "PANAMA 5th Shogun Cup — Nov 21, 2026",
+      },
+    ],
+  ]);
+  for (const [language, expected] of expectedPanamaRoutes) {
+    const route = eventRoutes.find(
+      (candidate) =>
+        candidate.eventId === panamaEventId && candidate.language === language,
+    );
+    assert.equal(route?.path, expected.path, language);
+    assert.equal(route?.title, expected.title, language);
+  }
+
+  const archivePageTwoTitles = routeManifest
+    .filter(
+      (route) => route.component === "pastEvents" && route.archivePage === 2,
+    )
+    .map((route) => route.title);
+  assert.deepEqual(archivePageTwoTitles, [
+    "Eventos pasados de Kendo — página 2 | Costa Rica",
+    "Past Kendo Events — page 2 | Costa Rica",
+  ]);
+
+  for (const route of routeManifest) {
+    assert.ok(route.title.length <= 60, `${route.path}: ${route.title}`);
+  }
 });
 
-test("excludes noindex routes from the sitemap", async () => {
+test("indexes all public routes, events, and archives in the sitemap", async () => {
   const sitemap = await readDist("sitemap.xml");
   const home = await readDist("index.html");
   const calendar = await readDist("eventos/index.html");
-  assert.doesNotMatch(sitemap, /<loc>/);
-  assert.match(home, /name="robots" content="noindex, follow"/);
-  assert.match(calendar, /name="robots" content="noindex, follow"/);
+  assert.match(sitemap, /<loc>https:\/\/fak-kendo\.org\/<\/loc>/);
+  assert.match(sitemap, /<loc>https:\/\/fak-kendo\.org\/eventos\/<\/loc>/);
+  assert.match(sitemap, /<loc>https:\/\/fak-kendo\.org\/en\/<\/loc>/);
   assert.match(
-    home,
-    /rel="canonical" href="https:\/\/fak-kendo\.pages\.dev\/"/,
+    sitemap,
+    /<loc>https:\/\/fak-kendo\.org\/eventos\/pasados\/<\/loc>/,
   );
-  assert.doesNotMatch(home, /application\/ld\+json/);
-  assert.doesNotMatch(calendar, /application\/ld\+json/);
+  assert.match(
+    sitemap,
+    /<loc>https:\/\/fak-kendo\.org\/eventos\/pasados\/2026-08-08-examen\/<\/loc>/,
+  );
+  assert.match(home, /name="robots" content="index, follow"/);
+  assert.match(calendar, /name="robots" content="index, follow"/);
+  assert.match(home, /rel="canonical" href="https:\/\/fak-kendo\.org\/"/);
+  assert.match(home, /application\/ld\+json/);
+  assert.match(calendar, /application\/ld\+json/);
 });
 
 test("uses the JPEG social card in generated Open Graph metadata", async () => {
@@ -100,9 +228,10 @@ test("uses the JPEG social card in generated Open Graph metadata", async () => {
   assert.match(gallery, /<html lang="es" prefix="og: https:\/\/ogp\.me\/ns#">/);
   assert.match(
     gallery,
-    /property="og:image" content="https:\/\/fak-kendo\.pages\.dev\/images\/social\/kendo-social-card-20260825\.jpg"/,
+    /property="og:image" content="https:\/\/fak-kendo\.org\/images\/social\/kendo-social-card-20260918\.jpg"/,
   );
   assert.match(gallery, /property="og:image:type" content="image\/jpeg"/);
+  assert.match(gallery, /name="twitter:card" content="summary_large_image"/);
 });
 
 test("keeps the sitemap synchronized with indexable generated routes only", async () => {
@@ -118,20 +247,100 @@ test("keeps the sitemap synchronized with indexable generated routes only", asyn
   assert.deepEqual(sitemapUrls, routeUrls);
 });
 
-test("omits sitemap images when no route is indexable", async () => {
+test("publishes only defensible event lastmod values in the sitemap", async () => {
+  const sitemap = await readDist("sitemap.xml");
+  const home = await readDist("index.html");
+  const prerenderedAt = home.match(
+    /<meta name="app-prerendered-at" content="([^"]+)" \/>/,
+  )?.[1];
+
+  assert.ok(prerenderedAt);
+
+  const urlBlocks = new Map(
+    [...sitemap.matchAll(/<url>\s*([\s\S]*?)\s*<\/url>/g)].map(([, block]) => {
+      const location = block.match(/<loc>([^<]+)<\/loc>/)?.[1];
+      return [location, block];
+    }),
+  );
+
+  const homeBlock = urlBlocks.get("https://fak-kendo.org/");
+  assert.ok(homeBlock);
+  assert.doesNotMatch(homeBlock, /<lastmod>/);
+  assert.doesNotMatch(
+    sitemap,
+    new RegExp(`<lastmod>${prerenderedAt}<\\/lastmod>`),
+  );
+
+  const bilingualLastmods = new Map();
+
+  for (const route of getRouteManifest().filter(
+    (candidate) => candidate.component === "event",
+  )) {
+    const event = CALENDAR_EVENTS.find(
+      (candidate) => candidate.id === route.eventId,
+    );
+    assert.ok(event, route.path);
+
+    const isPast =
+      route.path.includes("/eventos/pasados/") ||
+      route.path.includes("/en/events/past/");
+    const candidates = (
+      isPast
+        ? [event.sourceUpdatedAt, event.archiveEligibleAt]
+        : [event.sourceUpdatedAt]
+    )
+      .filter(Boolean)
+      .map((value) => new Date(value).getTime())
+      .filter((value) => Number.isFinite(value));
+    const expected = candidates.length
+      ? new Date(Math.max(...candidates)).toISOString()
+      : undefined;
+
+    const seo = getRouteSeoPayload(route);
+    const block = urlBlocks.get(seo.canonicalUrl);
+    assert.ok(block, route.path);
+
+    const actual = block.match(/<lastmod>([^<]+)<\/lastmod>/)?.[1];
+    assert.equal(actual, expected, route.path);
+
+    const values = bilingualLastmods.get(event.id) ?? [];
+    values.push(actual);
+    bilingualLastmods.set(event.id, values);
+  }
+
+  for (const values of bilingualLastmods.values()) {
+    if (values.length > 1) {
+      assert.equal(new Set(values).size, 1);
+    }
+  }
+});
+
+test("keeps every generated public route indexable", () => {
+  const nonIndexableRoutes = getRouteManifest()
+    .filter((route) => getRouteSeoPayload(route).robots !== "index, follow")
+    .map((route) => route.path);
+
+  assert.deepEqual(nonIndexableRoutes, []);
+});
+test("publishes sitemap images for approved routes", async () => {
   const sitemap = await readDist("sitemap.xml");
   const sitemapImageUrls = [
     ...sitemap.matchAll(/<image:loc>([^<]+)<\/image:loc>/g),
   ].map(([, url]) => url);
 
-  assert.deepEqual(sitemapImageUrls, []);
+  assert.ok(sitemapImageUrls.length > 0);
+  assert.ok(
+    sitemapImageUrls.includes(
+      "https://fak-kendo.org/images/hero/kendo-hero-formacion-960.webp?v=20260704-0120",
+    ),
+  );
 
   const home = await readDist("index.html");
   const calendar = await readDist("eventos/index.html");
   for (const html of [home, calendar]) {
     assert.match(
       html,
-      /og:image" content="https:\/\/fak-kendo\.pages\.dev\/images\/social\/kendo-social-card-20260825\.jpg"/,
+      /og:image" content="https:\/\/fak-kendo\.org\/images\/social\/kendo-social-card-20260918\.jpg"/,
     );
     assert.match(html, /og:image:type" content="image\/jpeg"/);
     assert.match(html, /og:image:width" content="1200"/);
@@ -139,13 +348,13 @@ test("omits sitemap images when no route is indexable", async () => {
   }
 });
 
-test("keeps both calendar archive views noindex and structured-data-free", async () => {
+test("keeps both calendar archive views indexable with structured data", async () => {
   const pastEvents = await readDist("eventos/pasados/index.html");
   const englishPastEvents = await readDist("en/events/past/index.html");
 
   for (const html of [pastEvents, englishPastEvents]) {
-    assert.match(html, /name="robots" content="noindex, follow"/);
-    assert.doesNotMatch(html, /application\/ld\+json/);
+    assert.match(html, /name="robots" content="index, follow"/);
+    assert.match(html, /application\/ld\+json/);
   }
 });
 
@@ -169,8 +378,48 @@ test("redirects legacy calendar and archived event URLs to their canonical route
     redirects,
     /^\/eventos\/2026-08-08-examen\/ \/eventos\/pasados\/2026-08-08-examen\/ 301$/m,
   );
+  assert.match(
+    redirects,
+    /^\/eventos\/2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario\/ \/eventos\/2026-11-21-panama-torneo-por-equipos\/ 301$/m,
+  );
+  assert.match(
+    redirects,
+    /^\/en\/events\/2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario\/ \/en\/events\/2026-11-21-panama-torneo-por-equipos\/ 301$/m,
+  );
+  assert.match(
+    redirects,
+    /^\/eventos\/2026-05-29-clak-seminario-instructores-chile\/ \/eventos\/pasados\/2026-05-30-seminario\/ 301$/m,
+  );
+  assert.match(
+    redirects,
+    /^\/eventos\/pasados\/2026-05-29-clak-seminario-instructores-chile\/ \/eventos\/pasados\/2026-05-30-seminario\/ 301$/m,
+  );
+  assert.match(
+    redirects,
+    /^\/en\/events\/2026-05-29-clak-seminario-instructores-chile\/ \/en\/events\/past\/2026-05-30-seminario\/ 301$/m,
+  );
+  assert.match(
+    redirects,
+    /^\/en\/events\/past\/2026-05-29-clak-seminario-instructores-chile\/ \/en\/events\/past\/2026-05-30-seminario\/ 301$/m,
+  );
 });
 
+test("omits breadcrumbs from event and archive routes", async () => {
+  const pastEvent = await readDist(
+    "eventos/pasados/2026-08-08-examen/index.html",
+  );
+  const englishPastEvent = await readDist(
+    "en/events/past/2026-08-08-examen/index.html",
+  );
+  const archivePageTwo = await readDist("eventos/pasados/pagina/2/index.html");
+
+  for (const html of [pastEvent, englishPastEvent, archivePageTwo]) {
+    assert.doesNotMatch(html, /aria-label="Migas de navegación"/);
+    assert.doesNotMatch(html, /aria-label="Breadcrumb"/);
+    assert.doesNotMatch(html, /"@type":"BreadcrumbList"/);
+    assert.doesNotMatch(html, /#breadcrumb/);
+  }
+});
 test("shares one deterministic prerender timestamp across generated routes", async () => {
   const home = await readDist("index.html");
   const archive = await readDist("eventos/pasados/index.html");
@@ -194,15 +443,15 @@ test("generates localized English routes with reciprocal language metadata", asy
   assert.match(home, /href="\/en\/events\/"/);
   assert.match(
     home,
-    /rel="alternate" hreflang="es-CR" href="https:\/\/fak-kendo\.pages\.dev\/"/,
+    /rel="alternate" hreflang="es-CR" href="https:\/\/fak-kendo\.org\/"/,
   );
   assert.match(
     home,
-    /rel="alternate" hreflang="en" href="https:\/\/fak-kendo\.pages\.dev\/en\/"/,
+    /rel="alternate" hreflang="en" href="https:\/\/fak-kendo\.org\/en\/"/,
   );
   assert.match(event, /<h1[^>]*>Examination<\/h1>/);
   assert.match(event, /Examinations from 8th to 2nd kyu/);
-  assert.doesNotMatch(sitemap, /<loc>/);
+  assert.match(sitemap, /<loc>https:\/\/fak-kendo\.org\/en\/<\/loc>/);
 });
 
 test("publishes English event routes only when their editorial translation is valid", async () => {

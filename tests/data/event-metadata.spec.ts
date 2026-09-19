@@ -27,10 +27,10 @@ test("a prerendered event exposes its approved public metadata", async ({
   ).toBeVisible();
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
     "content",
-    "noindex, follow",
+    "index, follow",
   );
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     "href",
-    `https://fak-kendo.pages.dev${path}`,
+    `https://fak-kendo.org${path}`,
   );
 });

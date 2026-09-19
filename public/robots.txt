@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://fak-kendo.pages.dev/sitemap.xml
+Sitemap: https://fak-kendo.org/sitemap.xml

@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import {
+  CALENDAR_EVENTS,
   getEventRedirects,
   getRouteHeadDescriptors,
   getRouteManifest,
@@ -27,13 +28,43 @@ function escapeText(value) {
   return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;");
 }
 
+function latestIsoTimestamp(values) {
+  const timestamps = values
+    .filter(Boolean)
+    .map((value) => new Date(value).getTime())
+    .filter((value) => Number.isFinite(value));
+
+  return timestamps.length
+    ? new Date(Math.max(...timestamps)).toISOString()
+    : undefined;
+}
+
+function getRouteLastModified(route) {
+  if (route.component !== "event" || !route.eventId) return undefined;
+
+  const event = CALENDAR_EVENTS.find(
+    (candidate) => candidate.id === route.eventId,
+  );
+  if (!event) return undefined;
+
+  const isPast =
+    route.path.includes("/eventos/pasados/") ||
+    route.path.includes("/en/events/past/");
+
+  return latestIsoTimestamp(
+    isPast
+      ? [event.sourceUpdatedAt, event.archiveEligibleAt]
+      : [event.sourceUpdatedAt],
+  );
+}
+
 function managedHead(route) {
   return getRouteHeadDescriptors(route)
     .map((descriptor) => {
       const attributes = Object.entries(descriptor.attributes)
         .map(([name, value]) => `${name}="${escapeAttribute(value)}"`)
         .join(" ");
-      const opening = `${descriptor.tag} data-route-seo ${attributes}`;
+      const opening = `${descriptor.tag} ${attributes}`;
 
       if (descriptor.tag === "script") {
         return `    <${opening}>${descriptor.text ?? ""}</script>`;
@@ -78,9 +109,14 @@ function renderRouteHtml(route) {
     `<div id="root">${bodyHtml}</div>`,
   );
 
+  html = html.replace(
+    /(<title>[\s\S]*?<\/title>)/i,
+    `$1\n${managedHead(route)}`,
+  );
+
   return html.replace(
     "</head>",
-    `    <meta name="app-prerendered-at" content="${prerenderedAt}" />\n${managedHead(route)}\n  </head>`,
+    `    <meta name="app-prerendered-at" content="${prerenderedAt}" />\n  </head>`,
   );
 }
 
@@ -138,10 +174,14 @@ const sitemap = [
   '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">',
   ...routes.flatMap((route) => {
     const seo = getRouteSeoPayload(route);
+    const lastModified = getRouteLastModified(route);
     return seo.robots === "index, follow" && seo.canonicalUrl
       ? [
           "  <url>",
           `    <loc>${escapeText(seo.canonicalUrl)}</loc>`,
+          ...(lastModified
+            ? [`    <lastmod>${escapeText(lastModified)}</lastmod>`]
+            : []),
           ...getRouteSitemapImageUrls(route).flatMap((imageUrl) => [
             "    <image:image>",
             `      <image:loc>${escapeText(imageUrl)}</image:loc>`,

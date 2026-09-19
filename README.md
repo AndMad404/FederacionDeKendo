@@ -2,7 +2,7 @@
 
 Sitio oficial de la Federacion de Asociaciones de Kendo de Costa Rica.
 
-[Visitar el sitio](https://fak-kendo.pages.dev)
+[Visitar el sitio](https://fak-kendo.org/)
 
 ## Funcionalidad
 

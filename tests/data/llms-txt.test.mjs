@@ -29,7 +29,7 @@ test("the published llms.txt complies with the project contract", async () => {
 });
 
 test("the observer returns false and alarms for an invalid file", () => {
-  const invalid = `# Sitio\n\nResumen sin bloque.\n\n## Páginas\n\n- [Calendario](https://fak-kendo.pages.dev/calendario/)`;
+  const invalid = `# Sitio\n\nResumen sin bloque.\n\n## Páginas\n\n- [Calendario](https://example.org/calendario/)`;
   const result = validateLlmsTxt(invalid, configuredPaths);
 
   assert.equal(result.compliant, false);

@@ -8,6 +8,11 @@ export interface UpcomingEventGroup {
 }
 
 const DEFAULT_EVENT_TIME_ZONE = "America/Costa_Rica";
+const EXTERNAL_EVENT_MARKER = /(?:^|\s)#EventoExterno\b/iu;
+
+export function isExternalEvent(event: { summary?: string }) {
+  return EXTERNAL_EVENT_MARKER.test(event.summary ?? "");
+}
 
 function parseDateParts(date: string) {
   const [year, month, day] = date.split("-").map(Number);
@@ -104,13 +109,17 @@ export function isPastEvent(event: CalendarEvent, now = new Date()) {
   );
 }
 
+export function isUpcomingEvent(event: CalendarEvent, now = new Date()) {
+  return getEventEndDate(event).getTime() > now.getTime();
+}
+
 export function getUpcomingEvents(
   events: readonly CalendarEvent[],
   now = new Date(),
   max = 4,
 ) {
   return [...events]
-    .filter((event) => !isPastEvent(event, now))
+    .filter((event) => isUpcomingEvent(event, now))
     .sort(
       (a, b) => getEventStartDate(a).getTime() - getEventStartDate(b).getTime(),
     )

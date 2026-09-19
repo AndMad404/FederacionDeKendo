@@ -149,7 +149,7 @@ export const COPY = {
       rangeSeparator: "al",
       place: "Lugar",
       opensMaps: "Abre Google Maps en una pestaña nueva.",
-      toBeConfirmed: "Pendiente de confirmar",
+      toBeConfirmed: "Ubicación pendiente de confirmar",
       informationPending: "Información pendiente de confirmar.",
       eventDetails: "Detalles del evento",
       linkCopied: "Enlace copiado",
@@ -212,7 +212,9 @@ export const COPY = {
       viewDetailsLabel: "Consultar detalles del evento",
       addToCalendar: "Añade a tu calendario",
       audienceNotice:
-        "Actividad abierta al público como espectador. La participación está reservada a miembros habilitados. El ingreso está sujeto a capacidad, normas del recinto y condiciones de seguridad.",
+        "Acceso del público: gratuito. Participación: para conocer los requisitos, la inscripción y las condiciones de participación, comuníquese con la organización.",
+      externalAudienceNotice:
+        "Costo y participación: consulte la convocatoria oficial o comuníquese con la organización del evento para conocer precios, requisitos e inscripción.",
     },
     archive: {
       title: "Eventos pasados",
@@ -286,7 +288,7 @@ export const COPY = {
       rangeSeparator: "to",
       place: "Place",
       opensMaps: "Opens Google Maps in a new tab.",
-      toBeConfirmed: "To be confirmed",
+      toBeConfirmed: "Location to be confirmed",
       informationPending: "Information to be confirmed.",
       eventDetails: "Event details",
       linkCopied: "Link copied",
@@ -349,7 +351,9 @@ export const COPY = {
       viewDetailsLabel: "View details for",
       addToCalendar: "Add to calendar",
       audienceNotice:
-        "The public may attend as spectators. Participation is reserved for eligible members. Admission is subject to venue capacity, rules, and safety requirements.",
+        "Public access: free. Participation: contact the organization for eligibility requirements, registration, and participation terms.",
+      externalAudienceNotice:
+        "Cost and participation: consult the official announcement or contact the event organization for pricing, eligibility requirements, and registration.",
     },
     archive: {
       title: "Past events",

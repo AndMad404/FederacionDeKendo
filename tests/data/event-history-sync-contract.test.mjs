@@ -33,6 +33,7 @@ const PUBLIC_EVENT_FIELDS = [
   "id",
   "aliases",
   "archiveEligibleAt",
+  "sourceUpdatedAt",
   "title",
   "date",
   "endDate",
@@ -51,12 +52,16 @@ const REGISTRY_EVENT_FIELDS = [
   "slug",
   "aliases",
   "archiveEligibleAt",
+  "sourceUpdatedAt",
   "historical",
   "editorialState",
   "pendingRevision",
   "editorialDecision",
   ...PUBLIC_EVENT_FIELDS.filter(
-    (field) => !["id", "aliases", "archiveEligibleAt"].includes(field),
+    (field) =>
+      !["id", "aliases", "archiveEligibleAt", "sourceUpdatedAt"].includes(
+        field,
+      ),
   ),
 ];
 
@@ -121,6 +126,7 @@ test("inventories every field persisted in the registry and public event model",
     "slug",
     "aliases",
     "archiveEligibleAt",
+    "sourceUpdatedAt",
     "historical",
     "editorialState",
     "pendingRevision",
@@ -141,6 +147,7 @@ test("inventories every field persisted in the registry and public event model",
     "id",
     "aliases",
     "archiveEligibleAt",
+    "sourceUpdatedAt",
     "title",
     "date",
     "endDate",
@@ -153,6 +160,29 @@ test("inventories every field persisted in the registry and public event model",
     "infoUrl",
     "timeZone",
   ]);
+});
+
+test("source timestamp alone does not create a historical editorial revision", () => {
+  const previous = {
+    ...historicalSnapshot,
+    sourceUpdatedAt: "2026-01-09T12:00:00.000Z",
+  };
+  const {
+    historical: _historical,
+    editorialState: _editorialState,
+    ...current
+  } = previous;
+  current.sourceUpdatedAt = "2026-01-10T12:00:00.000Z";
+
+  const result = mergeRegistry(
+    { version: 4, events: [previous] },
+    [current],
+    new Date("2026-03-01T00:00:00.000Z"),
+  );
+
+  assert.equal(result.events[0].editorialState, "publicado");
+  assert.equal(result.events[0].pendingRevision, undefined);
+  assert.equal(result.events[0].sourceUpdatedAt, "2026-01-09T12:00:00.000Z");
 });
 
 test("Given one historical event disappears, When another remains in the feed, Then the missing snapshot remains public and pending", () => {

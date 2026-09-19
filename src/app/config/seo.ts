@@ -1,6 +1,7 @@
 import seoData from "./seo-data.json";
 import { GALLERY_IMAGES, getGalleryImages } from "../data/gallery";
 import { CALENDAR_EVENTS } from "../data/calendarEvents";
+import { isExternalEvent } from "../utils/calendarEvents";
 import { EVENT_INDEXING_ENABLED, PAST_EVENTS_PAGE_SIZE } from "./events";
 import {
   findEventByPathname,
@@ -166,9 +167,10 @@ assertSeoData(seoData);
 const DATA: SeoData = seoData as SeoData;
 
 const SITE_URL = DATA.siteUrl.replace(/\/$/, "");
-// Public indexing remains paused until the owner separately approves the
-// canonical domain, legal identity, and launch policy.
-const SITE_INDEXING_ENABLED = false;
+// The owner approved fak-kendo.org as the canonical production domain and
+// authorized the public SEO launch on 2026-09-17. Route-level approvals remain
+// explicit so event and archive pages can keep their separate editorial gate.
+const SITE_INDEXING_ENABLED = true;
 const SITE_NAME = DATA.siteName;
 const DEFAULT_SITE_DESCRIPTION = DATA.defaultDescription;
 const DEFAULT_SOCIAL_IMAGE_ALT = DATA.defaultImageAlt;
@@ -207,6 +209,95 @@ function normalizeDescription(text: string) {
     .replace(/(?:^|\s)\*\s+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+const EXPLICIT_FOREIGN_COUNTRY_PATTERN =
+  /\b(?:alemania|argentina|australia|belice|belize|bolivia|brasil|brazil|canada|chile|china|colombia|corea|cuba|dominican republic|ecuador|el salvador|espana|estados unidos|francia|germany|guatemala|honduras|italia|italy|japan|japon|korea|mexico|nicaragua|panama|paraguay|peru|portugal|puerto rico|reino unido|republica dominicana|spain|taiwan|united kingdom|united states|uruguay|venezuela)\b/u;
+export function getEventOrganizerReference(
+  event: { summary?: string },
+  organizationId: string,
+) {
+  if (isExternalEvent(event)) return undefined;
+
+  return { "@id": organizationId };
+}
+
+interface EventSeoTitleInput {
+  event: (typeof CALENDAR_EVENTS)[number];
+  localizedEvent: (typeof CALENDAR_EVENTS)[number];
+  language: Language;
+}
+
+const EVENT_SEO_TITLE_OVERRIDES: Partial<
+  Record<string, Partial<Record<Language, string>>>
+> = {
+  "2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario": {
+    es: "PANAMA 5ta Copa Shogun",
+    en: "PANAMA 5th Shogun Cup",
+  },
+};
+
+function hasExplicitInternationalLocation({
+  event,
+  localizedEvent,
+}: Pick<EventSeoTitleInput, "event" | "localizedEvent">) {
+  const locationEvidence = [
+    event.title,
+    localizedEvent.title,
+    event.location,
+    localizedEvent.location,
+    event.summary,
+    localizedEvent.summary,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLocaleLowerCase("en-US");
+
+  return EXPLICIT_FOREIGN_COUNTRY_PATTERN.test(locationEvidence);
+}
+
+function improveGenericEventTitle(title: string, language: Language) {
+  if (language === "en") {
+    if (/^Examination$/iu.test(title)) return "Kendo Examination";
+    if (/^Seminar$/iu.test(title)) return "Kendo Seminar";
+    return title.replace(
+      /^(\d+(?:st|nd|rd|th)) Tournament$/iu,
+      "$1 Kendo Tournament",
+    );
+  }
+
+  if (/^Examen$/iu.test(title)) return "Examen de Kendo";
+  if (/^Seminario$/iu.test(title)) return "Seminario de Kendo";
+  return title.replace(
+    /^(\d+(?:er|do|ro|to|mo|vo)) Torneo$/iu,
+    "$1 Torneo de Kendo",
+  );
+}
+
+export function buildEventSeoTitle({
+  event,
+  localizedEvent,
+  language,
+}: EventSeoTitleInput) {
+  const title =
+    EVENT_SEO_TITLE_OVERRIDES[event.id]?.[language] ??
+    improveGenericEventTitle(
+      normalizeDescription(localizedEvent.title),
+      language,
+    );
+  const date = new Intl.DateTimeFormat(language === "en" ? "en-US" : "es-CR", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${event.date}T00:00:00Z`));
+  const isLocalExamOrSeminar =
+    (event.eventType === "examen" || event.eventType === "seminario") &&
+    !hasExplicitInternationalLocation({ event, localizedEvent });
+
+  return `${title} — ${date}${isLocalExamOrSeminar ? " | Costa Rica" : ""}`;
 }
 
 function ensureTerminalPunctuation(text: string) {
@@ -415,25 +506,41 @@ export function getEventRedirects() {
     ...CALENDAR_EVENTS.flatMap((event) => {
       const spanishPath = getEventPath(event, "es");
       const englishPath = getEventPath(event, "en");
-      return [
-        ...(spanishPath !== `/eventos/${event.id}/`
-          ? [{ from: `/eventos/${event.id}/`, to: spanishPath }]
-          : []),
-        ...(getEventTranslationStatus(event) === "valid" &&
-        englishPath !== `/en/events/${event.id}/`
-          ? [{ from: `/en/events/${event.id}/`, to: englishPath }]
-          : []),
-        ...(event.aliases ?? []).flatMap((alias) => [
-          { from: `/eventos/${alias}/`, to: spanishPath },
-          ...(getEventTranslationStatus(event) === "valid"
-            ? [{ from: `/en/events/${alias}/`, to: englishPath }]
-            : []),
+      const archived = spanishPath.startsWith("/eventos/pasados/");
+      const englishArchived = englishPath.startsWith("/en/events/past/");
+      const aliases = event.aliases ?? [];
+
+      const spanishSources = new Set([
+        `/eventos/${event.id}/`,
+        ...(archived ? [`/eventos/pasados/${event.id}/`] : []),
+        ...aliases.flatMap((alias) => [
+          `/eventos/${alias}/`,
+          ...(archived ? [`/eventos/pasados/${alias}/`] : []),
         ]),
+      ]);
+
+      const englishSources = new Set([
+        `/en/events/${event.id}/`,
+        ...(englishArchived ? [`/en/events/past/${event.id}/`] : []),
+        ...aliases.flatMap((alias) => [
+          `/en/events/${alias}/`,
+          ...(englishArchived ? [`/en/events/past/${alias}/`] : []),
+        ]),
+      ]);
+
+      return [
+        ...[...spanishSources]
+          .filter((from) => from !== spanishPath)
+          .map((from) => ({ from, to: spanishPath })),
+        ...(getEventTranslationStatus(event) === "valid"
+          ? [...englishSources]
+              .filter((from) => from !== englishPath)
+              .map((from) => ({ from, to: englishPath }))
+          : []),
       ];
     }),
   ];
 }
-
 function createEventRouteMeta(
   event: (typeof CALENDAR_EVENTS)[number],
   language: Language,
@@ -454,7 +561,7 @@ function createEventRouteMeta(
         : undefined,
     component: "event",
     eventId: event.id,
-    title: `${localizedEvent.title} — ${formatEventDate(event.date, language)} | ${SITE_NAME}`,
+    title: buildEventSeoTitle({ event, localizedEvent, language }),
     description: buildEventMetaDescription({
       event,
       localizedEvent,
@@ -488,8 +595,8 @@ function createArchiveRouteMeta(
     component: "pastEvents",
     archivePage: page,
     title: english
-      ? `Past events${page > 1 ? ` — page ${page}` : ""} | ${SITE_NAME}`
-      : `Eventos pasados${page > 1 ? ` — página ${page}` : ""} | ${SITE_NAME}`,
+      ? `Past Kendo Events${page > 1 ? ` — page ${page}` : ""} | Costa Rica`
+      : `Eventos pasados de Kendo${page > 1 ? ` — página ${page}` : ""} | Costa Rica`,
     description:
       page > 1
         ? `${archiveDescription} ${english ? "Page" : "Página"} ${page}.`
@@ -500,7 +607,7 @@ function createArchiveRouteMeta(
     imageHeight: calendarMeta.imageHeight,
     imageType: calendarMeta.imageType,
     schemaType: "CollectionPage",
-    indexable: false,
+    indexable: true,
     noindex: false,
     canonicalWhileNoindex: true,
   };
@@ -588,6 +695,7 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
         : event.endTime
           ? `${event.date}T${event.endTime}:00-06:00`
           : undefined;
+      const organizer = getEventOrganizerReference(event, organizationId);
       routeEntities.push({
         "@type": "Event",
         "@id": `${canonicalUrl}#event`,
@@ -613,6 +721,7 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
               },
             }
           : {}),
+        ...(organizer ? { organizer } : {}),
         image: [image.url],
         url: canonicalUrl,
       });
@@ -755,6 +864,19 @@ export function getRouteHeadDescriptors(meta: RouteMeta): HeadDescriptor[] {
     ].map(([property, content]) => ({
       tag: "meta" as const,
       attributes: { property, content },
+    })),
+  );
+
+  descriptors.push(
+    ...[
+      ["twitter:card", "summary_large_image"],
+      ["twitter:title", seo.title],
+      ["twitter:description", seo.description],
+      ["twitter:image", seo.image.url],
+      ["twitter:image:alt", seo.image.alt],
+    ].map(([name, content]) => ({
+      tag: "meta" as const,
+      attributes: { name, content },
     })),
   );
 

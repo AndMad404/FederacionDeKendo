@@ -24,6 +24,7 @@ test("the default social card is a baseline JPEG for link previews", async () =>
 
 test("every configured static route has complete public metadata", async () => {
   const seo = JSON.parse(await read("src/app/config/seo-data.json"));
+  assert.equal(seo.siteUrl, "https://fak-kendo.org");
   assert.ok(seo.siteUrl && seo.siteName && seo.defaultDescription);
   assert.ok(seo.logo && seo.defaultImage && seo.defaultImageAlt);
   assert.ok(Object.keys(seo.routes).length > 0);
@@ -49,12 +50,30 @@ test("every configured static route has complete public metadata", async () => {
       path,
     );
   }
+
+  for (const path of [
+    "/",
+    "/eventos/",
+    "/galeria/",
+    "/afiliados/",
+    "/en/",
+    "/en/events/",
+    "/en/gallery/",
+    "/en/affiliates/",
+  ]) {
+    assert.equal(seo.routes[path].indexable, true, path);
+  }
 });
 
 test("Spanish and English localized copy inventories expose the same sections", async () => {
   const { COPY } = await loadSourceModule("/src/app/config/i18n.ts");
   assert.ok(Object.keys(COPY.es).length > 0);
   assert.deepEqual(Object.keys(COPY.en), Object.keys(COPY.es));
+  assert.equal(
+    COPY.es.common.toBeConfirmed,
+    "Ubicación pendiente de confirmar",
+  );
+  assert.equal(COPY.en.common.toBeConfirmed, "Location to be confirmed");
 });
 
 test("every approved dojo record retains required contact and schedule fields", async () => {

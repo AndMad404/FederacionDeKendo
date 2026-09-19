@@ -1,6 +1,10 @@
 {
   "name": "Federación de Asociaciones de Kendo",
   "short_name": "FAK",
+  "description": "Sitio oficial de la Federación de Asociaciones de Kendo en Costa Rica.",
+  "lang": "es-CR",
+  "start_url": "/",
+  "scope": "/",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",

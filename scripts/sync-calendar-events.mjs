@@ -103,6 +103,7 @@ export const HISTORICAL_SNAPSHOT_FIELDS = [
   "slug",
   "aliases",
   "archiveEligibleAt",
+  "sourceUpdatedAt",
   "historical",
   "inactive",
   ...HISTORICAL_COMPARISON_FIELDS.filter(
@@ -231,6 +232,29 @@ function parseBasicDateTime(value) {
     hours: Number.parseInt(value.slice(9, 11), 10),
     minutes: Number.parseInt(value.slice(11, 13), 10),
   };
+}
+
+function parseUtcCalendarTimestamp(property) {
+  const match = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z$/.exec(
+    property?.rawValue ?? "",
+  );
+  if (!match) return undefined;
+
+  const [, year, month, day, hours, minutes, seconds] = match;
+  const timestamp = new Date(
+    Date.UTC(
+      Number(year),
+      Number(month) - 1,
+      Number(day),
+      Number(hours),
+      Number(minutes),
+      Number(seconds),
+    ),
+  );
+
+  const iso = timestamp.toISOString();
+  const expected = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000Z`;
+  return iso === expected ? iso : undefined;
 }
 
 function formatDate({ year, month, day }) {
@@ -443,8 +467,12 @@ export function parseCalendarEvent(properties, warnings = []) {
     title,
   );
   const end = parseIcsDate(properties.get("DTEND"));
+  const sourceUpdatedAt = parseUtcCalendarTimestamp(
+    properties.get("LAST-MODIFIED"),
+  );
   const event = {
     sourceId: hash(uid),
+    ...(sourceUpdatedAt ? { sourceUpdatedAt } : {}),
     slug: createCanonicalSlug(title, start.date),
     title,
     date: start.date,
@@ -605,8 +633,20 @@ export function mergeRegistry(
       );
     }
 
+    const publicContentMatchesPrevious =
+      previousEvent &&
+      HISTORICAL_COMPARISON_FIELDS.every(
+        (field) =>
+          JSON.stringify(previousEvent[field]) ===
+          JSON.stringify(currentEvent[field]),
+      );
+    const sourceUpdatedAt = publicContentMatchesPrevious
+      ? (previousEvent.sourceUpdatedAt ?? currentEvent.sourceUpdatedAt)
+      : currentEvent.sourceUpdatedAt;
+
     return {
       ...currentEvent,
+      ...(sourceUpdatedAt ? { sourceUpdatedAt } : {}),
       editorialState: "publicado",
       ...(becomesHistorical ? { historical: true } : {}),
       ...(aliases?.length ? { aliases } : {}),
@@ -1190,6 +1230,7 @@ function serializeCalendarEvent(event) {
     ["id", event.slug],
     ["aliases", event.aliases],
     ["archiveEligibleAt", event.archiveEligibleAt],
+    ["sourceUpdatedAt", event.sourceUpdatedAt],
     ["title", event.title],
     ["date", event.date],
     ["endDate", event.endDate],

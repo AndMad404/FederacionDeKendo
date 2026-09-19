@@ -57,11 +57,47 @@ test("scheduled event pages offer an add-to-calendar button", async ({
     name: "Añade a tu calendario",
   });
   await expect(addToCalendar).toBeVisible();
+  await expect(page.locator("#event-page-title + p")).toHaveText("Seminario");
   await expect(addToCalendar).toHaveAttribute("target", "_blank");
   const href = await addToCalendar.getAttribute("href");
   expect(href).toBeTruthy();
   expect(new URL(href!).searchParams.get("text")).toBe(title);
+  await expect(
+    page.getByText(
+      "Acceso del público: gratuito. Participación: para conocer los requisitos, la inscripción y las condiciones de participación, comuníquese con la organización.",
+    ),
+  ).toBeVisible();
 });
+
+for (const viewport of [
+  { name: "mobile 360x800 portrait", width: 360, height: 800, columns: 1 },
+  { name: "mobile 390x844 portrait", width: 390, height: 844, columns: 1 },
+  { name: "tablet 768x1024 portrait", width: 768, height: 1024, columns: 1 },
+  { name: "desktop 1366x768 landscape", width: 1366, height: 768, columns: 2 },
+]) {
+  test(`scheduled event details use a ${viewport.columns}-column ${viewport.name} grid`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport);
+    const { path } = await discoverUpcomingEvent(page);
+    await page.goto(path);
+
+    const addToCalendar = page.getByRole("link", {
+      name: "Añade a tu calendario",
+    });
+    const details = addToCalendar.locator("xpath=ancestor::dl");
+    await expect(details).toHaveCount(1);
+    await expect(details.locator(":scope > div")).toHaveCount(4);
+    await expect
+      .poll(() =>
+        details.evaluate(
+          (element) =>
+            getComputedStyle(element).gridTemplateColumns.split(" ").length,
+        ),
+      )
+      .toBe(viewport.columns);
+  });
+}
 
 test("accepts only current canonical event routes", async ({ page }) => {
   await page.goto("/eventos/examen-2026-08-08/");
@@ -152,9 +188,11 @@ test("moves an event from upcoming to history after its local date expires", asy
 
   await page.goto(HISTORICAL_EVENT_PATH);
   await expect(page.getByText("Actividad finalizada")).toBeVisible();
+  await expect(page.locator("#event-page-title + p")).toHaveText("Examen");
   await expect(
     page.getByRole("link", { name: "Añade a tu calendario" }),
   ).toHaveCount(0);
+  await expect(page.getByText("Acceso del público: gratuito.")).toHaveCount(0);
 });
 
 test("historical tournament details preserve complete information with its gallery", async ({
@@ -164,7 +202,13 @@ test("historical tournament details preserve complete information with its galle
   await page.goto(HISTORICAL_TOURNAMENT_PATH);
 
   await expect(page.getByText("Actividad finalizada")).toBeVisible();
-  await expect(page.getByText("3er Torneo", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "3er Torneo", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator("#event-page-title + p")).toHaveText("Torneo");
+  await expect(
+    page.getByRole("navigation", { name: "Migas de navegación" }),
+  ).toHaveCount(0);
   await expect(
     page.getByText("Tamashii Martial Arts Pinares", { exact: false }),
   ).toBeVisible();
@@ -280,6 +324,9 @@ test("renders the historical archive and the local not-found view", async ({
   await expect(
     page.getByRole("heading", { name: "Eventos pasados", level: 1 }),
   ).toBeVisible();
+  await expect(
+    page.getByRole("navigation", { name: "Migas de navegación" }),
+  ).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Anterior" })).toBeDisabled();
   await expect(page.getByRole("button", { name: "Siguiente" })).toBeEnabled();
 

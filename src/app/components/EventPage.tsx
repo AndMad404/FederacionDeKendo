@@ -16,7 +16,7 @@ import {
   primaryButtonClass,
   secondaryButtonClass,
 } from "../styles/shared";
-import { isPastEvent } from "../utils/calendarEvents";
+import { isExternalEvent, isPastEvent } from "../utils/calendarEvents";
 import {
   formatEventTime,
   getEventDateLabel,
@@ -88,7 +88,11 @@ export function EventPage() {
         titleCasing="normal"
         allowTitleWrap
         adaptiveHeight
-        description={event.type ?? copy.event.defaultType}
+        description={
+          event.eventType
+            ? copy.archive.types[event.eventType]
+            : (event.type ?? copy.event.defaultType)
+        }
         image={{
           src: "/images/calendar/kendo-calendar-1600.webp",
           sources: [
@@ -115,7 +119,7 @@ export function EventPage() {
                 <p className="text-sm font-bold uppercase tracking-wider text-site-accent">
                   {isPast ? copy.event.completed : copy.event.scheduled}
                 </p>
-                <dl className="grid gap-2 text-sm md:grid-cols-2">
+                <dl className="grid gap-2 text-sm land-sm:grid-cols-2 land-tall:grid-cols-2">
                   <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2">
                     <CalendarDays
                       className="row-span-2 size-5 shrink-0 text-site-accent-soft"
@@ -156,23 +160,26 @@ export function EventPage() {
                       )}
                     </dd>
                   </div>
+                  {!isPast ? (
+                    <div>
+                      <dt className="sr-only">{copy.event.addToCalendar}</dt>
+                      <dd className="my-2.5 flex items-center justify-center md:my-0 land-sm:my-0 land-sm:justify-start land-tall:justify-start">
+                        <a
+                          href={getGoogleCalendarUrl(event)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`${secondaryButtonClass} ${focusRingClass}`}
+                        >
+                          <CalendarPlus
+                            className="mr-2 size-4"
+                            aria-hidden="true"
+                          />
+                          {copy.event.addToCalendar}
+                        </a>
+                      </dd>
+                    </div>
+                  ) : null}
                 </dl>
-                {!isPast ? (
-                  <div className="my-2.5 flex items-center justify-center md:my-0 md:justify-start land-sm:my-0 land-sm:justify-start">
-                    <a
-                      href={getGoogleCalendarUrl(event)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`${secondaryButtonClass} ${focusRingClass}`}
-                    >
-                      <CalendarPlus
-                        className="mr-2 size-4"
-                        aria-hidden="true"
-                      />
-                      {copy.event.addToCalendar}
-                    </a>
-                  </div>
-                ) : null}
 
                 <div className="grid gap-1">
                   <h2 className="font-bold">{copy.event.description}</h2>
@@ -185,7 +192,9 @@ export function EventPage() {
               <aside className="grid self-center gap-3 rounded-xl bg-site-media p-4 land-sm:gap-2">
                 {!isPast ? (
                   <p className="text-sm leading-relaxed">
-                    {copy.event.audienceNotice}
+                    {isExternalEvent(event)
+                      ? copy.event.externalAudienceNotice
+                      : copy.event.audienceNotice}
                   </p>
                 ) : null}
                 <div className="grid gap-2">

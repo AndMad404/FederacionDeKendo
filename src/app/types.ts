@@ -35,6 +35,7 @@ export interface CalendarEvent {
   id: string;
   aliases?: string[];
   archiveEligibleAt?: string;
+  sourceUpdatedAt?: string;
   title: string;
   date: string;
   endDate?: string;

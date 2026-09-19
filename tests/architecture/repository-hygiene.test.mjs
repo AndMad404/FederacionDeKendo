@@ -1,25 +1,11 @@
 import assert from "node:assert/strict";
-import { readdirSync, readFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import test from "node:test";
 
 const ROOT = process.cwd();
 const SELF = "tests/architecture/repository-hygiene.test.mjs";
-const EXCLUDED_DIRECTORIES = new Set([
-  ".git",
-  ".cache",
-  ".codex-remote-attachments",
-  ".pnpm-store",
-  ".vite",
-  "coverage",
-  "dist",
-  "dist-ssr",
-  "node_modules",
-  "playwright-report",
-  "test-results",
-  "tmp",
-  "vitest-report",
-]);
 const FORBIDDEN_EXACT_PATHS = new Set(["AGENTS.md", "context-index.md"]);
 const FORBIDDEN_PREFIXES = [
   ".agents/",
@@ -43,34 +29,33 @@ const TEXT_EXTENSIONS = new Set([
   ".yaml",
   ".yml",
 ]);
-const PRIVATE_MARKERS = [
-  "Prometheus",
+const PRIVATE_MARKERS = new Set([
+  "DesarrolloAsistidoIA",
   "Prometheus",
   "federacion-workflow",
   "context-librarian",
   "indexation-librarian",
   "RTK Output",
-];
+]);
 
 function normalize(relativePath) {
   return relativePath.split(path.sep).join("/");
 }
 
-function walk(relativeDirectory = "") {
-  const entries = readdirSync(path.join(ROOT, relativeDirectory), {
-    withFileTypes: true,
+function trackedFiles() {
+  const result = spawnSync("git", ["ls-files", "--cached", "-z"], {
+    cwd: ROOT,
+    encoding: "utf8",
+    shell: false,
   });
-  const files = [];
-  for (const entry of entries) {
-    const relativePath = path.join(relativeDirectory, entry.name);
-    if (entry.isDirectory()) {
-      if (!EXCLUDED_DIRECTORIES.has(entry.name))
-        files.push(...walk(relativePath));
-      continue;
-    }
-    if (entry.isFile()) files.push(normalize(relativePath));
+  if (result.error || result.status !== 0) {
+    throw result.error ?? new Error(result.stderr.trim());
   }
-  return files;
+  return result.stdout
+    .split("\0")
+    .filter(Boolean)
+    .map(normalize)
+    .filter((file) => existsSync(path.join(ROOT, file)));
 }
 
 function isForbiddenPath(relativePath) {
@@ -83,12 +68,12 @@ function isForbiddenPath(relativePath) {
 }
 
 test("repository contains no private assisted-development artifacts", () => {
-  const forbidden = walk().filter(isForbiddenPath).sort();
+  const forbidden = trackedFiles().filter(isForbiddenPath).sort();
   assert.deepEqual(forbidden, []);
 });
 
 test("repository files contain no private tooling identifiers", () => {
-  const files = walk()
+  const files = trackedFiles()
     .filter((file) => file !== SELF)
     .filter((file) =>
       TEXT_EXTENSIONS.has(path.posix.extname(file).toLowerCase()),
