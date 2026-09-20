@@ -1,6 +1,6 @@
 # Federación de Asociaciones de Kendo
 
-> Sitio oficial de la Federación de Asociaciones de Kendo en Costa Rica, con información sobre eventos, comunidad y dojos afiliados.
+> Sitio oficial de la Federación de Asociaciones de Kendo, con información sobre eventos, comunidad y dojos afiliados en Costa Rica.
 
 ## Páginas principales
 
