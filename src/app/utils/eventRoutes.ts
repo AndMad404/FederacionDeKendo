@@ -7,7 +7,7 @@ export { getArchivePagePath } from "./eventArchiveRoutes.js";
 const EVENT_VANITY_SLUGS: Readonly<Record<string, string>> = {
   "2026-05-29-clak-seminario-instructores-chile": "2026-05-30-seminario",
   "2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario":
-    "2026-11-21-panama-torneo-por-equipos",
+    "panama-5ta-copa-shogun-torneo-por-equipos-y-seminario",
 };
 
 export function getEventPublicSlug(event: Pick<CalendarEvent, "id">) {
