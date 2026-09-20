@@ -157,6 +157,7 @@ export const COPY = {
     },
     calendar: {
       title: "Calendario de Próximos Eventos",
+      upcomingLabel: "Próximos eventos",
       description: "Torneos, exámenes y actividades de kendo.",
       empty: "No hay próximos eventos publicados.",
       pastEvents: "Eventos pasados",
@@ -296,6 +297,7 @@ export const COPY = {
     },
     calendar: {
       title: "Upcoming Events Calendar",
+      upcomingLabel: "Upcoming events",
       description: "Kendo tournaments, examinations, and activities.",
       empty: "There are no upcoming published events.",
       pastEvents: "Past events",

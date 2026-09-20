@@ -19,14 +19,20 @@ export function EventSectionNavigation({
       ? { upcoming: "/en/events/", past: "/en/events/past/" }
       : { upcoming: "/eventos/", past: "/eventos/pasados/" };
   const items = [
-    { id: "upcoming", label: copy.calendar.title, path: paths.upcoming },
+    {
+      id: "upcoming",
+      label: copy.calendar.upcomingLabel,
+      path: paths.upcoming,
+    },
     { id: "past", label: copy.archive.title, path: paths.past },
   ] as const;
 
   return (
     <nav
       aria-label={
-        active === "upcoming" ? copy.calendar.title : copy.archive.title
+        active === "upcoming"
+          ? copy.calendar.upcomingLabel
+          : copy.archive.title
       }
       className="flex flex-nowrap items-center justify-center gap-2 sm:gap-3"
     >
