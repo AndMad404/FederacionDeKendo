@@ -138,7 +138,7 @@ test("generates localized, unique, indexable SEO output for every event route", 
     ],
     [
       "2026-05-29-clak-seminario-instructores-chile:en",
-      "CLAK Instructor Seminar CHILE — May 29, 2026",
+      "CLAK Seminario Instructores CHILE — May 29, 2026",
     ],
     ["2026-08-08-examen:en", "Kendo Examination — Aug 8, 2026 | Costa Rica"],
   ]);
@@ -171,7 +171,7 @@ test("generates localized, unique, indexable SEO output for every event route", 
       "en",
       {
         path: `/en/events/${panamaEventId}/`,
-        title: "PANAMA 5th Shogun Cup — Nov 21, 2026",
+        title: "PANAMA 5ta Copa Shogun — Nov 21, 2026",
       },
     ],
   ]);
@@ -401,6 +401,57 @@ test("redirects legacy calendar and archived event URLs to their canonical route
     redirects,
     /^\/en\/events\/past\/2026-05-29-clak-seminario-instructores-chile\/ \/en\/events\/past\/2026-05-30-seminario\/ 301$/m,
   );
+});
+
+test("redirects every previous event URL to its current URL in each published language", async () => {
+  const redirects = await readDist("_redirects");
+  const redirectLines = new Set(redirects.split(/\r?\n/).filter(Boolean));
+  const redirectSources = new Set(
+    [...redirectLines].map((line) => line.split(" ")[0]),
+  );
+  const eventRoutes = getRouteManifest().filter(
+    (route) => route.component === "event",
+  );
+  const renamedEvents = CALENDAR_EVENTS.filter(
+    ({ aliases }) => aliases?.length,
+  );
+
+  assert.ok(renamedEvents.length > 0);
+
+  for (const event of renamedEvents) {
+    const routes = eventRoutes.filter((route) => route.eventId === event.id);
+    assert.ok(
+      routes.some((route) => route.language === "es"),
+      `${event.id}: missing Spanish route`,
+    );
+
+    for (const route of routes) {
+      const [current, past] =
+        route.language === "en"
+          ? ["/en/events/", "/en/events/past/"]
+          : ["/eventos/", "/eventos/pasados/"];
+      const prefixes = route.path.startsWith(past)
+        ? [current, past]
+        : [current];
+
+      for (const slug of [event.id, ...event.aliases]) {
+        for (const prefix of prefixes) {
+          const from = `${prefix}${slug}/`;
+          if (from === route.path) continue;
+          assert.ok(
+            redirectLines.has(`${from} ${route.path} 301`),
+            `${from} must redirect to ${route.path}`,
+          );
+        }
+      }
+
+      assert.equal(
+        redirectSources.has(route.path),
+        false,
+        `${route.path} must not redirect elsewhere`,
+      );
+    }
+  }
 });
 
 test("omits breadcrumbs from event and archive routes", async () => {

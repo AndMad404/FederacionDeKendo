@@ -233,7 +233,7 @@ const EVENT_SEO_TITLE_OVERRIDES: Partial<
 > = {
   "2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario": {
     es: "PANAMA 5ta Copa Shogun",
-    en: "PANAMA 5th Shogun Cup",
+    en: "PANAMA 5ta Copa Shogun",
   },
 };
 
