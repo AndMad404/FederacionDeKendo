@@ -192,9 +192,14 @@ export function EventPage() {
               <aside className="grid self-center gap-3 rounded-xl bg-site-media p-4 land-sm:gap-2">
                 {!isPast ? (
                   <p className="text-sm leading-relaxed">
-                    {isExternalEvent(event)
-                      ? copy.event.externalAudienceNotice
-                      : copy.event.audienceNotice}
+                    {isExternalEvent(event) ? (
+                      <>
+                        <strong>{copy.event.externalAudienceNoticeLabel}</strong>{" "}
+                        {copy.event.externalAudienceNotice}
+                      </>
+                    ) : (
+                      copy.event.audienceNotice
+                    )}
                   </p>
                 ) : null}
                 <div className="grid gap-2">
