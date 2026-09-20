@@ -30,9 +30,7 @@ export function EventSectionNavigation({
   return (
     <nav
       aria-label={
-        active === "upcoming"
-          ? copy.calendar.upcomingLabel
-          : copy.archive.title
+        active === "upcoming" ? copy.calendar.upcomingLabel : copy.archive.title
       }
       className="flex flex-nowrap items-center justify-center gap-2 sm:gap-3"
     >

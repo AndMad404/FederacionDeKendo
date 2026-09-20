@@ -194,7 +194,9 @@ export function EventPage() {
                   <p className="text-sm leading-relaxed">
                     {isExternalEvent(event) ? (
                       <>
-                        <strong>{copy.event.externalAudienceNoticeLabel}</strong>{" "}
+                        <strong>
+                          {copy.event.externalAudienceNoticeLabel}
+                        </strong>{" "}
                         {copy.event.externalAudienceNotice}
                       </>
                     ) : (
