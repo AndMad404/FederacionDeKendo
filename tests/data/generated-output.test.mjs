@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   CALENDAR_EVENTS,
   getEventRedirects,
+  getEventTranslationStatus,
   getRouteManifest,
   getRouteSeoPayload,
 } from "../../dist-ssr/entry-server.js";
@@ -13,6 +14,22 @@ async function readDist(relativePath) {
     new URL(`../../dist/${relativePath}`, import.meta.url),
     "utf8",
   );
+}
+
+async function describeTranslation(eventId) {
+  const event = CALENDAR_EVENTS.find(({ id }) => id === eventId);
+  const translations = JSON.parse(
+    await readFile(
+      new URL("../../src/app/data/eventTranslations.json", import.meta.url),
+      "utf8",
+    ),
+  );
+
+  return JSON.stringify({
+    status: event ? getEventTranslationStatus(event) : "event-missing",
+    calendar: { title: event?.title, summary: event?.summary },
+    translationSource: translations[eventId]?.source,
+  });
 }
 
 test("generates historical event routes with canonical and indexable metadata", async () => {
@@ -180,7 +197,11 @@ test("generates localized, unique, indexable SEO output for every event route", 
       (candidate) =>
         candidate.eventId === panamaEventId && candidate.language === language,
     );
-    assert.equal(route?.path, expected.path, language);
+    assert.equal(
+      route?.path,
+      expected.path,
+      `${language}: ${await describeTranslation(panamaEventId)}`,
+    );
     assert.equal(route?.title, expected.title, language);
   }
 
