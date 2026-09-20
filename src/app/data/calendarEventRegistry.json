@@ -88,13 +88,14 @@
     },
     {
       "sourceId": "e25ca7168de483e195f1aaf1",
-      "sourceUpdatedAt": "2026-05-18T19:19:09.000Z",
+      "sourceUpdatedAt": "2026-09-18T20:17:19.000Z",
       "slug": "2026-10-10-clak-1er-panamericano-brasil",
       "title": "CLAK 1er Panamericano BRASIL",
       "date": "2026-10-10",
       "timeZone": "America/Costa_Rica",
       "endDate": "2026-10-12",
       "archiveEligibleAt": "2026-10-13T06:00:00.000Z",
+      "summary": "#EventoExterno",
       "eventType": "seminario",
       "editorialState": "publicado"
     },
@@ -115,18 +116,18 @@
     },
     {
       "sourceId": "2d5bad84832b0a2be6193e52",
-      "sourceUpdatedAt": "2026-07-24T17:16:22.000Z",
+      "sourceUpdatedAt": "2026-09-18T20:17:37.000Z",
       "slug": "2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario",
-      "aliases": [
-        "2026-11-21-panama-torneo-por-equipos"
-      ],
       "title": "PANAMÁ 5ta Copa Shogun Torneo por Equipos y Seminario",
       "date": "2026-11-21",
       "timeZone": "America/Costa_Rica",
       "archiveEligibleAt": "2026-11-23T06:00:00.000Z",
+      "summary": "#EventoExterno:\nInvitación del Dojo Shinsei Panamá a la 5ta Copa Shogun : Torneo por equipos, práctica libre y seminario.",
       "eventType": "torneo",
       "editorialState": "publicado",
-      "summary": "#EventoExterno: Invitación del Dojo Shinsei Panamá a la 5ta Copa Shogun :\nTorneo por equipos, práctica libre y seminario."
+      "aliases": [
+        "2026-11-21-panama-torneo-por-equipos"
+      ]
     },
     {
       "sourceId": "d5e995f4e75da854e455e4a5",
