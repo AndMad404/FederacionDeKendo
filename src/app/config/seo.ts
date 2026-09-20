@@ -276,7 +276,7 @@ function improveGenericEventTitle(title: string, language: Language) {
   );
 }
 
-export function buildEventSeoTitle({
+function buildEventSeoTitle({
   event,
   localizedEvent,
   language,

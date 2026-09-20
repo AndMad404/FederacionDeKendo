@@ -8,7 +8,7 @@ const EVENT_VANITY_SLUGS: Readonly<Record<string, string>> = {
   "2026-05-29-clak-seminario-instructores-chile": "2026-05-30-seminario",
 };
 
-export function getEventPublicSlug(event: Pick<CalendarEvent, "id">) {
+function getEventPublicSlug(event: Pick<CalendarEvent, "id">) {
   return EVENT_VANITY_SLUGS[event.id] ?? event.id;
 }
 
