@@ -7,7 +7,7 @@ test("calendar menu opens on hover and navigates to past events", async ({
   await page.goto("/eventos/");
 
   const calendarButton = page.getByRole("button", {
-    name: "Eventos",
+    name: "Evento",
   });
   await expect(calendarButton).toHaveClass(/gap-1/);
   await calendarButton.hover();
@@ -52,7 +52,10 @@ test("calendar menu opens on focus, closes with Escape and restores focus", asyn
   await expect(
     page
       .getByRole("list", { name: "Opciones del calendario" })
-      .getByRole("link", { name: "Próximos eventos", exact: true }),
+      .getByRole("link", {
+        name: "Calendario de Próximos Eventos",
+        exact: true,
+      }),
   ).toBeVisible();
 
   await page.keyboard.press("Escape");
@@ -67,7 +70,7 @@ test("calendar menu closes on an outside click and keeps English destinations ac
   await page.goto("/en/events/");
 
   const calendarButton = page.getByRole("button", {
-    name: "Calendar",
+    name: "Event",
   });
   await calendarButton.click();
   await expect(calendarButton).toHaveAttribute("aria-expanded", "true");
@@ -92,7 +95,7 @@ test("calendar section expands inside the mobile navigation", async ({
 
   await page.getByRole("button", { name: "Abrir menú" }).click();
   const calendarButton = page.getByRole("button", {
-    name: "Eventos",
+    name: "Evento",
   });
   await calendarButton.click();
 
@@ -112,7 +115,7 @@ test("navigation history invalidates open desktop and mobile menus", async ({
   await page.goto("/eventos/");
 
   const desktopCalendarButton = page.getByRole("button", {
-    name: "Eventos",
+    name: "Evento",
   });
   await desktopCalendarButton.focus();
   await expect(desktopCalendarButton).toHaveAttribute("aria-expanded", "true");

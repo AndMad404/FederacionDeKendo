@@ -11,7 +11,7 @@ test("primary and secondary actions exchange their colors on hover", async ({
     exact: true,
   });
   const primary = home.getByRole("link", {
-    name: "Próximos eventos",
+    name: "Calendario de Próximos Eventos",
     exact: true,
   });
 
@@ -36,7 +36,7 @@ test("reduced motion removes non-essential button and gallery motion", async ({
   await page.goto("/");
 
   const primary = page.locator("main").getByRole("link", {
-    name: "Próximos eventos",
+    name: "Calendario de Próximos Eventos",
     exact: true,
   });
   await expect(primary).toHaveCSS("transition-duration", "0s");
