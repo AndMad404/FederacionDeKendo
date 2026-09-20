@@ -87,7 +87,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
     sourceUpdatedAt: "2026-07-24T17:16:22.000Z",
     title: "PANAMÁ 5ta Copa Shogun Torneo por Equipos y Seminario",
     date: "2026-11-21",
-    summary: "Torneo por Equipos en Panamá. Invitación de Shinsei Panamá.",
+    summary: "#EventoExterno: Invitación del Dojo Shinsei Panamá a la 5ta Copa Shogun :\nTorneo por equipos, práctica libre y seminario.",
     eventType: "torneo",
     timeZone: "America/Costa_Rica"
   },

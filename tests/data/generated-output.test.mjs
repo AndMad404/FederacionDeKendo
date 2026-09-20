@@ -159,20 +159,18 @@ test("generates localized, unique, indexable SEO output for every event route", 
 
   const panamaEventId =
     "2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario";
-  const panamaPublicSlug =
-    "panama-5ta-copa-shogun-torneo-por-equipos-y-seminario";
   const expectedPanamaRoutes = new Map([
     [
       "es",
       {
-        path: `/eventos/${panamaPublicSlug}/`,
+        path: `/eventos/${panamaEventId}/`,
         title: "PANAMA 5ta Copa Shogun — 21 nov 2026",
       },
     ],
     [
       "en",
       {
-        path: `/en/events/${panamaPublicSlug}/`,
+        path: `/en/events/${panamaEventId}/`,
         title: "PANAMA 5th Shogun Cup — Nov 21, 2026",
       },
     ],
@@ -381,19 +379,11 @@ test("redirects legacy calendar and archived event URLs to their canonical route
   );
   assert.match(
     redirects,
-    /^\/eventos\/2026-11-21-panama-torneo-por-equipos\/ \/eventos\/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario\/ 301$/m,
+    /^\/eventos\/2026-11-21-panama-torneo-por-equipos\/ \/eventos\/2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario\/ 301$/m,
   );
   assert.match(
     redirects,
-    /^\/eventos\/2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario\/ \/eventos\/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario\/ 301$/m,
-  );
-  assert.match(
-    redirects,
-    /^\/en\/events\/2026-11-21-panama-torneo-por-equipos\/ \/en\/events\/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario\/ 301$/m,
-  );
-  assert.match(
-    redirects,
-    /^\/en\/events\/2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario\/ \/en\/events\/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario\/ 301$/m,
+    /^\/en\/events\/2026-11-21-panama-torneo-por-equipos\/ \/en\/events\/2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario\/ 301$/m,
   );
   assert.match(
     redirects,
