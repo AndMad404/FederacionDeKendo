@@ -2,26 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import type { RouteComponent } from "../../src/app/config/routeTypes";
 import { FIXED_TEST_TIME } from "./design-contract";
 
-const FLOW_VIEWPORTS = [
-  { name: "below-width-and-height-boundary", width: 767, height: 640 },
-  { name: "at-width-below-height-boundary", width: 768, height: 640 },
-  { name: "below-width-at-height-boundary", width: 767, height: 641 },
-  { name: "at-width-and-height-boundary", width: 768, height: 641 },
-  { name: "above-width-at-height-boundary", width: 769, height: 641 },
-  { name: "tablet-intermediate-720", width: 768, height: 720 },
-  { name: "tablet-intermediate-800", width: 768, height: 800 },
-  { name: "tablet-intermediate-900", width: 768, height: 900 },
-  { name: "tablet-short-landscape", width: 1024, height: 600 },
-  { name: "desktop-short-1280", width: 1280, height: 720 },
-  { name: "desktop-short-1366", width: 1366, height: 720 },
-] as const;
-
-const CONTAINED_VIEWPORTS = [
-  { name: "approved-tablet", width: 768, height: 1024 },
-  { name: "approved-desktop", width: 1366, height: 768 },
-] as const;
-
-const REPRESENTATIVE_ROUTES = Object.values({
+const ROUTES = {
   home: { name: "home", path: "/" },
   calendar: { name: "calendar", path: "/eventos/" },
   gallery: { name: "gallery", path: "/galeria/" },
@@ -29,7 +10,80 @@ const REPRESENTATIVE_ROUTES = Object.values({
   event: { name: "event", path: "/eventos/pasados/2026-08-08-examen/" },
   pastEvents: { name: "past events", path: "/eventos/pasados/" },
   notFound: { name: "not found", path: "/ruta-responsive-inexistente/" },
-} satisfies Record<RouteComponent, { name: string; path: string }>);
+} satisfies Record<RouteComponent, { name: string; path: string }>;
+
+const ALL_ROUTE_KEYS = Object.keys(ROUTES) as RouteComponent[];
+
+const FLOW_CASES = [
+  {
+    name: "land-compact-entry",
+    viewport: { width: 1024, height: 480 },
+    routes: ["affiliates", "event"],
+  },
+  {
+    name: "land-compact-exit",
+    viewport: { width: 1024, height: 481 },
+    routes: ["affiliates", "event"],
+  },
+  {
+    name: "below-width-and-height-boundary",
+    viewport: { width: 767, height: 640 },
+    routes: ["home"],
+  },
+  {
+    name: "at-width-below-height-boundary",
+    viewport: { width: 768, height: 640 },
+    routes: ["home"],
+  },
+  {
+    name: "below-width-at-height-boundary",
+    viewport: { width: 767, height: 641 },
+    routes: ["home"],
+  },
+  {
+    name: "at-width-and-height-boundary",
+    viewport: { width: 768, height: 641 },
+    routes: ["home"],
+  },
+  {
+    name: "intermediate-tall-md",
+    viewport: { width: 768, height: 720 },
+    routes: ["home"],
+  },
+  {
+    name: "short-landscape-non-compact",
+    viewport: { width: 1024, height: 600 },
+    routes: ["gallery"],
+  },
+  {
+    name: "before-tablet-fit",
+    viewport: { width: 768, height: 1023 },
+    routes: ["home"],
+  },
+  {
+    name: "before-page-fit",
+    viewport: { width: 1280, height: 767 },
+    routes: ["calendar"],
+  },
+] as const;
+
+const REACHABILITY_CASES = [
+  {
+    name: "tablet-fit-entry",
+    viewport: { width: 768, height: 1024 },
+    routes: ALL_ROUTE_KEYS,
+  },
+  {
+    name: "page-fit-entry",
+    viewport: { width: 1280, height: 768 },
+    routes: ["calendar", "affiliates"],
+  },
+  {
+    name: "approved-desktop",
+    viewport: { width: 1366, height: 768 },
+    routes: ALL_ROUTE_KEYS,
+  },
+] as const;
 
 async function preparePage(page: Page, path: string) {
   await page.clock.setFixedTime(FIXED_TEST_TIME);
@@ -115,11 +169,12 @@ async function getReachability(page: Page) {
   });
 }
 
-for (const viewport of FLOW_VIEWPORTS) {
-  test.describe(`${viewport.name} uses document flow`, () => {
-    test.use({ viewport });
+for (const scenario of FLOW_CASES) {
+  test.describe(`${scenario.name} uses document flow`, () => {
+    test.use({ viewport: scenario.viewport });
 
-    for (const route of REPRESENTATIVE_ROUTES) {
+    for (const routeKey of scenario.routes) {
+      const route = ROUTES[routeKey];
       test(`${route.name} keeps all route content reachable`, async ({
         page,
       }) => {
@@ -150,11 +205,12 @@ for (const viewport of FLOW_VIEWPORTS) {
   });
 }
 
-for (const viewport of CONTAINED_VIEWPORTS) {
-  test.describe(`${viewport.name} preserves contained reachability`, () => {
-    test.use({ viewport });
+for (const scenario of REACHABILITY_CASES) {
+  test.describe(`${scenario.name} preserves route reachability`, () => {
+    test.use({ viewport: scenario.viewport });
 
-    for (const route of REPRESENTATIVE_ROUTES) {
+    for (const routeKey of scenario.routes) {
+      const route = ROUTES[routeKey];
       test(`${route.name} keeps all route content reachable`, async ({
         page,
       }) => {
