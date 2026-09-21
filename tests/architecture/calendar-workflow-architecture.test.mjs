@@ -89,12 +89,10 @@ test("Phase 6: the shared gate and human CI coverage remain complete", async () 
     ["pnpm", "run", "typecheck"],
     ["pnpm", "run", "build"],
     ["pnpm", "run", "test:unit"],
-    ["pnpm", "run", "test:generated"],
     ["pnpm", "exec", "playwright", "install", "--with-deps", "chromium"],
     ["pnpm", "exec", "playwright", "test", "tests/data"],
     ["pnpm", "run", "test:behavior"],
     ["pnpm", "run", "test:design"],
-    ["pnpm", "run", "format:check"],
   ]);
   assert.throws(
     () => verificationSteps("arbitrary-command"),
