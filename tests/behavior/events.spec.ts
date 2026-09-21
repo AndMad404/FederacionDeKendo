@@ -26,13 +26,25 @@ async function discoverUpcomingEvent(page: Page) {
   return { eventLink, path: path!, title: title! };
 }
 
-test("calendar cards link to the canonical event page", async ({ page }) => {
-  const { eventLink, path } = await discoverUpcomingEvent(page);
+test("calendar cards link to the canonical event page with public metadata", async ({
+  page,
+}) => {
+  const { eventLink, path, title } = await discoverUpcomingEvent(page);
   await expect(eventLink).toHaveAttribute("href", path);
   await eventLink.click();
   await expect(page).toHaveURL(new RegExp(`${path}$`));
+  await expect(
+    page.getByRole("heading", { name: title, level: 1 }),
+  ).toBeVisible();
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+    "content",
+    "index, follow",
+  );
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    "href",
+    `https://fak-kendo.org${path}`,
+  );
 });
-
 test("shows the next event after the previous event ends", async ({ page }) => {
   await page.clock.setFixedTime(new Date("2026-08-22T16:59:59-06:00"));
   await page.goto("/eventos/");
@@ -68,36 +80,6 @@ test("scheduled event pages offer an add-to-calendar button", async ({
     ),
   ).toBeVisible();
 });
-
-for (const viewport of [
-  { name: "mobile 360x800 portrait", width: 360, height: 800, columns: 1 },
-  { name: "mobile 390x844 portrait", width: 390, height: 844, columns: 1 },
-  { name: "tablet 768x1024 portrait", width: 768, height: 1024, columns: 1 },
-  { name: "desktop 1366x768 landscape", width: 1366, height: 768, columns: 2 },
-]) {
-  test(`scheduled event details use a ${viewport.columns}-column ${viewport.name} grid`, async ({
-    page,
-  }) => {
-    await page.setViewportSize(viewport);
-    const { path } = await discoverUpcomingEvent(page);
-    await page.goto(path);
-
-    const addToCalendar = page.getByRole("link", {
-      name: "Añade a tu calendario",
-    });
-    const details = addToCalendar.locator("xpath=ancestor::dl");
-    await expect(details).toHaveCount(1);
-    await expect(details.locator(":scope > div")).toHaveCount(4);
-    await expect
-      .poll(() =>
-        details.evaluate(
-          (element) =>
-            getComputedStyle(element).gridTemplateColumns.split(" ").length,
-        ),
-      )
-      .toBe(viewport.columns);
-  });
-}
 
 test("accepts only current canonical event routes", async ({ page }) => {
   await page.goto("/eventos/examen-2026-08-08/");

@@ -161,6 +161,23 @@ async function expectInteractiveNames(page: Page) {
   ).toEqual([]);
 }
 
+test("calendar and historical content panels align on the reference desktop", async ({
+  page,
+}) => {
+  await page.clock.setFixedTime(new Date("2026-08-04T12:00:00-06:00"));
+  await page.setViewportSize({ width: 1366, height: 768 });
+
+  await page.goto("/eventos/");
+  const calendarTop = await getBox(
+    page.locator("[data-page-content-boundary]"),
+  );
+
+  await page.goto("/eventos/pasados/");
+  const archiveTop = await getBox(page.locator("[data-page-content-boundary]"));
+
+  expect(Math.abs(calendarTop.y - archiveTop.y)).toBeLessThanOrEqual(1);
+});
+
 test.describe("all generated routes preserve the desktop shell contract", () => {
   test.use({ viewport: SHELL_CONTRACT.desktopViewport });
 
