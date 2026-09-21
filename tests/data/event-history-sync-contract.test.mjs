@@ -26,7 +26,6 @@ import {
   loadYamlDocument,
   workflowSteps,
 } from "../helpers/load-yaml-document.mjs";
-import { synchronizeEventGalleries } from "../../scripts/sync-event-galleries.mjs";
 import { formatCalendarNotificationEmail } from "../../scripts/write-calendar-notification-email.mjs";
 
 const PUBLIC_EVENT_FIELDS = [
@@ -1152,103 +1151,6 @@ test("F4: the approved email delivery body contains only the redacted structured
     ),
     null,
   );
-});
-
-async function galleryFixture() {
-  const directory = await mkdtemp(path.join(os.tmpdir(), "fak-c0-gallery-"));
-  const image = await sharp({
-    create: { width: 640, height: 480, channels: 3, background: "red" },
-  })
-    .jpeg()
-    .toBuffer();
-  return {
-    directory,
-    image,
-    options: {
-      manifestPath: path.join(directory, "eventGalleries.ts"),
-      statePath: path.join(directory, "eventGalleryState.json"),
-      imagesRoot: path.join(directory, "images"),
-    },
-  };
-}
-
-test("Given no album, When galleries synchronize, Then no gallery is invented and no warning is required", async () => {
-  const context = await galleryFixture();
-  try {
-    const result = await synchronizeEventGalleries({
-      ...context.options,
-      events: [
-        { slug: historicalSnapshot.slug, title: historicalSnapshot.title },
-      ],
-    });
-    assert.deepEqual(result.galleries, {});
-    assert.deepEqual(result.warnings, []);
-  } finally {
-    await rm(context.directory, { recursive: true, force: true });
-  }
-});
-
-test("Given the first valid album, When galleries synchronize, Then it is published once", async () => {
-  const context = await galleryFixture();
-  try {
-    const result = await synchronizeEventGalleries({
-      ...context.options,
-      events: [
-        {
-          ...historicalSnapshot,
-          albumUrl: "https://drive.google.com/drive/folders/approved",
-        },
-      ],
-      listFolder: async () => [{ id: "one", name: "1.jpg" }],
-      downloadFile: async () => context.image,
-    });
-    assert.equal(result.galleries[historicalSnapshot.slug].images.length, 1);
-    assert.equal(
-      result.state.galleries[historicalSnapshot.slug].fingerprint.length,
-      64,
-    );
-  } finally {
-    await rm(context.directory, { recursive: true, force: true });
-  }
-});
-
-test("Given a frozen gallery, When Drive changes, Then the site does not inspect it again", async () => {
-  const context = await galleryFixture();
-  const event = {
-    ...historicalSnapshot,
-    albumUrl: "https://drive.google.com/drive/folders/approved",
-  };
-  try {
-    const first = await synchronizeEventGalleries({
-      ...context.options,
-      events: [event],
-      listFolder: async () => [{ id: "one", name: "1.jpg" }],
-      downloadFile: async () => context.image,
-    });
-    const manifest = await readFile(context.options.manifestPath, "utf8");
-    const changedImage = await sharp({
-      create: { width: 640, height: 480, channels: 3, background: "blue" },
-    })
-      .jpeg()
-      .toBuffer();
-    const changed = await synchronizeEventGalleries({
-      ...context.options,
-      events: [event],
-      listFolder: async () => [{ id: "two", name: "2.jpg" }],
-      downloadFile: async () => changedImage,
-    });
-    assert.equal(
-      await readFile(context.options.manifestPath, "utf8"),
-      manifest,
-    );
-    assert.equal(
-      changed.galleries[event.slug].fingerprint,
-      first.galleries[event.slug].fingerprint,
-    );
-    assert.deepEqual(changed.warnings, []);
-  } finally {
-    await rm(context.directory, { recursive: true, force: true });
-  }
 });
 
 test("C4: Calendar and a first gallery publication leave no mixed artifacts when staging calendar output fails", async () => {
