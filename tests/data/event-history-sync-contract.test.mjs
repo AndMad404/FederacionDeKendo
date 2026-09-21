@@ -214,6 +214,18 @@ test("Given one historical event disappears, When another remains in the feed, T
   );
 });
 
+test("Given every historical event disappears, When the registry is reconciled, Then synchronization aborts before changing historical publication", () => {
+  assert.throws(
+    () =>
+      mergeRegistry(
+        { version: 4, events: [historicalSnapshot] },
+        [],
+        new Date("2026-03-01T00:00:00.000Z"),
+      ),
+    /all historical events disappeared/i,
+  );
+});
+
 test("Given a future event, When Calendar changes every persisted editorial field, Then the changes remain editable", () => {
   const previous = {
     ...historicalSnapshot,

@@ -260,73 +260,6 @@ test("rejects different Drive album folders", () => {
   assert.throws(() => parseCalendarEvent(properties), /Multiple album URLs/);
 });
 
-test("Given a pending event, When its title changes, Then its identity remains editable", () => {
-  const previous = {
-    version: 2,
-    events: [
-      {
-        sourceId: "same-source",
-        slug: "2026-08-08-examen",
-        title: "Examen",
-        date: "2026-08-08",
-      },
-    ],
-  };
-  const current = [
-    {
-      sourceId: "same-source",
-      slug: "2026-08-08-examen-nacional",
-      title: "Examen nacional",
-      date: "2026-08-08",
-    },
-  ];
-
-  const [event] = mergeRegistry(
-    previous,
-    current,
-    new Date("2026-07-01"),
-  ).events;
-  assert.equal(event.slug, "2026-08-08-examen-nacional");
-  assert.equal(event.title, "Examen nacional");
-});
-
-test("Given a historical event, When Calendar changes its date and title, Then its identity stays frozen", () => {
-  const previous = {
-    version: 2,
-    events: [
-      {
-        sourceId: "same-source",
-        slug: "2026-08-08-examen",
-        title: "Examen",
-        date: "2026-08-08",
-        archiveEligibleAt: "2026-08-10T06:00:00.000Z",
-        historical: true,
-        aliases: ["2026-08-01-examen-anterior"],
-      },
-    ],
-  };
-  const current = [
-    {
-      sourceId: "same-source",
-      slug: "2026-08-15-examen-nacional",
-      title: "Examen nacional",
-      date: "2026-08-15",
-      archiveEligibleAt: "2026-08-17T06:00:00.000Z",
-    },
-  ];
-
-  const [event] = mergeRegistry(
-    previous,
-    current,
-    new Date("2026-08-20T00:00:00Z"),
-  ).events;
-  assert.equal(event.slug, "2026-08-08-examen");
-  assert.equal(event.title, "Examen");
-  assert.equal(event.date, "2026-08-08");
-  assert.equal(event.archiveEligibleAt, "2026-08-10T06:00:00.000Z");
-  assert.deepEqual(event.aliases, ["2026-08-01-examen-anterior"]);
-});
-
 test("Given a version 2 historical event, When the registry migrates, Then its existing identity is frozen", () => {
   const previous = {
     version: 2,
@@ -437,44 +370,6 @@ test("Given timed and all-day events, When parsed, Then eligibility uses the las
 
   assert.equal(timed.archiveEligibleAt, "2026-08-10T06:00:00.000Z");
   assert.equal(allDay.archiveEligibleAt, "2026-08-10T06:00:00.000Z");
-});
-
-test("keeps missing events published as pending revisions until a human decision", () => {
-  const previous = {
-    version: 2,
-    events: [
-      {
-        sourceId: "past",
-        slug: "2025-01-01-past",
-        title: "Past",
-        date: "2025-01-01",
-      },
-      {
-        sourceId: "future",
-        slug: "2027-01-01-future",
-        title: "Future",
-        date: "2027-01-01",
-      },
-      {
-        sourceId: "present-past",
-        slug: "2025-02-01-present-past",
-        title: "Present past",
-        date: "2025-02-01",
-      },
-    ],
-  };
-
-  const merged = mergeRegistry(
-    previous,
-    [previous.events[2]],
-    new Date("2026-07-01"),
-  );
-  assert.deepEqual(
-    merged.events.map((event) => event.sourceId),
-    ["past", "present-past", "future"],
-  );
-  assert.equal(merged.events[0].editorialState, "pendiente");
-  assert.equal(merged.events[2].editorialState, "pendiente");
 });
 
 test("canonical slug starts with the date and normalizes accents", () => {
