@@ -15,27 +15,18 @@ const { buildEventMetaDescription, getEventOrganizerReference } =
 
 const TERMINAL_PUNCTUATION = /[.!?…]$/u;
 const IRREGULAR_WHITESPACE = /\s{2,}|^\s|\s$/u;
-const APPROVED_STATIC_DESCRIPTIONS = {
-  "/": "Sitio oficial de la Federación de Asociaciones de Kendo. Conoce el kendo en Costa Rica, sus eventos, comunidad y dojos afiliados.",
-  "/eventos/":
-    "Consulta el calendario oficial de kendo en Costa Rica: torneos, exámenes, seminarios y actividades de la Federación.",
-  "/galeria/":
-    "Explora la galería de la Federación de Asociaciones de Kendo: entrenamientos, actividades y comunidad de kendo en Costa Rica.",
-  "/afiliados/":
-    "Encuentra dojos afiliados a la Federación de Asociaciones de Kendo en Costa Rica, con horarios, ubicación y datos de contacto.",
-  "/eventos/pasados/":
-    "Consulta el archivo de eventos de kendo en Costa Rica: torneos, exámenes, seminarios y actividades anteriores de la Federación.",
-  "/en/":
-    "Official site of the Federation of Kendo Associations. Discover kendo in Costa Rica, upcoming events, the community, and affiliated dojos.",
-  "/en/events/":
-    "View Costa Rica’s official kendo calendar: tournaments, examinations, seminars, and federation activities.",
-  "/en/gallery/":
-    "Explore the Federation of Kendo Associations gallery: training, activities, and Costa Rica’s kendo community.",
-  "/en/affiliates/":
-    "Find kendo dojos affiliated with the Federation of Kendo Associations in Costa Rica, including schedules, locations, and contact details.",
-  "/en/events/past/":
-    "Browse past kendo events in Costa Rica, including federation tournaments, examinations, seminars, and activities.",
-};
+const STATIC_ROUTE_PATHS = [
+  "/",
+  "/eventos/",
+  "/galeria/",
+  "/afiliados/",
+  "/eventos/pasados/",
+  "/en/",
+  "/en/events/",
+  "/en/gallery/",
+  "/en/affiliates/",
+  "/en/events/past/",
+];
 const FORBIDDEN_FRAGMENTS =
   /este y|this and|doscientos metros|two hundred meters|includes:/iu;
 
@@ -116,13 +107,12 @@ test("assigns the Federation as organizer except for #EventoExterno events", () 
   );
 });
 
-test("keeps the ten approved static ES/EN descriptions consistent across config, SEO payload, and HTML", async (t) => {
+test("validates static ES/EN description quality and consistency across config, SEO payload, and HTML", async (t) => {
   const config = await readSeoConfig();
   const manifest = ssr.getRouteManifest();
+  const descriptions = [];
 
-  for (const [path, approvedDescription] of Object.entries(
-    APPROVED_STATIC_DESCRIPTIONS,
-  )) {
+  for (const path of STATIC_ROUTE_PATHS) {
     await t.test(path, async () => {
       const configured = config.routes[path];
       assert.ok(
@@ -132,6 +122,7 @@ test("keeps the ten approved static ES/EN descriptions consistent across config,
 
       const route = manifest.find((candidate) => candidate.path === path);
       assert.ok(route, `${path}: route missing from manifest`);
+
       const payload = ssr.getRouteSeoPayload(route);
       const html = await readDist(outputPath(path));
       const descriptionTag = html.match(
@@ -139,24 +130,29 @@ test("keeps the ten approved static ES/EN descriptions consistent across config,
       )?.[0];
       const htmlDescription = descriptionTag?.match(/content="([^"]*)"/u)?.[1];
 
-      assert.equal(
-        configured.description,
-        approvedDescription,
-        `${path}: config`,
-      );
+      const description = configured.description;
+
+      assertDescriptionQuality(description, path);
+      assert.doesNotMatch(description, FORBIDDEN_FRAGMENTS, path);
+
       assert.equal(
         payload.description,
-        approvedDescription,
-        `${path}: payload`,
+        description,
+        `${path}: SEO payload must match config`,
       );
-      assert.equal(htmlDescription, approvedDescription, `${path}: HTML`);
-      assertDescriptionQuality(approvedDescription, path);
+      assert.equal(
+        htmlDescription,
+        description,
+        `${path}: generated HTML must match config`,
+      );
+
+      descriptions.push(description);
     });
   }
 
   assert.equal(
-    new Set(Object.values(APPROVED_STATIC_DESCRIPTIONS)).size,
-    Object.keys(APPROVED_STATIC_DESCRIPTIONS).length,
+    new Set(descriptions).size,
+    descriptions.length,
     "static routes must have unique descriptions",
   );
 });

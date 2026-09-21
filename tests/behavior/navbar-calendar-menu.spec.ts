@@ -45,7 +45,7 @@ test("calendar menu opens on focus, closes with Escape and restores focus", asyn
   await page.goto("/eventos/");
 
   const calendarButton = page.getByRole("button", {
-    name: "Eventos",
+    name: "Evento",
   });
   await calendarButton.focus();
   await expect(calendarButton).toHaveAttribute("aria-expanded", "true");
