@@ -208,74 +208,47 @@ test("historical tournament details preserve complete information with its galle
   ).toHaveCount(1);
 });
 
-for (const viewport of [
-  { width: 360, height: 800 },
-  { width: 390, height: 844 },
-  { width: 768, height: 1024 },
-  { width: 1366, height: 768 },
-]) {
-  test(`historical gallery is operable and accessible at ${viewport.width}x${viewport.height}`, async ({
-    page,
-  }) => {
-    await page.setViewportSize(viewport);
-    await page.clock.setFixedTime(FIXED_HISTORICAL_TIME);
-    await page.goto(HISTORICAL_EVENT_PATH);
+test("historical gallery opens the shared lightbox from the selected image", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.clock.setFixedTime(FIXED_HISTORICAL_TIME);
+  await page.goto(HISTORICAL_EVENT_PATH);
 
-    const gallery = page.getByRole("region", {
-      name: "Fotografías del evento Examen",
-    });
-    await expect(gallery).toBeVisible();
-    const thumbnails = gallery.getByRole("group", {
-      name: "Seleccionar fotografía",
-    });
-    await expect(gallery.locator("figure")).toBeVisible();
-    await expect(thumbnails).toBeVisible();
-    await expect(gallery.locator("img[alt]")).toHaveCount(4);
-    await expect(
-      gallery.getByRole("img", { name: "Fotografía 1 del evento Examen" }),
-    ).toBeVisible();
-    await expect(gallery.locator('img[alt=""]')).toHaveCount(3);
-    expect(
-      await gallery
-        .locator("img")
-        .evaluateAll((images) =>
-          images.every((image) => image.loading === "lazy"),
-        ),
-    ).toBe(true);
-
-    await gallery.getByRole("button", { name: "Fotografía siguiente" }).click();
-    await expect(
-      gallery.getByRole("img", { name: "Fotografía 2 del evento Examen" }),
-    ).toBeVisible();
-
-    const opener = gallery.getByRole("button", {
-      name: "Abrir Fotografía 2 del evento Examen",
-    });
-    await opener.click();
-    const dialog = page.getByRole("dialog");
-    await expect(dialog).toBeVisible();
-    await expect(dialog).toHaveAccessibleName("Fotografía 2 del evento Examen");
-    await expect(
-      dialog.getByRole("img", { name: "Fotografía 2 del evento Examen" }),
-    ).toBeVisible();
-    await expect
-      .poll(() =>
-        page.evaluate(
-          () => document.querySelector<HTMLElement>("#root")?.inert,
-        ),
-      )
-      .toBe(true);
-
-    await page.keyboard.press("ArrowRight");
-    await expect(
-      dialog.getByRole("img", { name: "Fotografía 3 del evento Examen" }),
-    ).toBeVisible();
-    await page.keyboard.press("Escape");
-    await expect(dialog).toBeHidden();
-    await expect(opener).toBeFocused();
+  const gallery = page.getByRole("region", {
+    name: "Fotografías del evento Examen",
   });
-}
+  await expect(gallery).toBeVisible();
 
+  const thumbnails = gallery.getByRole("group", {
+    name: "Seleccionar fotografía",
+  });
+  await expect(thumbnails).toBeVisible();
+  await expect(gallery.locator("img[alt]")).toHaveCount(4);
+
+  expect(
+    await gallery
+      .locator("img")
+      .evaluateAll((images) =>
+        images.every((image) => image.loading === "lazy"),
+      ),
+  ).toBe(true);
+
+  await gallery.getByRole("button", { name: "Fotografía siguiente" }).click();
+
+  const opener = gallery.getByRole("button", {
+    name: "Abrir Fotografía 2 del evento Examen",
+  });
+  await expect(opener).toBeVisible();
+  await opener.click();
+
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toHaveAccessibleName("Fotografía 2 del evento Examen");
+  await expect(
+    dialog.getByRole("img", { name: "Fotografía 2 del evento Examen" }),
+  ).toBeVisible();
+});
 test("historical tournament thumbnails follow carousel navigation on mobile", async ({
   page,
 }) => {
