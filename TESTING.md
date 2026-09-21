@@ -70,15 +70,15 @@ representativa estable. Agregar otro evento no crea nuevos baselines.
 
 ## Revision visual manual
 
-Las 32 capturas existentes se ejecutan por separado en Windows. Cubren siete
-tipos de pagina en cuatro viewports mas el estado abierto del lightbox de la
-galeria principal en esos mismos cuatro viewports:
+Las 24 capturas existentes se ejecutan por separado en Windows. Cubren siete
+tipos de pagina en tres viewports (360x800, 768x1024 y 1366x768) mas el estado
+abierto del lightbox de la galeria principal en esos mismos tres viewports:
 
 ```powershell
 pnpm run test:visual
 ```
 
-Esta suite contiene siete tipos de pagina por cuatro viewports y cuatro
+Esta suite contiene siete tipos de pagina por tres viewports y tres
 capturas adicionales del lightbox. Se mantiene fuera del CI predeterminado
 porque la rasterizacion de fuentes e imagenes difiere entre Windows y Ubuntu.
 

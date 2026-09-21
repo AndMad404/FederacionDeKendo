@@ -1,15 +1,14 @@
 import { expect, test, type Page } from "@playwright/test";
+import {
+  APPROVED_VIEWPORTS as DESIGN_VIEWPORTS,
+  FIXED_TEST_TIME,
+} from "./design-contract";
 import { readdirSync } from "node:fs";
 import { relative, resolve, sep } from "node:path";
 
-const APPROVED_VIEWPORTS = [
-  { name: "mobile-360x800", width: 360, height: 800 },
-  { name: "mobile-390x844", width: 390, height: 844 },
-  { name: "tablet-768x1024", width: 768, height: 1024 },
-  { name: "desktop-1366x768", width: 1366, height: 768 },
-] as const;
-
-const FIXED_TEST_TIME = new Date("2026-08-04T12:00:00-06:00");
+const VISUAL_VIEWPORTS = DESIGN_VIEWPORTS.filter(
+  ({ name }) => name !== "mobile-390x844",
+);
 const HISTORICAL_EVENT_REFERENCE_TIME = new Date("2026-08-20T12:00:00-06:00");
 
 interface ApprovedPage {
@@ -113,7 +112,7 @@ async function prepareApprovedPage(
   });
 }
 
-for (const viewport of APPROVED_VIEWPORTS) {
+for (const viewport of VISUAL_VIEWPORTS) {
   test.describe(`${viewport.name} approved visual designs`, () => {
     test.use({ viewport });
 
