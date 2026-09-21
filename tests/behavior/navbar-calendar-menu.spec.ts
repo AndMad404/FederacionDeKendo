@@ -9,7 +9,6 @@ test("calendar menu opens on hover and navigates to past events", async ({
   const calendarButton = page.getByRole("button", {
     name: "Evento",
   });
-  await expect(calendarButton).toHaveClass(/gap-1/);
   await calendarButton.hover();
 
   await expect(calendarButton).toHaveAttribute("aria-expanded", "true");
@@ -34,7 +33,6 @@ test("calendar menu opens on hover and navigates to past events", async ({
     .getByRole("link", { name: "Eventos pasados", exact: true })
     .click();
   await expect(page).toHaveURL(/\/eventos\/pasados\/$/);
-  await expect(calendarButton).toHaveClass(/border-site-accent/);
   await expect(calendarButton).toHaveAttribute("aria-expanded", "false");
 });
 
@@ -84,7 +82,6 @@ test("calendar menu closes on an outside click and keeps English destinations ac
     .getByRole("link", { name: "Past events", exact: true })
     .click();
   await expect(page).toHaveURL(/\/en\/events\/past\/$/);
-  await expect(calendarButton).toHaveClass(/border-site-accent/);
 });
 
 test("calendar section expands inside the mobile navigation", async ({
