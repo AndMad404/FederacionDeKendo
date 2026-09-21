@@ -90,8 +90,17 @@ async function preparePage(page: Page, path: string) {
 }
 
 async function getBox(locator: Locator) {
-  const box = await locator.boundingBox();
-  expect(box, `expected ${locator} to have rendered geometry`).not.toBeNull();
+  await expect(locator).toBeVisible();
+
+  let box = await locator.boundingBox();
+
+  await expect
+    .poll(async () => {
+      box = await locator.boundingBox();
+      return box !== null;
+    })
+    .toBe(true);
+
   return box!;
 }
 
@@ -333,7 +342,7 @@ test.describe("event details preserve desktop document flow", () => {
 });
 
 const EVENT_ACTION_SELECTOR =
-  "main a[aria-label*='ubicación'], main a[aria-label*='detalles']";
+  "main a[aria-label*='ubicaciÃ³n'], main a[aria-label*='detalles']";
 
 async function getVisibleEventActionSizes(page: Page) {
   return page.locator(EVENT_ACTION_SELECTOR).evaluateAll((elements) =>
