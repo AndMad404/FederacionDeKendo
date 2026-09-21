@@ -342,7 +342,7 @@ test.describe("event details preserve desktop document flow", () => {
 });
 
 const EVENT_ACTION_SELECTOR =
-  "main a[aria-label*='ubicaciÃ³n'], main a[aria-label*='detalles']";
+  "main a[aria-label*='ubicación'], main a[aria-label*='detalles']";
 
 async function getVisibleEventActionSizes(page: Page) {
   return page.locator(EVENT_ACTION_SELECTOR).evaluateAll((elements) =>
