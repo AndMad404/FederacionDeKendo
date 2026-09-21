@@ -15,7 +15,8 @@
   },
   "organization": {
     "sport": "Kendo",
-    "areaServed": "Costa Rica"
+    "areaServed": "Costa Rica",
+    "sameAs": ["https://www.instagram.com/federacionkendocostarica/"]
   },
   "routes": {
     "/": {

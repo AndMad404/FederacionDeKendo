@@ -45,6 +45,7 @@ interface SeoData {
   organization: {
     sport: string;
     areaServed?: string;
+    sameAs: string[];
   };
   routes: Record<string, RouteMeta>;
 }
@@ -661,6 +662,7 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
     logo: absoluteUrl(DATA.logo),
     description: DEFAULT_SITE_DESCRIPTION,
     sport: DATA.organization.sport,
+    sameAs: DATA.organization.sameAs,
   };
 
   if (DATA.organization.areaServed) {
