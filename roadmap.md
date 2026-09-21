@@ -40,7 +40,7 @@ Se conserva la publicacion automatica; no se activa un gate de despliegue.
 La instrumentacion asistida privada, sus contratos, estado, hooks, indices y
 pruebas especificas se retiraron a su repositorio propietario externo. El
 producto conserva codigo, datos, build, CI, documentacion operativa y este
-roadmap. `tests/architecture/repository-hygiene.test.mjs` protege de forma
+roadmap. `tests/architecture/repository-policy.test.mjs` protege de forma
 permanente esa frontera sin depender del tooling externo. La edicion local
 preexistente del workflow de calendario queda fuera de este cierre.
 

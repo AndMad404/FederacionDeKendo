@@ -28,7 +28,7 @@
     "test:generated": "node --test tests/data/generated-output.test.mjs",
     "test:llms": "node --test tests/data/llms-txt.test.mjs",
     "test:meta-descriptions": "node --test tests/data/meta-descriptions-approval.test.mjs",
-    "test:lint-priorities": "node --test tests/architecture/style-priority-guard.test.mjs",
+    "test:lint-priorities": "node --test --test-name-pattern=\"source CSS does not use important declarations\" tests/architecture/repository-policy.test.mjs",
     "test:unit": "pnpm run test:architecture && pnpm run test:data:node",
     "test:sync-directed": "node --test tests/data/calendar-sync.test.mjs tests/data/event-gallery-sync.test.mjs tests/data/event-history-sync-contract.test.mjs tests/architecture/calendar-workflow-architecture.test.mjs",
     "test:unit:without-sync": "node --test tests/data/event-history-filters.test.mjs tests/data/calendar-history-correction.test.mjs tests/data/gallery-data.test.mjs",

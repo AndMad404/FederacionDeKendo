@@ -2,6 +2,13 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  CALENDAR_EVENTS,
+  getEventTranslationStatus,
+  getLocalizedEvent,
+  getLocalizedEvents,
+} from "../../dist-ssr/entry-server.js";
+
+import {
   closeSourceModuleLoader,
   loadSourceModule,
 } from "../helpers/load-source-module.mjs";
@@ -16,6 +23,7 @@ const tournament = {
   endTime: "17:00",
   timeZone: "America/Costa_Rica",
 };
+
 const gasshuku = {
   id: "2026-09-12-gasshuku-monteverde",
   title: "Gasshuku Monteverde",
@@ -23,6 +31,10 @@ const gasshuku = {
   endDate: "2026-09-14",
   timeZone: "America/Costa_Rica",
 };
+
+const publishedGasshuku = CALENDAR_EVENTS.find(
+  ({ id }) => id === "2026-09-12-gasshuku-monteverde",
+);
 
 test("upcoming events advance at the exact local event end time", async () => {
   const { getUpcomingEvents } = await loadSourceModule(
@@ -36,6 +48,7 @@ test("upcoming events advance at the exact local event end time", async () => {
     ).map(({ id }) => id),
     [tournament.id, gasshuku.id],
   );
+
   assert.deepEqual(
     getUpcomingEvents(
       [tournament, gasshuku],
@@ -54,6 +67,7 @@ test("public history keeps its separate next-midnight boundary", async () => {
     isPastEvent(tournament, new Date("2026-08-22T23:59:59-06:00")),
     false,
   );
+
   assert.equal(
     isPastEvent(tournament, new Date("2026-08-23T00:00:00-06:00")),
     true,
@@ -69,5 +83,42 @@ test("identifies #EventoExterno markers in the event description", async () => {
     isExternalEvent({ summary: "#EventoExterno Seminario de CLAK" }),
     true,
   );
+
   assert.equal(isExternalEvent({ summary: "Seminario" }), false);
+});
+
+test("uses the reviewed English Gasshuku translation from the editorial record", () => {
+  const localized = getLocalizedEvent(publishedGasshuku, "en");
+
+  assert.equal(getEventTranslationStatus(publishedGasshuku), "valid");
+  assert.equal(localized?.title, "Gasshuku Monteverde");
+  assert.match(localized?.summary ?? "", /round-trip transportation/);
+  assert.doesNotMatch(localized?.summary ?? "", /La participación incluye/);
+});
+
+test("classifies absent and changed editorial translations without falling back", () => {
+  const missing = {
+    ...publishedGasshuku,
+    id: "not-translated",
+  };
+
+  const stale = {
+    ...publishedGasshuku,
+    title: "Gasshuku Monteverde actualizado",
+  };
+
+  assert.equal(getEventTranslationStatus(missing), "missing");
+  assert.equal(getEventTranslationStatus(stale), "stale");
+  assert.equal(getLocalizedEvent(missing, "en"), undefined);
+  assert.equal(getLocalizedEvent(stale, "en"), undefined);
+});
+
+test("omits unavailable English events while retaining their Spanish publication", () => {
+  const stale = {
+    ...publishedGasshuku,
+    summary: "Texto español actualizado.",
+  };
+
+  assert.deepEqual(getLocalizedEvents([stale], "en"), []);
+  assert.deepEqual(getLocalizedEvents([stale], "es"), [stale]);
 });
