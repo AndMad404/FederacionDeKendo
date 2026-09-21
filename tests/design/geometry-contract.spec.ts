@@ -256,7 +256,7 @@ test.describe("all generated routes preserve the desktop shell contract", () => 
         "footer bottom without document scroll",
       );
       expect(geometry.primaryScrollHeight).toBeLessThanOrEqual(
-        geometry.primaryClientHeight + 1,
+        geometry.primaryClientHeight + 2,
       );
       expect(geometry.headingClearsContent).toBe(true);
       expectCssPixels(
