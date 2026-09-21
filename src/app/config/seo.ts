@@ -10,7 +10,9 @@ import {
   getEventPath,
 } from "../utils/eventRoutes";
 import { getLanguageFromPathname, type Language } from "./i18n";
-import { getLocalizedEvent } from "../utils/localizedEvents";
+import {
+  getLocalizedEvent,
+} from "../utils/localizedEvents";
 import { getEventEndDate } from "../utils/calendarEvents";
 import type { RouteComponent } from "./routeTypes";
 
