@@ -96,7 +96,7 @@ test("uses the reviewed English Gasshuku translation from the editorial record",
   assert.doesNotMatch(localized?.summary ?? "", /La participación incluye/);
 });
 
-test("classifies absent and changed editorial translations without falling back", () => {
+test("classifies unavailable editorial translations and falls back to Spanish", () => {
   const missing = {
     ...publishedGasshuku,
     id: "not-translated",
@@ -109,16 +109,16 @@ test("classifies absent and changed editorial translations without falling back"
 
   assert.equal(getEventTranslationStatus(missing), "missing");
   assert.equal(getEventTranslationStatus(stale), "stale");
-  assert.equal(getLocalizedEvent(missing, "en"), undefined);
-  assert.equal(getLocalizedEvent(stale, "en"), undefined);
+  assert.deepEqual(getLocalizedEvent(missing, "en"), missing);
+  assert.deepEqual(getLocalizedEvent(stale, "en"), stale);
 });
 
-test("omits unavailable English events while retaining their Spanish publication", () => {
+test("keeps untranslated events available in both route languages", () => {
   const stale = {
     ...publishedGasshuku,
     summary: "Texto español actualizado.",
   };
 
-  assert.deepEqual(getLocalizedEvents([stale], "en"), []);
+  assert.deepEqual(getLocalizedEvents([stale], "en"), [stale]);
   assert.deepEqual(getLocalizedEvents([stale], "es"), [stale]);
 });

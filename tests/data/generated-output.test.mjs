@@ -52,10 +52,10 @@ test("generates historical event routes with canonical and indexable metadata", 
   assert.match(incomplete, /application\/ld\+json/);
 });
 
-test("identifies the Federation as organizer for every non-external event", () => {
+test("publishes Event JSON-LD only when the required physical location is known", () => {
   const organizationId = "https://fak-kendo.org/#organization";
   const eventRoutes = getRouteManifest().filter(
-    (route) => route.component === "event" && route.language === "es",
+    (route) => route.component === "event",
   );
 
   for (const route of eventRoutes) {
@@ -66,9 +66,27 @@ test("identifies the Federation as organizer for every non-external event", () =
     const structuredEvent = Array.isArray(graph)
       ? graph.find((entity) => entity?.["@type"] === "Event")
       : undefined;
+
+    assert.ok(event, `${route.path}: calendar event is missing`);
+
+    if (!event.location?.trim()) {
+      assert.equal(
+        structuredEvent,
+        undefined,
+        `${route.path}: incomplete Event JSON-LD must be omitted`,
+      );
+      continue;
+    }
+
     const external = /(?:^|\s)#EventoExterno\b/iu.test(event?.summary ?? "");
 
     assert.ok(structuredEvent, `${route.path}: Event JSON-LD is missing`);
+    assert.equal(structuredEvent.location?.["@type"], "Place");
+    assert.equal(
+      structuredEvent.location?.address?.streetAddress,
+      event.location.trim(),
+    );
+    assert.ok(structuredEvent.endDate, `${route.path}: endDate is missing`);
     assert.deepEqual(
       structuredEvent.organizer,
       external ? undefined : { "@id": organizationId },
@@ -525,18 +543,18 @@ test("generates localized English routes with reciprocal language metadata", asy
   assert.match(sitemap, /<loc>https:\/\/fak-kendo\.org\/en\/<\/loc>/);
 });
 
-test("publishes English event routes only when their editorial translation is valid", async () => {
-  const { CALENDAR_EVENTS, getEventTranslationStatus } =
-    await import("../../dist-ssr/entry-server.js");
+test("publishes every event route in both Spanish and English", async () => {
+  const { CALENDAR_EVENTS } = await import("../../dist-ssr/entry-server.js");
+  const spanishEventRoutes = getRouteManifest()
+    .filter((route) => route.component === "event" && route.language === "es")
+    .map((route) => route.eventId)
+    .sort();
   const englishEventRoutes = getRouteManifest()
     .filter((route) => route.component === "event" && route.language === "en")
     .map((route) => route.eventId)
     .sort();
-  const validTranslationIds = CALENDAR_EVENTS.filter(
-    (event) => getEventTranslationStatus(event) === "valid",
-  )
-    .map((event) => event.id)
-    .sort();
+  const eventIds = CALENDAR_EVENTS.map((event) => event.id).sort();
 
-  assert.deepEqual(englishEventRoutes, validTranslationIds);
+  assert.deepEqual(spanishEventRoutes, eventIds);
+  assert.deepEqual(englishEventRoutes, eventIds);
 });
