@@ -8,7 +8,6 @@ import {
 } from "../../scripts/verify-site.mjs";
 
 test("site verification owns checks previously delegated to local Git hooks", async () => {
-  const { verificationSteps } = await import("../../scripts/verify-site.mjs");
   const steps = verificationSteps().map((step) => step.join(" "));
   assert.ok(steps.includes("pnpm run format:line-endings:check"));
   assert.ok(steps.includes("git diff --check"));
