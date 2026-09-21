@@ -67,3 +67,5 @@ Thumbs.db
 # Gallery synchronization temporary artifacts
 /.tmp-*
 /public/images/events.*.stage/
+# Local visual review reports
+/f9-visual-review.html
