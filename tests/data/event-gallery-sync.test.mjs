@@ -91,7 +91,7 @@ test("accepts the minimum dimensions independently of orientation", async () => 
   }
 });
 
-test("valid public album freezes five naturally ordered sanitized responsive images and warns about the sixth", async () => {
+test("valid public album freezes all naturally ordered sanitized responsive images", async () => {
   const names = [
     "photo10.jpg",
     "photo2.jpg",
@@ -111,10 +111,10 @@ test("valid public album freezes five naturally ordered sanitized responsive ima
   const context = await fixture(files);
   try {
     const result = await run(context.options);
-    assert.equal(result.galleries["2026-01-01-evento"].images.length, 5);
+    assert.equal(result.galleries["2026-01-01-evento"].images.length, 6);
     assert.equal(
       result.warnings.some((warning) => warning.includes("additional files")),
-      true,
+      false,
     );
     const manifest = await readFile(context.options.manifestPath, "utf8");
     assert.match(manifest, /photo-1-480\.webp 480w/);

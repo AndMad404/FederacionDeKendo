@@ -24,7 +24,7 @@ export function HistoricalEventGallery({
 }: HistoricalEventGalleryProps) {
   const images = useMemo<GalleryImage[]>(() => {
     const gallery = EVENT_GALLERIES[eventId];
-    return (gallery?.images ?? []).slice(0, 5).map((image) => ({
+    return (gallery?.images ?? []).map((image) => ({
       id: image.order,
       src: image.src,
       srcSet: image.srcSet.webp,

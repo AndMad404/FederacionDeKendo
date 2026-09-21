@@ -313,9 +313,7 @@ export async function synchronizeEventGalleries({
         });
         continue;
       }
-      if (valid.length > 5)
-        warnings.push(`${event.slug}: additional files ignored.`);
-      const selected = valid.slice(0, 5);
+      const selected = valid;
       const fingerprint = digest(
         selected
           .map((item) => `${item.file.name}:${item.pixelHash}`)
