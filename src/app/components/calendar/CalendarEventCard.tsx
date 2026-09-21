@@ -40,7 +40,11 @@ export function CalendarEventCard({ event }: CalendarEventCardProps) {
           </>
         ) : null}
       </span>
-      <p className="text-sm leading-tight text-site-action-soft">
+      <p
+        className={`text-sm leading-tight ${
+          event.startTime ? "text-site-action-soft" : "text-black"
+        }`}
+      >
         {formatEventTime(event, language)}
       </p>
       {locationUrl ? (

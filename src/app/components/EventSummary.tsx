@@ -32,7 +32,7 @@ export function EventSummary({ summary, compact = false }: EventSummaryProps) {
   if (blocks.length === 1 && blocks[0].type === "list") {
     return (
       <ul
-        className={`list-disc pl-5 text-left text-sm text-site-muted ${compact ? "max-h-10 overflow-hidden leading-5" : "space-y-1 leading-relaxed"}`}
+        className={`list-disc pl-5 text-left text-sm ${compact ? "text-site-muted" : "text-black"} ${compact ? "max-h-10 overflow-hidden leading-5" : "space-y-1 leading-relaxed"}`}
       >
         {blocks[0].items.map((item, index) => (
           <li key={`${index}-${item}`}>{item}</li>
@@ -43,7 +43,7 @@ export function EventSummary({ summary, compact = false }: EventSummaryProps) {
 
   if (!compact && blocks.length > 1) {
     return (
-      <div className="grid gap-3 text-sm text-site-muted">
+      <div className="grid gap-3 text-sm text-black">
         {blocks.map((block, blockIndex) =>
           block.type === "list" ? (
             <ul
@@ -69,7 +69,7 @@ export function EventSummary({ summary, compact = false }: EventSummaryProps) {
 
   return (
     <p
-      className={`${compact ? "line-clamp-2" : "whitespace-pre-line leading-relaxed"} text-sm text-site-muted`}
+      className={`${compact ? "line-clamp-2 text-site-muted" : "whitespace-pre-line leading-relaxed text-black"} text-sm`}
     >
       {blocks[0]?.type === "paragraph" ? blocks[0].text : summary}
     </p>
