@@ -155,7 +155,7 @@ export function Lightbox({
 
         <div
           data-lightbox-image
-          className="flex h-[min(54svh,32rem)] min-h-0 w-full touch-none items-end justify-center overflow-hidden rounded-xl bg-site-navy sm:h-[min(68svh,36rem)] land-sm:h-full land-sm:flex-none"
+          className="flex h-[min(54svh,32rem)] min-h-0 w-full touch-none items-center justify-center overflow-hidden rounded-xl bg-site-navy sm:h-[min(68svh,36rem)] land-sm:h-full land-sm:flex-none"
         >
           <img
             src={image.src}
@@ -223,7 +223,7 @@ export function Lightbox({
             />
           </div>
         ) : (
-          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-between px-3">
+          <div className="flex w-full max-w-[22rem] items-center justify-between pt-2 sm:pointer-events-none sm:absolute sm:inset-0 sm:z-10 sm:max-w-none sm:px-3 sm:pt-0">
             <NavigationArrowButton
               direction="previous"
               label={copy.gallery.previousImage}
@@ -232,7 +232,7 @@ export function Lightbox({
                 event.stopPropagation();
                 handlePrev();
               }}
-              className="pointer-events-auto"
+              className="sm:pointer-events-auto"
             />
             <NavigationArrowButton
               direction="next"
@@ -242,7 +242,7 @@ export function Lightbox({
                 event.stopPropagation();
                 handleNext();
               }}
-              className="pointer-events-auto"
+              className="sm:pointer-events-auto"
             />
           </div>
         )}

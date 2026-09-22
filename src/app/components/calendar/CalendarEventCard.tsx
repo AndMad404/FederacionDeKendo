@@ -1,4 +1,4 @@
-import { Info, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { Link } from "react-router";
 import type { CalendarEvent } from "../../types";
 import {
@@ -74,9 +74,8 @@ export function CalendarEventCard({ event }: CalendarEventCardProps) {
         <Link
           to={getEventPath(event, language)}
           aria-label={`${copy.calendar.viewDetailsLabel} ${event.title}`}
-          className={`inline-flex min-h-11 cursor-pointer items-center justify-center rounded-full border border-site-action bg-site-action px-3 py-1 text-sm font-semibold text-site-on-dark transition-colors hover:bg-site-action-hover desktop-fine:min-h-8 ${focusRingClass}`}
+          className={`inline-flex min-h-11 origin-center cursor-pointer items-center justify-center rounded-full border border-site-action bg-site-action px-3 py-1 text-sm font-semibold text-site-on-dark transition-[background-color,transform,scale] duration-200 hover:scale-[1.04] hover:bg-site-action-hover motion-reduce:transition-none motion-reduce:hover:scale-100 desktop-fine:min-h-8 ${focusRingClass}`}
         >
-          <Info className="mr-1.5 size-4" />
           {copy.common.eventDetails}
         </Link>
       </div>

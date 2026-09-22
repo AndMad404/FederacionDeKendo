@@ -32,6 +32,9 @@ import { EventSummary } from "./EventSummary";
 
 const SOCIAL_PREVIEW_VERSION = "20260825";
 
+const eventNavigationLinkClass =
+  "inline-flex min-h-11 items-center justify-center rounded-lg border px-5 py-2 font-bold transition-[box-shadow,transform] duration-200 hover:scale-[1.025] hover:shadow-md active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:scale-100 motion-reduce:active:scale-100";
+
 async function shareEvent(title: string, url: string) {
   if (navigator.share) {
     try {
@@ -209,13 +212,13 @@ export function EventPage() {
                     <>
                       <Link
                         to={english ? "/en/events/past/" : "/eventos/pasados/"}
-                        className={`${secondaryButtonClass} ${focusRingClass}`}
+                        className={`${eventNavigationLinkClass} border-site-action bg-site-surface text-site-action ${focusRingClass}`}
                       >
                         {copy.event.viewArchive}
                       </Link>
                       <Link
                         to={english ? "/en/events/" : "/eventos/"}
-                        className={`${primaryButtonClass} ${focusRingClass}`}
+                        className={`${eventNavigationLinkClass} border-site-action bg-site-action text-site-on-dark shadow-sm ${focusRingClass}`}
                       >
                         {copy.archive.upcomingEvents}
                       </Link>
@@ -225,7 +228,7 @@ export function EventPage() {
                     <button
                       type="button"
                       onClick={() => void handleShare()}
-                      className={`${secondaryButtonClass} ${focusRingClass}`}
+                      className={`${eventNavigationLinkClass} border-site-action bg-site-surface text-site-action ${focusRingClass}`}
                     >
                       {copied ? (
                         <Check className="mr-2 size-4" aria-hidden="true" />
@@ -238,7 +241,7 @@ export function EventPage() {
                   {!isPast ? (
                     <Link
                       to={english ? "/en/events/" : "/eventos/"}
-                      className={`${primaryButtonClass} ${focusRingClass}`}
+                      className={`${eventNavigationLinkClass} border-site-action bg-site-action text-site-on-dark shadow-sm ${focusRingClass}`}
                     >
                       {copy.event.backToCalendar}
                     </Link>
