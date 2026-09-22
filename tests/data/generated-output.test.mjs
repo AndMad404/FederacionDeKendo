@@ -266,7 +266,7 @@ test("uses the JPEG social card in generated Open Graph metadata", async () => {
   assert.match(gallery, /<html lang="es" prefix="og: https:\/\/ogp\.me\/ns#">/);
   assert.match(
     gallery,
-    /property="og:image" content="https:\/\/fak-kendo\.org\/images\/social\/kendo-social-card-20260918\.jpg"/,
+    /property="og:image" content="https:\/\/fak-kendo\.org\/images\/social\/kendo-social-card-20260921\.jpg"/,
   );
   assert.match(gallery, /property="og:image:type" content="image\/jpeg"/);
   assert.match(gallery, /name="twitter:card" content="summary_large_image"/);
@@ -378,7 +378,7 @@ test("publishes sitemap images for approved routes", async () => {
   for (const html of [home, calendar]) {
     assert.match(
       html,
-      /og:image" content="https:\/\/fak-kendo\.org\/images\/social\/kendo-social-card-20260918\.jpg"/,
+      /og:image" content="https:\/\/fak-kendo\.org\/images\/social\/kendo-social-card-20260921\.jpg"/,
     );
     assert.match(html, /og:image:type" content="image\/jpeg"/);
     assert.match(html, /og:image:width" content="1200"/);

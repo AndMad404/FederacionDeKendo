@@ -10,16 +10,16 @@
 
   <rect width="1200" height="630" fill="#ffffff"/>
 
-  <text class="sans bold" x="407" y="174" text-anchor="middle" fill="#1d4ed8" font-size="22" letter-spacing="1.2">SITIO OFICIAL</text>
-  <text class="sans bold" x="407" y="226" text-anchor="middle" fill="#0f172a" font-size="52">
-    <tspan x="407" dy="0">Federación de</tspan>
-    <tspan x="407" dy="62">Asociaciones de Kendo</tspan>
+  <text class="sans bold" x="60" y="191" fill="#1d4ed8" font-size="25" letter-spacing="1.2">SITIO OFICIAL</text>
+  <text class="sans bold" x="60" y="254" fill="#0f172a" font-size="58">
+    <tspan x="60" dy="0">Federación de</tspan>
+    <tspan x="60" dy="68">Asociaciones de Kendo</tspan>
   </text>
-  <text class="sans bold" x="407" y="326" text-anchor="middle" fill="#1e3a8a" font-size="30">El camino de la espada</text>
-  <text class="sans" x="407" y="374" text-anchor="middle" fill="#334155" font-size="22">
-    <tspan x="407" dy="0">Comunidad, galería y dojos afiliados para practicar</tspan>
-    <tspan x="407" dy="31">kendo con disciplina, respeto y continuidad.</tspan>
+  <text class="sans bold" x="60" y="367" fill="#1e3a8a" font-size="34">El camino de la espada</text>
+  <text class="sans" x="60" y="423" fill="#334155" font-size="25">
+    <tspan x="60" dy="0">Comunidad, galería y dojos afiliados para practicar</tspan>
+    <tspan x="60" dy="35">kendo con disciplina, respeto y continuidad.</tspan>
   </text>
-  <image href="../logo/fakcr-logo.png" x="716" y="65" width="420" height="500" preserveAspectRatio="xMidYMid meet"/>
+  <image href="../logo/fakcr-logo.png" x="714" y="32" width="459" height="566" preserveAspectRatio="xMidYMid meet"/>
 
 </svg>
