@@ -117,5 +117,250 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "sizes": "(max-width: 640px) 100vw, 960px"
       }
     ]
+  },
+  "2026-09-12-gasshuku-monteverde": {
+    "fingerprint": "82896ffb0c046080c5083b1f67d8e456ef145b7809ccbffe146c1591891971ef",
+    "images": [
+      {
+        "order": 1,
+        "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
+        "width": 1600,
+        "height": 1066,
+        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-1-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-1-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-1-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-1-1600.webp 1600w",
+          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-1-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-1-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-1-1600.avif 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 2,
+        "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
+        "width": 1600,
+        "height": 1066,
+        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-2-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-2-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-2-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-2-1600.webp 1600w",
+          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-2-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-2-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-2-1600.avif 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 3,
+        "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
+        "width": 1600,
+        "height": 1066,
+        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-3-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-3-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-3-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-3-1600.webp 1600w",
+          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-3-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-3-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-3-1600.avif 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 4,
+        "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
+        "width": 1600,
+        "height": 1066,
+        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-4-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-4-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-4-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-4-1600.webp 1600w",
+          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-4-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-4-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-4-1600.avif 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 5,
+        "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
+        "width": 1600,
+        "height": 1066,
+        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-5-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-5-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-5-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-5-1600.webp 1600w",
+          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-5-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-5-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-5-1600.avif 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 6,
+        "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
+        "width": 1600,
+        "height": 1066,
+        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-6-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-6-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-6-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-6-1600.webp 1600w",
+          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-6-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-6-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-6-1600.avif 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 7,
+        "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
+        "width": 1600,
+        "height": 1066,
+        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-7-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-7-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-7-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-7-1600.webp 1600w",
+          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-7-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-7-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-7-1600.avif 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 8,
+        "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
+        "width": 1600,
+        "height": 1066,
+        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-8-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-8-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-8-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-8-1600.webp 1600w",
+          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-8-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-8-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-8-1600.avif 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 9,
+        "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
+        "width": 1600,
+        "height": 863,
+        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-9-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-9-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-9-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-9-1600.webp 1600w",
+          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-9-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-9-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-9-1600.avif 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 10,
+        "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
+        "width": 1600,
+        "height": 1066,
+        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-10-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-10-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-10-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-10-1600.webp 1600w",
+          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-10-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-10-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-10-1600.avif 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 11,
+        "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
+        "width": 1600,
+        "height": 1066,
+        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-11-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-11-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-11-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-11-1600.webp 1600w",
+          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-11-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-11-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-11-1600.avif 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 12,
+        "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
+        "width": 1600,
+        "height": 1066,
+        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-12-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-12-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-12-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-12-1600.webp 1600w",
+          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-12-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-12-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-12-1600.avif 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 13,
+        "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
+        "width": 1600,
+        "height": 1066,
+        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-13-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-13-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-13-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-13-1600.webp 1600w",
+          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-13-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-13-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-13-1600.avif 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 14,
+        "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
+        "width": 1600,
+        "height": 1066,
+        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-14-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-14-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-14-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-14-1600.webp 1600w",
+          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-14-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-14-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-14-1600.avif 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 15,
+        "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
+        "width": 1600,
+        "height": 1066,
+        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-15-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-15-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-15-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-15-1600.webp 1600w",
+          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-15-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-15-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-15-1600.avif 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 16,
+        "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
+        "width": 1600,
+        "height": 1066,
+        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-16-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-16-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-16-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-16-1600.webp 1600w",
+          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-16-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-16-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-16-1600.avif 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 17,
+        "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
+        "width": 1600,
+        "height": 1066,
+        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-17-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-17-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-17-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-17-1600.webp 1600w",
+          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-17-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-17-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-17-1600.avif 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 18,
+        "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
+        "width": 1600,
+        "height": 1066,
+        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-18-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-18-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-18-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-18-1600.webp 1600w",
+          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-18-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-18-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-18-1600.avif 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 19,
+        "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
+        "width": 1600,
+        "height": 1066,
+        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-19-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-19-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-19-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-19-1600.webp 1600w",
+          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-19-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-19-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-19-1600.avif 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 20,
+        "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
+        "width": 1600,
+        "height": 1066,
+        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-20-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-20-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-20-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-20-1600.webp 1600w",
+          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-20-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-20-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-20-1600.avif 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      }
+    ]
   }
 };

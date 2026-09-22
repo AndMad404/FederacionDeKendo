@@ -113,11 +113,11 @@ export const COPY = {
       switchToSpanish: "Ver sitio en español",
       switchToEnglish: "View site in English",
       calendarMenu: "Opciones del calendario",
-      upcomingEvents: "Próximos eventos",
+      upcomingEvents: "Calendario de Próximos Eventos",
       pastEvents: "Eventos pasados",
       links: [
         { id: "home", path: "/", label: "Inicio" },
-        { id: "calendar", path: "/eventos/", label: "Calendario" },
+        { id: "calendar", path: "/eventos/", label: "Evento" },
         { id: "gallery", path: "/galeria/", label: "Galería" },
         { id: "affiliates", path: "/afiliados/", label: "Afiliados" },
       ],
@@ -132,8 +132,8 @@ export const COPY = {
       description:
         "Encuentra un dojo afiliado o consulta nuestros próximos encuentros.",
       dojos: "Encuentra un dojo",
-      events: "Próximos eventos",
-      upcoming: "Próximos encuentros",
+      events: "Calendario de Próximos Eventos",
+      upcoming: "Calendario de Próximos Eventos",
       heroAlt:
         "Grupo de practicantes de kendo reunidos después de una actividad",
     },
@@ -156,7 +156,8 @@ export const COPY = {
       shareEvent: "Compartir evento",
     },
     calendar: {
-      title: "Próximos eventos",
+      title: "Calendario de Próximos Eventos",
+      upcomingLabel: "Próximos eventos",
       description: "Torneos, exámenes y actividades de kendo.",
       empty: "No hay próximos eventos publicados.",
       pastEvents: "Eventos pasados",
@@ -213,13 +214,14 @@ export const COPY = {
       addToCalendar: "Añade a tu calendario",
       audienceNotice:
         "Acceso del público: gratuito. Participación: para conocer los requisitos, la inscripción y las condiciones de participación, comuníquese con la organización.",
+      externalAudienceNoticeLabel: "Costo y participación:",
       externalAudienceNotice:
-        "Costo y participación: consulte la convocatoria oficial o comuníquese con la organización del evento para conocer precios, requisitos e inscripción.",
+        "consulte la convocatoria oficial o comuníquese con la organización del evento para conocer precios, requisitos e inscripción.",
     },
     archive: {
       title: "Eventos pasados",
       description: "Archivo histórico de actividades publicadas.",
-      upcomingEvents: "Próximos eventos",
+      upcomingEvents: "Calendario de Próximos Eventos",
       empty: "Todavía no hay eventos en el archivo.",
       viewEvent: "Detalles del evento",
       pagination: "Paginación del archivo",
@@ -254,11 +256,11 @@ export const COPY = {
       switchToSpanish: "Ver sitio en español",
       switchToEnglish: "View site in English",
       calendarMenu: "Calendar options",
-      upcomingEvents: "Upcoming events",
+      upcomingEvents: "Upcoming Events Calendar",
       pastEvents: "Past events",
       links: [
         { id: "home", path: "/en/", label: "Home" },
-        { id: "calendar", path: "/en/events/", label: "Calendar" },
+        { id: "calendar", path: "/en/events/", label: "Event" },
         { id: "gallery", path: "/en/gallery/", label: "Gallery" },
         { id: "affiliates", path: "/en/affiliates/", label: "Affiliates" },
       ],
@@ -272,8 +274,8 @@ export const COPY = {
       lead: "A community that learns, trains, and grows together through kendo in Costa Rica.",
       description: "Find an affiliated dojo or view our upcoming events.",
       dojos: "Find a dojo",
-      events: "Upcoming events",
-      upcoming: "Upcoming events",
+      events: "Upcoming Events Calendar",
+      upcoming: "Upcoming Events Calendar",
       heroAlt: "Group of kendo practitioners gathered after an activity",
     },
     footer: {
@@ -295,7 +297,8 @@ export const COPY = {
       shareEvent: "Share event",
     },
     calendar: {
-      title: "Upcoming events",
+      title: "Upcoming Events Calendar",
+      upcomingLabel: "Upcoming events",
       description: "Kendo tournaments, examinations, and activities.",
       empty: "There are no upcoming published events.",
       pastEvents: "Past events",
@@ -352,13 +355,14 @@ export const COPY = {
       addToCalendar: "Add to calendar",
       audienceNotice:
         "Public access: free. Participation: contact the organization for eligibility requirements, registration, and participation terms.",
+      externalAudienceNoticeLabel: "Cost and participation:",
       externalAudienceNotice:
-        "Cost and participation: consult the official announcement or contact the event organization for pricing, eligibility requirements, and registration.",
+        "consult the official announcement or contact the event organization for pricing, eligibility requirements, and registration.",
     },
     archive: {
       title: "Past events",
       description: "Historical archive of published activities.",
-      upcomingEvents: "Upcoming events",
+      upcomingEvents: "Upcoming Events Calendar",
       empty: "There are no events in the archive yet.",
       viewEvent: "Event details",
       pagination: "Archive pagination",

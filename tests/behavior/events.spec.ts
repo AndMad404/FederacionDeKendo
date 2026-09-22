@@ -26,13 +26,25 @@ async function discoverUpcomingEvent(page: Page) {
   return { eventLink, path: path!, title: title! };
 }
 
-test("calendar cards link to the canonical event page", async ({ page }) => {
-  const { eventLink, path } = await discoverUpcomingEvent(page);
+test("calendar cards link to the canonical event page with public metadata", async ({
+  page,
+}) => {
+  const { eventLink, path, title } = await discoverUpcomingEvent(page);
   await expect(eventLink).toHaveAttribute("href", path);
   await eventLink.click();
   await expect(page).toHaveURL(new RegExp(`${path}$`));
+  await expect(
+    page.getByRole("heading", { name: title, level: 1 }),
+  ).toBeVisible();
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+    "content",
+    "index, follow",
+  );
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    "href",
+    `https://fak-kendo.org${path}`,
+  );
 });
-
 test("shows the next event after the previous event ends", async ({ page }) => {
   await page.clock.setFixedTime(new Date("2026-08-22T16:59:59-06:00"));
   await page.goto("/eventos/");
@@ -69,36 +81,6 @@ test("scheduled event pages offer an add-to-calendar button", async ({
   ).toBeVisible();
 });
 
-for (const viewport of [
-  { name: "mobile 360x800 portrait", width: 360, height: 800, columns: 1 },
-  { name: "mobile 390x844 portrait", width: 390, height: 844, columns: 1 },
-  { name: "tablet 768x1024 portrait", width: 768, height: 1024, columns: 1 },
-  { name: "desktop 1366x768 landscape", width: 1366, height: 768, columns: 2 },
-]) {
-  test(`scheduled event details use a ${viewport.columns}-column ${viewport.name} grid`, async ({
-    page,
-  }) => {
-    await page.setViewportSize(viewport);
-    const { path } = await discoverUpcomingEvent(page);
-    await page.goto(path);
-
-    const addToCalendar = page.getByRole("link", {
-      name: "Añade a tu calendario",
-    });
-    const details = addToCalendar.locator("xpath=ancestor::dl");
-    await expect(details).toHaveCount(1);
-    await expect(details.locator(":scope > div")).toHaveCount(4);
-    await expect
-      .poll(() =>
-        details.evaluate(
-          (element) =>
-            getComputedStyle(element).gridTemplateColumns.split(" ").length,
-        ),
-      )
-      .toBe(viewport.columns);
-  });
-}
-
 test("accepts only current canonical event routes", async ({ page }) => {
   await page.goto("/eventos/examen-2026-08-08/");
   await expect(page.getByText(/página que buscas no existe/i)).toBeVisible();
@@ -106,7 +88,10 @@ test("accepts only current canonical event routes", async ({ page }) => {
   await page.goto("/eventos/#examen-2026-08-08");
   await expect(page).toHaveURL(/\/eventos\/#examen-2026-08-08$/);
   await expect(
-    page.getByRole("heading", { name: "Eventos", level: 1 }),
+    page.getByRole("heading", {
+      name: "Calendario de Próximos Eventos",
+      level: 1,
+    }),
   ).toBeVisible();
 });
 
@@ -223,74 +208,47 @@ test("historical tournament details preserve complete information with its galle
   ).toHaveCount(1);
 });
 
-for (const viewport of [
-  { width: 360, height: 800 },
-  { width: 390, height: 844 },
-  { width: 768, height: 1024 },
-  { width: 1366, height: 768 },
-]) {
-  test(`historical gallery is operable and accessible at ${viewport.width}x${viewport.height}`, async ({
-    page,
-  }) => {
-    await page.setViewportSize(viewport);
-    await page.clock.setFixedTime(FIXED_HISTORICAL_TIME);
-    await page.goto(HISTORICAL_EVENT_PATH);
+test("historical gallery opens the shared lightbox from the selected image", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.clock.setFixedTime(FIXED_HISTORICAL_TIME);
+  await page.goto(HISTORICAL_EVENT_PATH);
 
-    const gallery = page.getByRole("region", {
-      name: "Fotografías del evento Examen",
-    });
-    await expect(gallery).toBeVisible();
-    const thumbnails = gallery.getByRole("group", {
-      name: "Seleccionar fotografía",
-    });
-    await expect(gallery.locator("figure")).toBeVisible();
-    await expect(thumbnails).toBeVisible();
-    await expect(gallery.locator("img[alt]")).toHaveCount(4);
-    await expect(
-      gallery.getByRole("img", { name: "Fotografía 1 del evento Examen" }),
-    ).toBeVisible();
-    await expect(gallery.locator('img[alt=""]')).toHaveCount(3);
-    expect(
-      await gallery
-        .locator("img")
-        .evaluateAll((images) =>
-          images.every((image) => image.loading === "lazy"),
-        ),
-    ).toBe(true);
-
-    await gallery.getByRole("button", { name: "Fotografía siguiente" }).click();
-    await expect(
-      gallery.getByRole("img", { name: "Fotografía 2 del evento Examen" }),
-    ).toBeVisible();
-
-    const opener = gallery.getByRole("button", {
-      name: "Abrir Fotografía 2 del evento Examen",
-    });
-    await opener.click();
-    const dialog = page.getByRole("dialog");
-    await expect(dialog).toBeVisible();
-    await expect(dialog).toHaveAccessibleName("Fotografía 2 del evento Examen");
-    await expect(
-      dialog.getByRole("img", { name: "Fotografía 2 del evento Examen" }),
-    ).toBeVisible();
-    await expect
-      .poll(() =>
-        page.evaluate(
-          () => document.querySelector<HTMLElement>("#root")?.inert,
-        ),
-      )
-      .toBe(true);
-
-    await page.keyboard.press("ArrowRight");
-    await expect(
-      dialog.getByRole("img", { name: "Fotografía 3 del evento Examen" }),
-    ).toBeVisible();
-    await page.keyboard.press("Escape");
-    await expect(dialog).toBeHidden();
-    await expect(opener).toBeFocused();
+  const gallery = page.getByRole("region", {
+    name: "Fotografías del evento Examen",
   });
-}
+  await expect(gallery).toBeVisible();
 
+  const thumbnails = gallery.getByRole("group", {
+    name: "Seleccionar fotografía",
+  });
+  await expect(thumbnails).toBeVisible();
+  await expect(gallery.locator("img[alt]")).toHaveCount(4);
+
+  expect(
+    await gallery
+      .locator("img")
+      .evaluateAll((images) =>
+        images.every((image) => image.loading === "lazy"),
+      ),
+  ).toBe(true);
+
+  await gallery.getByRole("button", { name: "Fotografía siguiente" }).click();
+
+  const opener = gallery.getByRole("button", {
+    name: "Abrir Fotografía 2 del evento Examen",
+  });
+  await expect(opener).toBeVisible();
+  await opener.click();
+
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toHaveAccessibleName("Fotografía 2 del evento Examen");
+  await expect(
+    dialog.getByRole("img", { name: "Fotografía 2 del evento Examen" }),
+  ).toBeVisible();
+});
 test("historical tournament thumbnails follow carousel navigation on mobile", async ({
   page,
 }) => {

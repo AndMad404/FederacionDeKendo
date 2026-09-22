@@ -9,12 +9,15 @@ import {
 import { useLanguage } from "../config/i18n";
 
 const imageVersion = "v=20260704-0120";
+const avifSrcSet =
+  "/images/hero/kendo-hero-formacion-480.avif?v=44c635faf6d3 480w, /images/hero/kendo-hero-formacion-960.avif?v=72e40d00f3ff 960w, /images/hero/kendo-hero-formacion-1500.avif?v=6d56fed2e5fb 1500w";
 
 function HeroBanner() {
   const { copy } = useLanguage();
   return (
     <header className="relative my-2 flex h-[clamp(520px,calc(100svh_-_4rem_-_10px),680px)] items-stretch overflow-hidden rounded-xl land-sm:h-auto land-sm:min-h-[calc(100svh_-_3rem_-_6px)] tall-md:h-auto tall-md:min-h-[230px] tall-md:flex-1 tablet-fit:h-[348px] tablet-fit:min-h-0 tablet-fit:flex-none">
       <picture className="absolute inset-0">
+        <source srcSet={avifSrcSet} sizes="100vw" type="image/avif" />
         <source
           srcSet={`/images/hero/kendo-hero-formacion-480.webp?${imageVersion} 480w, /images/hero/kendo-hero-formacion-960.webp?${imageVersion} 960w, /images/hero/kendo-hero-formacion-1500.webp?${imageVersion} 1500w`}
           sizes="100vw"

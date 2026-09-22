@@ -109,7 +109,7 @@ export function isPastEvent(event: CalendarEvent, now = new Date()) {
   );
 }
 
-export function isUpcomingEvent(event: CalendarEvent, now = new Date()) {
+function isUpcomingEvent(event: CalendarEvent, now = new Date()) {
   return getEventEndDate(event).getTime() > now.getTime();
 }
 

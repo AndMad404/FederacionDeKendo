@@ -1,4 +1,4 @@
-import { expect, test, type Locator } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { expectInteractiveReady } from "../helpers/interactive-ready";
 
 const ARCHIVE_TIME = new Date("2028-01-01T12:00:00-06:00");
@@ -6,20 +6,6 @@ const ARCHIVE_TIME = new Date("2028-01-01T12:00:00-06:00");
 test.beforeEach(async ({ page }) => {
   await page.clock.setFixedTime(ARCHIVE_TIME);
 });
-
-async function getVisibleBoundingBox(locator: Locator) {
-  await expect(locator).toBeVisible();
-
-  let box = await locator.boundingBox();
-  await expect
-    .poll(async () => {
-      box = await locator.boundingBox();
-      return box !== null;
-    })
-    .toBe(true);
-
-  return box!;
-}
 
 test("persists combined filters on reload and localized routes", async ({
   page,
@@ -108,25 +94,6 @@ test("renders localized upcoming and past event navigation with the active page"
     await inactive.press("Enter");
     await expect(page).toHaveURL(new RegExp(`${inactivePath}$`));
   }
-});
-
-test("aligns the calendar and historical content panels on the reference desktop", async ({
-  page,
-}) => {
-  await page.clock.setFixedTime(new Date("2026-08-04T12:00:00-06:00"));
-  await page.setViewportSize({ width: 1366, height: 768 });
-
-  await page.goto("/eventos/");
-  const calendarTop = await getVisibleBoundingBox(
-    page.locator("[data-page-content-boundary]"),
-  );
-
-  await page.goto("/eventos/pasados/");
-  const archiveTop = await getVisibleBoundingBox(
-    page.locator("[data-page-content-boundary]"),
-  );
-
-  expect(Math.abs(calendarTop.y - archiveTop.y)).toBeLessThanOrEqual(1);
 });
 
 test("preserves filters in pagination and resets to page one when changed", async ({

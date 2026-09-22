@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   CALENDAR_EVENTS,
   getEventRedirects,
+  getEventTranslationStatus,
   getRouteManifest,
   getRouteSeoPayload,
 } from "../../dist-ssr/entry-server.js";
@@ -13,6 +14,22 @@ async function readDist(relativePath) {
     new URL(`../../dist/${relativePath}`, import.meta.url),
     "utf8",
   );
+}
+
+async function describeTranslation(eventId) {
+  const event = CALENDAR_EVENTS.find(({ id }) => id === eventId);
+  const translations = JSON.parse(
+    await readFile(
+      new URL("../../src/app/data/eventTranslations.json", import.meta.url),
+      "utf8",
+    ),
+  );
+
+  return JSON.stringify({
+    status: event ? getEventTranslationStatus(event) : "event-missing",
+    calendar: { title: event?.title, summary: event?.summary },
+    translationSource: translations[eventId]?.source,
+  });
 }
 
 test("generates historical event routes with canonical and indexable metadata", async () => {
@@ -35,10 +52,10 @@ test("generates historical event routes with canonical and indexable metadata", 
   assert.match(incomplete, /application\/ld\+json/);
 });
 
-test("identifies the Federation as organizer for every non-external event", () => {
+test("publishes Event JSON-LD only when the required physical location is known", () => {
   const organizationId = "https://fak-kendo.org/#organization";
   const eventRoutes = getRouteManifest().filter(
-    (route) => route.component === "event" && route.language === "es",
+    (route) => route.component === "event",
   );
 
   for (const route of eventRoutes) {
@@ -49,9 +66,27 @@ test("identifies the Federation as organizer for every non-external event", () =
     const structuredEvent = Array.isArray(graph)
       ? graph.find((entity) => entity?.["@type"] === "Event")
       : undefined;
+
+    assert.ok(event, `${route.path}: calendar event is missing`);
+
+    if (!event.location?.trim()) {
+      assert.equal(
+        structuredEvent,
+        undefined,
+        `${route.path}: incomplete Event JSON-LD must be omitted`,
+      );
+      continue;
+    }
+
     const external = /(?:^|\s)#EventoExterno\b/iu.test(event?.summary ?? "");
 
     assert.ok(structuredEvent, `${route.path}: Event JSON-LD is missing`);
+    assert.equal(structuredEvent.location?.["@type"], "Place");
+    assert.equal(
+      structuredEvent.location?.address?.streetAddress,
+      event.location.trim(),
+    );
+    assert.ok(structuredEvent.endDate, `${route.path}: endDate is missing`);
     assert.deepEqual(
       structuredEvent.organizer,
       external ? undefined : { "@id": organizationId },
@@ -138,7 +173,7 @@ test("generates localized, unique, indexable SEO output for every event route", 
     ],
     [
       "2026-05-29-clak-seminario-instructores-chile:en",
-      "CLAK Instructor Seminar CHILE — May 29, 2026",
+      "CLAK Seminario Instructores CHILE — May 29, 2026",
     ],
     ["2026-08-08-examen:en", "Kendo Examination — Aug 8, 2026 | Costa Rica"],
   ]);
@@ -159,20 +194,19 @@ test("generates localized, unique, indexable SEO output for every event route", 
 
   const panamaEventId =
     "2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario";
-  const panamaVanitySlug = "2026-11-21-panama-torneo-por-equipos";
   const expectedPanamaRoutes = new Map([
     [
       "es",
       {
-        path: `/eventos/${panamaVanitySlug}/`,
+        path: `/eventos/${panamaEventId}/`,
         title: "PANAMA 5ta Copa Shogun — 21 nov 2026",
       },
     ],
     [
       "en",
       {
-        path: `/en/events/${panamaVanitySlug}/`,
-        title: "PANAMA 5th Shogun Cup — Nov 21, 2026",
+        path: `/en/events/${panamaEventId}/`,
+        title: "PANAMA 5ta Copa Shogun — Nov 21, 2026",
       },
     ],
   ]);
@@ -181,7 +215,11 @@ test("generates localized, unique, indexable SEO output for every event route", 
       (candidate) =>
         candidate.eventId === panamaEventId && candidate.language === language,
     );
-    assert.equal(route?.path, expected.path, language);
+    assert.equal(
+      route?.path,
+      expected.path,
+      `${language}: ${await describeTranslation(panamaEventId)}`,
+    );
     assert.equal(route?.title, expected.title, language);
   }
 
@@ -228,7 +266,7 @@ test("uses the JPEG social card in generated Open Graph metadata", async () => {
   assert.match(gallery, /<html lang="es" prefix="og: https:\/\/ogp\.me\/ns#">/);
   assert.match(
     gallery,
-    /property="og:image" content="https:\/\/fak-kendo\.org\/images\/social\/kendo-social-card-20260918\.jpg"/,
+    /property="og:image" content="https:\/\/fak-kendo\.org\/images\/social\/kendo-social-card-20260921\.jpg"/,
   );
   assert.match(gallery, /property="og:image:type" content="image\/jpeg"/);
   assert.match(gallery, /name="twitter:card" content="summary_large_image"/);
@@ -340,7 +378,7 @@ test("publishes sitemap images for approved routes", async () => {
   for (const html of [home, calendar]) {
     assert.match(
       html,
-      /og:image" content="https:\/\/fak-kendo\.org\/images\/social\/kendo-social-card-20260918\.jpg"/,
+      /og:image" content="https:\/\/fak-kendo\.org\/images\/social\/kendo-social-card-20260921\.jpg"/,
     );
     assert.match(html, /og:image:type" content="image\/jpeg"/);
     assert.match(html, /og:image:width" content="1200"/);
@@ -380,11 +418,11 @@ test("redirects legacy calendar and archived event URLs to their canonical route
   );
   assert.match(
     redirects,
-    /^\/eventos\/2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario\/ \/eventos\/2026-11-21-panama-torneo-por-equipos\/ 301$/m,
+    /^\/eventos\/2026-11-21-panama-torneo-por-equipos\/ \/eventos\/2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario\/ 301$/m,
   );
   assert.match(
     redirects,
-    /^\/en\/events\/2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario\/ \/en\/events\/2026-11-21-panama-torneo-por-equipos\/ 301$/m,
+    /^\/en\/events\/2026-11-21-panama-torneo-por-equipos\/ \/en\/events\/2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario\/ 301$/m,
   );
   assert.match(
     redirects,
@@ -402,6 +440,57 @@ test("redirects legacy calendar and archived event URLs to their canonical route
     redirects,
     /^\/en\/events\/past\/2026-05-29-clak-seminario-instructores-chile\/ \/en\/events\/past\/2026-05-30-seminario\/ 301$/m,
   );
+});
+
+test("redirects every previous event URL to its current URL in each published language", async () => {
+  const redirects = await readDist("_redirects");
+  const redirectLines = new Set(redirects.split(/\r?\n/).filter(Boolean));
+  const redirectSources = new Set(
+    [...redirectLines].map((line) => line.split(" ")[0]),
+  );
+  const eventRoutes = getRouteManifest().filter(
+    (route) => route.component === "event",
+  );
+  const renamedEvents = CALENDAR_EVENTS.filter(
+    ({ aliases }) => aliases?.length,
+  );
+
+  assert.ok(renamedEvents.length > 0);
+
+  for (const event of renamedEvents) {
+    const routes = eventRoutes.filter((route) => route.eventId === event.id);
+    assert.ok(
+      routes.some((route) => route.language === "es"),
+      `${event.id}: missing Spanish route`,
+    );
+
+    for (const route of routes) {
+      const [current, past] =
+        route.language === "en"
+          ? ["/en/events/", "/en/events/past/"]
+          : ["/eventos/", "/eventos/pasados/"];
+      const prefixes = route.path.startsWith(past)
+        ? [current, past]
+        : [current];
+
+      for (const slug of [event.id, ...event.aliases]) {
+        for (const prefix of prefixes) {
+          const from = `${prefix}${slug}/`;
+          if (from === route.path) continue;
+          assert.ok(
+            redirectLines.has(`${from} ${route.path} 301`),
+            `${from} must redirect to ${route.path}`,
+          );
+        }
+      }
+
+      assert.equal(
+        redirectSources.has(route.path),
+        false,
+        `${route.path} must not redirect elsewhere`,
+      );
+    }
+  }
 });
 
 test("omits breadcrumbs from event and archive routes", async () => {
@@ -454,18 +543,18 @@ test("generates localized English routes with reciprocal language metadata", asy
   assert.match(sitemap, /<loc>https:\/\/fak-kendo\.org\/en\/<\/loc>/);
 });
 
-test("publishes English event routes only when their editorial translation is valid", async () => {
-  const { CALENDAR_EVENTS, getEventTranslationStatus } =
-    await import("../../dist-ssr/entry-server.js");
+test("publishes every event route in both Spanish and English", async () => {
+  const { CALENDAR_EVENTS } = await import("../../dist-ssr/entry-server.js");
+  const spanishEventRoutes = getRouteManifest()
+    .filter((route) => route.component === "event" && route.language === "es")
+    .map((route) => route.eventId)
+    .sort();
   const englishEventRoutes = getRouteManifest()
     .filter((route) => route.component === "event" && route.language === "en")
     .map((route) => route.eventId)
     .sort();
-  const validTranslationIds = CALENDAR_EVENTS.filter(
-    (event) => getEventTranslationStatus(event) === "valid",
-  )
-    .map((event) => event.id)
-    .sort();
+  const eventIds = CALENDAR_EVENTS.map((event) => event.id).sort();
 
-  assert.deepEqual(englishEventRoutes, validTranslationIds);
+  assert.deepEqual(spanishEventRoutes, eventIds);
+  assert.deepEqual(englishEventRoutes, eventIds);
 });

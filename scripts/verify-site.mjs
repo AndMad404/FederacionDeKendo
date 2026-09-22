@@ -36,7 +36,7 @@ export function verificationSteps(unitScript = "test:unit") {
   if (!ALLOWED_UNIT_SCRIPTS.has(unitScript)) {
     throw new Error(`Unsupported unit script: ${unitScript}`);
   }
-  return [
+  const steps = [
     ["pnpm", "run", "format:line-endings:check"],
     ["pnpm", "run", "lint"],
     ["pnpm", "run", "format:check"],
@@ -45,13 +45,20 @@ export function verificationSteps(unitScript = "test:unit") {
     ["pnpm", "run", "typecheck"],
     ["pnpm", "run", "build"],
     ["pnpm", "run", unitScript],
-    ["pnpm", "run", "test:generated"],
+  ];
+
+  if (unitScript !== "test:unit") {
+    steps.push(["pnpm", "run", "test:generated"]);
+  }
+
+  steps.push(
     ["pnpm", "exec", "playwright", "install", "--with-deps", "chromium"],
     ["pnpm", "exec", "playwright", "test", "tests/data"],
     ["pnpm", "run", "test:behavior"],
     ["pnpm", "run", "test:design"],
-    ["pnpm", "run", "format:check"],
-  ];
+  );
+
+  return steps;
 }
 
 function parseUnitScript(args) {

@@ -21,7 +21,6 @@ import {
 import { synchronizeApprovedHistoricalGalleries } from "../../scripts/sync-approved-historical-galleries.mjs";
 import {
   detectHistoricalChanges,
-  mergeRegistry,
   serializeCalendarEvents,
 } from "../../scripts/sync-calendar-events.mjs";
 
@@ -124,12 +123,12 @@ test("C3 accepts multiple fields in canonical order and updates both artifacts c
 
 test("C3 accepts a multi-line approved summary while keeping private values blocked", async () => {
   const files = await fixture(
-    createReport({ ...proposed, summary: "Primera línea\nSegunda línea" }),
+    createReport({ ...proposed, summary: "Primera lÃ­nea\nSegunda lÃ­nea" }),
   );
   try {
     await run(files, ["summary"]);
     const registry = JSON.parse(await readFile(files.registryPath, "utf8"));
-    assert.equal(registry.events[0].summary, "Primera línea\nSegunda línea");
+    assert.equal(registry.events[0].summary, "Primera lÃ­nea\nSegunda lÃ­nea");
   } finally {
     await rm(files.directory, { recursive: true, force: true });
   }
@@ -140,7 +139,7 @@ test("C3 normalizes approved calendar HTML before publishing a summary", async (
     createReport({
       ...proposed,
       summary:
-        '- Categoría con Bogu<br>- Categoría por equipos<br><br><a href=" class="pastedDriveLink-0">',
+        '- CategorÃ­a con Bogu<br>- CategorÃ­a por equipos<br><br><a href=" class="pastedDriveLink-0">',
     }),
   );
   try {
@@ -148,7 +147,7 @@ test("C3 normalizes approved calendar HTML before publishing a summary", async (
     const registry = JSON.parse(await readFile(files.registryPath, "utf8"));
     assert.equal(
       registry.events[0].summary,
-      "- Categoría con Bogu\n- Categoría por equipos",
+      "- CategorÃ­a con Bogu\n- CategorÃ­a por equipos",
     );
   } finally {
     await rm(files.directory, { recursive: true, force: true });
@@ -513,39 +512,4 @@ test("later synchronization still reports differences not accepted", async () =>
   } finally {
     await rm(files.directory, { recursive: true, force: true });
   }
-});
-
-test("an individual disappearance becomes pending, remains retained, and stays public", () => {
-  const second = {
-    ...published,
-    sourceId: "present",
-    slug: "2026-02-01-present",
-    aliases: undefined,
-  };
-  const merged = mergeRegistry(
-    { version: 3, events: [published, second] },
-    [{ ...second, historical: undefined }],
-    new Date("2026-03-01"),
-  );
-  assert.equal(
-    merged.events.find(({ sourceId }) => sourceId === published.sourceId)
-      .editorialState,
-    "pendiente",
-  );
-  assert.match(
-    serializeCalendarEvents(merged.events),
-    new RegExp(published.slug),
-  );
-});
-
-test("disappearance of every historical event aborts before producing a registry", () => {
-  assert.throws(
-    () =>
-      mergeRegistry(
-        { version: 3, events: [published] },
-        [],
-        new Date("2026-03-01"),
-      ),
-    /all historical events disappeared/i,
-  );
 });

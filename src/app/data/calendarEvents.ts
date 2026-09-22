@@ -60,10 +60,11 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: "2026-10-10-clak-1er-panamericano-brasil",
     archiveEligibleAt: "2026-10-13T06:00:00.000Z",
-    sourceUpdatedAt: "2026-05-18T19:19:09.000Z",
+    sourceUpdatedAt: "2026-09-18T20:17:19.000Z",
     title: "CLAK 1er Panamericano BRASIL",
     date: "2026-10-10",
     endDate: "2026-10-12",
+    summary: "#EventoExterno",
     eventType: "seminario",
     timeZone: "America/Costa_Rica"
   },
@@ -84,10 +85,10 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
     id: "2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario",
     aliases: ["2026-11-21-panama-torneo-por-equipos"],
     archiveEligibleAt: "2026-11-23T06:00:00.000Z",
-    sourceUpdatedAt: "2026-07-24T17:16:22.000Z",
+    sourceUpdatedAt: "2026-09-18T20:17:37.000Z",
     title: "PANAMÁ 5ta Copa Shogun Torneo por Equipos y Seminario",
     date: "2026-11-21",
-    summary: "#EventoExterno: Invitación del Dojo Shinsei Panamá a la 5ta Copa Shogun :\nTorneo por equipos, práctica libre y seminario.",
+    summary: "#EventoExterno:\nInvitación del Dojo Shinsei Panamá a la 5ta Copa Shogun : Torneo por equipos, práctica libre y seminario.",
     eventType: "torneo",
     timeZone: "America/Costa_Rica"
   },

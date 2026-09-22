@@ -61,6 +61,35 @@ test("mobile event actions remain usable and contained with an optional descript
   ).toBeLessThanOrEqual(0);
 });
 
+for (const viewport of [
+  { name: "mobile 360x800 portrait", width: 360, height: 800, columns: 1 },
+  { name: "mobile 390x844 portrait", width: 390, height: 844, columns: 1 },
+  { name: "tablet 768x1024 portrait", width: 768, height: 1024, columns: 1 },
+  { name: "desktop 1366x768 landscape", width: 1366, height: 768, columns: 2 },
+]) {
+  test(`scheduled event details use a ${viewport.columns}-column ${viewport.name} grid`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport);
+    await page.goto(await discoverUpcomingEvent(page));
+
+    const addToCalendar = page.getByRole("link", {
+      name: "Añade a tu calendario",
+    });
+    const details = addToCalendar.locator("xpath=ancestor::dl");
+    await expect(details).toHaveCount(1);
+    await expect(details.locator(":scope > div")).toHaveCount(4);
+    await expect
+      .poll(() =>
+        details.evaluate(
+          (element) =>
+            getComputedStyle(element).gridTemplateColumns.split(" ").length,
+        ),
+      )
+      .toBe(viewport.columns);
+  });
+}
+
 test("historical gallery starts with the first landscape image", async ({
   page,
 }) => {

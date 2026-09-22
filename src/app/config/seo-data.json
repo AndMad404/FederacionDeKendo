@@ -5,7 +5,7 @@
   "locale": "es_CR",
   "language": "es",
   "logo": "/images/logo/fakcr-logo-640.webp",
-  "defaultImage": "/images/social/kendo-social-card-20260918.jpg",
+  "defaultImage": "/images/social/kendo-social-card-20260921.jpg",
   "defaultImageAlt": "Tarjeta social de la Federación de Asociaciones de Kendo",
   "defaultImageWidth": 1200,
   "defaultImageHeight": 630,
@@ -15,7 +15,8 @@
   },
   "organization": {
     "sport": "Kendo",
-    "areaServed": "Costa Rica"
+    "areaServed": "Costa Rica",
+    "sameAs": ["https://www.instagram.com/federacionkendocostarica/"]
   },
   "routes": {
     "/": {
@@ -25,16 +26,16 @@
       "alternatePath": "/en/",
       "component": "home",
       "title": "Federación de Asociaciones de Kendo | Costa Rica",
-      "description": "Sitio oficial de la Federación de Asociaciones de Kendo. Conoce el kendo en Costa Rica, sus eventos, comunidad y dojos afiliados.",
+      "description": "Sitio oficial de la Federación de Asociaciones de Kendo. Conoce el kendo ubicados en Costa Rica, sus eventos, comunidad y dojos afiliados.",
       "image": "/images/hero/kendo-hero-formacion-1500.webp?v=20260704-0120",
       "imageAlt": "Grupo de practicantes de kendo reunidos después de una actividad",
       "imageWidth": 1500,
       "imageHeight": 750,
       "imageType": "image/webp",
       "preloadImage": {
-        "href": "/images/hero/kendo-hero-formacion-960.webp?v=20260704-0120",
-        "type": "image/webp",
-        "srcSet": "/images/hero/kendo-hero-formacion-480.webp?v=20260704-0120 480w, /images/hero/kendo-hero-formacion-960.webp?v=20260704-0120 960w, /images/hero/kendo-hero-formacion-1500.webp?v=20260704-0120 1500w",
+        "href": "/images/hero/kendo-hero-formacion-960.avif?v=72e40d00f3ff",
+        "type": "image/avif",
+        "srcSet": "/images/hero/kendo-hero-formacion-480.avif?v=44c635faf6d3 480w, /images/hero/kendo-hero-formacion-960.avif?v=72e40d00f3ff 960w, /images/hero/kendo-hero-formacion-1500.avif?v=6d56fed2e5fb 1500w",
         "sizes": "100vw"
       },
       "schemaType": "WebPage",
@@ -91,7 +92,7 @@
       "alternatePath": "/en/affiliates/",
       "component": "affiliates",
       "title": "Dojos de Kendo en Costa Rica",
-      "description": "Encuentra dojos afiliados a la Federación de Asociaciones de Kendo en Costa Rica, con horarios, ubicación y datos de contacto.",
+      "description": "Encuentra dojos afiliados a la Federación de Asociaciones de Kendo ubicados en Costa Rica, con horarios, ubicación y datos de contacto.",
       "image": "/images/affiliates/kendo-affiliates-1200.webp",
       "imageAlt": "Practicantes de kendo reunidos durante una explicación en el dojo",
       "imageWidth": 1200,
@@ -120,9 +121,9 @@
       "imageHeight": 750,
       "imageType": "image/webp",
       "preloadImage": {
-        "href": "/images/hero/kendo-hero-formacion-960.webp?v=20260704-0120",
-        "type": "image/webp",
-        "srcSet": "/images/hero/kendo-hero-formacion-480.webp?v=20260704-0120 480w, /images/hero/kendo-hero-formacion-960.webp?v=20260704-0120 960w, /images/hero/kendo-hero-formacion-1500.webp?v=20260704-0120 1500w",
+        "href": "/images/hero/kendo-hero-formacion-960.avif?v=72e40d00f3ff",
+        "type": "image/avif",
+        "srcSet": "/images/hero/kendo-hero-formacion-480.avif?v=44c635faf6d3 480w, /images/hero/kendo-hero-formacion-960.avif?v=72e40d00f3ff 960w, /images/hero/kendo-hero-formacion-1500.avif?v=6d56fed2e5fb 1500w",
         "sizes": "100vw"
       },
       "schemaType": "WebPage",

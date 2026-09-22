@@ -10,10 +10,7 @@ import {
   getEventPath,
 } from "../utils/eventRoutes";
 import { getLanguageFromPathname, type Language } from "./i18n";
-import {
-  getEventTranslationStatus,
-  getLocalizedEvent,
-} from "../utils/localizedEvents";
+import { getLocalizedEvent } from "../utils/localizedEvents";
 import { getEventEndDate } from "../utils/calendarEvents";
 import type { RouteComponent } from "./routeTypes";
 
@@ -46,6 +43,7 @@ interface SeoData {
   organization: {
     sport: string;
     areaServed?: string;
+    sameAs: string[];
   };
   routes: Record<string, RouteMeta>;
 }
@@ -233,7 +231,7 @@ const EVENT_SEO_TITLE_OVERRIDES: Partial<
 > = {
   "2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario": {
     es: "PANAMA 5ta Copa Shogun",
-    en: "PANAMA 5th Shogun Cup",
+    en: "PANAMA 5ta Copa Shogun",
   },
 };
 
@@ -276,7 +274,7 @@ function improveGenericEventTitle(title: string, language: Language) {
   );
 }
 
-export function buildEventSeoTitle({
+function buildEventSeoTitle({
   event,
   localizedEvent,
   language,
@@ -488,9 +486,7 @@ export function getRouteManifest() {
     ),
     ...CALENDAR_EVENTS.flatMap((event) => {
       const spanishRoute = createEventRouteMeta(event, "es");
-      return getEventTranslationStatus(event) === "valid"
-        ? [spanishRoute, createEventRouteMeta(event, "en")]
-        : [spanishRoute];
+      return [spanishRoute, createEventRouteMeta(event, "en")];
     }),
     ...archiveRoutes,
     ...Array.from({ length: pastPageCount }, (_, index) =>
@@ -532,11 +528,9 @@ export function getEventRedirects() {
         ...[...spanishSources]
           .filter((from) => from !== spanishPath)
           .map((from) => ({ from, to: spanishPath })),
-        ...(getEventTranslationStatus(event) === "valid"
-          ? [...englishSources]
-              .filter((from) => from !== englishPath)
-              .map((from) => ({ from, to: englishPath }))
-          : []),
+        ...[...englishSources]
+          .filter((from) => from !== englishPath)
+          .map((from) => ({ from, to: englishPath })),
       ];
     }),
   ];
@@ -555,10 +549,7 @@ function createEventRouteMeta(
     path: getEventPath(event, language),
     language,
     locale: english ? "en_US" : "es_CR",
-    alternatePath:
-      english || getEventTranslationStatus(event) === "valid"
-        ? getEventPath(event, english ? "es" : "en")
-        : undefined,
+    alternatePath: getEventPath(event, english ? "es" : "en"),
     component: "event",
     eventId: event.id,
     title: buildEventSeoTitle({ event, localizedEvent, language }),
@@ -669,6 +660,7 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
     logo: absoluteUrl(DATA.logo),
     description: DEFAULT_SITE_DESCRIPTION,
     sport: DATA.organization.sport,
+    sameAs: DATA.organization.sameAs,
   };
 
   if (DATA.organization.areaServed) {
@@ -682,7 +674,10 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
     const event = CALENDAR_EVENTS.find(
       (candidate) => candidate.id === meta.eventId,
     );
-    if (event) {
+    // Google requires a real physical location for Event rich results. Keep the
+    // page's general structured data, but do not publish an incomplete Event
+    // entity when the calendar has not supplied a defensible venue.
+    if (event?.location?.trim()) {
       const localizedEvent = getLocalizedEvent(event, meta.language);
       if (!localizedEvent) return null;
       const startDate = event.startTime
@@ -694,8 +689,11 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
           : event.endDate
         : event.endTime
           ? `${event.date}T${event.endTime}:00-06:00`
-          : undefined;
+          : event.startTime
+            ? undefined
+            : event.date;
       const organizer = getEventOrganizerReference(event, organizationId);
+      const location = event.location.trim();
       routeEntities.push({
         "@type": "Event",
         "@id": `${canonicalUrl}#event`,
@@ -708,19 +706,15 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
             ? "https://schema.org/EventCompleted"
             : "https://schema.org/EventScheduled",
         eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
-        ...(event.location
-          ? {
-              location: {
-                "@type": "Place",
-                name: event.location.split(",", 1)[0].trim(),
-                address: {
-                  "@type": "PostalAddress",
-                  streetAddress: event.location,
-                  addressCountry: "CR",
-                },
-              },
-            }
-          : {}),
+        location: {
+          "@type": "Place",
+          name: location.split(",", 1)[0].trim(),
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: location,
+            addressCountry: "CR",
+          },
+        },
         ...(organizer ? { organizer } : {}),
         image: [image.url],
         url: canonicalUrl,

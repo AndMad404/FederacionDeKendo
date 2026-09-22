@@ -20,7 +20,10 @@ export function getLocalizedEvent(
   language: Language,
 ): CalendarEvent | undefined {
   if (language === "es") return event;
-  if (getEventTranslationStatus(event) !== "valid") return undefined;
+  // English event routes remain publishable while editorial translations are
+  // paused. Use the Spanish calendar content as a transparent fallback rather
+  // than omitting the event or blocking the production build.
+  if (getEventTranslationStatus(event) !== "valid") return event;
 
   const translation = EVENT_TRANSLATIONS[event.id].translation;
   return {

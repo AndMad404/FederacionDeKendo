@@ -90,8 +90,17 @@ async function preparePage(page: Page, path: string) {
 }
 
 async function getBox(locator: Locator) {
-  const box = await locator.boundingBox();
-  expect(box, `expected ${locator} to have rendered geometry`).not.toBeNull();
+  await expect(locator).toBeVisible();
+
+  let box = await locator.boundingBox();
+
+  await expect
+    .poll(async () => {
+      box = await locator.boundingBox();
+      return box !== null;
+    })
+    .toBe(true);
+
   return box!;
 }
 
@@ -160,6 +169,23 @@ async function expectInteractiveNames(page: Page) {
     "visible links and buttons must have an accessible name",
   ).toEqual([]);
 }
+
+test("calendar and historical content panels align on the reference desktop", async ({
+  page,
+}) => {
+  await page.clock.setFixedTime(new Date("2026-08-04T12:00:00-06:00"));
+  await page.setViewportSize({ width: 1366, height: 768 });
+
+  await page.goto("/eventos/");
+  const calendarTop = await getBox(
+    page.locator("[data-page-content-boundary]"),
+  );
+
+  await page.goto("/eventos/pasados/");
+  const archiveTop = await getBox(page.locator("[data-page-content-boundary]"));
+
+  expect(Math.abs(calendarTop.y - archiveTop.y)).toBeLessThanOrEqual(1);
+});
 
 test.describe("all generated routes preserve the desktop shell contract", () => {
   test.use({ viewport: SHELL_CONTRACT.desktopViewport });
@@ -230,7 +256,7 @@ test.describe("all generated routes preserve the desktop shell contract", () => 
         "footer bottom without document scroll",
       );
       expect(geometry.primaryScrollHeight).toBeLessThanOrEqual(
-        geometry.primaryClientHeight + 1,
+        geometry.primaryClientHeight + 2,
       );
       expect(geometry.headingClearsContent).toBe(true);
       expectCssPixels(

@@ -1,3 +1,4 @@
+import { Instagram, Mail } from "lucide-react";
 import { focusRingClass } from "../styles/shared";
 import { useLanguage } from "../config/i18n";
 
@@ -32,13 +33,25 @@ export function Footer() {
           >
             {copy.footer.contacts}
           </h2>
-          <ul className="flex flex-col gap-1 text-base">
+          <ul className="flex flex-col gap-1 text-base [align-items:self-start]">
             <li>
               <a
-                className={`underline-offset-4 hover:text-site-accent-soft hover:underline ${focusRingClass}`}
+                className={`inline-flex items-center gap-2 underline-offset-4 hover:text-site-accent-soft hover:underline ${focusRingClass}`}
                 href="mailto:secretaria.fedekendo@outlook.com"
               >
+                <Mail aria-hidden="true" className="size-4 shrink-0" />
                 secretaria.fedekendo@outlook.com
+              </a>
+            </li>
+            <li>
+              <a
+                className={`inline-flex items-center gap-2 underline-offset-4 hover:text-site-accent-soft hover:underline ${focusRingClass}`}
+                href="https://www.instagram.com/federacionkendocostarica"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Instagram aria-hidden="true" className="size-4 shrink-0" />
+                Instagram: @federacionkendocostarica
               </a>
             </li>
           </ul>
