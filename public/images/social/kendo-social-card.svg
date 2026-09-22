@@ -16,7 +16,7 @@
     <tspan x="60" dy="68">Asociaciones de Kendo</tspan>
   </text>
   <text class="sans bold" x="60" y="367" fill="#1e3a8a" font-size="34">El camino de la espada</text>
-  <text class="sans" x="60" y="423" fill="#334155" font-size="25">
+  <text class="sans" x="60" y="423" fill="#000000" font-size="26">
     <tspan x="60" dy="0">Comunidad, galería y dojos afiliados para practicar</tspan>
     <tspan x="60" dy="35">kendo con disciplina, respeto y continuidad.</tspan>
   </text>
