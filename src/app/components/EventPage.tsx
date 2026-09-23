@@ -13,7 +13,6 @@ import { getLocalizedEvent } from "../utils/localizedEvents";
 import {
   focusRingClass,
   panelSurfaceClass,
-  primaryButtonClass,
   secondaryButtonClass,
 } from "../styles/shared";
 import { isExternalEvent, isPastEvent } from "../utils/calendarEvents";
