@@ -1287,10 +1287,32 @@ function escapeWorkflowCommandMessage(value) {
     .replace(/\n/g, "%0A");
 }
 
+const notificationTitles = {
+  id_fuente_duplicado: "IDs de Calendar duplicados",
+  url_evento_duplicada: "URLs duplicadas de eventos",
+  fuente_inaccesible: "No se pudo leer la fuente del calendario",
+  parser_o_fuente_invalida: "La fuente del calendario tiene un formato invalido",
+  desaparicion_masiva: "Desaparicion inusual de eventos del calendario",
+  verificacion_fallida: "Fallo una verificacion de la publicacion",
+};
+
+function notificationTitle(kind) {
+  return notificationTitles[kind] ?? "Alerta operativa del calendario";
+}
+
+function notificationIdentity(notification) {
+  const identity = notification.identity ?? {};
+  return identity.slug ?? identity.sourceId ?? "no aplica";
+}
+
+function formatWorkflowWarning(notification) {
+  return `${notificationTitle(notification.kind)}. Afectado: ${notificationIdentity(notification)}. ${notification.cause} ${notification.actionRequired}`;
+}
+
 export function getCalendarNotificationWarnings(notificationReport) {
   return (notificationReport?.notifications ?? []).map(
     (notification) =>
-      `::warning title=Calendar ${escapeWorkflowCommandMessage(notification.kind)}::${escapeWorkflowCommandMessage(`${notification.cause} ${notification.actionRequired}`)}`,
+      `::warning title=${escapeWorkflowCommandMessage(`Calendario: ${notificationTitle(notification.kind)}`)}::${escapeWorkflowCommandMessage(formatWorkflowWarning(notification))}`,
   );
 }
 
@@ -1447,6 +1469,95 @@ function escapeActionText(value) {
     .replace(/([\\`*_{[\]}()#+.!|~-])/g, "\\$1");
 }
 
+function escapeSummaryHtml(value) {
+  return [...String(value ?? "")]
+    .map((character) => {
+      const codePoint = character.codePointAt(0);
+      return codePoint <= 31 || codePoint === 127 ? " " : character;
+    })
+    .join("")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\|/g, "&#124;")
+    .replace(/\[/g, "&#91;")
+    .replace(/\]/g, "&#93;")
+    .replace(/\*/g, "&#42;");
+}
+
+function escapeDiagnosticJson(value) {
+  return JSON.stringify(value, null, 2)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function summaryInlineCode(value) {
+  return `\`${escapeSummaryHtml(value).replace(/`/g, "'")}\``;
+}
+
+function formatNotificationComparison(notification) {
+  const fields = [
+    ["ID de origen", "sourceId"],
+    ["Titulo", "title"],
+    ["Fecha", "date"],
+    ["URL canonica", "slug"],
+    ["Tipo de coincidencia", "matchedAs"],
+  ].filter(
+    ([, field]) => notification.before?.[field] || notification.after?.[field],
+  );
+  if (!fields.length) return [];
+  return [
+    "**Registros comparados**",
+    "",
+    "| Campo | Registro anterior | Registro actual |",
+    "| --- | --- | --- |",
+    ...fields.map(
+      ([label, field]) =>
+        `| ${label} | ${escapeSummaryHtml(notification.before?.[field] ?? "sin dato")} | ${escapeSummaryHtml(notification.after?.[field] ?? "sin dato")} |`,
+    ),
+    "",
+  ];
+}
+
+function formatNotificationDiagnostic(notification) {
+  const diagnostic = {
+    kind: notification.kind,
+    identity: notification.identity,
+    temporality: notification.temporality,
+    cause: notification.cause,
+    actionRequired: notification.actionRequired,
+    execution: notification.execution,
+    before: notification.before,
+    after: notification.after,
+    fingerprint: notification.id,
+  };
+  return [
+    "<details>",
+    "<summary>Detalles tecnicos para diagnostico automatico (JSON redactado)</summary>",
+    "",
+    `<pre><code>${escapeDiagnosticJson(diagnostic)}</code></pre>`,
+    "</details>",
+    "",
+  ];
+}
+
+function formatNotificationSummary(notification, index) {
+  const execution = notification.execution ?? {};
+  return [
+    `### ${index + 1}. ${notificationTitle(notification.kind)}`,
+    "",
+    `**Elemento afectado:** ${summaryInlineCode(notificationIdentity(notification))}`,
+    `**Cuando ocurrio:** ${escapeSummaryHtml(notification.temporality ?? "ejecucion actual")}`,
+    `**Causa:** ${escapeSummaryHtml(notification.cause)}`,
+    `**Accion requerida:** ${escapeSummaryHtml(notification.actionRequired)}`,
+    `**Ejecucion:** ${escapeSummaryHtml(execution.origin ?? "desconocida")} · run ${summaryInlineCode(execution.runId ?? "sin identificador")} · intento ${escapeSummaryHtml(execution.attempt ?? "sin dato")} · ${escapeSummaryHtml(execution.trigger ?? "origen no indicado")}`,
+    "",
+    ...formatNotificationComparison(notification),
+    ...formatNotificationDiagnostic(notification),
+  ];
+}
+
 export async function writeHistoricalChangesReport(report, reportPath) {
   if (!reportPath) return;
   await mkdir(path.dirname(reportPath), { recursive: true });
@@ -1529,23 +1640,12 @@ export async function writeCalendarNotificationsSummary(
   if (!summaryPath) return;
   const notifications = notificationReport?.notifications ?? [];
   const lines = [
-    "## Calendar actionable notifications",
+    "## Alertas operativas del calendario",
     "",
-    `Notifications: ${notifications.length}`,
+    `${notifications.length} alerta(s) requiere(n) atencion.`,
     "",
     ...(notifications.length
-      ? notifications.flatMap((notification) => [
-          `### ${escapeActionText(notification.kind)}`,
-          `Identity: ${escapeActionText(notification.identity?.slug ?? "not applicable")}`,
-          `Temporality: ${escapeActionText(notification.temporality)}`,
-          `Cause: ${escapeActionText(notification.cause)}`,
-          `Required action: ${escapeActionText(notification.actionRequired)}`,
-          `Execution: ${escapeActionText(notification.execution?.origin ?? "unknown")} run ${escapeActionText(notification.execution?.runId ?? "not available")} (attempt ${escapeActionText(notification.execution?.attempt ?? "not available")}, trigger ${escapeActionText(notification.execution?.trigger ?? "not available")})`,
-          `Before (redacted): ${escapeActionText(JSON.stringify(notification.before))}`,
-          `After (redacted): ${escapeActionText(JSON.stringify(notification.after))}`,
-          `Notification fingerprint: \`${escapeActionText(notification.id)}\``,
-          "",
-        ])
+      ? notifications.flatMap(formatNotificationSummary)
       : ["None.", ""]),
   ];
   await appendFile(summaryPath, lines.join("\n"), "utf8");
