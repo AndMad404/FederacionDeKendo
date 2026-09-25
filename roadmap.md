@@ -20,6 +20,8 @@ Se conserva la publicacion automatica; no se activa un gate de despliegue.
 
 ## Decisiones cerradas
 
+- 2026-09-24: El código fuente y scripts propios del sitio se distribuyen bajo MIT con la Federación de Asociaciones de Kendo de Costa Rica como titular del copyright. Fotografías, logos, marcas, material de eventos, contenido institucional y demás recursos gráficos quedan excluidos; sus derechos corresponden a sus titulares respectivos. Los avisos de terceros se mantienen en ATTRIBUTIONS.md.
+
 - 2026-09-24: Las URLs nuevas de eventos usan exclusivamente el titulo
   normalizado, sin incluir la fecha. Presidencia mantiene titulos unicos; la
   sincronizacion rechaza una URL ya ocupada antes de publicar. Cuando cambia
