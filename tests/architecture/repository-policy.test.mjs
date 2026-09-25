@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { readdir, readFile } from "node:fs/promises";
 import { extname, resolve } from "node:path";
 import path from "node:path";
@@ -42,6 +42,14 @@ const PRIVATE_MARKERS = new Set([
   "context-librarian",
   "indexation-librarian",
   "RTK Output",
+]);
+
+const MAX_TRACKED_FILE_BYTES = 5 * 1024 * 1024;
+const LARGE_FILE_EXCEPTIONS = new Map([
+  [
+    "public/images/gallery/kendo-gallery-03.jpg",
+    "legacy source asset; removal requires an explicit archival decision",
+  ],
 ]);
 
 function normalize(relativePath) {
@@ -121,6 +129,31 @@ test("repository files contain no private tooling identifiers", () => {
   }
 
   assert.deepEqual(matches, []);
+});
+
+test("new tracked files stay below the repository size limit", () => {
+  const files = trackedFiles();
+  const oversized = files
+    .filter(
+      (file) => statSync(path.join(ROOT, file)).size > MAX_TRACKED_FILE_BYTES,
+    )
+    .filter((file) => !LARGE_FILE_EXCEPTIONS.has(file))
+    .sort();
+  const staleExceptions = [...LARGE_FILE_EXCEPTIONS.keys()]
+    .filter(
+      (file) =>
+        !files.includes(file) ||
+        statSync(path.join(ROOT, file)).size <= MAX_TRACKED_FILE_BYTES,
+    )
+    .sort();
+
+  assert.deepEqual(
+    { oversized, staleExceptions },
+    {
+      oversized: [],
+      staleExceptions: [],
+    },
+  );
 });
 
 test("source CSS does not use important declarations", async () => {

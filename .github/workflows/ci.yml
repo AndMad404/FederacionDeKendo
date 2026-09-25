@@ -26,6 +26,10 @@ jobs:
         with:
           node-version: 22
 
+      - name: Validate pull request metadata
+        if: github.event_name == 'pull_request'
+        run: node scripts/validate-pull-request.mjs
+
       - name: Enable Corepack
         run: corepack enable
 
