@@ -10,8 +10,10 @@ import {
   HISTORICAL_COMPARISON_FIELDS,
   applyEditorialDecision,
   applyEditorialDecisionToFiles,
+  assertSafeCalendarInput,
   createCalendarFailureNotification,
   createCalendarNotifications,
+  getCalendarNotificationWarnings,
   recordCalendarNotifications,
   detectHistoricalChanges,
   getTranslationPublicationCounts,
@@ -243,7 +245,7 @@ test("Given a future event, When Calendar changes every persisted editorial fiel
   );
   assert.deepEqual(result.events[0], {
     ...current,
-    aliases: previous.aliases,
+    aliases: [...previous.aliases, previous.slug],
     editorialState: "publicado",
   });
 });
@@ -1095,7 +1097,49 @@ test("F4: an emitted pending revision is not notified again until its evidence c
 });
 
 test("F4: source, parser, mass-disappearance, and verification failures have safe actionable notifications", async () => {
+  const captureError = (operation) => {
+    try {
+      operation();
+    } catch (error) {
+      return error;
+    }
+    throw new Error("Expected operation to fail.");
+  };
+  const duplicateSourceError = captureError(() =>
+    assertSafeCalendarInput({ version: 4, events: [] }, [
+      {
+        sourceId: "duplicate-source",
+        slug: "primer-evento",
+        title: "Primer evento",
+        date: "2026-10-01",
+      },
+      {
+        sourceId: "duplicate-source",
+        slug: "segundo-evento",
+        title: "Segundo evento",
+        date: "2026-11-01",
+      },
+    ]),
+  );
+  const duplicateUrlError = captureError(() =>
+    mergeRegistry({ version: 4, events: [] }, [
+      {
+        sourceId: "first-source",
+        slug: "evento-duplicado",
+        title: "Evento duplicado",
+        date: "2026-10-01",
+      },
+      {
+        sourceId: "second-source",
+        slug: "evento-duplicado",
+        title: "Evento duplicado",
+        date: "2026-11-01",
+      },
+    ]),
+  );
   const cases = [
+    [duplicateSourceError, "id_fuente_duplicado"],
+    [duplicateUrlError, "url_evento_duplicada"],
     [new Error("Calendar request failed: 403 Forbidden"), "fuente_inaccesible"],
     [
       new Error("Invalid iCalendar feed: VCALENDAR boundaries are missing."),
@@ -1114,7 +1158,42 @@ test("F4: source, parser, mass-disappearance, and verification failures have saf
     assert.equal(report.notifications.length, 1);
     assert.equal(report.notifications[0].kind, kind);
     assert.match(report.notifications[0].actionRequired, /Revisar|Corregir/);
+    const warnings = getCalendarNotificationWarnings(report);
+    assert.equal(warnings.length, 1);
+    assert.match(warnings[0], /^::warning title=Calendar /);
   }
+
+  const duplicateSourceReport =
+    createCalendarFailureNotification(duplicateSourceError);
+  assert.deepEqual(duplicateSourceReport.notifications[0].identity, {
+    sourceId: "duplicate-source",
+  });
+  assert.equal(
+    duplicateSourceReport.notifications[0].before.slug,
+    "primer-evento",
+  );
+  assert.equal(
+    duplicateSourceReport.notifications[0].after.slug,
+    "segundo-evento",
+  );
+  assert.match(
+    formatCalendarNotificationEmail(
+      duplicateSourceReport,
+      "alerts@example.test",
+      "owner@example.test",
+    ),
+    /Tipo: id_fuente_duplicado/,
+  );
+
+  const duplicateUrlReport =
+    createCalendarFailureNotification(duplicateUrlError);
+  assert.deepEqual(duplicateUrlReport.notifications[0].identity, {
+    slug: "evento-duplicado",
+  });
+  assert.match(
+    getCalendarNotificationWarnings(duplicateUrlReport)[0],
+    /url_evento_duplicada/,
+  );
 
   const directory = await mkdtemp(path.join(os.tmpdir(), "fak-f4-summary-"));
   try {

@@ -20,16 +20,25 @@ Se conserva la publicacion automatica; no se activa un gate de despliegue.
 
 ## Decisiones cerradas
 
-- 2026-09-18: CLAK Seminario Instructores CHILE conserva
-  `/eventos/pasados/2026-05-30-seminario/` como vanity historico estable.
-  La identidad larga del Calendar redirige 301 al vanity, tambien en ingles;
-  el registro generico duplicado del 30 de mayo queda retirado y
-  `#EventoExterno` permanece en la descripcion.
+- 2026-09-24: Las URLs nuevas de eventos usan exclusivamente el titulo
+  normalizado, sin incluir la fecha. Presidencia mantiene titulos unicos; la
+  sincronizacion rechaza una URL ya ocupada antes de publicar. Cuando cambia
+  el titulo de un evento vigente, el slug anterior se conserva como alias para
+  emitir redirects 301 en ambos idiomas. Los vanity aprobados se conservan
+  como aliases historicos. Todos los aliases y vanity historicos
+  apuntan directamente al canonical vigente; no se permiten cadenas de
+  redirects. Sitemap, enlaces internos, canonical y hreflang publican solo la
+  URL vigente. Los IDs de fuente tambien deben ser unicos: cualquier ID o URL
+  duplicada interrumpe la sincronizacion y genera una alerta operativa.
 
-- 2026-09-18: El evento de Panama conserva el vanity estable
-  `/eventos/2026-11-21-panama-torneo-por-equipos/` como URL canonica; la
-  identidad larga derivada del titulo redirige 301 al vanity. La misma regla
-  aplica a su ruta inglesa.
+- 2026-09-18: Los vanitys historicos de CLAK Seminario Instructores CHILE
+  (`/eventos/pasados/2026-05-30-seminario/`) y Panama
+  (`/eventos/2026-11-21-panama-torneo-por-equipos/`) se mantienen como URLs
+  heredadas. Tras la proxima actualizacion de Calendar, cada uno redirige 301
+  directamente a la URL vigente del evento, tambien en ingles; ninguno es
+  canonico ni aparece en sitemap, enlaces internos o hreflang. El registro
+  generico duplicado del 30 de mayo queda retirado y `#EventoExterno`
+  permanece en la descripcion.
 - 2026-09-18: Las fichas de eventos vigentes informan acceso gratuito y
   condiciones de participacion; si la descripcion contiene `#EventoExterno`,
   derivan precios, requisitos e inscripcion a la organizacion externa. El aviso

@@ -33,6 +33,7 @@ type LegacyCalendarEventType =
 
 export interface CalendarEvent {
   id: string;
+  /** Previous slugs retained as vanity URLs that redirect to the current URL. */
   aliases?: string[];
   archiveEligibleAt?: string;
   sourceUpdatedAt?: string;

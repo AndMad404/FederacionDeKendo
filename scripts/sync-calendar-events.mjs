@@ -337,8 +337,8 @@ function hash(value, length = 24) {
   return createHash("sha256").update(value).digest("hex").slice(0, length);
 }
 
-export function createCanonicalSlug(title, date) {
-  return `${date}-${slugify(title) || "actividad"}`;
+export function createCanonicalSlug(title) {
+  return slugify(title) || "actividad";
 }
 
 function parseTechnicalDescription(description, title) {
@@ -473,7 +473,7 @@ export function parseCalendarEvent(properties, warnings = []) {
   const event = {
     sourceId: hash(uid),
     ...(sourceUpdatedAt ? { sourceUpdatedAt } : {}),
-    slug: createCanonicalSlug(title, start.date),
+    slug: createCanonicalSlug(title),
     title,
     date: start.date,
     timeZone: start.timeZone ?? defaultTimeZone,
@@ -521,6 +521,28 @@ export function parseCalendarEvent(properties, warnings = []) {
   return event;
 }
 
+function getEventIdentity(event, matchedAs) {
+  return {
+    sourceId: event.sourceId,
+    slug: event.slug,
+    title: event.title,
+    date: event.date,
+    ...(matchedAs ? { matchedAs } : {}),
+  };
+}
+
+function createCalendarIdentityConflict({
+  kind,
+  message,
+  identity,
+  before,
+  after,
+}) {
+  const error = new Error(message);
+  error.calendarNotification = { kind, identity, before, after };
+  return error;
+}
+
 function assertUniqueCurrentSlugs(events) {
   const ownerBySlug = new Map();
   for (const event of events) {
@@ -531,11 +553,21 @@ function assertUniqueCurrentSlugs(events) {
           slug === event.slug
             ? "Duplicate calendar canonical slug"
             : "Duplicate calendar canonical slug or alias";
-        throw new Error(
-          `${label}: ${slug} (${previousOwner} and ${event.sourceId}).`,
-        );
+        throw createCalendarIdentityConflict({
+          kind: "url_evento_duplicada",
+          message: `${label}: ${slug} (${previousOwner.sourceId} and ${event.sourceId}).`,
+          identity: { slug },
+          before: previousOwner,
+          after: getEventIdentity(
+            event,
+            slug === event.slug ? "canonical" : "vanity",
+          ),
+        });
       }
-      ownerBySlug.set(slug, event.sourceId);
+      ownerBySlug.set(
+        slug,
+        getEventIdentity(event, slug === event.slug ? "canonical" : "vanity"),
+      );
     }
   }
 }
@@ -547,12 +579,19 @@ export function assertSafeCalendarInput(previousRegistry, parsedEvents) {
     );
   }
 
-  const currentSourceIds = new Set();
+  const currentSourceIds = new Map();
   for (const event of parsedEvents) {
-    if (currentSourceIds.has(event.sourceId)) {
-      throw new Error(`Duplicate calendar source identity: ${event.sourceId}.`);
+    const previousOwner = currentSourceIds.get(event.sourceId);
+    if (previousOwner) {
+      throw createCalendarIdentityConflict({
+        kind: "id_fuente_duplicado",
+        message: `Duplicate calendar source identity: ${event.sourceId}.`,
+        identity: { sourceId: event.sourceId },
+        before: previousOwner,
+        after: getEventIdentity(event),
+      });
     }
-    currentSourceIds.add(event.sourceId);
+    currentSourceIds.set(event.sourceId, getEventIdentity(event));
   }
 
   const publishedEvents = (previousRegistry.events ?? []).filter(
@@ -603,7 +642,16 @@ export function mergeRegistry(
   });
   const reconciledCurrentEvents = currentEvents.map((currentEvent) => {
     const previousEvent = previousBySourceId.get(currentEvent.sourceId);
-    const aliases = previousEvent?.aliases;
+    const aliases = previousEvent
+      ? [
+          ...new Set([
+            ...(previousEvent.aliases ?? []),
+            ...(previousEvent.slug !== currentEvent.slug
+              ? [previousEvent.slug]
+              : []),
+          ]),
+        ].filter((slug) => slug !== currentEvent.slug)
+      : [];
     if (previousEvent?.editorialState === "eliminado") {
       return previousEvent;
     }
@@ -1178,38 +1226,49 @@ export function createCalendarFailureNotification(
   error,
   execution = getNotificationExecution(),
 ) {
+  const structuredFailure = error?.calendarNotification;
   const message = redactNotificationValue(
     error instanceof Error ? error.message : String(error),
   );
   const normalized = String(message).toLowerCase();
-  const kind = normalized.includes("mass calendar disappearance")
-    ? "desaparicion_masiva"
-    : normalized.includes("calendar request failed")
-      ? "fuente_inaccesible"
-      : normalized.includes("icalendar") ||
-          normalized.includes("calendar feed") ||
-          normalized.includes("duplicate calendar")
-        ? "parser_o_fuente_invalida"
-        : "verificacion_fallida";
+  const kind =
+    structuredFailure?.kind ??
+    (normalized.includes("mass calendar disappearance")
+      ? "desaparicion_masiva"
+      : normalized.includes("calendar request failed")
+        ? "fuente_inaccesible"
+        : normalized.includes("icalendar") ||
+            normalized.includes("calendar feed")
+          ? "parser_o_fuente_invalida"
+          : "verificacion_fallida");
   const actionRequired =
-    kind === "desaparicion_masiva"
-      ? "Revisar la fuente antes de reintentar; el umbral bloqueo la publicacion y conserva el ultimo conjunto valido."
-      : kind === "verificacion_fallida"
-        ? "Corregir la verificacion fallida y reejecutar; no publicar ni aprobar cambios a partir de esta ejecucion."
-        : "Corregir la fuente o el formato y reejecutar; el ultimo conjunto valido permanece sin cambios.";
-  const id = fingerprintOrderedFields({ kind, message }, ["kind", "message"]);
+    kind === "id_fuente_duplicado"
+      ? "Corregir los IDs duplicados en Calendar y reejecutar; la publicacion fue interrumpida y conserva el ultimo conjunto valido."
+      : kind === "url_evento_duplicada"
+        ? "Corregir los titulos para que produzcan URLs unicas y reejecutar; la publicacion fue interrumpida y conserva el ultimo conjunto valido."
+        : kind === "desaparicion_masiva"
+          ? "Revisar la fuente antes de reintentar; el umbral bloqueo la publicacion y conserva el ultimo conjunto valido."
+          : kind === "verificacion_fallida"
+            ? "Corregir la verificacion fallida y reejecutar; no publicar ni aprobar cambios a partir de esta ejecucion."
+            : "Corregir la fuente o el formato y reejecutar; el ultimo conjunto valido permanece sin cambios.";
+  const identity = redactNotificationValue(structuredFailure?.identity ?? null);
+  const id = fingerprintOrderedFields({ kind, message, identity }, [
+    "kind",
+    "message",
+    "identity",
+  ]);
   return {
     version: 1,
     notifications: [
       {
         id,
         kind,
-        identity: null,
+        identity,
         temporality: "ejecucion_actual",
         cause: message,
         actionRequired,
-        before: null,
-        after: null,
+        before: redactNotificationValue(structuredFailure?.before ?? null),
+        after: redactNotificationValue(structuredFailure?.after ?? null),
         execution,
         fingerprints: {
           revisionId: null,
@@ -1219,6 +1278,20 @@ export function createCalendarFailureNotification(
       },
     ],
   };
+}
+
+function escapeWorkflowCommandMessage(value) {
+  return String(value)
+    .replace(/%/g, "%25")
+    .replace(/\r/g, "%0D")
+    .replace(/\n/g, "%0A");
+}
+
+export function getCalendarNotificationWarnings(notificationReport) {
+  return (notificationReport?.notifications ?? []).map(
+    (notification) =>
+      `::warning title=Calendar ${escapeWorkflowCommandMessage(notification.kind)}::${escapeWorkflowCommandMessage(`${notification.cause} ${notification.actionRequired}`)}`,
+  );
 }
 
 function serializeProperty(name, value, isLast) {
@@ -1636,6 +1709,9 @@ const isDirectExecution =
 if (isDirectExecution) {
   main().catch(async (error) => {
     const notificationReport = createCalendarFailureNotification(error);
+    for (const warning of getCalendarNotificationWarnings(notificationReport)) {
+      console.log(warning);
+    }
     await writeCalendarNotificationsReport(
       notificationReport,
       process.env.CALENDAR_NOTIFICATIONS_REPORT_PATH,

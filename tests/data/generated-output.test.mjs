@@ -101,6 +101,12 @@ test("generates localized, unique, indexable SEO output for every event route", 
     (route) => route.component === "event",
   );
 
+  assert.equal(
+    new Set(eventRoutes.map((route) => route.path)).size,
+    eventRoutes.length,
+    "canonical event paths, including vanity paths, must be unique",
+  );
+
   for (const route of eventRoutes) {
     const html = await readDist(`${route.path.slice(1)}index.html`);
     const seo = getRouteSeoPayload(route);
@@ -451,11 +457,24 @@ test("redirects every previous event URL to its current URL in each published la
   const eventRoutes = getRouteManifest().filter(
     (route) => route.component === "event",
   );
+  const configuredRedirects = getEventRedirects();
+  const configuredSources = new Set(
+    configuredRedirects.map(({ from }) => from),
+  );
   const renamedEvents = CALENDAR_EVENTS.filter(
     ({ aliases }) => aliases?.length,
   );
 
   assert.ok(renamedEvents.length > 0);
+  assert.equal(configuredSources.size, configuredRedirects.length);
+  for (const { from, to } of configuredRedirects) {
+    assert.notEqual(from, to, `${from} must not redirect to itself`);
+    assert.equal(
+      configuredSources.has(to),
+      false,
+      `${from} must redirect directly to the final canonical URL`,
+    );
+  }
 
   for (const event of renamedEvents) {
     const routes = eventRoutes.filter((route) => route.eventId === event.id);
@@ -490,6 +509,79 @@ test("redirects every previous event URL to its current URL in each published la
         `${route.path} must not redirect elsewhere`,
       );
     }
+  }
+});
+
+test("uses only current event URLs in sitemap, internal links, canonical, and hreflang", async () => {
+  const routeManifest = getRouteManifest();
+  const eventRoutes = routeManifest.filter(
+    (route) => route.component === "event",
+  );
+  const redirectSources = new Set(getEventRedirects().map(({ from }) => from));
+  const sitemap = await readDist("sitemap.xml");
+  const listingPaths = [
+    "eventos/index.html",
+    "en/events/index.html",
+    ...routeManifest
+      .filter((route) => route.component === "pastEvents")
+      .map((route) => `${route.path.slice(1)}index.html`),
+  ];
+  const listingHtml = (
+    await Promise.all(listingPaths.map((listingPath) => readDist(listingPath)))
+  ).join("\n");
+  const eventHtml = (
+    await Promise.all(
+      eventRoutes.map((route) => readDist(`${route.path.slice(1)}index.html`)),
+    )
+  ).join("\n");
+
+  const canonicalEventPaths = new Set(eventRoutes.map((route) => route.path));
+  const internalEventLinks = [
+    ...listingHtml.matchAll(
+      /href="(\/(?:eventos|en\/events)\/(?:pasados\/|past\/)?[^"/]+\/)"/g,
+    ),
+  ]
+    .map(([, href]) => href)
+    .filter(
+      (href) => href !== "/eventos/pasados/" && href !== "/en/events/past/",
+    );
+  assert.ok(internalEventLinks.length > 0);
+  for (const href of internalEventLinks) {
+    assert.equal(
+      canonicalEventPaths.has(href),
+      true,
+      `${href} must be a current canonical event link`,
+    );
+  }
+
+  for (const source of redirectSources) {
+    assert.equal(
+      sitemap.includes(`<loc>https://fak-kendo.org${source}</loc>`),
+      false,
+      `${source} must not be in the sitemap`,
+    );
+    assert.equal(
+      listingHtml.includes(`href="${source}"`),
+      false,
+      `${source} must not be an internal event link`,
+    );
+    assert.equal(
+      eventHtml.includes(
+        `rel="canonical" href="https://fak-kendo.org${source}"`,
+      ),
+      false,
+      `${source} must not be canonical`,
+    );
+    assert.equal(
+      eventHtml.includes(
+        `hreflang="es-CR" href="https://fak-kendo.org${source}"`,
+      ) ||
+        eventHtml.includes(
+          `hreflang="en" href="https://fak-kendo.org${source}"`,
+        ),
+      false,
+      `${source} must not be published through hreflang`,
+    );
   }
 });
 

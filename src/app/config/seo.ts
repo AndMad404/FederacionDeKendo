@@ -496,7 +496,7 @@ export function getRouteManifest() {
 }
 
 export function getEventRedirects() {
-  return [
+  const redirects = [
     { from: "/calendario/", to: "/eventos/" },
     { from: "/en/calendar/", to: "/en/events/" },
     ...CALENDAR_EVENTS.flatMap((event) => {
@@ -534,6 +534,30 @@ export function getEventRedirects() {
       ];
     }),
   ];
+
+  const targetBySource = new Map<string, string>();
+  for (const { from, to } of redirects) {
+    const existingTarget = targetBySource.get(from);
+    if (existingTarget) {
+      throw new Error(
+        `Duplicate redirect source: ${from} (${existingTarget} and ${to}).`,
+      );
+    }
+    if (from === to) {
+      throw new Error(`Self redirect is not allowed: ${from}.`);
+    }
+    targetBySource.set(from, to);
+  }
+
+  for (const { from, to } of redirects) {
+    if (targetBySource.has(to)) {
+      throw new Error(
+        `Redirect chain is not allowed: ${from} -> ${to} -> ${targetBySource.get(to)}.`,
+      );
+    }
+  }
+
+  return redirects;
 }
 function createEventRouteMeta(
   event: (typeof CALENDAR_EVENTS)[number],
