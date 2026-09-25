@@ -4,6 +4,10 @@ Sitio oficial de la Federacion de Asociaciones de Kendo de Costa Rica.
 
 [Visitar el sitio](https://fak-kendo.org/)
 
+## Licencia y recursos
+
+El código fuente y los scripts propios se distribuyen bajo la licencia MIT; consulta [LICENSE](LICENSE). Las fotografías, logos, marcas, material de eventos, contenido institucional y otros recursos gráficos no están cubiertos por esa licencia; consulta [ASSETS-LICENSE.md](ASSETS-LICENSE.md). Los avisos y licencias de terceros se conservan en [ATTRIBUTIONS.md](ATTRIBUTIONS.md).
+
 ## Funcionalidad
 
 - Contenido completo en espanol e ingles.
