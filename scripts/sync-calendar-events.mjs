@@ -1291,7 +1291,8 @@ const notificationTitles = {
   id_fuente_duplicado: "IDs de Calendar duplicados",
   url_evento_duplicada: "URLs duplicadas de eventos",
   fuente_inaccesible: "No se pudo leer la fuente del calendario",
-  parser_o_fuente_invalida: "La fuente del calendario tiene un formato invalido",
+  parser_o_fuente_invalida:
+    "La fuente del calendario tiene un formato invalido",
   desaparicion_masiva: "Desaparicion inusual de eventos del calendario",
   verificacion_fallida: "Fallo una verificacion de la publicacion",
 };

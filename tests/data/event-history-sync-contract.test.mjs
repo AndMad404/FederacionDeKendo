@@ -1215,7 +1215,10 @@ test("F4: source, parser, mass-disappearance, and verification failures have saf
     assert.doesNotMatch(summary, /private\.ics|token=secret/);
     assert.match(summary, /run `456`/);
     assert.match(summary, /No se pudo leer la fuente del calendario/);
-    assert.match(summary, /<summary>Detalles tecnicos para diagnostico automatico/);
+    assert.match(
+      summary,
+      /<summary>Detalles tecnicos para diagnostico automatico/,
+    );
     assert.match(summary, /"before": null/);
 
     const duplicateSummaryPath = path.join(directory, "duplicate-summary.md");
@@ -1225,7 +1228,10 @@ test("F4: source, parser, mass-disappearance, and verification failures have saf
     );
     const duplicateSummary = await readFile(duplicateSummaryPath, "utf8");
     assert.match(duplicateSummary, /URLs duplicadas de eventos/);
-    assert.match(duplicateSummary, /\| Titulo \| Evento duplicado \| Evento duplicado \|/);
+    assert.match(
+      duplicateSummary,
+      /\| Titulo \| Evento duplicado \| Evento duplicado \|/,
+    );
     assert.match(duplicateSummary, /\| Fecha \| 2026-10-01 \| 2026-11-01 \|/);
     assert.doesNotMatch(duplicateSummary, /url\\_evento\\_duplicada/);
   } finally {

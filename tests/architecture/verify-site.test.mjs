@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 
 import {
+  formatVerificationFailure,
   runVerification,
   verificationSteps,
 } from "../../scripts/verify-site.mjs";
@@ -82,4 +83,15 @@ test("site verification preserves a failed step when the workspace is stable", (
       }),
     /directed failure/,
   );
+});
+
+test("site verification formats a failed phase for the GitHub job summary", () => {
+  const summary = formatVerificationFailure(
+    ["pnpm", "run", "format:check"],
+    new Error("pnpm run format:check failed with exit code 1"),
+  );
+
+  assert.match(summary, /\*\*Fase que fallo:\*\* Formato \(Prettier\)/);
+  assert.match(summary, /`pnpm run format:check`/);
+  assert.match(summary, /exit code 1/);
 });
