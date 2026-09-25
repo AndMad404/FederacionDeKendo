@@ -1160,7 +1160,8 @@ test("F4: source, parser, mass-disappearance, and verification failures have saf
     assert.match(report.notifications[0].actionRequired, /Revisar|Corregir/);
     const warnings = getCalendarNotificationWarnings(report);
     assert.equal(warnings.length, 1);
-    assert.match(warnings[0], /^::warning title=Calendar /);
+    assert.match(warnings[0], /^::warning title=Calendario: /);
+    assert.doesNotMatch(warnings[0], new RegExp(`title=Calendario: ${kind}`));
   }
 
   const duplicateSourceReport =
@@ -1192,7 +1193,7 @@ test("F4: source, parser, mass-disappearance, and verification failures have saf
   });
   assert.match(
     getCalendarNotificationWarnings(duplicateUrlReport)[0],
-    /url_evento_duplicada/,
+    /URLs duplicadas de eventos/,
   );
 
   const directory = await mkdtemp(path.join(os.tmpdir(), "fak-f4-summary-"));
@@ -1212,8 +1213,21 @@ test("F4: source, parser, mass-disappearance, and verification failures have saf
     await writeCalendarNotificationsSummary(failure, summaryPath);
     const summary = await readFile(summaryPath, "utf8");
     assert.doesNotMatch(summary, /private\.ics|token=secret/);
-    assert.match(summary, /run 456/);
-    assert.match(summary, /Before \(redacted\): null/);
+    assert.match(summary, /run `456`/);
+    assert.match(summary, /No se pudo leer la fuente del calendario/);
+    assert.match(summary, /<summary>Detalles tecnicos para diagnostico automatico/);
+    assert.match(summary, /"before": null/);
+
+    const duplicateSummaryPath = path.join(directory, "duplicate-summary.md");
+    await writeCalendarNotificationsSummary(
+      duplicateUrlReport,
+      duplicateSummaryPath,
+    );
+    const duplicateSummary = await readFile(duplicateSummaryPath, "utf8");
+    assert.match(duplicateSummary, /URLs duplicadas de eventos/);
+    assert.match(duplicateSummary, /\| Titulo \| Evento duplicado \| Evento duplicado \|/);
+    assert.match(duplicateSummary, /\| Fecha \| 2026-10-01 \| 2026-11-01 \|/);
+    assert.doesNotMatch(duplicateSummary, /url\\_evento\\_duplicada/);
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
