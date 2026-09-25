@@ -1,140 +1,98 @@
-# Federacion de Asociaciones de Kendo
+# Federación de Asociaciones de Kendo de Costa Rica
 
-Sitio oficial de la Federacion de Asociaciones de Kendo de Costa Rica.
+Sitio institucional que sincroniza los eventos de Google Calendar, los normaliza y versiona, y genera páginas prerenderizadas y rutas optimizadas para buscadores, sin depender de un CMS tradicional.
 
 [Visitar el sitio](https://fak-kendo.org/)
 
-## Licencia y recursos
+## Arquitectura
 
-El código fuente y los scripts propios se distribuyen bajo la licencia MIT; consulta [LICENSE](LICENSE). Las fotografías, logos, marcas, material de eventos, contenido institucional y otros recursos gráficos no están cubiertos por esa licencia; consulta [ASSETS-LICENSE.md](ASSETS-LICENSE.md). Los avisos y licencias de terceros se conservan en [ATTRIBUTIONS.md](ATTRIBUTIONS.md).
+```text
+Google Calendar → Sincronización → Normalización y validación → Estado versionado
+      → Rutas y metadatos → SSR + prerender → Verificación → Publicación
+```
 
-## Funcionalidad
+El mismo árbol de componentes se usa en navegador y servidor: Vite genera el bundle del cliente y el bundle SSR (`src/entry-server.tsx`), `scripts/generate-route-html.mjs` prerenderiza las rutas públicas y `src/main.tsx` hidrata ese HTML en producción.
 
-- Contenido completo en espanol e ingles.
-- Calendario de torneos, examenes, seminarios y actividades.
-- Paginas individuales y archivo para eventos pasados.
-- Galeria principal y galerias historicas por evento.
-- Directorio de dojos afiliados con horarios, ubicacion y contacto.
-- HTML prerenderizado, metadatos por ruta, datos estructurados y sitemap.
-- Imagenes responsive en WebP y AVIF.
+Las rutas estáticas y sus metadatos viven en `src/app/config/seo-data.json`; las de eventos y archivo histórico se derivan de los datos sincronizados.
 
-## Tecnologias
+## Decisiones de diseño
 
-- React 18 y TypeScript
-- React Router 7
-- Tailwind CSS 4
-- Vite 6
-- Playwright y Node.js Test Runner
-- ESLint y Prettier
-- pnpm 11
+**Identidad vs. URL.** La identidad interna de un evento es independiente de su URL pública, así que un cambio editorial —como título o fecha— no se trata automáticamente como una entidad nueva. Si la edición cambia una URL ya publicada, la ruta anterior se conserva mediante redirect.
+
+**Colisiones.** Títulos y fechas pueden producir URLs iguales o ambiguas; estas situaciones se detectan antes de publicar en lugar de resolverse silenciosamente.
+
+**Eliminaciones.** Borrar un evento publicado puede romper URLs indexadas y enlaces externos, por lo que no se trata como equivalente a eliminar un registro local.
+
+**Automatización acotada.** Lo derivable mediante reglas deterministas se automatiza; lo ambiguo o potencialmente destructivo pasa a revisión humana.
+
+Estas decisiones sostienen el resto del pipeline: los datos inválidos no se publican, un fallo de sincronización no reemplaza contenido válido en silencio y el HTML generado se verifica como artefacto de producción antes de publicar.
+
+## Diseño
+
+La interfaz está construida con React y Tailwind CSS y se verifica en layouts de escritorio, tablet y móvil.
+
+El diseño prioriza:
+
+- navegación consistente entre resoluciones;
+- páginas de eventos legibles y rastreables;
+- controles táctiles y geometría responsive;
+- galerías adaptadas a distintos tamaños de pantalla;
+- imágenes responsive y activos optimizados;
+- comportamiento visual verificable mediante pruebas automatizadas.
+
+Las regresiones de geometría y comportamiento forman parte de `tests/design/`, mientras que las comparaciones visuales se ejecutan por separado debido a diferencias de rasterización entre plataformas.
+
+## Pruebas y verificación
+
+Las suites se separan por responsabilidad:
+
+- `tests/architecture/`
+- `tests/data/`
+- `tests/behavior/`
+- `tests/design/`
+
+Las comparaciones visuales se mantienen aparte porque la rasterización cambia entre Windows y el entorno Ubuntu de CI. El detalle está documentado en [TESTING.md](TESTING.md).
+
+Gate de release:
+
+```bash
+corepack pnpm run verify:site
+```
+
+Verifica formato, lint, tipos, build, pruebas, HTML generado y estado limpio del workspace.
+
+## Stack
+
+React 18 · TypeScript · React Router 7 · Tailwind CSS 4 · Vite 6 · Playwright · Node.js Test Runner · pnpm · GitHub Actions · Cloudflare Pages
 
 ## Desarrollo local
-
-Requisitos:
-
-- Node.js compatible con las dependencias del proyecto
-- Corepack habilitado
-
-Instala las dependencias e inicia el servidor:
 
 ```bash
 corepack pnpm install
 corepack pnpm run dev
 ```
 
-Vite mostrara en la terminal la direccion local de la aplicacion.
+El proyecto corre con los datos versionados del repositorio y no requiere variables de entorno.
 
 ## Comandos principales
 
-Ejecuta cada script con `corepack pnpm run <nombre>`.
+| Script | Uso |
+| --- | --- |
+| `dev` / `build` / `preview` | Desarrollo, build de producción y preview local |
+| `verify:site` | Gate completo de verificación |
+| `test:unit` / `test:all` / `test:visual` | Arquitectura y datos / suite completa / regresión visual |
+| `lint` / `format` | Calidad de código; existen variantes `:fix` y `:check` |
 
-| Script                      | Proposito                                                               |
-| --------------------------- | ----------------------------------------------------------------------- |
-| `dev`                       | Inicia el entorno de desarrollo.                                        |
-| `build`                     | Genera el bundle, el render SSR y las paginas prerenderizadas.          |
-| `preview`                   | Sirve localmente el build de produccion.                                |
-| `check`                     | Ejecuta tipos, lint, formato y todas las suites no visuales.            |
-| `verify:site`               | Ejecuta el gate completo, no mutante, usado para verificar una entrega. |
-| `typecheck`                 | Comprueba los tipos de TypeScript.                                      |
-| `lint`                      | Ejecuta ESLint sin permitir advertencias.                               |
-| `lint:fix`                  | Aplica las correcciones seguras disponibles de ESLint.                  |
-| `format`                    | Normaliza LF y aplica el formato canonico con Prettier.                 |
-| `format:check`              | Comprueba el formato con Prettier.                                      |
-| `format:line-endings:check` | Comprueba los finales de linea sin modificar archivos.                  |
-| `test:unit`                 | Ejecuta los contratos de arquitectura y datos basados en Node.js.       |
-| `test:all`                  | Ejecuta las suites de arquitectura, datos, comportamiento y diseno.     |
-| `test:visual`               | Ejecuta por separado las comparaciones visuales aprobadas en Windows.   |
+## Actualización de contenido
 
-La estrategia completa, los viewports cubiertos y el procedimiento para
-actualizar capturas estan documentados en [TESTING.md](TESTING.md).
+- **Eventos:** `corepack pnpm run sync:calendar`, también ejecutado mediante GitHub Actions.
+- **Rutas y SEO estáticos:** `src/app/config/seo-data.json`.
+- **Dojos, galería y galerías de eventos:** `src/app/data/`.
 
-## Arquitectura y prerender
+## Licencia
 
-La aplicacion usa el mismo arbol de React en el navegador y en el servidor:
+El código se distribuye bajo MIT; consulta [LICENSE](LICENSE).
 
-1. Vite genera el bundle del navegador en `dist/`.
-2. Vite genera el bundle SSR desde `src/entry-server.tsx` en `dist-ssr/`.
-3. `scripts/generate-route-html.mjs` prerenderiza las rutas publicas y genera
-   el sitemap.
+Las fotografías, logos y contenido institucional no están cubiertos por esa licencia; consulta [ASSETS-LICENSE.md](ASSETS-LICENSE.md).
 
-`src/app/config/seo-data.json` es la fuente principal de rutas estaticas y
-metadatos. Las rutas de eventos y del archivo se derivan de los datos del
-calendario. En produccion, `src/main.tsx` hidrata el HTML generado; durante el
-desarrollo crea la aplicacion dentro de un contenedor vacio.
-
-## Pruebas y calidad
-
-Durante el desarrollo, ejecuta como minimo los controles rapidos y no
-mutantes:
-
-```bash
-corepack pnpm run format:line-endings:check
-corepack pnpm run format:check
-corepack pnpm run lint
-corepack pnpm run typecheck
-```
-
-Usa `format` y `lint:fix` cuando quieras aplicar correcciones locales. El
-repositorio no instala hooks de Git: la verificacion se concentra en scripts
-reproducibles y en CI.
-
-Antes de entregar un cambio, ejecuta el gate completo:
-
-```bash
-corepack pnpm run verify:site
-```
-
-Este comando comprueba finales de linea, lint, formato, diffs, tipos, build,
-pruebas unitarias, HTML generado y suites de Playwright. Tambien verifica que
-el proceso no haya modificado el workspace. La instalacion de Chromium y sus
-dependencias forma parte del gate y puede requerir acceso a la red.
-
-Las pruebas se dividen por responsabilidad:
-
-- `tests/architecture/`: limites internos y flujos del repositorio.
-- `tests/data/`: contenido, SEO, sincronizacion y salidas generadas.
-- `tests/behavior/`: navegacion, idiomas, calendario y accesibilidad funcional.
-- `tests/design/`: geometria responsive, controles tactiles y capturas.
-
-La suite visual se mantiene separada porque la rasterizacion difiere entre
-Windows y el entorno Ubuntu de CI.
-
-## Actualizacion de contenido
-
-- Las rutas y los metadatos estaticos viven en
-  `src/app/config/seo-data.json`.
-- Los eventos se sincronizan mediante `corepack pnpm run sync:calendar` y los
-  workflows de GitHub Actions.
-- Los datos de dojos viven en `src/app/data/dojos.ts`.
-- La galeria principal vive en `src/app/data/gallery.ts` y usa los activos
-  versionados en `public/images/gallery/`.
-- Las galerias de eventos viven en `src/app/data/eventGalleries.ts`.
-
-Los cambios de rutas, SEO, calendario o imagenes deben verificarse tambien en
-el HTML generado por el build.
-
-## Contribuciones
-
-Consulta [CONTRIBUTING.md](CONTRIBUTING.md) para conocer la convencion de
-mensajes de commit. No se requiere un archivo de variables de entorno para
-ejecutar el sitio localmente con los datos versionados.
+Las licencias y atribuciones de terceros se mantienen en [ATTRIBUTIONS.md](ATTRIBUTIONS.md), y las convenciones del repositorio están documentadas en [CONTRIBUTING.md](CONTRIBUTING.md).
