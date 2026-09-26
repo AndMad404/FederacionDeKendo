@@ -9,6 +9,16 @@ import {
   getRouteSeoPayload,
 } from "../../dist-ssr/entry-server.js";
 
+const PANAMA_LEGACY_SLUG = "2026-11-21-panama-torneo-por-equipos";
+
+function getPanamaEvent() {
+  const event = CALENDAR_EVENTS.find(({ aliases }) =>
+    aliases?.includes(PANAMA_LEGACY_SLUG),
+  );
+  assert.ok(event, "Panama event must retain its original URL as an alias");
+  return event;
+}
+
 async function readDist(relativePath) {
   return readFile(
     new URL(`../../dist/${relativePath}`, import.meta.url),
@@ -198,8 +208,7 @@ test("generates localized, unique, indexable SEO output for every event route", 
     );
   }
 
-  const panamaEventId =
-    "2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario";
+  const panamaEventId = getPanamaEvent().id;
   const expectedPanamaRoutes = new Map([
     [
       "es",
@@ -411,6 +420,15 @@ test("generates the archive route", async () => {
 test("redirects legacy calendar and archived event URLs to their canonical routes", async () => {
   const redirects = await readDist("_redirects");
   const configuredRedirects = getEventRedirects();
+  const panamaEventId = getPanamaEvent().id;
+  const panamaRoutes = new Map(
+    getRouteManifest()
+      .filter(
+        (route) =>
+          route.component === "event" && route.eventId === panamaEventId,
+      )
+      .map((route) => [route.language, route.path]),
+  );
 
   assert.ok(
     configuredRedirects.some(
@@ -422,13 +440,19 @@ test("redirects legacy calendar and archived event URLs to their canonical route
     redirects,
     /^\/eventos\/2026-08-08-examen\/ \/eventos\/pasados\/2026-08-08-examen\/ 301$/m,
   );
-  assert.match(
-    redirects,
-    /^\/eventos\/2026-11-21-panama-torneo-por-equipos\/ \/eventos\/2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario\/ 301$/m,
+  assert.ok(
+    redirects
+      .split("\n")
+      .includes(
+        `/eventos/${PANAMA_LEGACY_SLUG}/ ${panamaRoutes.get("es")} 301`,
+      ),
   );
-  assert.match(
-    redirects,
-    /^\/en\/events\/2026-11-21-panama-torneo-por-equipos\/ \/en\/events\/2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario\/ 301$/m,
+  assert.ok(
+    redirects
+      .split("\n")
+      .includes(
+        `/en/events/${PANAMA_LEGACY_SLUG}/ ${panamaRoutes.get("en")} 301`,
+      ),
   );
   assert.match(
     redirects,
