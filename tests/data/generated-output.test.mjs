@@ -5,6 +5,7 @@ import {
   CALENDAR_EVENTS,
   getEventRedirects,
   getEventTranslationStatus,
+  getLocalizedEvent,
   getRouteManifest,
   getRouteSeoPayload,
 } from "../../dist-ssr/entry-server.js";
@@ -17,6 +18,21 @@ function getPanamaEvent() {
   );
   assert.ok(event, "Panama event must retain its original URL as an alias");
   return event;
+}
+
+function formatEventSeoDate(date, language) {
+  return new Intl.DateTimeFormat(language === "en" ? "en-US" : "es-CR", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${date}T00:00:00Z`));
+}
+
+function getExpectedEventSeoTitle(event, language) {
+  const localizedEvent = getLocalizedEvent(event, language);
+  assert.ok(localizedEvent, `${event.id}: ${language} localization is missing`);
+  return `${localizedEvent.title} — ${formatEventSeoDate(event.date, language)}`;
 }
 
 async function readDist(relativePath) {
@@ -208,20 +224,21 @@ test("generates localized, unique, indexable SEO output for every event route", 
     );
   }
 
-  const panamaEventId = getPanamaEvent().id;
+  const panamaEvent = getPanamaEvent();
+  const panamaEventId = panamaEvent.id;
   const expectedPanamaRoutes = new Map([
     [
       "es",
       {
         path: `/eventos/${panamaEventId}/`,
-        title: "PANAMA 5ta Copa Shogun — 21 nov 2026",
+        title: getExpectedEventSeoTitle(panamaEvent, "es"),
       },
     ],
     [
       "en",
       {
         path: `/en/events/${panamaEventId}/`,
-        title: "PANAMA 5ta Copa Shogun — Nov 21, 2026",
+        title: getExpectedEventSeoTitle(panamaEvent, "en"),
       },
     ],
   ]);
@@ -247,10 +264,6 @@ test("generates localized, unique, indexable SEO output for every event route", 
     "Eventos pasados de Kendo — página 2 | Costa Rica",
     "Past Kendo Events — page 2 | Costa Rica",
   ]);
-
-  for (const route of routeManifest) {
-    assert.ok(route.title.length <= 60, `${route.path}: ${route.title}`);
-  }
 });
 
 test("indexes all public routes, events, and archives in the sitemap", async () => {

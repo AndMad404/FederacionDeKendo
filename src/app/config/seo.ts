@@ -226,15 +226,6 @@ interface EventSeoTitleInput {
   language: Language;
 }
 
-const EVENT_SEO_TITLE_OVERRIDES: Partial<
-  Record<string, Partial<Record<Language, string>>>
-> = {
-  "2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario": {
-    es: "PANAMA 5ta Copa Shogun",
-    en: "PANAMA 5ta Copa Shogun",
-  },
-};
-
 function hasExplicitInternationalLocation({
   event,
   localizedEvent,
@@ -279,12 +270,10 @@ function buildEventSeoTitle({
   localizedEvent,
   language,
 }: EventSeoTitleInput) {
-  const title =
-    EVENT_SEO_TITLE_OVERRIDES[event.id]?.[language] ??
-    improveGenericEventTitle(
-      normalizeDescription(localizedEvent.title),
-      language,
-    );
+  const title = improveGenericEventTitle(
+    normalizeDescription(localizedEvent.title),
+    language,
+  );
   const date = new Intl.DateTimeFormat(language === "en" ? "en-US" : "es-CR", {
     day: "numeric",
     month: "short",
