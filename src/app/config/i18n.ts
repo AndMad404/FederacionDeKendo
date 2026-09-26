@@ -1,6 +1,6 @@
 import { createContext, useContext } from "react";
-import { findEventByPathname } from "../utils/eventRoutes";
-import { getLocalizedEvent } from "../utils/localizedEvents";
+import { findEventByPathname, getEventPath } from "../utils/eventRoutes";
+import { hasDistinctEventTranslation } from "../utils/localizedEvents";
 
 export type Language = "es" | "en";
 
@@ -41,9 +41,9 @@ export function getLocalizedPath(pathname: string, language: Language) {
   if (spanishArchivedEvent) {
     if (language === "es") return normalized;
     const event = findEventByPathname(normalized);
-    return event && getLocalizedEvent(event, "en")
-      ? `/en/events/past/${spanishArchivedEvent[1]}/`
-      : "/en/";
+    return event && hasDistinctEventTranslation(event)
+      ? getEventPath(event, "en")
+      : "/en/events/past/";
   }
 
   const englishArchivedEvent = normalized.match(
@@ -59,9 +59,9 @@ export function getLocalizedPath(pathname: string, language: Language) {
   if (spanishEvent) {
     if (language === "es") return normalized;
     const event = findEventByPathname(normalized);
-    return event && getLocalizedEvent(event, "en")
-      ? `/en/events/${spanishEvent[1]}/`
-      : "/en/";
+    return event && hasDistinctEventTranslation(event)
+      ? getEventPath(event, "en")
+      : "/en/events/";
   }
 
   const englishEvent = normalized.match(/^\/en\/events\/([^/]+)\/$/);

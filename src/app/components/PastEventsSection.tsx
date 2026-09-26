@@ -131,7 +131,7 @@ export function PastEventsSection() {
                 aria-label={copy.archive.year}
                 value={filters.year ?? ""}
                 onChange={(event) => changeFilter("year", event.target.value)}
-                className={`min-h-11 w-full rounded-lg px-3 py-2 text-center text-sm ${focusRingClass} border border-site-border bg-site-surface text-site-action`}
+                className={`min-h-11 w-full cursor-pointer rounded-lg px-3 py-2 text-center text-sm ${focusRingClass} border border-site-border bg-site-surface text-site-action`}
               >
                 <option value="">{copy.archive.year}</option>
                 {years.map((year) => (
@@ -147,7 +147,7 @@ export function PastEventsSection() {
                 aria-label={copy.archive.type}
                 value={filters.type ?? ""}
                 onChange={(event) => changeFilter("type", event.target.value)}
-                className={`min-h-11 w-full rounded-lg px-3 py-2 text-center text-sm ${focusRingClass} border border-site-border bg-site-surface text-site-action`}
+                className={`min-h-11 w-full cursor-pointer rounded-lg px-3 py-2 text-center text-sm ${focusRingClass} border border-site-border bg-site-surface text-site-action`}
               >
                 <option value="">{copy.archive.type}</option>
                 {eventTypes.map((type) => (

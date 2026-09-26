@@ -1,136 +1,64 @@
-# Federacion de Asociaciones de Kendo
+# Federación de Asociaciones de Kendo de Costa Rica
 
-Sitio oficial de la Federacion de Asociaciones de Kendo de Costa Rica.
+Plataforma web institucional que sincroniza eventos desde Google Calendar,
+genera rutas prerenderizadas y publica contenido versionado sin depender de un
+CMS. [Sitio en producción](https://fak-kendo.org/).
 
-[Visitar el sitio](https://fak-kendo.org/)
+## Arquitectura
 
-## Funcionalidad
+```text
+Google Calendar → sincronización y validación → datos versionados
+                → React Router → SSR y prerender → Cloudflare Pages
+```
 
-- Contenido completo en espanol e ingles.
-- Calendario de torneos, examenes, seminarios y actividades.
-- Paginas individuales y archivo para eventos pasados.
-- Galeria principal y galerias historicas por evento.
-- Directorio de dojos afiliados con horarios, ubicacion y contacto.
-- HTML prerenderizado, metadatos por ruta, datos estructurados y sitemap.
-- Imagenes responsive en WebP y AVIF.
+- React comparte el árbol de componentes entre navegador y servidor.
+- Vite genera los bundles cliente y SSR; `scripts/generate-route-html.mjs`
+  materializa las rutas públicas.
+- Las rutas estáticas y sus metadatos se definen en
+  `src/app/config/seo-data.json`; las rutas de eventos se derivan de los datos
+  sincronizados.
+- La identidad de un evento está desacoplada de su URL. Los cambios de URL
+  conservan redirects y las colisiones bloquean la publicación.
+- Una sincronización inválida no reemplaza el último estado válido. El HTML
+  generado se verifica antes del despliegue.
 
-## Tecnologias
+## Stack
 
-- React 18 y TypeScript
-- React Router 7
-- Tailwind CSS 4
-- Vite 6
-- Playwright y Node.js Test Runner
-- ESLint y Prettier
-- pnpm 11
+React 18 · TypeScript · React Router 7 · Tailwind CSS 4 · Vite 6 · Playwright ·
+Node.js Test Runner · pnpm · GitHub Actions · Cloudflare Pages
 
-## Desarrollo local
-
-Requisitos:
-
-- Node.js compatible con las dependencias del proyecto
-- Corepack habilitado
-
-Instala las dependencias e inicia el servidor:
+## Desarrollo
 
 ```bash
 corepack pnpm install
 corepack pnpm run dev
 ```
 
-Vite mostrara en la terminal la direccion local de la aplicacion.
+El entorno local usa los datos versionados del repositorio y no requiere
+variables de entorno.
 
-## Comandos principales
-
-Ejecuta cada script con `corepack pnpm run <nombre>`.
-
-| Script                      | Proposito                                                               |
-| --------------------------- | ----------------------------------------------------------------------- |
-| `dev`                       | Inicia el entorno de desarrollo.                                        |
-| `build`                     | Genera el bundle, el render SSR y las paginas prerenderizadas.          |
-| `preview`                   | Sirve localmente el build de produccion.                                |
-| `check`                     | Ejecuta tipos, lint, formato y todas las suites no visuales.            |
-| `verify:site`               | Ejecuta el gate completo, no mutante, usado para verificar una entrega. |
-| `typecheck`                 | Comprueba los tipos de TypeScript.                                      |
-| `lint`                      | Ejecuta ESLint sin permitir advertencias.                               |
-| `lint:fix`                  | Aplica las correcciones seguras disponibles de ESLint.                  |
-| `format`                    | Normaliza LF y aplica el formato canonico con Prettier.                 |
-| `format:check`              | Comprueba el formato con Prettier.                                      |
-| `format:line-endings:check` | Comprueba los finales de linea sin modificar archivos.                  |
-| `test:unit`                 | Ejecuta los contratos de arquitectura y datos basados en Node.js.       |
-| `test:all`                  | Ejecuta las suites de arquitectura, datos, comportamiento y diseno.     |
-| `test:visual`               | Ejecuta por separado las comparaciones visuales aprobadas en Windows.   |
-
-La estrategia completa, los viewports cubiertos y el procedimiento para
-actualizar capturas estan documentados en [TESTING.md](TESTING.md).
-
-## Arquitectura y prerender
-
-La aplicacion usa el mismo arbol de React en el navegador y en el servidor:
-
-1. Vite genera el bundle del navegador en `dist/`.
-2. Vite genera el bundle SSR desde `src/entry-server.tsx` en `dist-ssr/`.
-3. `scripts/generate-route-html.mjs` prerenderiza las rutas publicas y genera
-   el sitemap.
-
-`src/app/config/seo-data.json` es la fuente principal de rutas estaticas y
-metadatos. Las rutas de eventos y del archivo se derivan de los datos del
-calendario. En produccion, `src/main.tsx` hidrata el HTML generado; durante el
-desarrollo crea la aplicacion dentro de un contenedor vacio.
-
-## Pruebas y calidad
-
-Durante el desarrollo, ejecuta como minimo los controles rapidos y no
-mutantes:
-
-```bash
-corepack pnpm run format:line-endings:check
-corepack pnpm run format:check
-corepack pnpm run lint
-corepack pnpm run typecheck
-```
-
-Usa `format` y `lint:fix` cuando quieras aplicar correcciones locales. El
-repositorio no instala hooks de Git: la verificacion se concentra en scripts
-reproducibles y en CI.
-
-Antes de entregar un cambio, ejecuta el gate completo:
+## Verificación
 
 ```bash
 corepack pnpm run verify:site
 ```
 
-Este comando comprueba finales de linea, lint, formato, diffs, tipos, build,
-pruebas unitarias, HTML generado y suites de Playwright. Tambien verifica que
-el proceso no haya modificado el workspace. La instalacion de Chromium y sus
-dependencias forma parte del gate y puede requerir acceso a la red.
+Este gate ejecuta formato, lint, tipos, build, pruebas y validación del output
+generado. Las suites están separadas por arquitectura, datos, comportamiento y
+diseño; consulta [TESTING.md](TESTING.md) para los comandos dirigidos.
 
-Las pruebas se dividen por responsabilidad:
+## Estructura
 
-- `tests/architecture/`: limites internos y flujos del repositorio.
-- `tests/data/`: contenido, SEO, sincronizacion y salidas generadas.
-- `tests/behavior/`: navegacion, idiomas, calendario y accesibilidad funcional.
-- `tests/design/`: geometria responsive, controles tactiles y capturas.
+| Ruta                 | Responsabilidad                                           |
+| -------------------- | --------------------------------------------------------- |
+| `src/app/`           | UI, rutas, configuración y datos versionados              |
+| `scripts/`           | Sincronización, prerender y verificación                  |
+| `tests/`             | Contratos de arquitectura, datos, comportamiento y diseño |
+| `.github/workflows/` | Integración continua y sincronización programada          |
 
-La suite visual se mantiene separada porque la rasterizacion difiere entre
-Windows y el entorno Ubuntu de CI.
+## Licencia
 
-## Actualizacion de contenido
-
-- Las rutas y los metadatos estaticos viven en
-  `src/app/config/seo-data.json`.
-- Los eventos se sincronizan mediante `corepack pnpm run sync:calendar` y los
-  workflows de GitHub Actions.
-- Los datos de dojos viven en `src/app/data/dojos.ts`.
-- La galeria principal vive en `src/app/data/gallery.ts` y usa los activos
-  versionados en `public/images/gallery/`.
-- Las galerias de eventos viven en `src/app/data/eventGalleries.ts`.
-
-Los cambios de rutas, SEO, calendario o imagenes deben verificarse tambien en
-el HTML generado por el build.
-
-## Contribuciones
-
-Consulta [CONTRIBUTING.md](CONTRIBUTING.md) para conocer la convencion de
-mensajes de commit. No se requiere un archivo de variables de entorno para
-ejecutar el sitio localmente con los datos versionados.
+El código usa licencia [MIT](LICENSE). Fotografías, logos y contenido
+institucional se rigen por [ASSETS-LICENSE.md](ASSETS-LICENSE.md); las
+dependencias y recursos de terceros se detallan en
+[ATTRIBUTIONS.md](ATTRIBUTIONS.md).

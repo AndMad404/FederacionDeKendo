@@ -13,7 +13,52 @@
       "aliases": [
         "2026-05-02-federacion-examen"
       ],
-      "editorialState": "publicado"
+      "editorialState": "pendiente",
+      "pendingRevision": {
+        "id": "7fb40867a54819982c1f50ca9b181b3d59e793bf189b7e4c20ce7121d0da78cf",
+        "reason": "historical_change",
+        "proposed": {
+          "sourceId": "7bd8989c63db48fab752ce0f",
+          "slug": "1er-examen-2026",
+          "archiveEligibleAt": "2026-05-04T06:00:00.000Z",
+          "title": "1er Examen 2026",
+          "date": "2026-05-02",
+          "eventType": "examen",
+          "timeZone": "America/Costa_Rica"
+        },
+        "evidence": {
+          "sourceId": "7bd8989c63db48fab752ce0f",
+          "firstDetectedAt": "2026-09-26T01:26:38.603Z",
+          "lastObservedAt": "2026-09-26T01:26:38.603Z",
+          "missingAt": null,
+          "lastReceived": {
+            "sourceId": "7bd8989c63db48fab752ce0f",
+            "slug": "1er-examen-2026",
+            "archiveEligibleAt": "2026-05-04T06:00:00.000Z",
+            "title": "1er Examen 2026",
+            "date": "2026-05-02",
+            "eventType": "examen",
+            "timeZone": "America/Costa_Rica"
+          },
+          "published": {
+            "sourceId": "7bd8989c63db48fab752ce0f",
+            "slug": "2026-05-02-examen",
+            "archiveEligibleAt": "2026-05-04T06:00:00.000Z",
+            "title": "Examen",
+            "date": "2026-05-02",
+            "eventType": "examen",
+            "timeZone": "America/Costa_Rica",
+            "aliases": [
+              "2026-05-02-federacion-examen"
+            ],
+            "historical": true
+          },
+          "fingerprint": "125f0a4dde4e256856fb2a5655c101f974b6de610a211ac5d9c46e0584a46094"
+        },
+        "notification": {
+          "evidenceFingerprint": "125f0a4dde4e256856fb2a5655c101f974b6de610a211ac5d9c46e0584a46094"
+        }
+      }
     },
     {
       "sourceId": "462f5f7da99a1d17474471bd",
@@ -25,11 +70,62 @@
       "archiveEligibleAt": "2026-06-02T06:00:00.000Z",
       "eventType": "seminario",
       "historical": true,
-      "editorialState": "publicado",
+      "editorialState": "pendiente",
       "summary": "#EventoExterno",
       "aliases": [
         "2026-05-30-federacion-seminario-y-reunion"
-      ]
+      ],
+      "pendingRevision": {
+        "id": "d341dabf315f1d1719a4ab03926d9102d018efc7112d259b7f3399b3bf37ce72",
+        "reason": "historical_change",
+        "proposed": {
+          "sourceId": "462f5f7da99a1d17474471bd",
+          "slug": "clak-seminario-instructores-chile",
+          "archiveEligibleAt": "2026-06-02T06:00:00.000Z",
+          "title": "CLAK Seminario Instructores CHILE",
+          "date": "2026-05-29",
+          "endDate": "2026-06-01",
+          "summary": "#EventoExterno",
+          "eventType": "seminario",
+          "timeZone": "America/Costa_Rica"
+        },
+        "evidence": {
+          "sourceId": "462f5f7da99a1d17474471bd",
+          "firstDetectedAt": "2026-09-26T01:26:38.603Z",
+          "lastObservedAt": "2026-09-26T01:26:38.603Z",
+          "missingAt": null,
+          "lastReceived": {
+            "sourceId": "462f5f7da99a1d17474471bd",
+            "slug": "clak-seminario-instructores-chile",
+            "archiveEligibleAt": "2026-06-02T06:00:00.000Z",
+            "title": "CLAK Seminario Instructores CHILE",
+            "date": "2026-05-29",
+            "endDate": "2026-06-01",
+            "summary": "#EventoExterno",
+            "eventType": "seminario",
+            "timeZone": "America/Costa_Rica"
+          },
+          "published": {
+            "sourceId": "462f5f7da99a1d17474471bd",
+            "slug": "2026-05-29-clak-seminario-instructores-chile",
+            "archiveEligibleAt": "2026-06-02T06:00:00.000Z",
+            "title": "CLAK Seminario Instructores CHILE",
+            "date": "2026-05-29",
+            "endDate": "2026-06-01",
+            "summary": "#EventoExterno",
+            "eventType": "seminario",
+            "timeZone": "America/Costa_Rica",
+            "aliases": [
+              "2026-05-30-federacion-seminario-y-reunion"
+            ],
+            "historical": true
+          },
+          "fingerprint": "0d04a4123ea09ec5b3a4a1dbdbee2caa65e0b0fb52b0dece66030b0dc7a11e09"
+        },
+        "notification": {
+          "evidenceFingerprint": "0d04a4123ea09ec5b3a4a1dbdbee2caa65e0b0fb52b0dece66030b0dc7a11e09"
+        }
+      }
     },
     {
       "sourceId": "9c63151cacb01bef733c39cb",
@@ -55,7 +151,61 @@
       "summary": "Exámenes de 8vo a 2do kyu",
       "eventType": "examen",
       "historical": true,
-      "editorialState": "publicado"
+      "editorialState": "pendiente",
+      "pendingRevision": {
+        "id": "b466cfd82835dd5bddebbc25f189f1fe3598d465b722c4edf3de28b610b2854a",
+        "reason": "historical_change",
+        "proposed": {
+          "sourceId": "89d31aa2d6937a78b1866283",
+          "slug": "2do-examen-2026",
+          "archiveEligibleAt": "2026-08-10T06:00:00.000Z",
+          "title": "2do Examen 2026",
+          "date": "2026-08-08",
+          "startTime": "13:00",
+          "endTime": "15:00",
+          "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
+          "summary": "Exámenes de 8vo a 2do kyu",
+          "eventType": "examen",
+          "timeZone": "America/Costa_Rica"
+        },
+        "evidence": {
+          "sourceId": "89d31aa2d6937a78b1866283",
+          "firstDetectedAt": "2026-09-26T01:26:38.603Z",
+          "lastObservedAt": "2026-09-26T01:26:38.603Z",
+          "missingAt": null,
+          "lastReceived": {
+            "sourceId": "89d31aa2d6937a78b1866283",
+            "slug": "2do-examen-2026",
+            "archiveEligibleAt": "2026-08-10T06:00:00.000Z",
+            "title": "2do Examen 2026",
+            "date": "2026-08-08",
+            "startTime": "13:00",
+            "endTime": "15:00",
+            "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
+            "summary": "Exámenes de 8vo a 2do kyu",
+            "eventType": "examen",
+            "timeZone": "America/Costa_Rica"
+          },
+          "published": {
+            "sourceId": "89d31aa2d6937a78b1866283",
+            "slug": "2026-08-08-examen",
+            "archiveEligibleAt": "2026-08-10T06:00:00.000Z",
+            "title": "Examen",
+            "date": "2026-08-08",
+            "startTime": "13:00",
+            "endTime": "15:00",
+            "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
+            "summary": "Exámenes de 8vo a 2do kyu",
+            "eventType": "examen",
+            "timeZone": "America/Costa_Rica",
+            "historical": true
+          },
+          "fingerprint": "2d72ecd44c17a34ca2e28217ef95a4776e1ca9fb56dae3ab9cbd1a42d99106c4"
+        },
+        "notification": {
+          "evidenceFingerprint": "2d72ecd44c17a34ca2e28217ef95a4776e1ca9fb56dae3ab9cbd1a42d99106c4"
+        }
+      }
     },
     {
       "sourceId": "72f0b1f2f02e0f5d73ae28ec",
@@ -69,8 +219,62 @@
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
       "summary": "- Categoría con Bogu y sin Bogu\n- Categoría por equipos",
       "eventType": "torneo",
-      "editorialState": "publicado",
-      "historical": true
+      "editorialState": "pendiente",
+      "historical": true,
+      "pendingRevision": {
+        "id": "3f7bfb8629c51da7e63b11e945b20596d047abd61de2522d0d0c598dddc1cf7d",
+        "reason": "historical_change",
+        "proposed": {
+          "sourceId": "72f0b1f2f02e0f5d73ae28ec",
+          "slug": "3er-torneo",
+          "archiveEligibleAt": "2026-08-24T06:00:00.000Z",
+          "title": "3er Torneo",
+          "date": "2026-08-22",
+          "startTime": "13:00",
+          "endTime": "17:00",
+          "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
+          "summary": "- Categoría con Bogu y sin Bogu\n- Categoría por equipos",
+          "eventType": "torneo",
+          "timeZone": "America/Costa_Rica"
+        },
+        "evidence": {
+          "sourceId": "72f0b1f2f02e0f5d73ae28ec",
+          "firstDetectedAt": "2026-09-26T01:26:38.603Z",
+          "lastObservedAt": "2026-09-26T01:26:38.603Z",
+          "missingAt": null,
+          "lastReceived": {
+            "sourceId": "72f0b1f2f02e0f5d73ae28ec",
+            "slug": "3er-torneo",
+            "archiveEligibleAt": "2026-08-24T06:00:00.000Z",
+            "title": "3er Torneo",
+            "date": "2026-08-22",
+            "startTime": "13:00",
+            "endTime": "17:00",
+            "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
+            "summary": "- Categoría con Bogu y sin Bogu\n- Categoría por equipos",
+            "eventType": "torneo",
+            "timeZone": "America/Costa_Rica"
+          },
+          "published": {
+            "sourceId": "72f0b1f2f02e0f5d73ae28ec",
+            "slug": "2026-08-22-3er-torneo",
+            "archiveEligibleAt": "2026-08-24T06:00:00.000Z",
+            "title": "3er Torneo",
+            "date": "2026-08-22",
+            "startTime": "13:00",
+            "endTime": "17:00",
+            "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
+            "summary": "- Categoría con Bogu y sin Bogu\n- Categoría por equipos",
+            "eventType": "torneo",
+            "timeZone": "America/Costa_Rica",
+            "historical": true
+          },
+          "fingerprint": "32f8f42319f4f80fc3d1b0186ccbe2a3b2bb2f91c8909bbc535d0fa88e92c01a"
+        },
+        "notification": {
+          "evidenceFingerprint": "32f8f42319f4f80fc3d1b0186ccbe2a3b2bb2f91c8909bbc535d0fa88e92c01a"
+        }
+      }
     },
     {
       "sourceId": "45c4376b5e5e0fcf347835d0",
@@ -83,13 +287,64 @@
       "location": "El Establo Mountain Hotel, Provincia de Puntarenas, Monteverde, Costa Rica",
       "summary": "La participación incluye:\n\n* Transporte ida y vuelta\n* Almuerzo primer día\n* Desayuno del segundo día\n* Habitación compartida\n* Acceso a las instalaciones y senderos del hotel\n* Uso de los salones de entrenamiento\n* Experiencia intensiva de entrenamiento a cargo de senséis de alto nivel\n\nEste encuentro guiado por cuatro senséis japoneses de alto rango nace con el propósito de vivir el kendo más allá del entrenamiento habitual: compartir dos días de disciplina, convivencia y aprendizaje.\n\nEl Gasshuku se desarrollará en el Establo Mountain Hotel, Monteverde. Sus instalaciones y salones de madera ofrecerán un espacio para entrenar, alejarnos por unos días de la rutina y disfrutar de una experiencia diferente alrededor del kendo.",
       "eventType": "seminario",
-      "editorialState": "publicado",
-      "historical": true
+      "editorialState": "pendiente",
+      "historical": true,
+      "pendingRevision": {
+        "id": "8fef7690e68618b372857802b10eaf3479288b10d7c49de870df26f0e5ddea18",
+        "reason": "historical_change",
+        "proposed": {
+          "sourceId": "45c4376b5e5e0fcf347835d0",
+          "slug": "gasshuku-monteverde",
+          "archiveEligibleAt": "2026-09-15T06:00:00.000Z",
+          "title": "Gasshuku Monteverde",
+          "date": "2026-09-12",
+          "endDate": "2026-09-14",
+          "location": "El Establo Mountain Hotel, Provincia de Puntarenas, Monteverde, Costa Rica",
+          "summary": "La participación incluye:\n\n* Transporte ida y vuelta\n* Almuerzo primer día\n* Desayuno del segundo día\n* Habitación compartida\n* Acceso a las instalaciones y senderos del hotel\n* Uso de los salones de entrenamiento\n* Experiencia intensiva de entrenamiento a cargo de senséis de alto nivel\n\nEste encuentro guiado por cuatro senséis japoneses de alto rango nace con el propósito de vivir el kendo más allá del entrenamiento habitual: compartir dos días de disciplina, convivencia y aprendizaje.\n\nEl Gasshuku se desarrollará en el Establo Mountain Hotel, Monteverde. Sus instalaciones y salones de madera ofrecerán un espacio para entrenar, alejarnos por unos días de la rutina y disfrutar de una experiencia diferente alrededor del kendo.",
+          "eventType": "seminario",
+          "timeZone": "America/Costa_Rica"
+        },
+        "evidence": {
+          "sourceId": "45c4376b5e5e0fcf347835d0",
+          "firstDetectedAt": "2026-09-26T01:26:38.603Z",
+          "lastObservedAt": "2026-09-26T01:26:38.603Z",
+          "missingAt": null,
+          "lastReceived": {
+            "sourceId": "45c4376b5e5e0fcf347835d0",
+            "slug": "gasshuku-monteverde",
+            "archiveEligibleAt": "2026-09-15T06:00:00.000Z",
+            "title": "Gasshuku Monteverde",
+            "date": "2026-09-12",
+            "endDate": "2026-09-14",
+            "location": "El Establo Mountain Hotel, Provincia de Puntarenas, Monteverde, Costa Rica",
+            "summary": "La participación incluye:\n\n* Transporte ida y vuelta\n* Almuerzo primer día\n* Desayuno del segundo día\n* Habitación compartida\n* Acceso a las instalaciones y senderos del hotel\n* Uso de los salones de entrenamiento\n* Experiencia intensiva de entrenamiento a cargo de senséis de alto nivel\n\nEste encuentro guiado por cuatro senséis japoneses de alto rango nace con el propósito de vivir el kendo más allá del entrenamiento habitual: compartir dos días de disciplina, convivencia y aprendizaje.\n\nEl Gasshuku se desarrollará en el Establo Mountain Hotel, Monteverde. Sus instalaciones y salones de madera ofrecerán un espacio para entrenar, alejarnos por unos días de la rutina y disfrutar de una experiencia diferente alrededor del kendo.",
+            "eventType": "seminario",
+            "timeZone": "America/Costa_Rica"
+          },
+          "published": {
+            "sourceId": "45c4376b5e5e0fcf347835d0",
+            "slug": "2026-09-12-gasshuku-monteverde",
+            "archiveEligibleAt": "2026-09-15T06:00:00.000Z",
+            "title": "Gasshuku Monteverde",
+            "date": "2026-09-12",
+            "endDate": "2026-09-14",
+            "location": "El Establo Mountain Hotel, Provincia de Puntarenas, Monteverde, Costa Rica",
+            "summary": "La participación incluye:\n\n* Transporte ida y vuelta\n* Almuerzo primer día\n* Desayuno del segundo día\n* Habitación compartida\n* Acceso a las instalaciones y senderos del hotel\n* Uso de los salones de entrenamiento\n* Experiencia intensiva de entrenamiento a cargo de senséis de alto nivel\n\nEste encuentro guiado por cuatro senséis japoneses de alto rango nace con el propósito de vivir el kendo más allá del entrenamiento habitual: compartir dos días de disciplina, convivencia y aprendizaje.\n\nEl Gasshuku se desarrollará en el Establo Mountain Hotel, Monteverde. Sus instalaciones y salones de madera ofrecerán un espacio para entrenar, alejarnos por unos días de la rutina y disfrutar de una experiencia diferente alrededor del kendo.",
+            "eventType": "seminario",
+            "timeZone": "America/Costa_Rica",
+            "historical": true
+          },
+          "fingerprint": "940e9fe85fc22988c9ab000cdb1571c4ce8b4bf426d99d2265c9e79d7c671ebd"
+        },
+        "notification": {
+          "evidenceFingerprint": "940e9fe85fc22988c9ab000cdb1571c4ce8b4bf426d99d2265c9e79d7c671ebd"
+        }
+      }
     },
     {
       "sourceId": "e25ca7168de483e195f1aaf1",
       "sourceUpdatedAt": "2026-09-18T20:17:19.000Z",
-      "slug": "2026-10-10-clak-1er-panamericano-brasil",
+      "slug": "clak-1er-panamericano-brasil",
       "title": "CLAK 1er Panamericano BRASIL",
       "date": "2026-10-10",
       "timeZone": "America/Costa_Rica",
@@ -97,42 +352,51 @@
       "archiveEligibleAt": "2026-10-13T06:00:00.000Z",
       "summary": "#EventoExterno",
       "eventType": "seminario",
-      "editorialState": "publicado"
+      "editorialState": "publicado",
+      "aliases": [
+        "2026-10-10-clak-1er-panamericano-brasil"
+      ]
     },
     {
       "sourceId": "56f8899c9ee30db7265945af",
-      "sourceUpdatedAt": "2026-07-24T17:14:09.000Z",
-      "slug": "2026-10-31-examen",
-      "title": "Examen",
+      "sourceUpdatedAt": "2026-09-24T18:48:44.000Z",
+      "slug": "3er-examen-2026",
+      "title": "3er Examen 2026",
       "date": "2026-10-31",
       "timeZone": "America/Costa_Rica",
       "startTime": "13:00",
       "endTime": "15:00",
       "archiveEligibleAt": "2026-11-02T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
-      "summary": "Exámenes de 8vo a 2do kyu",
+      "summary": "Exámenes de grado de Kendo 8vo a 2do kyu.",
       "eventType": "examen",
-      "editorialState": "publicado"
+      "editorialState": "publicado",
+      "aliases": [
+        "2026-10-31-examen"
+      ]
     },
     {
       "sourceId": "2d5bad84832b0a2be6193e52",
-      "sourceUpdatedAt": "2026-09-18T20:17:37.000Z",
-      "slug": "2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario",
+      "sourceUpdatedAt": "2026-09-21T17:02:29.000Z",
+      "slug": "panama-5ta-copa-shogun-torneo-por-equipos-y-seminario",
       "title": "PANAMÁ 5ta Copa Shogun Torneo por Equipos y Seminario",
-      "date": "2026-11-21",
+      "date": "2026-11-20",
       "timeZone": "America/Costa_Rica",
-      "archiveEligibleAt": "2026-11-23T06:00:00.000Z",
-      "summary": "#EventoExterno:\nInvitación del Dojo Shinsei Panamá a la 5ta Copa Shogun : Torneo por equipos, práctica libre y seminario.",
+      "endDate": "2026-11-23",
+      "archiveEligibleAt": "2026-11-24T06:00:00.000Z",
+      "location": "Shinsei Budokan Panamá, Plaza Mirage, Panamá, Provincia de Panamá, Panamá",
+      "summary": "#EventoExterno: \n\nInvitación del Dojo Shinsei Panamá : 5ta Copa Shogun\n\n- Práctica libre.\n- Torneo por equipos.\n- Seminario.\n\nParticiparemos en todas las actividades , fortaleciendo lazos con la comunidad Kendoka internacional .",
       "eventType": "torneo",
       "editorialState": "publicado",
       "aliases": [
-        "2026-11-21-panama-torneo-por-equipos"
+        "2026-11-21-panama-torneo-por-equipos",
+        "2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario"
       ]
     },
     {
       "sourceId": "d5e995f4e75da854e455e4a5",
-      "sourceUpdatedAt": "2026-07-24T17:16:47.000Z",
-      "slug": "2026-12-12-4to-torneo",
+      "sourceUpdatedAt": "2026-09-24T18:52:47.000Z",
+      "slug": "4to-torneo",
       "title": "4to Torneo",
       "date": "2026-12-12",
       "timeZone": "America/Costa_Rica",
@@ -140,29 +404,35 @@
       "endTime": "17:00",
       "archiveEligibleAt": "2026-12-14T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
-      "summary": "Categoría con Bogu y sin Bogu",
+      "summary": "Torneo de la Federación de Asociaciones de Kendo. FAK\nCategoría con Bogu, sin Bogu y por Equipos",
       "eventType": "torneo",
-      "editorialState": "publicado"
+      "editorialState": "publicado",
+      "aliases": [
+        "2026-12-12-4to-torneo"
+      ]
     },
     {
       "sourceId": "8f7f631510e2e2523d7345c1",
-      "sourceUpdatedAt": "2026-07-24T17:17:03.000Z",
-      "slug": "2027-01-30-examen",
-      "title": "Examen",
+      "sourceUpdatedAt": "2026-09-24T18:49:27.000Z",
+      "slug": "1er-examen-2027",
+      "title": "1er Examen 2027",
       "date": "2027-01-30",
       "timeZone": "America/Costa_Rica",
       "startTime": "13:00",
       "endTime": "15:00",
       "archiveEligibleAt": "2027-02-01T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
-      "summary": "Exámenes de 8vo a 2do kyu",
+      "summary": "Exámenes de grado para Kende de 8vo a 2do kyu",
       "eventType": "examen",
-      "editorialState": "publicado"
+      "editorialState": "publicado",
+      "aliases": [
+        "2027-01-30-examen"
+      ]
     },
     {
       "sourceId": "325fa23572d746c098463cfc",
-      "sourceUpdatedAt": "2026-07-24T17:17:23.000Z",
-      "slug": "2027-04-03-5to-torneo",
+      "sourceUpdatedAt": "2026-09-24T18:52:55.000Z",
+      "slug": "5to-torneo",
       "title": "5to Torneo",
       "date": "2027-04-03",
       "timeZone": "America/Costa_Rica",
@@ -170,44 +440,53 @@
       "endTime": "15:00",
       "archiveEligibleAt": "2027-04-05T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
-      "summary": "Categoría con Bogu y sin Bogu",
+      "summary": "Torneo de la Federación de Asociaciones de Kendo. FAK\nCategoría con Bogu, sin Bogu y por Equipos",
       "eventType": "torneo",
-      "editorialState": "publicado"
+      "editorialState": "publicado",
+      "aliases": [
+        "2027-04-03-5to-torneo"
+      ]
     },
     {
       "sourceId": "2c34e1accb679991a55100bb",
-      "sourceUpdatedAt": "2026-07-24T17:17:56.000Z",
-      "slug": "2027-05-01-examen",
-      "title": "Examen",
+      "sourceUpdatedAt": "2026-09-24T18:50:02.000Z",
+      "slug": "2do-examen-2027",
+      "title": "2do Examen 2027",
       "date": "2027-05-01",
       "timeZone": "America/Costa_Rica",
       "startTime": "13:00",
       "endTime": "15:00",
       "archiveEligibleAt": "2027-05-03T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
-      "summary": "Exámenes de 8vo a 2do kyu",
+      "summary": "Exámenes de grado para Kende de 8vo a 2do kyu",
       "eventType": "examen",
-      "editorialState": "publicado"
+      "editorialState": "publicado",
+      "aliases": [
+        "2027-05-01-examen"
+      ]
     },
     {
       "sourceId": "1361a31e6ed86361f014c7c1",
-      "sourceUpdatedAt": "2026-07-24T17:18:10.000Z",
-      "slug": "2027-07-31-examen",
-      "title": "Examen",
+      "sourceUpdatedAt": "2026-09-24T18:50:19.000Z",
+      "slug": "3er-examen-2027",
+      "title": "3er Examen 2027",
       "date": "2027-07-31",
       "timeZone": "America/Costa_Rica",
       "startTime": "13:00",
       "endTime": "15:00",
       "archiveEligibleAt": "2027-08-02T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
-      "summary": "Exámenes de 8vo a 2do kyu",
+      "summary": "Exámenes de grado para Kende de 8vo a 2do kyu",
       "eventType": "examen",
-      "editorialState": "publicado"
+      "editorialState": "publicado",
+      "aliases": [
+        "2027-07-31-examen"
+      ]
     },
     {
       "sourceId": "af94c6be4ebe10e334a37951",
-      "sourceUpdatedAt": "2026-07-24T17:18:28.000Z",
-      "slug": "2027-08-14-6to-torneo",
+      "sourceUpdatedAt": "2026-09-24T18:53:06.000Z",
+      "slug": "6to-torneo",
       "title": "6to Torneo",
       "date": "2027-08-14",
       "timeZone": "America/Costa_Rica",
@@ -215,29 +494,35 @@
       "endTime": "17:00",
       "archiveEligibleAt": "2027-08-16T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
-      "summary": "Categoría con Bogu y sin Bogu",
+      "summary": "Torneo de la Federación de Asociaciones de Kendo. FAK\nCategoría con Bogu, sin Bogu y por Equipos",
       "eventType": "torneo",
-      "editorialState": "publicado"
+      "editorialState": "publicado",
+      "aliases": [
+        "2027-08-14-6to-torneo"
+      ]
     },
     {
       "sourceId": "2d0ecad0919db5dc75e39dd5",
-      "sourceUpdatedAt": "2026-07-24T17:18:42.000Z",
-      "slug": "2027-10-30-examen",
-      "title": "Examen",
+      "sourceUpdatedAt": "2026-09-25T15:36:31.000Z",
+      "slug": "4to-examen-2027",
+      "title": "4to Examen 2027",
       "date": "2027-10-30",
       "timeZone": "America/Costa_Rica",
       "startTime": "13:00",
       "endTime": "15:00",
       "archiveEligibleAt": "2027-11-01T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
-      "summary": "Exámenes de 8vo a 2do kyu",
+      "summary": "Exámenes de grado para Kende de 8vo a 2do kyu",
       "eventType": "examen",
-      "editorialState": "publicado"
+      "editorialState": "publicado",
+      "aliases": [
+        "2027-10-30-examen"
+      ]
     },
     {
       "sourceId": "26e2ecffe893577fa8a242ec",
-      "sourceUpdatedAt": "2026-07-24T17:19:00.000Z",
-      "slug": "2027-12-11-7mo-torneo",
+      "sourceUpdatedAt": "2026-09-24T18:52:28.000Z",
+      "slug": "7mo-torneo",
       "title": "7mo Torneo",
       "date": "2027-12-11",
       "timeZone": "America/Costa_Rica",
@@ -245,9 +530,12 @@
       "endTime": "17:00",
       "archiveEligibleAt": "2027-12-13T06:00:00.000Z",
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
-      "summary": "Categoría con Bogu y sin Bogu",
+      "summary": "Torneo de la Federación de Asociaciones de Kendo. FAK\nCategoría con Bogu, sin Bogu y por Equipos",
       "eventType": "torneo",
-      "editorialState": "publicado"
+      "editorialState": "publicado",
+      "aliases": [
+        "2027-12-11-7mo-torneo"
+      ]
     }
   ]
 }

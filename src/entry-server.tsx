@@ -10,6 +10,7 @@ import { EventPage } from "./app/components/EventPage";
 import { PastEventsSection } from "./app/components/PastEventsSection";
 
 export {
+  getEventAddressCountry,
   getRouteHeadDescriptors,
   getEventRedirects,
   getRouteManifest,
@@ -19,6 +20,7 @@ export {
 } from "./app/config/seo";
 export { CALENDAR_EVENTS } from "./app/data/calendarEvents";
 export {
+  hasDistinctEventTranslation,
   getEventTranslationStatus,
   getLocalizedEvent,
   getLocalizedEvents,

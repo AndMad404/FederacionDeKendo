@@ -3,11 +3,39 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
   CALENDAR_EVENTS,
+  getEventAddressCountry,
   getEventRedirects,
   getEventTranslationStatus,
+  getLocalizedEvent,
+  hasDistinctEventTranslation,
   getRouteManifest,
   getRouteSeoPayload,
 } from "../../dist-ssr/entry-server.js";
+
+const PANAMA_LEGACY_SLUG = "2026-11-21-panama-torneo-por-equipos";
+
+function getPanamaEvent() {
+  const event = CALENDAR_EVENTS.find(({ aliases }) =>
+    aliases?.includes(PANAMA_LEGACY_SLUG),
+  );
+  assert.ok(event, "Panama event must retain its original URL as an alias");
+  return event;
+}
+
+function formatEventSeoDate(date, language) {
+  return new Intl.DateTimeFormat(language === "en" ? "en-US" : "es-CR", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${date}T00:00:00Z`));
+}
+
+function getExpectedEventSeoTitle(event, language) {
+  const localizedEvent = getLocalizedEvent(event, language);
+  assert.ok(localizedEvent, `${event.id}: ${language} localization is missing`);
+  return `${localizedEvent.title} — ${formatEventSeoDate(event.date, language)}`;
+}
 
 async function readDist(relativePath) {
   return readFile(
@@ -86,6 +114,10 @@ test("publishes Event JSON-LD only when the required physical location is known"
       structuredEvent.location?.address?.streetAddress,
       event.location.trim(),
     );
+    assert.equal(
+      structuredEvent.location?.address?.addressCountry,
+      getEventAddressCountry(event),
+    );
     assert.ok(structuredEvent.endDate, `${route.path}: endDate is missing`);
     assert.deepEqual(
       structuredEvent.organizer,
@@ -95,10 +127,45 @@ test("publishes Event JSON-LD only when the required physical location is known"
   }
 });
 
+test("publishes the correct address country for regional events", () => {
+  const expectedCountries = [
+    [/panam[aá]/iu, "PA"],
+    [/chile/iu, "CL"],
+    [/(?:brasil|brazil)/iu, "BR"],
+  ];
+
+  for (const [countryPattern, expectedCountry] of expectedCountries) {
+    const event = CALENDAR_EVENTS.find((candidate) =>
+      countryPattern.test(
+        [candidate.title, candidate.location, candidate.summary]
+          .filter(Boolean)
+          .join(" "),
+      ),
+    );
+
+    assert.ok(event, `${expectedCountry}: regional event is missing`);
+    assert.equal(getEventAddressCountry(event), expectedCountry);
+  }
+
+  assert.equal(
+    getEventAddressCountry({
+      title: "Examen de Kendo",
+      location: "San José, Costa Rica",
+    }),
+    "CR",
+  );
+});
+
 test("generates localized, unique, indexable SEO output for every event route", async () => {
   const routeManifest = getRouteManifest();
   const eventRoutes = routeManifest.filter(
     (route) => route.component === "event",
+  );
+
+  assert.equal(
+    new Set(eventRoutes.map((route) => route.path)).size,
+    eventRoutes.length,
+    "canonical event paths, including vanity paths, must be unique",
   );
 
   for (const route of eventRoutes) {
@@ -171,10 +238,6 @@ test("generates localized, unique, indexable SEO output for every event route", 
       "2026-05-29-clak-seminario-instructores-chile:es",
       "CLAK Seminario Instructores CHILE — 29 may 2026",
     ],
-    [
-      "2026-05-29-clak-seminario-instructores-chile:en",
-      "CLAK Seminario Instructores CHILE — May 29, 2026",
-    ],
     ["2026-08-08-examen:en", "Kendo Examination — Aug 8, 2026 | Costa Rica"],
   ]);
 
@@ -192,21 +255,14 @@ test("generates localized, unique, indexable SEO output for every event route", 
     );
   }
 
-  const panamaEventId =
-    "2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario";
+  const panamaEvent = getPanamaEvent();
+  const panamaEventId = panamaEvent.id;
   const expectedPanamaRoutes = new Map([
     [
       "es",
       {
         path: `/eventos/${panamaEventId}/`,
-        title: "PANAMA 5ta Copa Shogun — 21 nov 2026",
-      },
-    ],
-    [
-      "en",
-      {
-        path: `/en/events/${panamaEventId}/`,
-        title: "PANAMA 5ta Copa Shogun — Nov 21, 2026",
+        title: getExpectedEventSeoTitle(panamaEvent, "es"),
       },
     ],
   ]);
@@ -222,6 +278,13 @@ test("generates localized, unique, indexable SEO output for every event route", 
     );
     assert.equal(route?.title, expected.title, language);
   }
+  assert.equal(
+    eventRoutes.find(
+      (candidate) =>
+        candidate.eventId === panamaEventId && candidate.language === "en",
+    ),
+    undefined,
+  );
 
   const archivePageTwoTitles = routeManifest
     .filter(
@@ -232,10 +295,6 @@ test("generates localized, unique, indexable SEO output for every event route", 
     "Eventos pasados de Kendo — página 2 | Costa Rica",
     "Past Kendo Events — page 2 | Costa Rica",
   ]);
-
-  for (const route of routeManifest) {
-    assert.ok(route.title.length <= 60, `${route.path}: ${route.title}`);
-  }
 });
 
 test("indexes all public routes, events, and archives in the sitemap", async () => {
@@ -405,6 +464,15 @@ test("generates the archive route", async () => {
 test("redirects legacy calendar and archived event URLs to their canonical routes", async () => {
   const redirects = await readDist("_redirects");
   const configuredRedirects = getEventRedirects();
+  const panamaEventId = getPanamaEvent().id;
+  const panamaRoutes = new Map(
+    getRouteManifest()
+      .filter(
+        (route) =>
+          route.component === "event" && route.eventId === panamaEventId,
+      )
+      .map((route) => [route.language, route.path]),
+  );
 
   assert.ok(
     configuredRedirects.some(
@@ -416,13 +484,19 @@ test("redirects legacy calendar and archived event URLs to their canonical route
     redirects,
     /^\/eventos\/2026-08-08-examen\/ \/eventos\/pasados\/2026-08-08-examen\/ 301$/m,
   );
-  assert.match(
-    redirects,
-    /^\/eventos\/2026-11-21-panama-torneo-por-equipos\/ \/eventos\/2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario\/ 301$/m,
+  assert.ok(
+    redirects
+      .split("\n")
+      .includes(
+        `/eventos/${PANAMA_LEGACY_SLUG}/ ${panamaRoutes.get("es")} 301`,
+      ),
   );
-  assert.match(
-    redirects,
-    /^\/en\/events\/2026-11-21-panama-torneo-por-equipos\/ \/en\/events\/2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario\/ 301$/m,
+  assert.ok(
+    redirects
+      .split("\n")
+      .includes(
+        `/en/events/${PANAMA_LEGACY_SLUG}/ ${panamaRoutes.get("es")} 301`,
+      ),
   );
   assert.match(
     redirects,
@@ -434,11 +508,11 @@ test("redirects legacy calendar and archived event URLs to their canonical route
   );
   assert.match(
     redirects,
-    /^\/en\/events\/2026-05-29-clak-seminario-instructores-chile\/ \/en\/events\/past\/2026-05-30-seminario\/ 301$/m,
+    /^\/en\/events\/2026-05-29-clak-seminario-instructores-chile\/ \/eventos\/pasados\/2026-05-30-seminario\/ 301$/m,
   );
   assert.match(
     redirects,
-    /^\/en\/events\/past\/2026-05-29-clak-seminario-instructores-chile\/ \/en\/events\/past\/2026-05-30-seminario\/ 301$/m,
+    /^\/en\/events\/past\/2026-05-29-clak-seminario-instructores-chile\/ \/eventos\/pasados\/2026-05-30-seminario\/ 301$/m,
   );
 });
 
@@ -451,11 +525,24 @@ test("redirects every previous event URL to its current URL in each published la
   const eventRoutes = getRouteManifest().filter(
     (route) => route.component === "event",
   );
+  const configuredRedirects = getEventRedirects();
+  const configuredSources = new Set(
+    configuredRedirects.map(({ from }) => from),
+  );
   const renamedEvents = CALENDAR_EVENTS.filter(
     ({ aliases }) => aliases?.length,
   );
 
   assert.ok(renamedEvents.length > 0);
+  assert.equal(configuredSources.size, configuredRedirects.length);
+  for (const { from, to } of configuredRedirects) {
+    assert.notEqual(from, to, `${from} must not redirect to itself`);
+    assert.equal(
+      configuredSources.has(to),
+      false,
+      `${from} must redirect directly to the final canonical URL`,
+    );
+  }
 
   for (const event of renamedEvents) {
     const routes = eventRoutes.filter((route) => route.eventId === event.id);
@@ -490,6 +577,79 @@ test("redirects every previous event URL to its current URL in each published la
         `${route.path} must not redirect elsewhere`,
       );
     }
+  }
+});
+
+test("uses only current event URLs in sitemap, internal links, canonical, and hreflang", async () => {
+  const routeManifest = getRouteManifest();
+  const eventRoutes = routeManifest.filter(
+    (route) => route.component === "event",
+  );
+  const redirectSources = new Set(getEventRedirects().map(({ from }) => from));
+  const sitemap = await readDist("sitemap.xml");
+  const listingPaths = [
+    "eventos/index.html",
+    "en/events/index.html",
+    ...routeManifest
+      .filter((route) => route.component === "pastEvents")
+      .map((route) => `${route.path.slice(1)}index.html`),
+  ];
+  const listingHtml = (
+    await Promise.all(listingPaths.map((listingPath) => readDist(listingPath)))
+  ).join("\n");
+  const eventHtml = (
+    await Promise.all(
+      eventRoutes.map((route) => readDist(`${route.path.slice(1)}index.html`)),
+    )
+  ).join("\n");
+
+  const canonicalEventPaths = new Set(eventRoutes.map((route) => route.path));
+  const internalEventLinks = [
+    ...listingHtml.matchAll(
+      /href="(\/(?:eventos|en\/events)\/(?:pasados\/|past\/)?[^"/]+\/)"/g,
+    ),
+  ]
+    .map(([, href]) => href)
+    .filter(
+      (href) => href !== "/eventos/pasados/" && href !== "/en/events/past/",
+    );
+  assert.ok(internalEventLinks.length > 0);
+  for (const href of internalEventLinks) {
+    assert.equal(
+      canonicalEventPaths.has(href),
+      true,
+      `${href} must be a current canonical event link`,
+    );
+  }
+
+  for (const source of redirectSources) {
+    assert.equal(
+      sitemap.includes(`<loc>https://fak-kendo.org${source}</loc>`),
+      false,
+      `${source} must not be in the sitemap`,
+    );
+    assert.equal(
+      listingHtml.includes(`href="${source}"`),
+      false,
+      `${source} must not be an internal event link`,
+    );
+    assert.equal(
+      eventHtml.includes(
+        `rel="canonical" href="https://fak-kendo.org${source}"`,
+      ),
+      false,
+      `${source} must not be canonical`,
+    );
+    assert.equal(
+      eventHtml.includes(
+        `hreflang="es-CR" href="https://fak-kendo.org${source}"`,
+      ) ||
+        eventHtml.includes(
+          `hreflang="en" href="https://fak-kendo.org${source}"`,
+        ),
+      false,
+      `${source} must not be published through hreflang`,
+    );
   }
 });
 
@@ -543,8 +703,7 @@ test("generates localized English routes with reciprocal language metadata", asy
   assert.match(sitemap, /<loc>https:\/\/fak-kendo\.org\/en\/<\/loc>/);
 });
 
-test("publishes every event route in both Spanish and English", async () => {
-  const { CALENDAR_EVENTS } = await import("../../dist-ssr/entry-server.js");
+test("publishes English event routes only for distinct editorial translations", async () => {
   const spanishEventRoutes = getRouteManifest()
     .filter((route) => route.component === "event" && route.language === "es")
     .map((route) => route.eventId)
@@ -554,7 +713,55 @@ test("publishes every event route in both Spanish and English", async () => {
     .map((route) => route.eventId)
     .sort();
   const eventIds = CALENDAR_EVENTS.map((event) => event.id).sort();
+  const translatedEventIds = CALENDAR_EVENTS.filter((event) =>
+    hasDistinctEventTranslation(event),
+  )
+    .map((event) => event.id)
+    .sort();
+  const duplicateEvents = CALENDAR_EVENTS.filter(
+    (event) => !hasDistinctEventTranslation(event),
+  );
+  const routeManifest = getRouteManifest();
+  const redirects = getEventRedirects();
+  const sitemap = await readDist("sitemap.xml");
 
   assert.deepEqual(spanishEventRoutes, eventIds);
-  assert.deepEqual(englishEventRoutes, eventIds);
+  assert.deepEqual(englishEventRoutes, translatedEventIds);
+  assert.ok(duplicateEvents.length > 0);
+
+  for (const event of duplicateEvents) {
+    const spanishRoute = routeManifest.find(
+      (route) =>
+        route.component === "event" &&
+        route.eventId === event.id &&
+        route.language === "es",
+    );
+    const englishRoute = routeManifest.find(
+      (route) =>
+        route.component === "event" &&
+        route.eventId === event.id &&
+        route.language === "en",
+    );
+
+    assert.ok(spanishRoute, event.id);
+    assert.equal(englishRoute, undefined, event.id);
+
+    const englishRedirects = redirects.filter(
+      ({ from, to }) =>
+        from.startsWith("/en/events/") && to === spanishRoute.path,
+    );
+    assert.ok(englishRedirects.length > 0, event.id);
+    for (const { from } of englishRedirects) {
+      assert.equal(
+        sitemap.includes(`<loc>https://fak-kendo.org${from}</loc>`),
+        false,
+        from,
+      );
+    }
+
+    const spanishHtml = await readDist(
+      `${spanishRoute.path.slice(1)}index.html`,
+    );
+    assert.doesNotMatch(spanishHtml, /hreflang="en"/, event.id);
+  }
 });

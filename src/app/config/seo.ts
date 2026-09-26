@@ -10,7 +10,10 @@ import {
   getEventPath,
 } from "../utils/eventRoutes";
 import { getLanguageFromPathname, type Language } from "./i18n";
-import { getLocalizedEvent } from "../utils/localizedEvents";
+import {
+  getLocalizedEvent,
+  hasDistinctEventTranslation,
+} from "../utils/localizedEvents";
 import { getEventEndDate } from "../utils/calendarEvents";
 import type { RouteComponent } from "./routeTypes";
 
@@ -211,6 +214,31 @@ function normalizeDescription(text: string) {
 
 const EXPLICIT_FOREIGN_COUNTRY_PATTERN =
   /\b(?:alemania|argentina|australia|belice|belize|bolivia|brasil|brazil|canada|chile|china|colombia|corea|cuba|dominican republic|ecuador|el salvador|espana|estados unidos|francia|germany|guatemala|honduras|italia|italy|japan|japon|korea|mexico|nicaragua|panama|paraguay|peru|portugal|puerto rico|reino unido|republica dominicana|spain|taiwan|united kingdom|united states|uruguay|venezuela)\b/u;
+const EVENT_ADDRESS_COUNTRY_RULES = [
+  { code: "PA", pattern: /\bpanama\b/u },
+  { code: "CL", pattern: /\bchile\b/u },
+  { code: "BR", pattern: /\b(?:brasil|brazil)\b/u },
+] as const;
+
+export function getEventAddressCountry(event: {
+  title: string;
+  location?: string;
+  summary?: string;
+}): "CR" | "PA" | "CL" | "BR" {
+  const countryEvidence = [event.location, event.title, event.summary]
+    .filter(Boolean)
+    .join(" ")
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLocaleLowerCase("en-US");
+
+  return (
+    EVENT_ADDRESS_COUNTRY_RULES.find(({ pattern }) =>
+      pattern.test(countryEvidence),
+    )?.code ?? "CR"
+  );
+}
+
 export function getEventOrganizerReference(
   event: { summary?: string },
   organizationId: string,
@@ -225,15 +253,6 @@ interface EventSeoTitleInput {
   localizedEvent: (typeof CALENDAR_EVENTS)[number];
   language: Language;
 }
-
-const EVENT_SEO_TITLE_OVERRIDES: Partial<
-  Record<string, Partial<Record<Language, string>>>
-> = {
-  "2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario": {
-    es: "PANAMA 5ta Copa Shogun",
-    en: "PANAMA 5ta Copa Shogun",
-  },
-};
 
 function hasExplicitInternationalLocation({
   event,
@@ -279,12 +298,10 @@ function buildEventSeoTitle({
   localizedEvent,
   language,
 }: EventSeoTitleInput) {
-  const title =
-    EVENT_SEO_TITLE_OVERRIDES[event.id]?.[language] ??
-    improveGenericEventTitle(
-      normalizeDescription(localizedEvent.title),
-      language,
-    );
+  const title = improveGenericEventTitle(
+    normalizeDescription(localizedEvent.title),
+    language,
+  );
   const date = new Intl.DateTimeFormat(language === "en" ? "en-US" : "es-CR", {
     day: "numeric",
     month: "short",
@@ -486,7 +503,9 @@ export function getRouteManifest() {
     ),
     ...CALENDAR_EVENTS.flatMap((event) => {
       const spanishRoute = createEventRouteMeta(event, "es");
-      return [spanishRoute, createEventRouteMeta(event, "en")];
+      return hasDistinctEventTranslation(event)
+        ? [spanishRoute, createEventRouteMeta(event, "en")]
+        : [spanishRoute];
     }),
     ...archiveRoutes,
     ...Array.from({ length: pastPageCount }, (_, index) =>
@@ -496,14 +515,13 @@ export function getRouteManifest() {
 }
 
 export function getEventRedirects() {
-  return [
+  const redirects = [
     { from: "/calendario/", to: "/eventos/" },
     { from: "/en/calendar/", to: "/en/events/" },
     ...CALENDAR_EVENTS.flatMap((event) => {
       const spanishPath = getEventPath(event, "es");
       const englishPath = getEventPath(event, "en");
       const archived = spanishPath.startsWith("/eventos/pasados/");
-      const englishArchived = englishPath.startsWith("/en/events/past/");
       const aliases = event.aliases ?? [];
 
       const spanishSources = new Set([
@@ -517,10 +535,10 @@ export function getEventRedirects() {
 
       const englishSources = new Set([
         `/en/events/${event.id}/`,
-        ...(englishArchived ? [`/en/events/past/${event.id}/`] : []),
+        ...(archived ? [`/en/events/past/${event.id}/`] : []),
         ...aliases.flatMap((alias) => [
           `/en/events/${alias}/`,
-          ...(englishArchived ? [`/en/events/past/${alias}/`] : []),
+          ...(archived ? [`/en/events/past/${alias}/`] : []),
         ]),
       ]);
 
@@ -534,6 +552,30 @@ export function getEventRedirects() {
       ];
     }),
   ];
+
+  const targetBySource = new Map<string, string>();
+  for (const { from, to } of redirects) {
+    const existingTarget = targetBySource.get(from);
+    if (existingTarget) {
+      throw new Error(
+        `Duplicate redirect source: ${from} (${existingTarget} and ${to}).`,
+      );
+    }
+    if (from === to) {
+      throw new Error(`Self redirect is not allowed: ${from}.`);
+    }
+    targetBySource.set(from, to);
+  }
+
+  for (const { from, to } of redirects) {
+    if (targetBySource.has(to)) {
+      throw new Error(
+        `Redirect chain is not allowed: ${from} -> ${to} -> ${targetBySource.get(to)}.`,
+      );
+    }
+  }
+
+  return redirects;
 }
 function createEventRouteMeta(
   event: (typeof CALENDAR_EVENTS)[number],
@@ -545,11 +587,16 @@ function createEventRouteMeta(
     throw new Error(`Missing valid ${language} translation for ${event.id}.`);
   }
   const calendarMeta = CALENDAR_META[language];
+  const englishAlternate = hasDistinctEventTranslation(event);
   return {
     path: getEventPath(event, language),
     language,
     locale: english ? "en_US" : "es_CR",
-    alternatePath: getEventPath(event, english ? "es" : "en"),
+    alternatePath: english
+      ? getEventPath(event, "es")
+      : englishAlternate
+        ? getEventPath(event, "en")
+        : undefined,
     component: "event",
     eventId: event.id,
     title: buildEventSeoTitle({ event, localizedEvent, language }),
@@ -712,7 +759,7 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
           address: {
             "@type": "PostalAddress",
             streetAddress: location,
-            addressCountry: "CR",
+            addressCountry: getEventAddressCountry(event),
           },
         },
         ...(organizer ? { organizer } : {}),

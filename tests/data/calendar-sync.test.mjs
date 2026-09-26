@@ -372,11 +372,8 @@ test("Given timed and all-day events, When parsed, Then eligibility uses the las
   assert.equal(allDay.archiveEligibleAt, "2026-08-10T06:00:00.000Z");
 });
 
-test("canonical slug starts with the date and normalizes accents", () => {
-  assert.equal(
-    createCanonicalSlug("Torneo de América", "2026-10-10"),
-    "2026-10-10-torneo-de-america",
-  );
+test("canonical slug uses only the normalized event title", () => {
+  assert.equal(createCanonicalSlug("Torneo de América"), "torneo-de-america");
 });
 
 test("keeps sourceId in the registry and out of the public event URL", async () => {
@@ -392,16 +389,16 @@ test("keeps sourceId in the registry and out of the public event URL", async () 
     const generatedOutput = await readFile(result.outputPath, "utf8");
 
     assert.equal(event.sourceId, "3f2eb91b31105691fbf84f65");
-    assert.equal(event.slug, "2026-08-08-examen-de-kyu");
+    assert.equal(event.slug, "examen-de-kyu");
     assert.equal(event.slug.includes(event.sourceId.slice(0, 8)), false);
     assert.equal(generatedOutput.includes(event.sourceId), false);
-    assert.match(generatedOutput, /id: "2026-08-08-examen-de-kyu"/);
+    assert.match(generatedOutput, /id: "examen-de-kyu"/);
   } finally {
     await rm(tempDirectory, { recursive: true, force: true });
   }
 });
 
-test("a duplicate date and title aborts before either destination is published", async () => {
+test("a title-only URL collision across different dates aborts before publication", async () => {
   const tempDirectory = await mkdtemp(path.join(os.tmpdir(), "fak-calendar-"));
   const sourcePath = path.join(tempDirectory, "collision.ics");
   const outputPath = path.join(tempDirectory, "calendarEvents.ts");
@@ -409,7 +406,10 @@ test("a duplicate date and title aborts before either destination is published",
   const previousRegistry = '{"version":2,"events":[]}';
   await writeFile(
     sourcePath,
-    createIcs([{ uid: "first@example.test" }, { uid: "second@example.test" }]),
+    createIcs([
+      { uid: "first@example.test", date: "20260808", title: "Examen" },
+      { uid: "second@example.test", date: "20261031", title: "Examen" },
+    ]),
   );
   await writeFile(outputPath, "previous output");
   await writeFile(registryPath, previousRegistry);
@@ -422,13 +422,98 @@ test("a duplicate date and title aborts before either destination is published",
         registryPath,
         now: new Date("2026-07-01"),
       }),
-      /Duplicate calendar canonical slug: 2026-08-08-examen/,
+      /Duplicate calendar canonical slug: examen/,
     );
     assert.equal(await readFile(outputPath, "utf8"), "previous output");
     assert.equal(await readFile(registryPath, "utf8"), previousRegistry);
   } finally {
     await rm(tempDirectory, { recursive: true, force: true });
   }
+});
+
+test("a current title change preserves the previous URL as a redirect alias", () => {
+  const previous = {
+    version: 4,
+    events: [
+      {
+        sourceId: "current-source",
+        slug: "torneo-de-verano",
+        aliases: ["2026-08-22-torneo-de-verano"],
+        archiveEligibleAt: "2026-12-02T06:00:00.000Z",
+        title: "Torneo de Verano",
+        date: "2026-11-30",
+        editorialState: "publicado",
+      },
+    ],
+  };
+  const current = [
+    {
+      sourceId: "current-source",
+      slug: "copa-nacional-de-kendo",
+      archiveEligibleAt: "2026-12-02T06:00:00.000Z",
+      title: "Copa Nacional de Kendo",
+      date: "2026-11-30",
+    },
+  ];
+
+  const [event] = mergeRegistry(
+    previous,
+    current,
+    new Date("2026-09-24T00:00:00.000Z"),
+  ).events;
+
+  assert.equal(event.slug, "copa-nacional-de-kendo");
+  assert.deepEqual(event.aliases, [
+    "2026-08-22-torneo-de-verano",
+    "torneo-de-verano",
+  ]);
+});
+
+test("a new title URL cannot reuse an existing alias", () => {
+  const previous = {
+    version: 4,
+    events: [
+      {
+        sourceId: "renamed-source",
+        slug: "torneo-de-verano",
+        archiveEligibleAt: "2026-12-02T06:00:00.000Z",
+        title: "Torneo de Verano",
+        date: "2026-11-30",
+        editorialState: "publicado",
+      },
+      {
+        sourceId: "owner-source",
+        slug: "encuentro-nacional",
+        aliases: ["copa-nacional-de-kendo"],
+        archiveEligibleAt: "2026-12-09T06:00:00.000Z",
+        title: "Encuentro Nacional",
+        date: "2026-12-07",
+        editorialState: "publicado",
+      },
+    ],
+  };
+  const current = [
+    {
+      sourceId: "renamed-source",
+      slug: "copa-nacional-de-kendo",
+      archiveEligibleAt: "2026-12-02T06:00:00.000Z",
+      title: "Copa Nacional de Kendo",
+      date: "2026-11-30",
+    },
+    {
+      sourceId: "owner-source",
+      slug: "encuentro-nacional",
+      archiveEligibleAt: "2026-12-09T06:00:00.000Z",
+      title: "Encuentro Nacional",
+      date: "2026-12-07",
+    },
+  ];
+
+  assert.throws(
+    () =>
+      mergeRegistry(previous, current, new Date("2026-09-24T00:00:00.000Z")),
+    /Duplicate calendar canonical slug or alias: copa-nacional-de-kendo/,
+  );
 });
 
 test("an invalid feed leaves the last published files untouched", async () => {
@@ -569,8 +654,7 @@ test("phase 2 normalizes public descriptions and event types without publishing 
     assert.equal(byTitle.get("Torneo futuro").historical, undefined);
     assert.equal(byTitle.get("Examen en preparación").historical, true);
     assert.match(
-      result.galleryResult.state.galleries["2026-08-08-examen-en-preparacion"]
-        .fingerprint,
+      result.galleryResult.state.galleries["examen-en-preparacion"].fingerprint,
       /^[a-f0-9]{64}$/,
     );
     assert.equal(byTitle.get("Seminario histórico").historical, true);

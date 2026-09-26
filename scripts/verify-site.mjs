@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
+import { appendFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -9,6 +10,61 @@ const ALLOWED_UNIT_SCRIPTS = new Set([
   "test:unit:without-history-correction",
   "test:unit:without-sync",
 ]);
+
+const VERIFICATION_STEP_LABELS = new Map([
+  ["pnpm run format:line-endings:check", "Finales de linea"],
+  ["pnpm run lint", "Lint (ESLint)"],
+  ["pnpm run format:check", "Formato (Prettier)"],
+  ["git diff --check", "Espacios en cambios sin preparar"],
+  ["git diff --cached --check", "Espacios en cambios preparados"],
+  ["pnpm run typecheck", "Tipos (TypeScript)"],
+  ["pnpm run build", "Build y prerenderizado"],
+  ["pnpm run test:unit", "Pruebas unitarias"],
+  ["pnpm run test:unit:without-history-correction", "Pruebas unitarias"],
+  ["pnpm run test:unit:without-sync", "Pruebas unitarias"],
+  ["pnpm run test:generated", "Salida HTML generada"],
+  [
+    "pnpm exec playwright install --with-deps chromium",
+    "Instalacion de Chromium",
+  ],
+  ["pnpm exec playwright test tests/data", "Pruebas de datos en navegador"],
+  ["pnpm run test:behavior", "Pruebas de comportamiento en navegador"],
+  ["pnpm run test:design", "Pruebas de diseno en navegador"],
+]);
+
+function commandFor(step) {
+  return step.join(" ");
+}
+
+export function formatVerificationFailure(step, error) {
+  const command = commandFor(step);
+  const label =
+    VERIFICATION_STEP_LABELS.get(command) ?? "Verificacion del sitio";
+  return [
+    "## Verificacion del sitio: fallo",
+    "",
+    `**Fase que fallo:** ${label}`,
+    `**Comando:** \`${command}\``,
+    `**Resultado:** ${error.message}`,
+    "",
+    "El detalle de la prueba o archivo aparece en el log inmediatamente anterior a este resumen.",
+    "",
+  ].join("\n");
+}
+
+async function writeVerificationFailureSummary(error) {
+  const summaryPath = process.env.GITHUB_STEP_SUMMARY;
+  if (!summaryPath || !error.verificationStep) return;
+  try {
+    await appendFile(
+      summaryPath,
+      formatVerificationFailure(error.verificationStep, error),
+      "utf8",
+    );
+  } catch {
+    // The original verification failure remains the useful result.
+  }
+}
 
 export function captureWorkspaceFingerprint(root) {
   const result = spawnSync(
@@ -69,7 +125,7 @@ function parseUnitScript(args) {
 }
 
 function runStep(root, [tool, ...args]) {
-  const command = `${tool} ${args.join(" ")}`;
+  const command = commandFor([tool, ...args]);
   console.log(`\n> ${command}`);
   const usesWindowsPnpm = process.platform === "win32" && tool === "pnpm";
   const executable = usesWindowsPnpm
@@ -97,9 +153,13 @@ export function runVerification({
 }) {
   const initialFingerprint = captureFingerprint(root);
   let stepError;
+  let failedStep;
 
   try {
-    for (const step of verificationSteps(unitScript)) executeStep(root, step);
+    for (const step of verificationSteps(unitScript)) {
+      failedStep = step;
+      executeStep(root, step);
+    }
   } catch (error) {
     stepError = error;
   }
@@ -111,7 +171,10 @@ export function runVerification({
       { cause: stepError },
     );
   }
-  if (stepError) throw stepError;
+  if (stepError) {
+    stepError.verificationStep = failedStep;
+    throw stepError;
+  }
 }
 
 const isDirectExecution =
@@ -126,6 +189,7 @@ if (isDirectExecution) {
       unitScript: parseUnitScript(process.argv.slice(2)),
     });
   } catch (error) {
+    await writeVerificationFailureSummary(error);
     console.error(error.message);
     process.exitCode = 1;
   }

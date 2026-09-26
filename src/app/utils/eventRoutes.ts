@@ -2,6 +2,7 @@ import { CALENDAR_EVENTS } from "../data/calendarEvents";
 import type { CalendarEvent } from "../types";
 import type { Language } from "../config/i18n";
 import { isPastEvent } from "./calendarEvents";
+import { hasDistinctEventTranslation } from "./localizedEvents";
 export { getArchivePagePath } from "./eventArchiveRoutes.js";
 
 const EVENT_VANITY_SLUGS: Readonly<Record<string, string>> = {
@@ -19,8 +20,10 @@ export function getEventPath(
 ) {
   const archived = isPastEvent(event, now);
   const slug = getEventPublicSlug(event);
+  const publishEnglishRoute =
+    language === "en" && hasDistinctEventTranslation(event);
 
-  if (language === "en") {
+  if (publishEnglishRoute) {
     return archived ? `/en/events/past/${slug}/` : `/en/events/${slug}/`;
   }
 

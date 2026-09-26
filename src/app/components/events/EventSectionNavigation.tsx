@@ -1,10 +1,9 @@
 import { Link } from "react-router";
 import { useLanguage } from "../../config/i18n";
-import {
-  focusRingClass,
-  primaryButtonClass,
-  secondaryButtonClass,
-} from "../../styles/shared";
+import { focusRingClass } from "../../styles/shared";
+
+const eventSectionNavigationButtonClass =
+  "inline-flex min-h-11 items-center justify-center rounded-lg border px-5 py-2 font-bold transition-[box-shadow,transform] duration-200 hover:scale-[1.025] hover:shadow-md active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:scale-100 motion-reduce:active:scale-100";
 
 interface EventSectionNavigationProps {
   active: "upcoming" | "past";
@@ -41,7 +40,11 @@ export function EventSectionNavigation({
             key={item.id}
             to={item.path}
             aria-current={isActive ? "page" : undefined}
-            className={`${isActive ? primaryButtonClass : secondaryButtonClass} ${focusRingClass} max-sm:px-2 max-sm:text-sm`}
+            className={`${eventSectionNavigationButtonClass} ${
+              isActive
+                ? "border-site-action bg-site-action text-site-on-dark shadow-sm"
+                : "border-site-action bg-site-surface text-site-action"
+            } ${focusRingClass} max-sm:px-2 max-sm:text-sm`}
           >
             {item.label}
           </Link>

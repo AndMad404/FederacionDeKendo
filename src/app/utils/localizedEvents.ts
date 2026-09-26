@@ -15,14 +15,30 @@ export function getEventTranslationStatus(
     : "stale";
 }
 
+function normalizeComparableContent(value?: string) {
+  return value?.replace(/\s+/g, " ").trim() ?? "";
+}
+
+export function hasDistinctEventTranslation(event: CalendarEvent) {
+  if (getEventTranslationStatus(event) !== "valid") return false;
+
+  const translation = EVENT_TRANSLATIONS[event.id].translation;
+  return (
+    normalizeComparableContent(translation.title) !==
+      normalizeComparableContent(event.title) ||
+    normalizeComparableContent(translation.summary) !==
+      normalizeComparableContent(event.summary)
+  );
+}
+
 export function getLocalizedEvent(
   event: CalendarEvent,
   language: Language,
 ): CalendarEvent | undefined {
   if (language === "es") return event;
-  // English event routes remain publishable while editorial translations are
-  // paused. Use the Spanish calendar content as a transparent fallback rather
-  // than omitting the event or blocking the production build.
+  // English listings remain complete while editorial translations are paused.
+  // Route publication separately requires distinct English content so this
+  // fallback cannot create a duplicate indexable event page.
   if (getEventTranslationStatus(event) !== "valid") return event;
 
   const translation = EVENT_TRANSLATIONS[event.id].translation;
