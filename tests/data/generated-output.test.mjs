@@ -31,6 +31,20 @@ function formatEventSeoDate(date, language) {
   }).format(new Date(`${date}T00:00:00Z`));
 }
 
+function getExpectedStructuredEndDate(event) {
+  if (event.endDate && !event.startTime && !event.endTime) {
+    const endDate = new Date(`${event.endDate}T00:00:00.000Z`);
+    endDate.setUTCDate(endDate.getUTCDate() - 1);
+    return endDate.toISOString().slice(0, 10);
+  }
+  if (event.endDate && event.endTime) {
+    return `${event.endDate}T${event.endTime}:00-06:00`;
+  }
+  if (event.endDate) return event.endDate;
+  if (event.endTime) return `${event.date}T${event.endTime}:00-06:00`;
+  return event.startTime ? undefined : event.date;
+}
+
 function getExpectedEventSeoTitle(event, language) {
   const localizedEvent = getLocalizedEvent(event, language);
   assert.ok(localizedEvent, `${event.id}: ${language} localization is missing`);
@@ -80,7 +94,7 @@ test("generates historical event routes with canonical and indexable metadata", 
   assert.match(incomplete, /application\/ld\+json/);
 });
 
-test("publishes Event JSON-LD only when the required physical location is known", () => {
+test("publishes Event JSON-LD only for federation events with a known physical location", () => {
   const organizationId = "https://fak-kendo.org/#organization";
   const eventRoutes = getRouteManifest().filter(
     (route) => route.component === "event",
@@ -97,16 +111,16 @@ test("publishes Event JSON-LD only when the required physical location is known"
 
     assert.ok(event, `${route.path}: calendar event is missing`);
 
-    if (!event.location?.trim()) {
+    const external = /(?:^|\s)#EventoExterno\b/iu.test(event?.summary ?? "");
+
+    if (!event.location?.trim() || external) {
       assert.equal(
         structuredEvent,
         undefined,
-        `${route.path}: incomplete Event JSON-LD must be omitted`,
+        `${route.path}: ineligible Event JSON-LD must be omitted`,
       );
       continue;
     }
-
-    const external = /(?:^|\s)#EventoExterno\b/iu.test(event?.summary ?? "");
 
     assert.ok(structuredEvent, `${route.path}: Event JSON-LD is missing`);
     assert.equal(structuredEvent.location?.["@type"], "Place");
@@ -118,11 +132,60 @@ test("publishes Event JSON-LD only when the required physical location is known"
       structuredEvent.location?.address?.addressCountry,
       getEventAddressCountry(event),
     );
-    assert.ok(structuredEvent.endDate, `${route.path}: endDate is missing`);
+    assert.equal(
+      structuredEvent.endDate,
+      getExpectedStructuredEndDate(event),
+      `${route.path}: endDate must match the visible inclusive event end`,
+    );
+    assert.deepEqual(
+      structuredEvent.image,
+      [
+        "https://fak-kendo.org/images/calendar/kendo-calendar-1600.webp?v=20260723-1004",
+      ],
+      `${route.path}: Event image must match the visible calendar banner`,
+    );
     assert.deepEqual(
       structuredEvent.organizer,
-      external ? undefined : { "@id": organizationId },
+      [
+        { "@id": organizationId },
+        {
+          "@type": "Person",
+          name: "Pablo Quesada",
+          url: "https://www.facebook.com/pablo.quesadachavarria",
+          sameAs: ["https://www.instagram.com/kendocostarica/"],
+        },
+      ],
       `${route.path}: unexpected organizer`,
+    );
+    assert.deepEqual(
+      structuredEvent.performer,
+      [
+        {
+          "@type": "Person",
+          name: "Genki Kubo",
+          description: "Sensei de kendo 7° Dan",
+        },
+        {
+          "@type": "Person",
+          name: "Haruyo Kubo",
+          description: "Sensei de kendo 7° Dan",
+        },
+      ],
+      `${route.path}: unexpected performers`,
+    );
+    const scheduled =
+      structuredEvent.eventStatus === "https://schema.org/EventScheduled";
+    assert.deepEqual(
+      structuredEvent.offers,
+      scheduled
+        ? {
+            "@type": "Offer",
+            url: `https://fak-kendo.org${route.path}`,
+            price: 0,
+            priceCurrency: "CRC",
+          }
+        : undefined,
+      `${route.path}: unexpected offer`,
     );
   }
 });
@@ -171,6 +234,9 @@ test("generates localized, unique, indexable SEO output for every event route", 
   for (const route of eventRoutes) {
     const html = await readDist(`${route.path.slice(1)}index.html`);
     const seo = getRouteSeoPayload(route);
+    const event = CALENDAR_EVENTS.find(
+      (candidate) => candidate.id === route.eventId,
+    );
     const spanishPath =
       route.language === "es" ? route.path : route.alternatePath;
     const englishPath =
@@ -185,6 +251,12 @@ test("generates localized, unique, indexable SEO output for every event route", 
     assert.ok(html.includes('name="robots" content="index, follow"'));
     assert.ok(html.includes(`rel="canonical" href="${seo.canonicalUrl}"`));
     assert.ok(html.includes(`property="og:url" content="${seo.canonicalUrl}"`));
+    assert.ok(event, `${route.path}: calendar event is missing`);
+    assert.ok(event.timeZone, `${route.path}: event time zone is missing`);
+    assert.ok(
+      html.includes(`<dd>${event.timeZone}</dd>`),
+      `${route.path}: registered time zone is not visible`,
+    );
     assert.ok(
       html.includes(
         `hreflang="es-CR" href="https://fak-kendo.org${spanishPath}"`,
@@ -312,6 +384,14 @@ test("indexes all public routes, events, and archives in the sitemap", async () 
     sitemap,
     /<loc>https:\/\/fak-kendo\.org\/eventos\/pasados\/2026-08-08-examen\/<\/loc>/,
   );
+  assert.doesNotMatch(
+    sitemap,
+    /<loc>https:\/\/fak-kendo\.org\/en\/events\/<\/loc>/,
+  );
+  assert.doesNotMatch(
+    sitemap,
+    /<loc>https:\/\/fak-kendo\.org\/en\/events\/past\/<\/loc>/,
+  );
   assert.match(home, /name="robots" content="index, follow"/);
   assert.match(calendar, /name="robots" content="index, follow"/);
   assert.match(home, /rel="canonical" href="https:\/\/fak-kendo\.org\/"/);
@@ -412,12 +492,19 @@ test("publishes only defensible event lastmod values in the sitemap", async () =
   }
 });
 
-test("keeps every generated public route indexable", () => {
-  const nonIndexableRoutes = getRouteManifest()
-    .filter((route) => getRouteSeoPayload(route).robots !== "index, follow")
-    .map((route) => route.path);
+test("keeps only the English calendar listings out of the index", () => {
+  const routeManifest = getRouteManifest();
 
-  assert.deepEqual(nonIndexableRoutes, []);
+  for (const route of routeManifest) {
+    const shouldBeNoindex =
+      route.path === "/en/events/" ||
+      (route.component === "pastEvents" && route.language === "en");
+    assert.equal(
+      getRouteSeoPayload(route).robots,
+      shouldBeNoindex ? "noindex, follow" : "index, follow",
+      route.path,
+    );
+  }
 });
 test("publishes sitemap images for approved routes", async () => {
   const sitemap = await readDist("sitemap.xml");
@@ -445,13 +532,20 @@ test("publishes sitemap images for approved routes", async () => {
   }
 });
 
-test("keeps both calendar archive views indexable with structured data", async () => {
+test("indexes the Spanish archive and excludes the English archive listings", async () => {
   const pastEvents = await readDist("eventos/pasados/index.html");
   const englishPastEvents = await readDist("en/events/past/index.html");
+  const englishPastEventsPageTwo = await readDist(
+    "en/events/past/page/2/index.html",
+  );
 
-  for (const html of [pastEvents, englishPastEvents]) {
-    assert.match(html, /name="robots" content="index, follow"/);
-    assert.match(html, /application\/ld\+json/);
+  assert.match(pastEvents, /name="robots" content="index, follow"/);
+  assert.match(pastEvents, /application\/ld\+json/);
+
+  for (const html of [englishPastEvents, englishPastEventsPageTwo]) {
+    assert.match(html, /name="robots" content="noindex, follow"/);
+    assert.match(html, /rel="canonical"/);
+    assert.doesNotMatch(html, /application\/ld\+json/);
   }
 });
 

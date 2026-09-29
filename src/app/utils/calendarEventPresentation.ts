@@ -1,5 +1,6 @@
 import type { CalendarEvent } from "../types";
 import type { Language } from "../config/i18n";
+import { getEventInclusiveEndDate } from "./calendarEvents";
 
 function formatCalendarDate(date: Date, language: Language) {
   return new Intl.DateTimeFormat(language === "es" ? "es-CR" : "en", {
@@ -17,18 +18,13 @@ function formatEventDate(date: string, language: Language) {
   return formatCalendarDate(new Date(`${date}T00:00:00.000Z`), language);
 }
 
-function getInclusiveEndDateValue(date: string) {
-  const endDate = new Date(`${date}T00:00:00.000Z`);
-  endDate.setUTCDate(endDate.getUTCDate() - 1);
-  return endDate.toISOString().slice(0, 10);
-}
-
 export function getEventDateRangeLabels(
-  { date, endDate }: CalendarEvent,
+  event: CalendarEvent,
   language: Language = "es",
 ) {
+  const { date } = event;
   const startDateLabel = formatEventDate(date, language);
-  const endDateValue = endDate ? getInclusiveEndDateValue(endDate) : undefined;
+  const endDateValue = getEventInclusiveEndDate(event);
 
   return {
     startDateLabel,

@@ -10,6 +10,11 @@ import {
   getRouteSitemapImageUrls,
   render,
 } from "../dist-ssr/entry-server.js";
+import { validateLlmsTxt } from "./check-llms-txt.mjs";
+import {
+  generateLlmsTxt,
+  generateRobotsTxt,
+} from "./generate-crawler-files.mjs";
 
 const ROOT = process.cwd();
 const DIST_DIR = path.join(ROOT, "dist");
@@ -197,6 +202,28 @@ const sitemap = [
 
 await writeFile(path.join(DIST_DIR, "sitemap.xml"), sitemap, "utf8");
 console.log("generated dist\\sitemap.xml");
+
+const indexablePaths = new Set(
+  routes.flatMap((route) => {
+    const seo = getRouteSeoPayload(route);
+    return seo.robots === "index, follow" && seo.canonicalUrl
+      ? [new URL(seo.canonicalUrl).pathname]
+      : [];
+  }),
+);
+const llmsTxt = generateLlmsTxt(routes, getRouteSeoPayload);
+const llmsValidation = validateLlmsTxt(llmsTxt, indexablePaths);
+if (!llmsValidation.compliant) {
+  throw new Error(
+    `Generated llms.txt is invalid: ${llmsValidation.alarms.join(" ")}`,
+  );
+}
+await writeFile(path.join(DIST_DIR, "llms.txt"), llmsTxt, "utf8");
+console.log("generated dist\\llms.txt");
+
+const robotsTxt = generateRobotsTxt(routes, getRouteSeoPayload);
+await writeFile(path.join(DIST_DIR, "robots.txt"), robotsTxt, "utf8");
+console.log("generated dist\\robots.txt");
 
 const redirects = getEventRedirects()
   .map(({ from, to }) => `${from} ${to} 301`)

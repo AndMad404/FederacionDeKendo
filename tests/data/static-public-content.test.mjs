@@ -51,11 +51,16 @@ test("every configured static route has complete public metadata", async () => {
     "/galeria/",
     "/afiliados/",
     "/en/",
-    "/en/events/",
     "/en/gallery/",
     "/en/affiliates/",
   ]) {
     assert.equal(seo.routes[path].indexable, true, path);
+  }
+
+  for (const path of ["/en/events/", "/en/events/past/"]) {
+    assert.equal(seo.routes[path].indexable, false, path);
+    assert.equal(seo.routes[path].noindex, true, path);
+    assert.equal(seo.routes[path].canonicalWhileNoindex, true, path);
   }
 });
 

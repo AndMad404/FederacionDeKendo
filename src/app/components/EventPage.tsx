@@ -3,6 +3,7 @@ import {
   CalendarPlus,
   Check,
   Clock,
+  Globe2,
   MapPin,
   Share2,
 } from "lucide-react";
@@ -138,6 +139,16 @@ export function EventPage() {
                     <dt className="font-bold">{copy.event.time}</dt>
                     <dd>{formatEventTime(event, language)}</dd>
                   </div>
+                  {event.timeZone ? (
+                    <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2">
+                      <Globe2
+                        className="row-span-2 size-5 shrink-0 text-site-accent-soft"
+                        aria-hidden="true"
+                      />
+                      <dt className="font-bold">{copy.event.timeZone}</dt>
+                      <dd>{event.timeZone}</dd>
+                    </div>
+                  ) : null}
                   <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2">
                     <MapPin
                       className="row-span-2 size-5 shrink-0 text-site-accent-soft"

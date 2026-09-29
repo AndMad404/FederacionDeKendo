@@ -86,13 +86,15 @@ export function validateLlmsTxt(content, configuredPaths) {
 
 async function run() {
   const rootUrl = new URL("../", import.meta.url);
-  const [content, seoData] = await Promise.all([
-    readFile(new URL("public/llms.txt", rootUrl), "utf8"),
-    readFile(new URL("src/app/config/seo-data.json", rootUrl), "utf8").then(
-      JSON.parse,
-    ),
+  const [content, sitemap] = await Promise.all([
+    readFile(new URL("dist/llms.txt", rootUrl), "utf8"),
+    readFile(new URL("dist/sitemap.xml", rootUrl), "utf8"),
   ]);
-  const configuredPaths = new Set(Object.keys(seoData.routes));
+  const configuredPaths = new Set(
+    [...sitemap.matchAll(/<loc>(https:\/\/[^<]+)<\/loc>/g)].map(
+      ([, url]) => new URL(url).pathname,
+    ),
+  );
   const result = validateLlmsTxt(content, configuredPaths);
 
   console.log(`LLMS_TXT_COMPLIANT=${result.compliant}`);

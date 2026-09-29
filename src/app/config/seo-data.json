@@ -149,7 +149,9 @@
         "sizes": "100vw"
       },
       "schemaType": "CollectionPage",
-      "indexable": true
+      "indexable": false,
+      "noindex": true,
+      "canonicalWhileNoindex": true
     },
     "/en/gallery/": {
       "path": "/en/gallery/",
@@ -223,7 +225,10 @@
       "imageWidth": 1600,
       "imageHeight": 1069,
       "imageType": "image/webp",
-      "schemaType": "CollectionPage"
+      "schemaType": "CollectionPage",
+      "indexable": false,
+      "noindex": true,
+      "canonicalWhileNoindex": true
     }
   }
 }

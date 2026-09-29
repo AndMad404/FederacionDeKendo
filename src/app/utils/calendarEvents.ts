@@ -98,11 +98,18 @@ export function getEventEndDate(event: CalendarEvent) {
   );
 }
 
+export function getEventInclusiveEndDate(
+  event: Pick<CalendarEvent, "endDate" | "startTime" | "endTime">,
+) {
+  if (!event.endDate) return undefined;
+
+  return !event.startTime && !event.endTime
+    ? addCalendarDays(event.endDate, -1)
+    : event.endDate;
+}
+
 export function isPastEvent(event: CalendarEvent, now = new Date()) {
-  const lastEventDate =
-    event.endDate && !event.startTime && !event.endTime
-      ? addCalendarDays(event.endDate, -1)
-      : (event.endDate ?? event.date);
+  const lastEventDate = getEventInclusiveEndDate(event) ?? event.date;
   return (
     calculatePublicPastAt(lastEventDate, event.timeZone).getTime() <=
     now.getTime()

@@ -88,7 +88,7 @@ function buildDescription({
   });
 }
 
-test("assigns the Federation as organizer except for #EventoExterno events", () => {
+test("assigns the Federation and Pablo Quesada as organizers except for #EventoExterno events", () => {
   const organizationId = "https://fak-kendo.org/#organization";
 
   assert.deepEqual(
@@ -96,7 +96,15 @@ test("assigns the Federation as organizer except for #EventoExterno events", () 
       { summary: "Seminario organizado por la Federación." },
       organizationId,
     ),
-    { "@id": organizationId },
+    [
+      { "@id": organizationId },
+      {
+        "@type": "Person",
+        name: "Pablo Quesada",
+        url: "https://www.facebook.com/pablo.quesadachavarria",
+        sameAs: ["https://www.instagram.com/kendocostarica/"],
+      },
+    ],
   );
   assert.equal(
     getEventOrganizerReference(

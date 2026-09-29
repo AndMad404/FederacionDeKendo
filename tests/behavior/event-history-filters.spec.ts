@@ -205,3 +205,30 @@ test("filters apply available values and the empty state remains available", asy
     page.getByText("Todavía no hay eventos en el archivo."),
   ).toBeVisible();
 });
+
+test("uses an assigned gallery thumbnail and falls back to the event description", async ({
+  page,
+}) => {
+  await page.goto("/eventos/pasados/?year=2026&type=seminario");
+
+  const eventWithGallery = page
+    .getByRole("heading", { name: "Gasshuku Monteverde", exact: true })
+    .locator("xpath=ancestor::li");
+  await expect(
+    eventWithGallery.locator("[data-event-thumbnail] img"),
+  ).toHaveCount(1);
+  await expect(
+    eventWithGallery.getByText("La participación incluye:", { exact: true }),
+  ).toHaveCount(0);
+
+  const eventWithoutGallery = page
+    .getByRole("heading", {
+      name: "CLAK 1er Panamericano BRASIL",
+      exact: true,
+    })
+    .locator("xpath=ancestor::li");
+  await expect(
+    eventWithoutGallery.locator("[data-event-thumbnail]"),
+  ).toHaveCount(0);
+  await expect(eventWithoutGallery.getByText("#EventoExterno")).toBeVisible();
+});

@@ -17,6 +17,9 @@ Google Calendar → sincronización y validación → datos versionados
 - Las rutas estáticas y sus metadatos se definen en
   `src/app/config/seo-data.json`; las rutas de eventos se derivan de los datos
   sincronizados.
+- En producción, `sitemap.xml`, `robots.txt` y `llms.txt` se regeneran desde el
+  manifiesto de rutas e incorporan automáticamente los eventos publicados; los
+  archivos de `public/` sirven como respaldo para desarrollo.
 - La identidad de un evento está desacoplada de su URL. Los cambios de URL
   conservan redirects y las colisiones bloquean la publicación.
 - Una sincronización inválida no reemplaza el último estado válido. El HTML

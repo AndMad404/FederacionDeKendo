@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { PAST_EVENTS_PAGE_SIZE } from "../config/events";
 import {
@@ -6,11 +7,8 @@ import {
   primaryButtonClass,
 } from "../styles/shared";
 import { getEventDateLabel } from "../utils/calendarEventPresentation";
-import {
-  getArchivePageFromPathname,
-  getEventPath,
-  getPastEvents,
-} from "../utils/eventRoutes";
+import { getEventPath, getPastEvents } from "../utils/eventRoutes";
+import { EVENT_GALLERIES } from "../data/eventGalleries";
 import {
   buildArchiveUrl,
   filterAndSortArchiveEvents,
@@ -29,11 +27,11 @@ import { NavigationArrowButton } from "./ui/ModalControls";
 
 export function PastEventsSection() {
   const { language, copy } = useLanguage();
-  const { pathname, search } = useLocation();
+  const { search } = useLocation();
   const navigate = useNavigate();
+  const [requestedPage, setRequestedPage] = useState(1);
   const isHydrated = useIsHydrated();
   const now = useHydratedNow();
-  const requestedPage = getArchivePageFromPathname(pathname) ?? 1;
   const historicalEvents = now ? getPastEvents(now) : [];
   const searchParams = new URLSearchParams(search);
   const filters = normalizeArchiveFilters({
@@ -58,7 +56,7 @@ export function PastEventsSection() {
 
   const navigateToPage = (targetPage: number) => {
     if (targetPage < 1 || targetPage > pageCount) return;
-    navigate(buildArchiveUrl(targetPage, language, filters));
+    setRequestedPage(targetPage);
   };
   const { swipeHandlers } = useSwipeNavigation({
     onSwipeLeft: () => navigateToPage(page + 1),
@@ -68,8 +66,12 @@ export function PastEventsSection() {
   });
 
   function changeFilter(name: "year" | "type", value: string) {
+    setRequestedPage(1);
     navigate(
-      buildArchiveUrl(1, language, { ...filters, [name]: value || undefined }),
+      buildArchiveUrl(1, language, {
+        ...filters,
+        [name]: value || undefined,
+      }),
     );
   }
 
@@ -161,33 +163,58 @@ export function PastEventsSection() {
 
           {pageEvents.length ? (
             <ul className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-              {pageEvents.map((event) => (
-                <li
-                  key={event.id}
-                  className="flex flex-col justify-between gap-2 rounded-xl border border-site-border bg-site-canvas p-3"
-                >
-                  <div>
-                    <p className="text-xs font-bold uppercase text-site-muted">
-                      {getEventDateLabel(event, language)}
-                    </p>
-                    <h2 className="mt-1 font-bold">{event.title}</h2>
-                    <div className="mt-1">
-                      <EventSummary
-                        summary={
-                          event.summary ?? copy.common.informationPending
-                        }
-                        compact
-                      />
-                    </div>
-                  </div>
-                  <Link
-                    to={getEventPath(event, language)}
-                    className={`text-sm ${primaryButtonClass} ${focusRingClass}`}
+              {pageEvents.map((event) => {
+                const thumbnail = EVENT_GALLERIES[event.id]?.images[0];
+
+                return (
+                  <li
+                    key={event.id}
+                    className="flex flex-col justify-between gap-2 rounded-xl border border-site-border bg-site-canvas p-3"
                   >
-                    {copy.archive.viewEvent}
-                  </Link>
-                </li>
-              ))}
+                    <div>
+                      <p className="text-xs font-bold uppercase text-site-muted">
+                        {getEventDateLabel(event, language)}
+                      </p>
+                      <h2 className="mt-1 font-bold">{event.title}</h2>
+                      <div className="mt-2">
+                        {thumbnail ? (
+                          <picture data-event-thumbnail className="block">
+                            <source
+                              srcSet={thumbnail.srcSet.avif}
+                              sizes="(min-width: 1024px) 14rem, (min-width: 768px) 50vw, 100vw"
+                              type="image/avif"
+                            />
+                            <img
+                              src={thumbnail.src}
+                              srcSet={thumbnail.srcSet.webp}
+                              sizes="(min-width: 1024px) 14rem, (min-width: 768px) 50vw, 100vw"
+                              alt=""
+                              width={thumbnail.width}
+                              height={thumbnail.height}
+                              loading="lazy"
+                              decoding="async"
+                              className="h-20 w-full rounded-lg object-cover"
+                            />
+                          </picture>
+                        ) : (
+                          <EventSummary
+                            summary={
+                              event.summary ?? copy.common.informationPending
+                            }
+                            compact
+                          />
+                        )}
+                      </div>
+                    </div>
+                    <Link
+                      to={getEventPath(event, language)}
+                      className={`text-sm ${primaryButtonClass} ${focusRingClass}`}
+                    >
+                      {copy.archive.viewEvent}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           ) : (
             <p className="py-8 text-center text-site-muted">

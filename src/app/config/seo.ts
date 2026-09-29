@@ -1,7 +1,11 @@
 import seoData from "./seo-data.json";
 import { GALLERY_IMAGES, getGalleryImages } from "../data/gallery";
 import { CALENDAR_EVENTS } from "../data/calendarEvents";
-import { isExternalEvent } from "../utils/calendarEvents";
+import {
+  getEventEndDate,
+  getEventInclusiveEndDate,
+  isExternalEvent,
+} from "../utils/calendarEvents";
 import { EVENT_INDEXING_ENABLED, PAST_EVENTS_PAGE_SIZE } from "./events";
 import {
   findEventByPathname,
@@ -14,7 +18,6 @@ import {
   getLocalizedEvent,
   hasDistinctEventTranslation,
 } from "../utils/localizedEvents";
-import { getEventEndDate } from "../utils/calendarEvents";
 import type { RouteComponent } from "./routeTypes";
 
 export type { RouteComponent } from "./routeTypes";
@@ -245,7 +248,52 @@ export function getEventOrganizerReference(
 ) {
   if (isExternalEvent(event)) return undefined;
 
-  return { "@id": organizationId };
+  return [
+    { "@id": organizationId },
+    {
+      "@type": "Person",
+      name: "Pablo Quesada",
+      url: "https://www.facebook.com/pablo.quesadachavarria",
+      sameAs: ["https://www.instagram.com/kendocostarica/"],
+    },
+  ];
+}
+
+export function getEventPerformers(event: { summary?: string }) {
+  if (isExternalEvent(event)) return undefined;
+
+  return [
+    {
+      "@type": "Person",
+      name: "Genki Kubo",
+      description: "Sensei de kendo 7° Dan",
+    },
+    {
+      "@type": "Person",
+      name: "Haruyo Kubo",
+      description: "Sensei de kendo 7° Dan",
+    },
+  ];
+}
+
+export function getEventOffer(
+  event: Parameters<typeof getEventEndDate>[0],
+  canonicalUrl: string,
+  now = new Date(),
+) {
+  if (
+    isExternalEvent(event) ||
+    getEventEndDate(event).getTime() <= now.getTime()
+  ) {
+    return undefined;
+  }
+
+  return {
+    "@type": "Offer",
+    url: canonicalUrl,
+    price: 0,
+    priceCurrency: "CRC",
+  };
 }
 
 interface EventSeoTitleInput {
@@ -622,6 +670,7 @@ function createArchiveRouteMeta(
   language: Language = "es",
 ): RouteMeta {
   const english = language === "en";
+  const indexable = !english;
   const calendarMeta = CALENDAR_META[language];
   const archiveDescription =
     ROUTE_META[english ? "/en/events/past/" : "/eventos/pasados/"].description;
@@ -645,8 +694,8 @@ function createArchiveRouteMeta(
     imageHeight: calendarMeta.imageHeight,
     imageType: calendarMeta.imageType,
     schemaType: "CollectionPage",
-    indexable: true,
-    noindex: false,
+    indexable,
+    noindex: !indexable,
     canonicalWhileNoindex: true,
   };
 }
@@ -721,25 +770,30 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
     const event = CALENDAR_EVENTS.find(
       (candidate) => candidate.id === meta.eventId,
     );
-    // Google requires a real physical location for Event rich results. Keep the
-    // page's general structured data, but do not publish an incomplete Event
-    // entity when the calendar has not supplied a defensible venue.
-    if (event?.location?.trim()) {
+    // Google requires a real physical location and recommends ticket,
+    // organizer, and performer data for Event rich results. External calendar
+    // notices do not supply a defensible public offer or participant contract,
+    // so keep their general WebPage data without publishing an incomplete Event
+    // entity or inventing commercial details.
+    if (event?.location?.trim() && !isExternalEvent(event)) {
       const localizedEvent = getLocalizedEvent(event, meta.language);
       if (!localizedEvent) return null;
       const startDate = event.startTime
         ? `${event.date}T${event.startTime}:00-06:00`
         : event.date;
-      const endDate = event.endDate
+      const inclusiveEndDate = getEventInclusiveEndDate(event);
+      const endDate = inclusiveEndDate
         ? event.endTime
-          ? `${event.endDate}T${event.endTime}:00-06:00`
-          : event.endDate
+          ? `${inclusiveEndDate}T${event.endTime}:00-06:00`
+          : inclusiveEndDate
         : event.endTime
           ? `${event.date}T${event.endTime}:00-06:00`
           : event.startTime
             ? undefined
             : event.date;
       const organizer = getEventOrganizerReference(event, organizationId);
+      const performers = getEventPerformers(event);
+      const offer = getEventOffer(event, canonicalUrl);
       const location = event.location.trim();
       routeEntities.push({
         "@type": "Event",
@@ -763,7 +817,9 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
           },
         },
         ...(organizer ? { organizer } : {}),
-        image: [image.url],
+        ...(performers ? { performer: performers } : {}),
+        ...(offer ? { offers: offer } : {}),
+        image: [getRouteImageUrl(meta)],
         url: canonicalUrl,
       });
     }
