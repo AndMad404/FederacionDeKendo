@@ -22,10 +22,6 @@ export interface ApprovedPage {
 
 export const FIXED_TEST_TIME = new Date("2026-08-04T12:00:00-06:00");
 
-export const PREFERRED_REPRESENTATIVE_PATHS: Partial<
-  Record<PageDesign, string>
-> = {};
-
 export const SHELL_CONTRACT = {
   mainPaddingInline: 10,
   routeSurfaceMarginBlock: 8,

@@ -1,3 +1,4 @@
+import { swipeLeft } from "../helpers/swipe";
 import { expect, test, type Page } from "@playwright/test";
 
 test.describe.configure({ mode: "serial" });
@@ -65,45 +66,17 @@ test("desktop calendar navigation advances and returns two months", async ({
 });
 
 test("touch swipe uses the same one-month navigation on mobile", async ({
-  context,
   page,
 }) => {
   await page.setViewportSize({ width: 360, height: 800 });
   await openCalendar(page);
 
-  const panel = page.locator("[data-page-content-boundary]");
-  const box = await panel.boundingBox();
-  expect(box).not.toBeNull();
-
-  const session = await context.newCDPSession(page);
-  const y = box!.y + box!.height / 2;
   const septemberLabel = calendarNavigation(page).getByText("Septiembre 2026", {
     exact: true,
   });
-
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    await session.send("Input.dispatchTouchEvent", {
-      type: "touchStart",
-      touchPoints: [{ x: box!.x + box!.width - 30, y }],
-    });
-    await page.waitForTimeout(30);
-    await session.send("Input.dispatchTouchEvent", {
-      type: "touchMove",
-      touchPoints: [{ x: box!.x + box!.width / 2, y }],
-    });
-    await page.waitForTimeout(30);
-    await session.send("Input.dispatchTouchEvent", {
-      type: "touchMove",
-      touchPoints: [{ x: box!.x + 30, y }],
-    });
-    await page.waitForTimeout(30);
-    await session.send("Input.dispatchTouchEvent", {
-      type: "touchEnd",
-      touchPoints: [],
-    });
-    await page.waitForTimeout(100);
-    if (await septemberLabel.isVisible()) break;
-  }
+  await swipeLeft(page, page.locator("[data-page-content-boundary]"), () =>
+    septemberLabel.isVisible(),
+  );
 
   await expect(septemberLabel).toBeVisible();
   await page.getByRole("button", { name: "Ver mes anterior" }).click();

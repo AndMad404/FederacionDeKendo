@@ -55,14 +55,16 @@ contrato visual y requiere aprobacion explicita del propietario.
 
 ## Eventos nuevos
 
-El build genera normalmente dos paginas por evento:
+El build genera la ruta espanola `/eventos/<slug>/`. La ruta inglesa
+`/en/events/<slug>/` se publica solo cuando existe una traduccion editorial
+valida y distinta. Los eventos sin esa traduccion permanecen disponibles en
+espanol; las rutas inglesas antiguas se redirigen a la ruta espanola vigente.
+Los eventos historicos usan el prefijo `/eventos/pasados/` o
+`/en/events/past/` segun el idioma publicado.
 
-- `/eventos/<slug>/`;
-- `/en/events/<slug>/`.
-
-La suite descubre ambas rutas automaticamente. Cada evento nuevo agrega una
-prueba estructural de escritorio por idioma, no una matriz completa de
-capturas. La pagina se rechaza si el contenido nuevo provoca overflow, scroll,
+La suite descubre las rutas publicadas automaticamente. Cada evento nuevo agrega
+una prueba estructural de escritorio por idioma publicado, no una matriz completa
+de capturas. La pagina se rechaza si el contenido nuevo provoca overflow, scroll,
 recorte o solapamiento.
 
 El diseno de evento en los cuatro viewports se valida mediante una ruta
@@ -130,6 +132,44 @@ redondeos de subpixel. Los valores CSS aprobados siguen siendo explicitos.
 - `playwright.config.ts`: suite predeterminada de CI.
 - `playwright.visual.config.ts`: suite visual de Windows.
 - `scripts/verify-site.mjs`: gate completo y no mutante de entrega.
+
+Los contratos de calendario se reparten entre `calendar-parsing.test.mjs`
+(entrada ICS y normalizacion), `calendar-dates.test.mjs` (limites de fechas),
+`event-history-sync-contract.test.mjs` (reconciliacion e identidad) y
+`calendar-sync.test.mjs` (publicacion de archivos). Los requisitos de workflows
+viven en `tests/architecture/calendar-workflow-architecture.test.mjs`.
+
+En diseno, `shell-geometry.spec.ts` comprueba el flujo, el recorte de contenido
+y el overflow horizontal de todas las rutas generadas a 1366x768.
+`responsive-reachability.spec.ts` conserva los limites de flujo y alcance en
+los demas viewports, usando el mismo helper `content-reachability.ts`;
+`event-action-geometry.spec.ts`, los controles segun dispositivo; y
+`geometry-contract.spec.ts`, los componentes representativos. Este ultimo
+conserva las comprobaciones semanticas en un paso separado y delega sus
+aserciones a `tests/helpers/content-assertions.ts`, sin duplicar casos ni
+navegaciones.
+
+`tests/helpers/` concentra descubrimiento de rutas, preparacion de fuentes e
+imagenes, gestos, medidas y lectura de HTML. `calendar-fixtures.mjs` construye
+feeds ICS; `temporary-directory.mjs` administra temporales, sus rutas y snapshots
+de archivos para comprobar conservacion byte por byte. Las tablas de calendario,
+galeria y acciones conservan los nombres y expectativas de cada escenario.
+
+El gate humano ejecuta `test:unit`, que ya incluye las pruebas de salida
+generada. Los workflows escritores ejecutan primero sus pruebas dirigidas y
+despues `verify:site` con la variante `without-*` correspondiente; esa variante
+ejecuta `test:generated` despues del build. La union de dirigidas, variante
+unitaria y salida generada cubre cada archivo Node una sola vez: 26 archivos
+en el inventario revisado el 2026-10-01. Mantener las listas de
+`test:sync-directed`, `test:unit:without-sync`,
+`test:unit:without-history-correction` y `test:generated` cuando se muevan o
+anadan archivos. Las pruebas dirigidas no requieren build previo.
+
+El refactor verificado el 2026-10-01 conserva 179 casos Node, 151 casos de
+navegador no visuales y 24 casos visuales. Solo se retiraron once nombres
+redundantes de Node y los siete casos `approved-desktop`, cuyas aserciones
+permanecen en `shell-geometry`. Las capturas no se regeneraron.
+Las cifras describen ese inventario; nuevas rutas generadas pueden ampliarlo.
 
 Las pruebas de tooling usan datos ficticios versionados en `tests/fixtures/`.
 No leen historial de revisiones ni documentos privados. Los requisitos de

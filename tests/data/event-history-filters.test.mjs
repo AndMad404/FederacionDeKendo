@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   buildArchiveUrl,
   filterAndSortArchiveEvents,
+  getArchivePageNumber,
   getArchiveYears,
   normalizeArchiveFilters,
 } from "../../src/app/utils/eventArchive.js";
@@ -73,10 +74,9 @@ test("builds equivalent localized URLs and preserves filters across pages", () =
   );
 });
 
-test("events remain reachable regardless of gallery state", () => {
-  assert.ok(
-    filterAndSortArchiveEvents(events, {}).some(
-      ({ id }) => id === "no-gallery",
-    ),
-  );
+test("reads the current page from each localized vanity route", () => {
+  assert.equal(getArchivePageNumber("/eventos/pasados/"), 1);
+  assert.equal(getArchivePageNumber("/eventos/pasados/pagina/3/"), 3);
+  assert.equal(getArchivePageNumber("/en/events/past/page/4/", "en"), 4);
+  assert.equal(getArchivePageNumber("/en/events/past/page/4/"), 1);
 });

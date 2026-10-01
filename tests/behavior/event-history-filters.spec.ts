@@ -1,3 +1,4 @@
+import { swipeLeft } from "../helpers/swipe";
 import { expect, test } from "@playwright/test";
 import { expectInteractiveReady } from "../helpers/interactive-ready";
 
@@ -99,28 +100,34 @@ test("renders localized upcoming and past event navigation with the active page"
 test("preserves filters in pagination and resets to page one when changed", async ({
   page,
 }) => {
-  await page.goto("/eventos/pasados/?type=examen");
+  await page.goto("/eventos/pasados/");
   await expectInteractiveReady(page, "past-events");
   const next = page.getByRole("button", { name: "Siguiente" });
   await expect(next).toBeVisible();
   await expect(next).toBeEnabled();
   await expect(next.locator("svg")).toHaveCount(1);
   await next.click();
-  await expect(page).toHaveURL(/pagina\/2\/\?type=examen$/);
+  await expect(page).toHaveURL(/pagina\/2\/$/);
   const previous = page.getByRole("button", { name: "Anterior" });
   await expect(previous).toBeEnabled();
   await expect(previous.locator("svg")).toHaveCount(1);
   await previous.click();
-  await expect(page).toHaveURL(/eventos\/pasados\/\?type=examen$/);
+  await expect(page).toHaveURL(/eventos\/pasados\/$/);
 
-  await page.goto("/en/events/past/?type=examen");
+  await page.goto("/en/events/past/");
   await expectInteractiveReady(page, "past-events");
   const englishNext = page.getByRole("button", { name: "Next" });
   await expect(englishNext).toBeEnabled();
   await englishNext.click();
-  await expect(page).toHaveURL(/en\/events\/past\/page\/2\/\?type=examen$/);
-  await expect(page.getByRole("button", { name: "Previous" })).toBeEnabled();
+  await expect(page).toHaveURL(/en\/events\/past\/page\/2\/$/);
+  const englishPrevious = page.getByRole("button", { name: "Previous" });
+  await expect(englishPrevious).toBeEnabled();
+  await page.reload();
+  await expect(page).toHaveURL(/en\/events\/past\/page\/2\/$/);
+  await page.getByRole("button", { name: "Previous" }).click();
+  await expect(page).toHaveURL(/en\/events\/past\/$/);
 
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/eventos/pasados/?type=examen");
   await expectInteractiveReady(page, "past-events");
   await expect(page.getByRole("button", { name: "Siguiente" })).toBeEnabled();
@@ -130,50 +137,31 @@ test("preserves filters in pagination and resets to page one when changed", asyn
   await expect(page).toHaveURL(/\/eventos\/pasados\/\?year=2026&type=examen$/);
 });
 
+test("normalizes legacy page query parameters to localized archive URLs", async ({
+  page,
+}) => {
+  await page.goto("/eventos/pasados/?page=2");
+  await expect(page).toHaveURL(/eventos\/pasados\/pagina\/2\/$/);
+  await expect(page.getByRole("button", { name: "Anterior" })).toBeEnabled();
+
+  await page.goto("/en/events/past/?page=2");
+  await expect(page).toHaveURL(/en\/events\/past\/page\/2\/$/);
+  await expect(page.getByRole("button", { name: "Previous" })).toBeEnabled();
+});
+
 test("touch swipe paginates the historical archive on mobile", async ({
-  context,
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/eventos/pasados/?type=examen");
   await expect(page.getByRole("button", { name: "Siguiente" })).toBeEnabled();
 
-  const panel = page.locator("[data-page-content-boundary]");
-  await expect(panel).toBeVisible();
-  let box = await panel.boundingBox();
-  await expect
-    .poll(async () => {
-      box = await panel.boundingBox();
-      return box !== null;
-    })
-    .toBe(true);
-
-  const session = await context.newCDPSession(page);
-  const y = box!.y + Math.min(box!.height / 2, 240);
-
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    await session.send("Input.dispatchTouchEvent", {
-      type: "touchStart",
-      touchPoints: [{ x: box!.x + box!.width - 30, y }],
-    });
-    await page.waitForTimeout(30);
-    await session.send("Input.dispatchTouchEvent", {
-      type: "touchMove",
-      touchPoints: [{ x: box!.x + box!.width / 2, y }],
-    });
-    await page.waitForTimeout(30);
-    await session.send("Input.dispatchTouchEvent", {
-      type: "touchMove",
-      touchPoints: [{ x: box!.x + 30, y }],
-    });
-    await page.waitForTimeout(30);
-    await session.send("Input.dispatchTouchEvent", {
-      type: "touchEnd",
-      touchPoints: [],
-    });
-    await page.waitForTimeout(100);
-    if (/pagina\/2\/\?type=examen$/.test(page.url())) break;
-  }
+  await swipeLeft(
+    page,
+    page.locator("[data-page-content-boundary]"),
+    async () => /pagina\/2\/\?type=examen$/.test(page.url()),
+    240,
+  );
 
   await expect(page).toHaveURL(/pagina\/2\/\?type=examen$/);
 });
@@ -217,6 +205,9 @@ test("uses an assigned gallery thumbnail and falls back to the event description
   await expect(
     eventWithGallery.locator("[data-event-thumbnail] img"),
   ).toHaveCount(1);
+  await expect(
+    eventWithGallery.locator("[data-event-thumbnail] img"),
+  ).toHaveCSS("object-fit", "cover");
   await expect(
     eventWithGallery.getByText("La participación incluye:", { exact: true }),
   ).toHaveCount(0);

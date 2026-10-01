@@ -114,9 +114,10 @@ test("Phase 6: the shared gate and human CI coverage remain complete", async () 
 });
 
 test("Phase 6: historical correction downloads the artifact produced by synchronization", async () => {
-  const syncSteps = workflowSteps(
-    await loadYamlDocument(".github/workflows/sync-calendar.yml"),
+  const syncWorkflow = await loadYamlDocument(
+    ".github/workflows/sync-calendar.yml",
   );
+  const syncSteps = workflowSteps(syncWorkflow);
   const correctionSteps = workflowSteps(
     await loadYamlDocument(
       ".github/workflows/correct-calendar-history-range.yml",
@@ -132,9 +133,43 @@ test("Phase 6: historical correction downloads the artifact produced by synchron
   assert.equal(upload?.with?.name, artifactName);
   assert.equal(download?.with?.name, artifactName);
   assert.match(upload?.with?.path ?? "", /calendar-historical-changes\.json/);
+  assert.equal(syncWorkflow.permissions?.issues, undefined);
+  assert.equal(
+    syncSteps.some((step) => step.run?.match(/exit\s+1/)),
+    false,
+  );
   assert.ok(
     correctionSteps.some((step) =>
       step.run?.includes("--report calendar-historical-changes.json"),
     ),
   );
+});
+
+test("range workflow requires an approved report run and an inclusive date range", async () => {
+  const workflow = await loadYamlDocument(
+    ".github/workflows/correct-calendar-history-range.yml",
+  );
+  const inputs = workflow.on?.workflow_dispatch?.inputs;
+  assert.ok(inputs?.report_run_id);
+  assert.ok(inputs?.from);
+  assert.ok(inputs?.to);
+  const steps = workflowSteps(workflow);
+  const commands = steps
+    .map((step) => step.run)
+    .filter(Boolean)
+    .join("\n");
+  assert.match(commands, /correct:calendar-history-range/);
+  assert.match(commands, /sync:approved-historical-galleries/);
+  assert.match(
+    commands,
+    /rm -f calendar-historical-changes\.json calendar-notifications\.json/,
+  );
+  assert.ok(
+    Object.values(workflow.jobs ?? {}).some((job) => job.env?.CALENDAR_ICS_URL),
+    "workflow must provide CALENDAR_ICS_URL",
+  );
+  assert.match(commands, /eventGalleries\.ts/);
+  assert.match(commands, /eventGalleryState\.json/);
+  assert.doesNotMatch(commands, /correct:calendar-history-range -- --report/);
+  assert.equal(workflow.permissions?.issues, undefined);
 });

@@ -1,6 +1,11 @@
+import {
+  temporaryDirectory,
+  temporaryPaths,
+  snapshotFiles,
+  expectFilesUnchanged,
+} from "../helpers/temporary-directory.mjs";
 import assert from "node:assert/strict";
-import { mkdtemp, readFile, rm, stat } from "node:fs/promises";
-import os from "node:os";
+import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import sharp from "sharp";
@@ -19,12 +24,15 @@ async function image(color, width = 640, height = 480, format = "jpeg") {
   return pipeline[format]().toBuffer();
 }
 
-async function fixture(files) {
-  const directory = await mkdtemp(path.join(os.tmpdir(), "fak-gallery-"));
+async function fixture(t, files) {
+  const directory = await temporaryDirectory(t, "fak-gallery-");
+
   const options = {
-    manifestPath: path.join(directory, "eventGalleries.ts"),
-    statePath: path.join(directory, "eventGalleryState.json"),
-    imagesRoot: path.join(directory, "images"),
+    ...temporaryPaths(directory, {
+      manifestPath: "eventGalleries.ts",
+      statePath: "eventGalleryState.json",
+      imagesRoot: "images",
+    }),
     listFolder: async () => files,
     downloadFile: async (file) => file.buffer,
   };
@@ -75,23 +83,19 @@ test("reads public Drive folder indexes encoded with hexadecimal JavaScript esca
   ]);
 });
 
-test("accepts the minimum dimensions independently of orientation", async () => {
-  const context = await fixture([
+test("accepts the minimum dimensions independently of orientation", async (t) => {
+  const context = await fixture(t, [
     {
       name: "portrait.jpg",
       id: "portrait",
       buffer: await image("red", 320, 480),
     },
   ]);
-  try {
-    const result = await run(context.options);
-    assert.equal(result.galleries["2026-01-01-evento"].images.length, 1);
-  } finally {
-    await rm(context.directory, { recursive: true, force: true });
-  }
+  const result = await run(context.options);
+  assert.equal(result.galleries["2026-01-01-evento"].images.length, 1);
 });
 
-test("valid public album freezes all naturally ordered sanitized responsive images", async () => {
+test("valid public album freezes all naturally ordered sanitized responsive images", async (t) => {
   const names = [
     "photo10.jpg",
     "photo2.jpg",
@@ -108,287 +112,195 @@ test("valid public album freezes all naturally ordered sanitized responsive imag
       buffer: await image(colors[index]),
     })),
   );
-  const context = await fixture(files);
-  try {
-    const result = await run(context.options);
-    assert.equal(result.galleries["2026-01-01-evento"].images.length, 6);
-    assert.equal(
-      result.warnings.some((warning) => warning.includes("additional files")),
-      false,
-    );
-    const manifest = await readFile(context.options.manifestPath, "utf8");
-    assert.match(manifest, /photo-1-480\.webp 480w/);
-    assert.match(manifest, /photo-1-480\.avif 480w/);
-    assert.match(
-      manifest,
-      /Federaciones de Asociaciones de Kendo - Evento 2026-01-01/,
-    );
-    assert.equal(/drive\.google|publicAlbum|private-/.test(manifest), false);
-    const firstPath = path.join(
-      context.options.imagesRoot,
-      "2026-01-01-evento",
-      "photo-1-480.webp",
-    );
-    const firstBuffer = await readFile(firstPath);
-    const stats = await sharp(firstBuffer).stats();
-    assert.ok(stats.channels[2].mean > stats.channels[0].mean); // photo1.jpg is blue.
-    assert.deepEqual((await sharp(firstBuffer).metadata()).exif, undefined);
-  } finally {
-    await rm(context.directory, { recursive: true, force: true });
-  }
+  const context = await fixture(t, files);
+  const result = await run(context.options);
+  assert.equal(result.galleries["2026-01-01-evento"].images.length, 6);
+  assert.equal(
+    result.warnings.some((warning) => warning.includes("additional files")),
+    false,
+  );
+  const manifest = await readFile(context.options.manifestPath, "utf8");
+  assert.match(manifest, /photo-1-480\.webp 480w/);
+  assert.match(manifest, /photo-1-480\.avif 480w/);
+  assert.match(
+    manifest,
+    /Federaciones de Asociaciones de Kendo - Evento 2026-01-01/,
+  );
+  assert.equal(/drive\.google|publicAlbum|private-/.test(manifest), false);
+  const firstPath = path.join(
+    context.options.imagesRoot,
+    "2026-01-01-evento",
+    "photo-1-480.webp",
+  );
+  const firstBuffer = await readFile(firstPath);
+  const stats = await sharp(firstBuffer).stats();
+  assert.ok(stats.channels[2].mean > stats.channels[0].mean); // photo1.jpg is blue.
+  assert.deepEqual((await sharp(firstBuffer).metadata()).exif, undefined);
 });
 
-test("does not inspect an already published gallery", async () => {
-  const context = await fixture([
-    { name: "1.jpg", id: "one", buffer: await image("red") },
-  ]);
-  try {
-    await run(context.options);
-    const before = await readFile(context.options.manifestPath, "utf8");
-    const invalid = await run(context.options, "https://example.test/folder");
-    assert.deepEqual(invalid.warnings, []);
-    const inaccessible = await run({
-      ...context.options,
-      listFolder: async () => {
-        throw new Error("not public");
-      },
-    });
-    assert.deepEqual(inaccessible.warnings, []);
-    assert.equal(await readFile(context.options.manifestPath, "utf8"), before);
-  } finally {
-    await rm(context.directory, { recursive: true, force: true });
-  }
-});
-
-test("does not validate later Drive contents after a gallery is published", async () => {
-  const initial = [{ name: "1.jpg", id: "one", buffer: await image("red") }];
-  const context = await fixture(initial);
-  try {
-    await run(context.options);
-    const before = await readFile(context.options.manifestPath, "utf8");
-    const cases = [
-      [{ name: "fake.jpg", id: "fake", buffer: Buffer.from("not an image") }],
-      [
-        {
-          name: "small.jpg",
-          id: "small",
-          buffer: await image("red", 320, 240),
-        },
-      ],
-      [
-        {
-          name: "large.jpg",
-          id: "large",
-          buffer: Buffer.alloc(EVENT_GALLERY_LIMITS.maxBytes + 1),
-        },
-      ],
-      [
-        {
-          name: "oversize.jpg",
-          id: "oversize",
-          buffer: await image("red", 3841, 2160),
-        },
-      ],
-      [
-        { name: "ok.jpg", id: "ok", buffer: await image("green") },
-        { name: "broken.jpg", id: "broken" },
-      ],
-    ];
-    for (const files of cases) {
-      const result = await run({
-        ...context.options,
-        listFolder: async () => files,
-        downloadFile: async (file) => {
-          if (!file.buffer) throw new Error("download interrupted");
-          return file.buffer;
-        },
-      });
-      assert.deepEqual(result.warnings, []);
-      assert.equal(
-        await readFile(context.options.manifestPath, "utf8"),
-        before,
-      );
-    }
-    const duplicateBuffer = await image("blue");
-    const duplicates = await fixture([
-      { name: "1.jpg", id: "one", buffer: duplicateBuffer },
-      { name: "2.jpg", id: "two", buffer: duplicateBuffer },
-    ]);
-    try {
-      const result = await run(duplicates.options);
-      assert.equal(result.galleries["2026-01-01-evento"].images.length, 1);
-      assert.equal(
-        result.warnings.some((warning) =>
-          warning.includes("duplicate ignored"),
-        ),
-        true,
-      );
-    } finally {
-      await rm(duplicates.directory, { recursive: true, force: true });
-    }
-  } finally {
-    await rm(context.directory, { recursive: true, force: true });
-  }
-});
-
-test("an existing gallery is preserved without later Drive checks", async () => {
+test("published galleries retain their manifest, state, and image without Drive reads", async (t) => {
   const files = [{ name: "1.jpg", id: "one", buffer: await image("red") }];
-  const context = await fixture(files);
-  try {
-    const first = await run(context.options);
-    const fingerprint = first.galleries["2026-01-01-evento"].fingerprint;
-    const manifest = await readFile(context.options.manifestPath, "utf8");
-    const absent = await synchronizeEventGalleries({
-      ...context.options,
-      events: [{ slug: "2026-01-01-evento", title: "Evento" }],
-    });
-    assert.equal(
-      await readFile(context.options.manifestPath, "utf8"),
-      manifest,
-    );
-    assert.deepEqual(absent.alarms, []);
-    const changed = await run({
-      ...context.options,
-      listFolder: async () => [
-        { name: "1.jpg", id: "changed", buffer: await image("blue") },
+  const context = await fixture(t, files);
+  const slug = "2026-01-01-evento";
+  const event = { slug, title: "Evento" };
+  const imagePath = path.join(
+    context.options.imagesRoot,
+    slug,
+    "photo-1-480.webp",
+  );
+  const first = await run(context.options);
+  const fingerprint = first.galleries[slug].fingerprint;
+  const before = await snapshotFiles([
+    context.options.manifestPath,
+    context.options.statePath,
+    imagePath,
+  ]);
+  const unexpectedRead = async () => {
+    throw new Error("A published gallery must not read Drive");
+  };
+  const cases = [
+    ["album absent", [event]],
+    ["invalid URL", [{ ...event, albumUrl: "https://example.test/folder" }]],
+    [
+      "inaccessible source",
+      [
+        {
+          ...event,
+          albumUrl: "https://drive.google.com/drive/folders/publicAlbum",
+        },
       ],
+    ],
+    [
+      "later contents differ",
+      [
+        {
+          ...event,
+          albumUrl: "https://drive.google.com/drive/folders/changedAlbum",
+        },
+      ],
+    ],
+  ];
+  for (const [name, events] of cases) {
+    await t.test(name, async () => {
+      const result = await synchronizeEventGalleries({
+        ...context.options,
+        events,
+        listFolder: unexpectedRead,
+        downloadFile: unexpectedRead,
+      });
+      assert.equal(result.galleries[slug].fingerprint, fingerprint);
+      assert.deepEqual(result.warnings, []);
+      assert.deepEqual(result.alarms, []);
+      await expectFilesUnchanged(before);
     });
-    assert.equal(
-      changed.galleries["2026-01-01-evento"].fingerprint,
-      fingerprint,
-    );
-    assert.deepEqual(changed.warnings, []);
-    assert.deepEqual(changed.alarms, []);
-    await stat(
-      path.join(
-        context.options.imagesRoot,
-        "2026-01-01-evento",
-        "photo-1-480.webp",
-      ),
-    );
-  } finally {
-    await rm(context.directory, { recursive: true, force: true });
   }
 });
 
-test("reports an unpublished album without inventing a frozen gallery", async () => {
-  const context = await fixture([]);
-  try {
-    const result = await synchronizeEventGalleries({
-      ...context.options,
-      events: [{ slug: "2026-01-01-evento", title: "Evento" }],
-    });
-    assert.deepEqual(result.alarms, [
-      {
-        slug: "2026-01-01-evento",
-        status: "album_aun_no_publicado",
-        reason: "album_ausente",
-      },
-    ]);
-    await assert.rejects(stat(context.options.manifestPath), /ENOENT/);
-    assert.deepEqual(result.state.checks["2026-01-01-evento"], {
-      phase: "final",
-    });
-  } finally {
-    await rm(context.directory, { recursive: true, force: true });
-  }
+test("deduplicates identical images during first publication", async (t) => {
+  const duplicateBuffer = await image("blue");
+  const context = await fixture(t, [
+    { name: "1.jpg", id: "one", buffer: duplicateBuffer },
+    { name: "2.jpg", id: "two", buffer: duplicateBuffer },
+  ]);
+  const result = await run(context.options);
+  assert.equal(result.galleries["2026-01-01-evento"].images.length, 1);
+  assert.equal(
+    result.warnings.some((warning) => warning.includes("duplicate ignored")),
+    true,
+  );
 });
 
-test("checks an absent gallery once at 24 hours and once at the 48-hour deadline", async () => {
-  const context = await fixture([]);
+test("reports an unpublished album without inventing a frozen gallery", async (t) => {
+  const context = await fixture(t, []);
+  const result = await synchronizeEventGalleries({
+    ...context.options,
+    events: [{ slug: "2026-01-01-evento", title: "Evento" }],
+  });
+  assert.deepEqual(result.alarms, [
+    {
+      slug: "2026-01-01-evento",
+      status: "album_aun_no_publicado",
+      reason: "album_ausente",
+    },
+  ]);
+  await assert.rejects(stat(context.options.manifestPath), /ENOENT/);
+  assert.deepEqual(result.state.checks["2026-01-01-evento"], {
+    phase: "final",
+  });
+});
+
+test("checks an absent gallery once at 24 hours and once at the 48-hour deadline", async (t) => {
+  const context = await fixture(t, []);
   const event = {
     slug: "2026-01-01-evento",
     title: "Evento",
     galleryCheckPhase: "first",
   };
-  try {
-    const first = await synchronizeEventGalleries({
+  for (const phase of ["first", "final"]) {
+    const events = [{ ...event, galleryCheckPhase: phase }];
+    const result = await synchronizeEventGalleries({
       ...context.options,
-      events: [event],
+      events,
     });
-    assert.equal(first.alarms.length, 1);
-    assert.deepEqual(first.state.checks[event.slug], { phase: "first" });
-
-    const repeatedFirst = await synchronizeEventGalleries({
+    assert.equal(result.alarms.length, 1);
+    assert.deepEqual(result.state.checks[event.slug], { phase });
+    const repeated = await synchronizeEventGalleries({
       ...context.options,
-      events: [event],
+      events,
     });
-    assert.deepEqual(repeatedFirst.alarms, []);
-
-    const final = await synchronizeEventGalleries({
-      ...context.options,
-      events: [{ ...event, galleryCheckPhase: "final" }],
-    });
-    assert.equal(final.alarms.length, 1);
-    assert.deepEqual(final.state.checks[event.slug], { phase: "final" });
-
-    const repeatedFinal = await synchronizeEventGalleries({
-      ...context.options,
-      events: [{ ...event, galleryCheckPhase: "final" }],
-    });
-    assert.deepEqual(repeatedFinal.alarms, []);
-  } finally {
-    await rm(context.directory, { recursive: true, force: true });
+    assert.deepEqual(repeated.alarms, []);
   }
 });
 
-test("imports content uploaded between the 24-hour check and the 48-hour deadline", async () => {
+test("imports content uploaded between the 24-hour check and the 48-hour deadline", async (t) => {
   const files = [{ name: "1.jpg", id: "one", buffer: await image("red") }];
-  const context = await fixture(files);
+  const context = await fixture(t, files);
   const event = { slug: "2026-01-01-evento", title: "Evento" };
-  try {
-    await synchronizeEventGalleries({
-      ...context.options,
-      events: [{ ...event, galleryCheckPhase: "first" }],
-    });
+  await synchronizeEventGalleries({
+    ...context.options,
+    events: [{ ...event, galleryCheckPhase: "first" }],
+  });
 
-    const final = await synchronizeEventGalleries({
-      ...context.options,
-      events: [
-        {
-          ...event,
-          galleryCheckPhase: "final",
-          albumUrl: "https://drive.google.com/drive/folders/publicAlbum",
-        },
-      ],
-      listFolder: async () => files,
-      downloadFile: async (file) => file.buffer,
-    });
+  const final = await synchronizeEventGalleries({
+    ...context.options,
+    events: [
+      {
+        ...event,
+        galleryCheckPhase: "final",
+        albumUrl: "https://drive.google.com/drive/folders/publicAlbum",
+      },
+    ],
+    listFolder: async () => files,
+    downloadFile: async (file) => file.buffer,
+  });
 
-    assert.equal(final.importedCount, 1);
-    assert.equal(final.galleries[event.slug].images.length, 1);
-    assert.deepEqual(final.state.checks[event.slug], { phase: "final" });
-  } finally {
-    await rm(context.directory, { recursive: true, force: true });
-  }
+  assert.equal(final.importedCount, 1);
+  assert.equal(final.galleries[event.slug].images.length, 1);
+  assert.deepEqual(final.state.checks[event.slug], { phase: "final" });
 });
 
-test("imports an album added after the final absent-gallery check", async () => {
+test("imports an album added after the final absent-gallery check", async (t) => {
   const files = [{ name: "1.jpg", id: "one", buffer: await image("red") }];
-  const context = await fixture(files);
+  const context = await fixture(t, files);
   const event = { slug: "2026-01-01-evento", title: "Evento" };
-  try {
-    await synchronizeEventGalleries({
-      ...context.options,
-      events: [{ ...event, galleryCheckPhase: "final" }],
-    });
+  await synchronizeEventGalleries({
+    ...context.options,
+    events: [{ ...event, galleryCheckPhase: "final" }],
+  });
 
-    const imported = await synchronizeEventGalleries({
-      ...context.options,
-      events: [
-        {
-          ...event,
-          galleryCheckPhase: "final",
-          albumUrl: "https://drive.google.com/drive/folders/publicAlbum",
-        },
-      ],
-      listFolder: async () => files,
-      downloadFile: async (file) => file.buffer,
-    });
+  const imported = await synchronizeEventGalleries({
+    ...context.options,
+    events: [
+      {
+        ...event,
+        galleryCheckPhase: "final",
+        albumUrl: "https://drive.google.com/drive/folders/publicAlbum",
+      },
+    ],
+    listFolder: async () => files,
+    downloadFile: async (file) => file.buffer,
+  });
 
-    assert.equal(imported.importedCount, 1);
-    assert.equal(imported.galleries[event.slug].images.length, 1);
-  } finally {
-    await rm(context.directory, { recursive: true, force: true });
-  }
+  assert.equal(imported.importedCount, 1);
+  assert.equal(imported.galleries[event.slug].images.length, 1);
 });

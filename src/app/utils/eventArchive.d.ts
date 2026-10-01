@@ -39,3 +39,7 @@ export function buildArchiveUrl(
   language?: Language,
   filters?: ArchiveFilters,
 ): string;
+export function getArchivePageNumber(
+  pathname: string,
+  language?: Language,
+): number;

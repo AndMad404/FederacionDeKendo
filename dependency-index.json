@@ -28,6 +28,8 @@
       ],
       "area": "Datos, rutas y filtros de calendario y eventos",
       "tests": [
+        "tests/data/calendar-dates.test.mjs",
+        "tests/data/calendar-parsing.test.mjs",
         "tests/data/calendar-sync.test.mjs",
         "tests/data/calendar-timezone-localization.spec.ts",
         "tests/data/event-history-filters.test.mjs",
@@ -51,7 +53,10 @@
         "tests/behavior/calendar-behavior.spec.ts",
         "tests/behavior/event-history-filters.spec.ts",
         "tests/behavior/events.spec.ts",
-        "tests/design/event-content-layout.spec.ts"
+        "tests/design/event-action-geometry.spec.ts",
+        "tests/design/event-content-layout.spec.ts",
+        "tests/design/responsive-reachability.spec.ts",
+        "tests/design/shell-geometry.spec.ts"
       ]
     },
     {
@@ -69,6 +74,7 @@
       "area": "Datos, assets y sincronizacion de galerias",
       "tests": [
         "tests/data/event-gallery-sync.test.mjs",
+        "tests/data/event-history-publication.test.mjs",
         "tests/data/event-history-sync-contract.test.mjs",
         "tests/data/gallery-data.test.mjs",
         "tests/data/static-public-content.test.mjs"
@@ -90,7 +96,8 @@
       "tests": [
         "tests/behavior/lightbox-behavior.spec.ts",
         "tests/design/interaction-states.spec.ts",
-        "tests/design/visual-regression.spec.ts"
+        "tests/design/visual-regression.spec.ts",
+        "tests/design/shell-geometry.spec.ts"
       ]
     },
     {
@@ -99,6 +106,7 @@
         "src/app/App.tsx",
         "src/app/components/Footer.tsx",
         "src/app/components/Navbar.tsx",
+        "src/app/config/routePresentation.ts",
         "src/app/routeRegistry.client.tsx",
         "src/main.tsx"
       ],
@@ -107,7 +115,8 @@
         "tests/behavior/accessibility.spec.ts",
         "tests/behavior/events.spec.ts",
         "tests/behavior/navbar-calendar-menu.spec.ts",
-        "tests/design/responsive-reachability.spec.ts"
+        "tests/design/responsive-reachability.spec.ts",
+        "tests/design/shell-geometry.spec.ts"
       ]
     },
     {
@@ -123,7 +132,11 @@
       ],
       "area": "SEO, metadata y prerender",
       "tests": [
+        "tests/data/generated-event-structured-data.test.mjs",
         "tests/data/generated-output.test.mjs",
+        "tests/data/generated-redirects.test.mjs",
+        "tests/data/generated-sitemap.test.mjs",
+        "tests/data/generated-translations.test.mjs",
         "tests/data/llms-txt.test.mjs",
         "tests/data/meta-descriptions-approval.test.mjs"
       ]
@@ -142,11 +155,35 @@
       "area": "Sincronizacion y automatizacion de calendario y galerias",
       "tests": [
         "tests/architecture/calendar-workflow-architecture.test.mjs",
+        "tests/data/calendar-dates.test.mjs",
         "tests/data/calendar-history-correction.test.mjs",
+        "tests/data/calendar-parsing.test.mjs",
         "tests/data/calendar-sync.test.mjs",
         "tests/data/event-gallery-sync.test.mjs",
+        "tests/data/event-history-editorial-decisions.test.mjs",
+        "tests/data/event-history-notifications.test.mjs",
+        "tests/data/event-history-publication.test.mjs",
+        "tests/data/event-history-reports.test.mjs",
         "tests/data/event-history-sync-contract.test.mjs"
       ]
+    },
+    {
+      "id": "design-page-preparation",
+      "changes": ["tests/helpers/prepare-page.ts"],
+      "area": "Preparacion de paginas para geometria y comparacion visual",
+      "tests": [
+        "tests/design/event-action-geometry.spec.ts",
+        "tests/design/geometry-contract.spec.ts",
+        "tests/design/responsive-reachability.spec.ts",
+        "tests/design/shell-geometry.spec.ts",
+        "tests/design/visual-regression.spec.ts"
+      ]
+    },
+    {
+      "id": "source-style-policy",
+      "changes": ["src/**/*.css", "src/**/*.js", "src/**/*.ts", "src/**/*.tsx"],
+      "area": "Prohibicion de declaraciones CSS y utilidades Tailwind importantes",
+      "tests": ["tests/architecture/repository-policy.test.mjs"]
     },
     {
       "id": "repository-tooling",

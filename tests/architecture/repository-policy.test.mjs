@@ -5,6 +5,7 @@ import { readdir, readFile } from "node:fs/promises";
 import { extname, resolve } from "node:path";
 import path from "node:path";
 import test from "node:test";
+import ts from "typescript";
 
 const ROOT = process.cwd();
 const SELF = "tests/architecture/repository-policy.test.mjs";
@@ -83,7 +84,7 @@ function isForbiddenPath(relativePath) {
   );
 }
 
-async function collectCssFiles(directory) {
+async function collectStyleSourceFiles(directory) {
   const entries = await readdir(directory, {
     withFileTypes: true,
   });
@@ -93,14 +94,62 @@ async function collectCssFiles(directory) {
       const entryPath = resolve(directory, entry.name);
 
       if (entry.isDirectory()) {
-        return collectCssFiles(entryPath);
+        return collectStyleSourceFiles(entryPath);
       }
 
-      return extname(entry.name).toLowerCase() === ".css" ? [entryPath] : [];
+      return [".css", ".js", ".jsx", ".ts", ".tsx"].includes(
+        extname(entry.name).toLowerCase(),
+      )
+        ? [entryPath]
+        : [];
     }),
   );
 
   return files.flat();
+}
+
+function importantClassTokens(filePath, source) {
+  const tree = ts.createSourceFile(
+    filePath,
+    source,
+    ts.ScriptTarget.Latest,
+    true,
+  );
+  const tokens = new Set();
+  function collect(node) {
+    if (ts.isStringLiteralLike(node) || ts.isTemplateLiteralToken(node)) {
+      for (const token of node.text.split(/\s+/).filter(Boolean)) {
+        if (/^!|:!|!$/.test(token)) tokens.add(token);
+      }
+    }
+    ts.forEachChild(node, collect);
+  }
+  function visit(node) {
+    const classAttribute =
+      ts.isJsxAttribute(node) && node.name.getText(tree) === "className";
+    const classBinding =
+      (ts.isVariableDeclaration(node) || ts.isPropertyAssignment(node)) &&
+      /class(?:name|names|es)?$/i.test(
+        node.name.getText(tree).replace(/["']/g, ""),
+      );
+    const classBuilder =
+      ts.isCallExpression(node) &&
+      /^(?:cn|cva|clsx|classNames|twMerge)$/.test(
+        node.expression.getText(tree),
+      );
+    const classListMutation =
+      ts.isCallExpression(node) &&
+      /\.classList\.(?:add|remove|toggle|replace)$/.test(
+        node.expression.getText(tree),
+      );
+    if (classAttribute || classBinding || classBuilder || classListMutation) {
+      collect(node);
+    } else {
+      ts.forEachChild(node, visit);
+    }
+  }
+  visit(tree);
+  return [...tokens];
 }
 
 test("repository contains no private assisted-development artifacts", () => {
@@ -158,14 +207,27 @@ test("new tracked files stay below the repository size limit", () => {
 
 test("source CSS does not use important declarations", async () => {
   const sourceDirectory = resolve(process.cwd(), "src");
-  const cssFiles = await collectCssFiles(sourceDirectory);
+  const sourceFiles = await collectStyleSourceFiles(sourceDirectory);
   const violations = [];
 
-  for (const filePath of cssFiles) {
+  for (const filePath of sourceFiles) {
     const source = await readFile(filePath, "utf8");
 
     if (/!\s*important\b/i.test(source)) {
       violations.push(filePath);
+    }
+    if (extname(filePath).toLowerCase() !== ".css") {
+      violations.push(
+        ...importantClassTokens(filePath, source).map(
+          (token) => `${filePath}: ${token}`,
+        ),
+      );
+    } else {
+      for (const apply of source.matchAll(/@apply\s+([^;]+);/g)) {
+        if (apply[1].split(/\s+/).some((token) => /^!|:!|!$/.test(token))) {
+          violations.push(`${filePath}: ${apply[0]}`);
+        }
+      }
     }
   }
 

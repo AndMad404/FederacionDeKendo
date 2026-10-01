@@ -1,134 +1,35 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
+import { APPROVED_VIEWPORTS, FIXED_TEST_TIME } from "./design-contract";
 import {
-  APPROVED_VIEWPORTS as DESIGN_VIEWPORTS,
-  FIXED_TEST_TIME,
-} from "./design-contract";
-import { readdirSync } from "node:fs";
-import { relative, resolve, sep } from "node:path";
-
-const VISUAL_VIEWPORTS = DESIGN_VIEWPORTS.filter(
+  generatedPages,
+  representativePages as selectRepresentatives,
+} from "../helpers/generated-pages";
+import { preparePage } from "../helpers/prepare-page";
+const VISUAL_VIEWPORTS = APPROVED_VIEWPORTS.filter(
   ({ name }) => name !== "mobile-390x844",
 );
 const HISTORICAL_EVENT_REFERENCE_TIME = new Date("2026-08-20T12:00:00-06:00");
-
-interface ApprovedPage {
-  name: string;
-  path: string;
-  component:
-    | "home"
-    | "calendar"
-    | "gallery"
-    | "affiliates"
-    | "event"
-    | "pastEvents"
-    | "notFound";
-}
-
-const DIST_DIRECTORY = resolve(process.cwd(), "dist");
-
-function getPageComponent(path: string): ApprovedPage["component"] {
-  if (path === "/") return "home";
-  if (path === "/eventos/") return "calendar";
-  if (path === "/galeria/") return "gallery";
-  if (path === "/afiliados/") return "affiliates";
-  if (
-    path === "/eventos/pasados/" ||
-    path.startsWith("/eventos/pasados/pagina/")
-  ) {
-    return "pastEvents";
-  }
-  return "event";
-}
-
-const generatedRoutePaths = readdirSync(DIST_DIRECTORY, {
-  recursive: true,
-  withFileTypes: true,
-})
-  .filter((entry) => entry.isFile() && entry.name === "index.html")
-  .map((entry) => {
-    const directory = relative(DIST_DIRECTORY, entry.parentPath)
-      .split(sep)
-      .join("/");
-    return directory ? `/${directory}/` : "/";
-  })
-  .sort();
-
-const approvedPages: ApprovedPage[] = [
-  ...generatedRoutePaths.map((path) => ({
-    name:
-      path === "/"
-        ? "home"
-        : path.replace(/^\//, "").replace(/\/$/, "").replaceAll("/", "-"),
-    path,
-    component: getPageComponent(path),
-  })),
-  {
-    name: "not-found",
-    path: "/ruta-visual-inexistente/",
-    component: "notFound",
-  },
-];
-
-const preferredRepresentativePaths: Partial<
-  Record<ApprovedPage["component"], string>
-> = {
-  event: "/eventos/pasados/2026-08-08-examen/",
-};
-
-const representativePages = Array.from(
-  approvedPages.reduce((pagesByComponent, page) => {
-    const preferredPath = preferredRepresentativePaths[page.component];
-    const current = pagesByComponent.get(page.component);
-
-    if (!current || page.path === preferredPath) {
-      pagesByComponent.set(page.component, page);
-    }
-
-    return pagesByComponent;
-  }, new Map<ApprovedPage["component"], ApprovedPage>()),
-  ([, page]) => page,
+const representativePages = selectRepresentatives(
+  generatedPages({ spanishOnly: true }),
+  { event: "/eventos/pasados/2026-08-08-examen/" },
 );
-
-async function prepareApprovedPage(
-  page: Page,
-  path: string,
-  referenceTime = FIXED_TEST_TIME,
-) {
-  await page.clock.setFixedTime(referenceTime);
-  await page.goto(path);
-  await expect(page.locator("main h1")).toBeVisible();
-  await page.evaluate(async () => {
-    await document.fonts.ready;
-    await Promise.all(
-      Array.from(document.images, (image) =>
-        image.complete
-          ? Promise.resolve()
-          : new Promise<void>((resolve) => {
-              image.addEventListener("load", () => resolve(), { once: true });
-              image.addEventListener("error", () => resolve(), { once: true });
-            }),
-      ),
-    );
-  });
-}
-
 for (const viewport of VISUAL_VIEWPORTS) {
   test.describe(`${viewport.name} approved visual designs`, () => {
     test.use({ viewport });
 
     for (const approvedPage of representativePages) {
-      test(`${approvedPage.component} matches its approved design`, async ({
+      test(`${approvedPage.design} matches its approved design`, async ({
         page,
       }) => {
-        await prepareApprovedPage(
+        await preparePage(
           page,
           approvedPage.path,
-          approvedPage.component === "event"
+          approvedPage.design === "event"
             ? HISTORICAL_EVENT_REFERENCE_TIME
             : FIXED_TEST_TIME,
         );
         await expect(page).toHaveScreenshot(
-          `${approvedPage.component}-${viewport.name}.png`,
+          `${approvedPage.design}-${viewport.name}.png`,
         );
       });
     }
@@ -136,7 +37,7 @@ for (const viewport of VISUAL_VIEWPORTS) {
     test("gallery lightbox details match their approved design", async ({
       page,
     }) => {
-      await prepareApprovedPage(page, "/galeria/");
+      await preparePage(page, "/galeria/");
       await page.locator(".gallery-featured-frame > button").click();
 
       const dialog = page.getByRole("dialog");

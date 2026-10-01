@@ -78,7 +78,10 @@ for (const viewport of [
     });
     const details = addToCalendar.locator("xpath=ancestor::dl");
     await expect(details).toHaveCount(1);
-    await expect(details.locator(":scope > div")).toHaveCount(4);
+    await expect(details.locator(":scope > div")).toHaveCount(5);
+    await expect(
+      details.getByText("America/Costa_Rica", { exact: true }),
+    ).toHaveCount(1);
     await expect
       .poll(() =>
         details.evaluate(

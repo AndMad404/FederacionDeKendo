@@ -1,4 +1,5 @@
 import { getArchivePagePath } from "./eventArchiveRoutes.js";
+export { getArchivePageNumber } from "./eventArchiveRoutes.js";
 
 const ARCHIVE_TIME_ZONE = "America/Costa_Rica";
 const ARCHIVE_EVENT_TYPES = new Set([

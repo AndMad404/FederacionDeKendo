@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
-import { PAST_EVENTS_PAGE_SIZE } from "../config/events";
+import {
+  MOBILE_PAST_EVENTS_PAGE_SIZE,
+  PAST_EVENTS_PAGE_SIZE,
+} from "../config/events";
 import {
   focusRingClass,
   panelSurfaceClass,
@@ -12,6 +15,7 @@ import { EVENT_GALLERIES } from "../data/eventGalleries";
 import {
   buildArchiveUrl,
   filterAndSortArchiveEvents,
+  getArchivePageNumber,
   getArchiveYears,
   normalizeArchiveFilters,
   type ArchiveEventType,
@@ -25,12 +29,38 @@ import { EventSummary } from "./EventSummary";
 import { EventSectionNavigation } from "./events/EventSectionNavigation";
 import { NavigationArrowButton } from "./ui/ModalControls";
 
+const mobileArchiveQuery = "(max-width: 767px)";
+const subscribeToViewport = (callback: () => void) => {
+  const query = window.matchMedia(mobileArchiveQuery);
+  query.addEventListener("change", callback);
+  return () => query.removeEventListener("change", callback);
+};
+const getMobileViewport = () => window.matchMedia(mobileArchiveQuery).matches;
+const getServerViewport = () => true;
+
+function getEventThumbnail(eventId: string) {
+  const images = EVENT_GALLERIES[eventId]?.images ?? [];
+  const targetRatio = 16 / 9;
+  const horizontalImages = images.filter(
+    (image) => image.width / image.height >= 1.3,
+  );
+  return [...(horizontalImages.length ? horizontalImages : images)].sort(
+    (a, b) =>
+      Math.abs(a.width / a.height - targetRatio) -
+      Math.abs(b.width / b.height - targetRatio),
+  )[0];
+}
+
 export function PastEventsSection() {
   const { language, copy } = useLanguage();
-  const { search } = useLocation();
+  const { pathname, search } = useLocation();
   const navigate = useNavigate();
-  const [requestedPage, setRequestedPage] = useState(1);
   const isHydrated = useIsHydrated();
+  const isMobile = useSyncExternalStore(
+    subscribeToViewport,
+    getMobileViewport,
+    getServerViewport,
+  );
   const now = useHydratedNow();
   const historicalEvents = now ? getPastEvents(now) : [];
   const searchParams = new URLSearchParams(search);
@@ -43,20 +73,33 @@ export function PastEventsSection() {
     language,
   );
   const years = getArchiveYears(historicalEvents);
-  const pageCount = Math.max(
+  const routePage = getArchivePageNumber(pathname, language);
+  // Mobile pages have canonical routes. Keep them readable if opened on a wider screen.
+  const desktopPageCount = Math.max(
     1,
     Math.ceil(events.length / PAST_EVENTS_PAGE_SIZE),
   );
+  const pageSize =
+    isMobile || routePage > desktopPageCount
+      ? MOBILE_PAST_EVENTS_PAGE_SIZE
+      : PAST_EVENTS_PAGE_SIZE;
+  const pageCount = Math.max(1, Math.ceil(events.length / pageSize));
+  const legacyPage = Number(searchParams.get("page"));
+  const requestedPage =
+    Number.isInteger(legacyPage) && legacyPage > 0 ? legacyPage : routePage;
   const page = Math.min(requestedPage, pageCount);
-  const pageEvents = events.slice(
-    (page - 1) * PAST_EVENTS_PAGE_SIZE,
-    page * PAST_EVENTS_PAGE_SIZE,
-  );
+  const canonicalPageUrl = buildArchiveUrl(page, language, filters);
+  const hasLegacyPageQuery = searchParams.has("page");
+  const pageEvents = events.slice((page - 1) * pageSize, page * pageSize);
   const eventTypes: ArchiveEventType[] = ["torneo", "examen", "seminario"];
+
+  useEffect(() => {
+    if (hasLegacyPageQuery) navigate(canonicalPageUrl, { replace: true });
+  }, [canonicalPageUrl, hasLegacyPageQuery, navigate]);
 
   const navigateToPage = (targetPage: number) => {
     if (targetPage < 1 || targetPage > pageCount) return;
-    setRequestedPage(targetPage);
+    navigate(buildArchiveUrl(targetPage, language, filters));
   };
   const { swipeHandlers } = useSwipeNavigation({
     onSwipeLeft: () => navigateToPage(page + 1),
@@ -66,7 +109,6 @@ export function PastEventsSection() {
   });
 
   function changeFilter(name: "year" | "type", value: string) {
-    setRequestedPage(1);
     navigate(
       buildArchiveUrl(1, language, {
         ...filters,
@@ -79,7 +121,7 @@ export function PastEventsSection() {
     <section
       aria-labelledby="past-events-title"
       data-interactive-ready={isHydrated ? "past-events" : undefined}
-      className="relative my-2 flex w-full flex-col overflow-hidden rounded-xl bg-site-canvas tall-md:h-[calc(100%_-_1rem)] tall-md:min-h-0"
+      className="relative my-2 flex w-full flex-col overflow-hidden rounded-xl bg-site-canvas page-fit:h-[calc(100%_-_1rem)] page-fit:min-h-0"
     >
       <MediaPageBanner
         className="relative z-10 h-28 shrink-0 overflow-hidden land-compact:h-20"
@@ -164,7 +206,7 @@ export function PastEventsSection() {
           {pageEvents.length ? (
             <ul className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
               {pageEvents.map((event) => {
-                const thumbnail = EVENT_GALLERIES[event.id]?.images[0];
+                const thumbnail = getEventThumbnail(event.id);
 
                 return (
                   <li
@@ -178,7 +220,10 @@ export function PastEventsSection() {
                       <h2 className="mt-1 font-bold">{event.title}</h2>
                       <div className="mt-2">
                         {thumbnail ? (
-                          <picture data-event-thumbnail className="block">
+                          <picture
+                            data-event-thumbnail
+                            className="flex aspect-video h-auto w-full max-w-full items-center justify-center overflow-hidden rounded-lg bg-site-surface"
+                          >
                             <source
                               srcSet={thumbnail.srcSet.avif}
                               sizes="(min-width: 1024px) 14rem, (min-width: 768px) 50vw, 100vw"
@@ -193,7 +238,7 @@ export function PastEventsSection() {
                               height={thumbnail.height}
                               loading="lazy"
                               decoding="async"
-                              className="h-20 w-full rounded-lg object-cover"
+                              className="block h-full max-h-full w-full max-w-full rounded-lg object-cover object-center"
                             />
                           </picture>
                         ) : (

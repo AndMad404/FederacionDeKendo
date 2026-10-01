@@ -14,7 +14,7 @@ const ROUTE_PRESENTATION = {
   gallery: { tabletMode: "contained", desktopMode: "contained" },
   affiliates: { tabletMode: "flow", desktopMode: "contained" },
   event: { tabletMode: "flow", desktopMode: "flow" },
-  pastEvents: { tabletMode: "contained", desktopMode: "contained" },
+  pastEvents: { tabletMode: "flow", desktopMode: "contained" },
   notFound: { tabletMode: "contained", desktopMode: "contained" },
 } satisfies Record<RouteComponent, RoutePresentation>;
 

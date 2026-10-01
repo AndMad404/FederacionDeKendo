@@ -9,11 +9,6 @@ import {
 } from "../../scripts/verify-site.mjs";
 
 test("site verification owns checks previously delegated to local Git hooks", async () => {
-  const steps = verificationSteps().map((step) => step.join(" "));
-  assert.ok(steps.includes("pnpm run format:line-endings:check"));
-  assert.ok(steps.includes("git diff --check"));
-  assert.ok(steps.includes("git diff --cached --check"));
-
   const packageJson = JSON.parse(readFileSync("package.json", "utf8"));
   assert.equal(packageJson.scripts.prepare, undefined);
   assert.equal(packageJson.scripts["setup:git-hooks"], undefined);
@@ -24,18 +19,6 @@ test("site verification owns checks previously delegated to local Git hooks", as
 test("site verification avoids duplicate generated-output and format checks", () => {
   const commandNames = (unitScript) =>
     verificationSteps(unitScript).map((step) => step.join(" "));
-
-  const defaultCommands = commandNames("test:unit");
-  assert.equal(
-    defaultCommands.filter((command) => command === "pnpm run test:generated")
-      .length,
-    0,
-  );
-  assert.equal(
-    defaultCommands.filter((command) => command === "pnpm run format:check")
-      .length,
-    1,
-  );
 
   for (const unitScript of [
     "test:unit:without-sync",

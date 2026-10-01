@@ -6,7 +6,7 @@ import {
   getEventInclusiveEndDate,
   isExternalEvent,
 } from "../utils/calendarEvents";
-import { EVENT_INDEXING_ENABLED, PAST_EVENTS_PAGE_SIZE } from "./events";
+import { EVENT_INDEXING_ENABLED, MOBILE_PAST_EVENTS_PAGE_SIZE } from "./events";
 import {
   findEventByPathname,
   getArchivePagePath,
@@ -539,7 +539,7 @@ export function getRouteMeta(pathname: string) {
 export function getRouteManifest() {
   const pastPageCount = Math.max(
     1,
-    Math.ceil(getPastEvents().length / PAST_EVENTS_PAGE_SIZE),
+    Math.ceil(getPastEvents().length / MOBILE_PAST_EVENTS_PAGE_SIZE),
   );
   const archiveRoutes = Array.from({ length: pastPageCount }, (_, index) =>
     createArchiveRouteMeta(index + 1),
@@ -563,9 +563,33 @@ export function getRouteManifest() {
 }
 
 export function getEventRedirects() {
+  const archivePageCount = Math.max(
+    1,
+    Math.ceil(getPastEvents().length / MOBILE_PAST_EVENTS_PAGE_SIZE),
+  );
   const redirects = [
     { from: "/calendario/", to: "/eventos/" },
     { from: "/en/calendar/", to: "/en/events/" },
+    ...Array.from(
+      { length: archivePageCount },
+      (_, index) => index + 1,
+    ).flatMap((page) => {
+      const spanishPath = getArchivePagePath(page, "es");
+      const englishPath = getArchivePagePath(page, "en");
+      const redirects = [];
+      if (page === 1) {
+        redirects.push(
+          { from: "/eventos/pasados/pagina/1/", to: spanishPath },
+          { from: "/en/events/past/page/1/", to: englishPath },
+        );
+      } else {
+        redirects.push(
+          { from: `/eventos/pasados/page/${page}/`, to: spanishPath },
+          { from: `/en/events/past/pagina/${page}/`, to: englishPath },
+        );
+      }
+      return redirects;
+    }),
     ...CALENDAR_EVENTS.flatMap((event) => {
       const spanishPath = getEventPath(event, "es");
       const englishPath = getEventPath(event, "en");

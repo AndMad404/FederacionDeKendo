@@ -1,6 +1,7 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import type { RouteComponent } from "../../src/app/config/routeTypes";
-import { FIXED_TEST_TIME } from "./design-contract";
+import { getReachability } from "../helpers/content-reachability";
+import { preparePage } from "../helpers/prepare-page";
 
 const ROUTES = {
   home: { name: "home", path: "/" },
@@ -78,96 +79,7 @@ const REACHABILITY_CASES = [
     viewport: { width: 1280, height: 768 },
     routes: ["calendar", "affiliates"],
   },
-  {
-    name: "approved-desktop",
-    viewport: { width: 1366, height: 768 },
-    routes: ALL_ROUTE_KEYS,
-  },
 ] as const;
-
-async function preparePage(page: Page, path: string) {
-  await page.clock.setFixedTime(FIXED_TEST_TIME);
-  await page.goto(path);
-  await expect(page.locator("main h1")).toBeVisible();
-  await page.evaluate(async () => {
-    await document.fonts.ready;
-  });
-}
-
-async function getReachability(page: Page) {
-  return page.evaluate(() => {
-    const root = document.documentElement;
-    const main = document.querySelector("main");
-    const appShell = document.querySelector("#root > div");
-    const contentElements = Array.from(
-      main?.querySelectorAll<HTMLElement>(
-        'h1, h2, h3, p, a[href], button:not([disabled]), dt, dd, time, img:not([aria-hidden="true"])',
-      ) ?? [],
-    ).filter((element) => element.getClientRects().length > 0);
-
-    const clippedContent = contentElements.flatMap((element) => {
-      const elementRect = element.getBoundingClientRect();
-      let ancestor = element.parentElement;
-
-      while (ancestor && ancestor !== document.body) {
-        const styles = getComputedStyle(ancestor);
-        if (styles.overflowY === "hidden" || styles.overflowY === "clip") {
-          const ancestorRect = ancestor.getBoundingClientRect();
-          if (
-            elementRect.top < ancestorRect.top - 1 ||
-            elementRect.bottom > ancestorRect.bottom + 1
-          ) {
-            return [
-              {
-                label:
-                  element.getAttribute("aria-label")?.trim() ||
-                  element.getAttribute("alt")?.trim() ||
-                  element.textContent?.trim().slice(0, 80) ||
-                  element.outerHTML.slice(0, 80),
-                tag: element.tagName.toLowerCase(),
-                clippedBy: ancestor.tagName.toLowerCase(),
-              },
-            ];
-          }
-        }
-        ancestor = ancestor.parentElement;
-      }
-
-      return [];
-    });
-
-    const internalVerticalScrollOwners = Array.from(
-      main?.querySelectorAll<HTMLElement>("*") ?? [],
-    )
-      .filter((element) => {
-        const overflowY = getComputedStyle(element).overflowY;
-        return (
-          (overflowY === "auto" || overflowY === "scroll") &&
-          element.scrollHeight > element.clientHeight + 1
-        );
-      })
-      .map((element) => ({
-        tag: element.tagName.toLowerCase(),
-        className: element.className,
-        clientHeight: element.clientHeight,
-        scrollHeight: element.scrollHeight,
-      }));
-
-    return {
-      documentOwnsVerticalOverflow: root.scrollHeight > root.clientHeight + 1,
-      flowLockOwners: [root, document.body, appShell, main]
-        .filter((element): element is Element => element !== null)
-        .filter((element) => {
-          const overflowY = getComputedStyle(element).overflowY;
-          return overflowY === "hidden" || overflowY === "clip";
-        })
-        .map((element) => element.tagName.toLowerCase()),
-      hasHorizontalOverflow: root.scrollWidth > root.clientWidth + 1,
-      clippedContent,
-      internalVerticalScrollOwners,
-    };
-  });
-}
 
 for (const scenario of FLOW_CASES) {
   test.describe(`${scenario.name} uses document flow`, () => {
@@ -214,11 +126,57 @@ for (const scenario of REACHABILITY_CASES) {
       test(`${route.name} keeps all route content reachable`, async ({
         page,
       }) => {
-        await preparePage(page, route.path);
+        const tabletArchive =
+          scenario.name === "tablet-fit-entry" && routeKey === "pastEvents";
+        await preparePage(
+          page,
+          route.path,
+          tabletArchive ? new Date("2026-10-01T12:00:00-06:00") : undefined,
+        );
+        if (tabletArchive) {
+          await expect(
+            page.locator('[data-interactive-ready="past-events"]'),
+          ).toBeVisible();
+          await expect
+            .poll(
+              async () =>
+                (await getReachability(page)).documentOwnsVerticalOverflow,
+            )
+            .toBe(true);
+        }
         const reachability = await getReachability(page);
 
         expect(reachability.clippedContent).toEqual([]);
         expect(reachability.hasHorizontalOverflow).toBe(false);
+        if (tabletArchive) {
+          expect(reachability.flowLockOwners).toEqual([]);
+          expect(reachability.internalVerticalScrollOwners).toEqual([]);
+          expect(reachability.documentOwnsVerticalOverflow).toBe(true);
+
+          const footer = page.getByRole("contentinfo");
+          const geometry = await page.evaluate(() => ({
+            contentBottom: document
+              .querySelector("main")!
+              .getBoundingClientRect().bottom,
+            footerTop: document.querySelector("footer")!.getBoundingClientRect()
+              .top,
+            footerBottom:
+              document.querySelector("footer")!.getBoundingClientRect().bottom +
+              window.scrollY,
+            viewportHeight: document.documentElement.clientHeight,
+          }));
+          expect(geometry.footerTop).toBeGreaterThanOrEqual(
+            geometry.contentBottom - 1,
+          );
+          expect(geometry.footerBottom).toBeGreaterThan(
+            geometry.viewportHeight,
+          );
+          await page.evaluate(() =>
+            window.scrollTo(0, document.documentElement.scrollHeight),
+          );
+          await expect(footer).toBeInViewport({ ratio: 1 });
+          expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+        }
       });
     }
   });

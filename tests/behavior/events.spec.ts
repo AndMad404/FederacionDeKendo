@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { expectInteractiveReady } from "../helpers/interactive-ready";
 
 const FIXED_UPCOMING_TIME = new Date("2026-08-23T12:00:00-06:00");
 const TOURNAMENT_EVENT_PATH = "/eventos/2026-08-22-3er-torneo/";
@@ -6,6 +7,7 @@ const GASSHUKU_EVENT_PATH = "/eventos/2026-09-12-gasshuku-monteverde/";
 const HISTORICAL_EVENT_PATH = "/eventos/pasados/2026-08-08-examen/";
 const HISTORICAL_TOURNAMENT_PATH = "/eventos/pasados/2026-08-22-3er-torneo/";
 const FIXED_HISTORICAL_TIME = new Date("2026-08-24T12:00:00-06:00");
+const FIXED_ARCHIVE_TIME = new Date("2028-01-01T12:00:00-06:00");
 
 async function discoverUpcomingEvent(page: Page) {
   await page.clock.setFixedTime(FIXED_UPCOMING_TIME);
@@ -274,11 +276,13 @@ test("historical tournament thumbnails follow carousel navigation on mobile", as
 test("renders the historical archive and the local not-found view", async ({
   page,
 }) => {
+  await page.clock.setFixedTime(FIXED_ARCHIVE_TIME);
   const consoleErrors: string[] = [];
   page.on("console", (message) => {
     if (message.type() === "error") consoleErrors.push(message.text());
   });
   await page.goto("/eventos/pasados/");
+  await expectInteractiveReady(page, "past-events");
   await expect(
     page.getByRole("heading", { name: "Eventos pasados", level: 1 }),
   ).toBeVisible();

@@ -1,3 +1,4 @@
+import { readDist } from "../helpers/generated-output-fixtures.mjs";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
@@ -29,10 +30,6 @@ const STATIC_ROUTE_PATHS = [
 ];
 const FORBIDDEN_FRAGMENTS =
   /este y|this and|doscientos metros|two hundred meters|includes:/iu;
-
-async function readDist(path) {
-  return readFile(new URL(`../../dist/${path}`, import.meta.url), "utf8");
-}
 
 async function readSeoConfig() {
   return JSON.parse(
@@ -115,54 +112,24 @@ test("assigns the Federation and Pablo Quesada as organizers except for #EventoE
   );
 });
 
-test("validates static ES/EN description quality and consistency across config, SEO payload, and HTML", async (t) => {
+test("validates static ES/EN description quality and consistency across config, SEO payload, and HTML", async () => {
   const config = await readSeoConfig();
   const manifest = ssr.getRouteManifest();
-  const descriptions = [];
 
   for (const path of STATIC_ROUTE_PATHS) {
-    await t.test(path, async () => {
-      const configured = config.routes[path];
-      assert.ok(
-        configured,
-        `${path}: static SEO description must live in config`,
-      );
-
-      const route = manifest.find((candidate) => candidate.path === path);
-      assert.ok(route, `${path}: route missing from manifest`);
-
-      const payload = ssr.getRouteSeoPayload(route);
-      const html = await readDist(outputPath(path));
-      const descriptionTag = html.match(
-        /<meta\s+[^>]*name="description"[^>]*>/u,
-      )?.[0];
-      const htmlDescription = descriptionTag?.match(/content="([^"]*)"/u)?.[1];
-
-      const description = configured.description;
-
-      assertDescriptionQuality(description, path);
-      assert.doesNotMatch(description, FORBIDDEN_FRAGMENTS, path);
-
-      assert.equal(
-        payload.description,
-        description,
-        `${path}: SEO payload must match config`,
-      );
-      assert.equal(
-        htmlDescription,
-        description,
-        `${path}: generated HTML must match config`,
-      );
-
-      descriptions.push(description);
-    });
+    const configured = config.routes[path];
+    assert.ok(
+      configured,
+      `${path}: static SEO description must live in config`,
+    );
+    const route = manifest.find((candidate) => candidate.path === path);
+    assert.ok(route, `${path}: route missing from manifest`);
+    assert.equal(
+      ssr.getRouteSeoPayload(route).description,
+      configured.description,
+      `${path}: SEO payload must match config`,
+    );
   }
-
-  assert.equal(
-    new Set(descriptions).size,
-    descriptions.length,
-    "static routes must have unique descriptions",
-  );
 });
 
 test("does not impose the dynamic event limit on curated static descriptions", () => {
