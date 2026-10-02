@@ -4,10 +4,17 @@ import type { CalendarEvent } from "../types";
 
 export type EventTranslationStatus = "valid" | "missing" | "stale";
 
+function getEventTranslation(event: CalendarEvent) {
+  return (
+    EVENT_TRANSLATIONS[event.id] ??
+    event.aliases?.map((alias) => EVENT_TRANSLATIONS[alias]).find(Boolean)
+  );
+}
+
 export function getEventTranslationStatus(
   event: CalendarEvent,
 ): EventTranslationStatus {
-  const record = EVENT_TRANSLATIONS[event.id];
+  const record = getEventTranslation(event);
   if (!record) return "missing";
   return record.source.title === event.title &&
     record.source.summary === event.summary
@@ -22,7 +29,7 @@ function normalizeComparableContent(value?: string) {
 export function hasDistinctEventTranslation(event: CalendarEvent) {
   if (getEventTranslationStatus(event) !== "valid") return false;
 
-  const translation = EVENT_TRANSLATIONS[event.id].translation;
+  const translation = getEventTranslation(event)!.translation;
   return (
     normalizeComparableContent(translation.title) !==
       normalizeComparableContent(event.title) ||
@@ -41,7 +48,7 @@ export function getLocalizedEvent(
   // fallback cannot create a duplicate indexable event page.
   if (getEventTranslationStatus(event) !== "valid") return event;
 
-  const translation = EVENT_TRANSLATIONS[event.id].translation;
+  const translation = getEventTranslation(event)!.translation;
   return {
     ...event,
     title: translation.title,

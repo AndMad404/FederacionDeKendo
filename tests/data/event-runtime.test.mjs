@@ -33,7 +33,7 @@ const gasshuku = {
 };
 
 const publishedGasshuku = CALENDAR_EVENTS.find(
-  ({ id }) => id === "2026-09-12-gasshuku-monteverde",
+  ({ id }) => id === "gasshuku-monteverde",
 );
 
 test("event time distinguishes multiple days, timed days and missing hours", async () => {
@@ -111,6 +111,7 @@ test("identifies #EventoExterno markers in the event description", async () => {
 });
 
 test("uses the reviewed English Gasshuku translation from the editorial record", () => {
+  assert.ok(publishedGasshuku);
   const localized = getLocalizedEvent(publishedGasshuku, "en");
 
   assert.equal(getEventTranslationStatus(publishedGasshuku), "valid");
@@ -123,6 +124,7 @@ test("classifies unavailable editorial translations and falls back to Spanish", 
   const missing = {
     ...publishedGasshuku,
     id: "not-translated",
+    aliases: [],
   };
 
   const stale = {
@@ -134,6 +136,22 @@ test("classifies unavailable editorial translations and falls back to Spanish", 
   assert.equal(getEventTranslationStatus(stale), "stale");
   assert.deepEqual(getLocalizedEvent(missing, "en"), missing);
   assert.deepEqual(getLocalizedEvent(stale, "en"), stale);
+});
+
+test("preserves reviewed translations through a URL change without accepting changed source content", () => {
+  const renamed = {
+    ...publishedGasshuku,
+    id: "gasshuku-renamed",
+    aliases: [publishedGasshuku.id, ...publishedGasshuku.aliases],
+  };
+  assert.equal(getEventTranslationStatus(renamed), "valid");
+  assert.match(
+    getLocalizedEvent(renamed, "en").summary,
+    /round-trip transportation/,
+  );
+  const changed = { ...renamed, summary: "Descripcion actualizada" };
+  assert.equal(getEventTranslationStatus(changed), "stale");
+  assert.deepEqual(getLocalizedEvent(changed, "en"), changed);
 });
 
 test("keeps untranslated events available in both route languages", () => {

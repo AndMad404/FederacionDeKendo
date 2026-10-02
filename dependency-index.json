@@ -36,7 +36,9 @@
         "tests/data/event-history-sync-contract.test.mjs",
         "tests/data/event-runtime.test.mjs",
         "tests/data/generated-redirects.test.mjs",
-        "tests/behavior/events.spec.ts"
+        "tests/behavior/events.spec.ts",
+        "tests/data/generated-translations.test.mjs",
+        "tests/data/generated-output.test.mjs"
       ]
     },
     {

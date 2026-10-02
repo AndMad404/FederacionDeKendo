@@ -100,14 +100,23 @@ test("C2: report feed disappearance with stable identity and deterministic event
 
 test("C2: omit deleted historical events while reporting active historical changes", () => {
   const deleted = makeHistoricalEvent({ editorialState: "eliminado" });
-  const active = makeHistoricalEvent({ sourceId: "active-source", slug: "active-event" });
+  const active = makeHistoricalEvent({
+    sourceId: "active-source",
+    slug: "active-event",
+  });
   for (const deletedSource of [[], [makeChangedCalendarEvent()]]) {
     const report = detectHistoricalChanges(
       { version: 4, events: [deleted, active] },
-      [...deletedSource, makeChangedCalendarEvent({ sourceId: active.sourceId })],
+      [
+        ...deletedSource,
+        makeChangedCalendarEvent({ sourceId: active.sourceId }),
+      ],
       new Date("2026-03-01T00:00:00.000Z"),
     );
-    assert.deepEqual(report.historicalChanges.map(({ sourceId }) => sourceId), [active.sourceId]);
+    assert.deepEqual(
+      report.historicalChanges.map(({ sourceId }) => sourceId),
+      [active.sourceId],
+    );
   }
 });
 

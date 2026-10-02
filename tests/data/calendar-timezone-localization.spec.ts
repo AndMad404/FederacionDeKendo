@@ -16,9 +16,13 @@ const eventTranslations = JSON.parse(
 ) as Record<string, TranslationRecord>;
 
 function getValidEnglishTranslation(event: CalendarEvent) {
-  const record = eventTranslations[event.id];
+  const record =
+    eventTranslations[event.id] ??
+    event.aliases?.map((alias) => eventTranslations[alias]).find(Boolean);
   return record?.source.title === event.title &&
-    record.source.summary === event.summary
+    record.source.summary === event.summary &&
+    (record.translation.title !== event.title ||
+      record.translation.summary !== event.summary)
     ? record.translation
     : undefined;
 }
