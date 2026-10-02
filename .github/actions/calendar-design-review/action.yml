@@ -1,0 +1,86 @@
+name: Review calendar design and notify
+description: Review the already generated site after publication and retain operational evidence.
+inputs:
+  git-saved:
+    description: Whether the commit and push step succeeded.
+    required: true
+  smtp-username:
+    required: true
+    description: Existing calendar alert SMTP sender.
+  smtp-password:
+    required: true
+    description: Existing calendar alert SMTP app password.
+  recipient:
+    required: true
+    description: Existing calendar alert recipient.
+runs:
+  using: composite
+  steps:
+    - name: Review generated calendar design
+      id: review
+      if: ${{ inputs.git-saved == 'true' }}
+      continue-on-error: true
+      shell: bash
+      run: pnpm run review:calendar-design
+      env:
+        CALENDAR_GIT_SAVED: ${{ inputs.git-saved }}
+        CALENDAR_LAYOUT_REPORT_DIR: ${{ runner.temp }}/calendar-design-review
+        CALENDAR_NOTIFICATIONS_REPORT_PATH: ${{ runner.temp }}/calendar-notifications.json
+    - name: Report incomplete design review
+      if: ${{ always() && steps.review.outcome == 'failure' }}
+      shell: bash
+      run: pnpm run review:calendar-design
+      env:
+        CALENDAR_GIT_SAVED: ${{ inputs.git-saved }}
+        CALENDAR_LAYOUT_FORCE_INCOMPLETE: "true"
+        CALENDAR_LAYOUT_REPORT_DIR: ${{ runner.temp }}/calendar-design-review
+        CALENDAR_NOTIFICATIONS_REPORT_PATH: ${{ runner.temp }}/calendar-notifications.json
+    - name: Prepare calendar notification email
+      id: email
+      if: ${{ always() }}
+      shell: bash
+      run: node scripts/write-calendar-notification-email.mjs
+      env:
+        CALENDAR_NOTIFICATIONS_REPORT_PATH: ${{ runner.temp }}/calendar-notifications.json
+        CALENDAR_NOTIFICATION_EMAIL_PATH: ${{ runner.temp }}/calendar-notification-email.txt
+        CALENDAR_ALERT_SMTP_USERNAME: ${{ inputs.smtp-username }}
+        CALENDAR_ALERT_RECIPIENT: ${{ inputs.recipient }}
+        CALENDAR_LAYOUT_REPORT_DIR: ${{ runner.temp }}/calendar-design-review
+    - name: Send calendar notification email
+      id: delivery
+      if: ${{ always() && steps.email.outputs.send == 'true' }}
+      shell: bash
+      run: >-
+        curl --fail --silent --show-error --url smtps://smtp.gmail.com:465 --ssl-reqd
+        --user "$CALENDAR_ALERT_SMTP_USERNAME:$CALENDAR_ALERT_SMTP_APP_PASSWORD"
+        --mail-from "$CALENDAR_ALERT_SMTP_USERNAME" --mail-rcpt "$CALENDAR_ALERT_RECIPIENT"
+        --upload-file "$CALENDAR_NOTIFICATION_EMAIL_PATH"
+      env:
+        CALENDAR_ALERT_SMTP_USERNAME: ${{ inputs.smtp-username }}
+        CALENDAR_ALERT_SMTP_APP_PASSWORD: ${{ inputs.smtp-password }}
+        CALENDAR_ALERT_RECIPIENT: ${{ inputs.recipient }}
+        CALENDAR_NOTIFICATION_EMAIL_PATH: ${{ runner.temp }}/calendar-notification-email.txt
+    - name: Report email delivery failure
+      if: ${{ always() && steps.delivery.outcome == 'failure' }}
+      shell: bash
+      run: |
+        echo "::error title=Calendario::No se pudo enviar el correo. Los cambios guardados en Git permanecen; consultar los artefactos."
+        echo "El envío del correo falló. Los cambios guardados en Git permanecen y la evidencia está en los artefactos." >> "$GITHUB_STEP_SUMMARY"
+    - name: Upload calendar design evidence
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v5
+      with:
+        name: calendar-design-review
+        path: ${{ runner.temp }}/calendar-design-review
+        if-no-files-found: warn
+        retention-days: 30
+    - name: Upload calendar notification reports
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v5
+      with:
+        name: calendar-notification-reports
+        path: |
+          ${{ runner.temp }}/calendar-historical-changes.json
+          ${{ runner.temp }}/calendar-notifications.json
+        if-no-files-found: warn
+        retention-days: 30

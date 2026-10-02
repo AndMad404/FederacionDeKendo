@@ -7,7 +7,7 @@ import {
   MASS_DISAPPEARANCE_RATIO,
   mergeRegistry,
   serializeCalendarEvents,
-} from "../../scripts/sync-calendar-events.mjs";
+} from "../../scripts/sync-calendar-events.ts";
 import {
   REMOVED_HISTORICAL_FIELDS,
   makeHistoricalEvent,

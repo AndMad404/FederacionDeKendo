@@ -3,6 +3,9 @@ import { expect, test } from "@playwright/test";
 test("calendar menu opens on hover and navigates to past events", async ({
   page,
 }) => {
+  // Pointer traversal below measures static bounds. Motion is covered by the
+  // interaction-state design tests; suppress it while moving through the gap.
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width: 1366, height: 768 });
   await page.goto("/eventos/");
 

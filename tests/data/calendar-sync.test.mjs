@@ -13,7 +13,7 @@ import sharp from "sharp";
 
 import { createIcs } from "../helpers/calendar-fixtures.mjs";
 
-import { synchronizeCalendar } from "../../scripts/sync-calendar-events.mjs";
+import { synchronizeCalendar } from "../../scripts/sync-calendar-events.ts";
 
 const phase2FixturePath = new URL(
   "../fixtures/calendar-events-phase-2.ics",

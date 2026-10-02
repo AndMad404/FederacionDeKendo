@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { applyHistoricalCorrections } from "./correct-calendar-history.mjs";
+import { applyHistoricalCorrections } from "./correct-calendar-history.ts";
 
 const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),

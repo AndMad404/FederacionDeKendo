@@ -1,4 +1,4 @@
-import { mergeRegistry } from "../../scripts/sync-calendar-events.mjs";
+import { mergeRegistry } from "../../scripts/sync-calendar-events.ts";
 
 const historicalDefaults = {
   sourceId: "stable-source",

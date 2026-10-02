@@ -1,0 +1,118 @@
+{
+  "baseline": "e73c092f",
+  "registry": {
+    "version": 4,
+    "events": [
+      {
+        "sourceId": "4f17fa08cb6033be4a11f7aa",
+        "slug": "seminario-historico",
+        "title": "Seminario histórico",
+        "date": "2026-01-10",
+        "timeZone": "America/Costa_Rica",
+        "archiveEligibleAt": "2026-01-12T06:00:00.000Z",
+        "summary": "Memoria institucional.",
+        "eventType": "seminario",
+        "editorialState": "publicado",
+        "historical": true
+      },
+      {
+        "sourceId": "c62eb208f2ba4a5133bf1176",
+        "slug": "encuentro-actualizado",
+        "title": "Encuentro actualizado",
+        "date": "2026-02-14",
+        "timeZone": "America/Costa_Rica",
+        "archiveEligibleAt": "2026-02-16T06:00:00.000Z",
+        "summary": "Descripción pública actualizada.",
+        "eventType": "seminario",
+        "editorialState": "publicado",
+        "historical": true
+      },
+      {
+        "sourceId": "330095024f5eed82a002932b",
+        "slug": "torneo-sin-album",
+        "title": "Torneo sin álbum",
+        "date": "2026-03-21",
+        "timeZone": "America/Costa_Rica",
+        "archiveEligibleAt": "2026-03-23T06:00:00.000Z",
+        "summary": "Sin fotografías.",
+        "eventType": "torneo",
+        "editorialState": "publicado",
+        "historical": true
+      },
+      {
+        "sourceId": "8b08f9daadfc74a2436c0f02",
+        "slug": "examenes-con-album",
+        "title": "Exámenes con álbum",
+        "date": "2026-04-18",
+        "timeZone": "America/Costa_Rica",
+        "archiveEligibleAt": "2026-04-20T06:00:00.000Z",
+        "summary": "Fotografías aprobadas.",
+        "eventType": "examen",
+        "editorialState": "publicado",
+        "historical": true
+      },
+      {
+        "sourceId": "2d83b51f60cbaff5aa849255",
+        "slug": "gasshuku-tecnico",
+        "title": "Gasshuku técnico",
+        "date": "2026-05-23",
+        "timeZone": "America/Costa_Rica",
+        "archiveEligibleAt": "2026-05-25T06:00:00.000Z",
+        "summary": "Tipo inferido por título.",
+        "eventType": "seminario",
+        "editorialState": "publicado",
+        "historical": true
+      },
+      {
+        "sourceId": "bc5dd93f71a3a58fb086dadd",
+        "slug": "encuentro-federativo",
+        "title": "Encuentro federativo",
+        "date": "2026-06-20",
+        "timeZone": "America/Costa_Rica",
+        "archiveEligibleAt": "2026-06-22T06:00:00.000Z",
+        "summary": "Tipo general.",
+        "eventType": "seminario",
+        "editorialState": "publicado",
+        "historical": true
+      },
+      {
+        "sourceId": "155a7a621f335656164d76c8",
+        "slug": "examen-en-preparacion",
+        "title": "Examen en preparación",
+        "date": "2026-08-08",
+        "timeZone": "America/Costa_Rica",
+        "archiveEligibleAt": "2026-08-10T06:00:00.000Z",
+        "summary": "Resultado pendiente.",
+        "eventType": "examen",
+        "editorialState": "publicado"
+      },
+      {
+        "sourceId": "264823169e64ab05ac984da4",
+        "slug": "torneo-futuro",
+        "title": "Torneo futuro",
+        "date": "2026-10-10",
+        "timeZone": "America/Costa_Rica",
+        "archiveEligibleAt": "2026-10-12T06:00:00.000Z",
+        "summary": "Descripción pública.",
+        "eventType": "torneo",
+        "editorialState": "publicado"
+      }
+    ]
+  },
+  "warnings": [],
+  "serialized": "import type { CalendarEvent } from \"../types\";\n\n// Auto-generated from Google Calendar. Do not edit manually.\nexport const CALENDAR_EVENTS: CalendarEvent[] = [\n  {\n    id: \"seminario-historico\",\n    archiveEligibleAt: \"2026-01-12T06:00:00.000Z\",\n    title: \"Seminario histórico\",\n    date: \"2026-01-10\",\n    summary: \"Memoria institucional.\",\n    eventType: \"seminario\",\n    timeZone: \"America/Costa_Rica\"\n  },\n  {\n    id: \"encuentro-actualizado\",\n    archiveEligibleAt: \"2026-02-16T06:00:00.000Z\",\n    title: \"Encuentro actualizado\",\n    date: \"2026-02-14\",\n    summary: \"Descripción pública actualizada.\",\n    eventType: \"seminario\",\n    timeZone: \"America/Costa_Rica\"\n  },\n  {\n    id: \"torneo-sin-album\",\n    archiveEligibleAt: \"2026-03-23T06:00:00.000Z\",\n    title: \"Torneo sin álbum\",\n    date: \"2026-03-21\",\n    summary: \"Sin fotografías.\",\n    eventType: \"torneo\",\n    timeZone: \"America/Costa_Rica\"\n  },\n  {\n    id: \"examenes-con-album\",\n    archiveEligibleAt: \"2026-04-20T06:00:00.000Z\",\n    title: \"Exámenes con álbum\",\n    date: \"2026-04-18\",\n    summary: \"Fotografías aprobadas.\",\n    eventType: \"examen\",\n    timeZone: \"America/Costa_Rica\"\n  },\n  {\n    id: \"gasshuku-tecnico\",\n    archiveEligibleAt: \"2026-05-25T06:00:00.000Z\",\n    title: \"Gasshuku técnico\",\n    date: \"2026-05-23\",\n    summary: \"Tipo inferido por título.\",\n    eventType: \"seminario\",\n    timeZone: \"America/Costa_Rica\"\n  },\n  {\n    id: \"encuentro-federativo\",\n    archiveEligibleAt: \"2026-06-22T06:00:00.000Z\",\n    title: \"Encuentro federativo\",\n    date: \"2026-06-20\",\n    summary: \"Tipo general.\",\n    eventType: \"seminario\",\n    timeZone: \"America/Costa_Rica\"\n  },\n  {\n    id: \"examen-en-preparacion\",\n    archiveEligibleAt: \"2026-08-10T06:00:00.000Z\",\n    title: \"Examen en preparación\",\n    date: \"2026-08-08\",\n    summary: \"Resultado pendiente.\",\n    eventType: \"examen\",\n    timeZone: \"America/Costa_Rica\"\n  },\n  {\n    id: \"torneo-futuro\",\n    archiveEligibleAt: \"2026-10-12T06:00:00.000Z\",\n    title: \"Torneo futuro\",\n    date: \"2026-10-10\",\n    summary: \"Descripción pública.\",\n    eventType: \"torneo\",\n    timeZone: \"America/Costa_Rica\"\n  }\n];\n",
+  "fingerprints": [
+    "dbd70bda142c64c651bb2f884452a182a219c76eeaaff1fd1e3719bfb34ea4e9",
+    "9303e0dc99e5e8f5013be069e0efa37d822cd1ada7add43c4ea5ed44c1b0cedd",
+    "e09f1b35092a4bc9cc0650386d8d61ee33d6bcb588450dc34b8b5445a3f0fdd4",
+    "71baa60cf5b3005120872378a0ec8caa5a52a2148b1f197105132fddbbc93461",
+    "8787d7ce6f23fea0cf7235fc9536c827a0c7046d8c3e09c3a133d891f8d49581",
+    "b58247523adb6c99696e92b178d36f51da5a4e0a883e3e747b2b7ef17d51db1d",
+    "d08418c004d6a54e22f644f82395d6b704ad582e1fcd2fca2aa9ec78a5506a23",
+    "6419f2ffbb9e6311a13c3871f4ecdc0e41c53cb38f46363e919afc2d35fc58e1"
+  ],
+  "notifications": {
+    "version": 1,
+    "notifications": []
+  }
+}

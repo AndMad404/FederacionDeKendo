@@ -5,11 +5,11 @@ import {
   calculateGalleryCheckAt,
   calculateGalleryDeadlineAt,
   calculatePublicPastAt,
-} from "../../src/app/utils/eventArchive.js";
+} from "../../src/app/utils/eventArchive.ts";
 import {
   addCalendarDays,
   getCalendarDateTimeSortKey,
-} from "../../src/app/utils/calendarDate.js";
+} from "../../src/app/utils/calendarDate.ts";
 test("calendar date helpers cross month and year boundaries independently of the runner zone", () => {
   assert.equal(addCalendarDays("2026-01-31", 1), "2026-02-01");
   assert.equal(addCalendarDays("2026-01-01", -1), "2025-12-31");

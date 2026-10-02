@@ -8,6 +8,9 @@ export async function preparePage(
 ) {
   await page.clock.setFixedTime(referenceTime);
   await page.goto(path);
+  // Generated HTML can still be replaced during hydration (notably archive
+  // images and event galleries when the test clock differs from build time).
+  await page.waitForLoadState("networkidle");
   await expect(page.locator("main h1")).toBeVisible();
   await page.evaluate(async () => {
     await document.fonts.ready;
@@ -39,4 +42,10 @@ export async function preparePage(
       },
     )
     .toEqual([]);
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+      ),
+  );
 }

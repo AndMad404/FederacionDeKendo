@@ -2,6 +2,10 @@ name: Verify site
 description: Run the shared site verification gate on the current workspace.
 
 inputs:
+  mode:
+    description: full for code changes, calendar for blocking calendar verification.
+    required: false
+    default: full
   unit-script:
     description: Approved package script for the unit-test portion of this gate.
     required: false
@@ -12,4 +16,4 @@ runs:
   steps:
     - name: Run immutable site verification gate
       shell: bash
-      run: pnpm run verify:site -- --unit-script "${{ inputs.unit-script }}"
+      run: pnpm run verify:site -- --unit-script "${{ inputs.unit-script }}" --mode "${{ inputs.mode }}"

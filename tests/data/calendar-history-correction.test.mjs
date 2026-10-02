@@ -9,7 +9,7 @@ import {
   applyHistoricalCorrection,
   fingerprintHistoricalProposal,
   fingerprintHistoricalSnapshot,
-} from "../../scripts/correct-calendar-history.mjs";
+} from "../../scripts/correct-calendar-history.ts";
 import {
   applyHistoricalCorrectionsByDateRange,
   parseCliArguments,
@@ -18,7 +18,7 @@ import { synchronizeApprovedHistoricalGalleries } from "../../scripts/sync-appro
 import {
   detectHistoricalChanges,
   serializeCalendarEvents,
-} from "../../scripts/sync-calendar-events.mjs";
+} from "../../scripts/sync-calendar-events.ts";
 
 const published = {
   sourceId: "stable-source",

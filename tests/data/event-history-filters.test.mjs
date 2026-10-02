@@ -7,7 +7,7 @@ import {
   getArchivePageNumber,
   getArchiveYears,
   normalizeArchiveFilters,
-} from "../../src/app/utils/eventArchive.js";
+} from "../../src/app/utils/eventArchive.ts";
 
 const events = [
   { id: "no-gallery", date: "2024-01-15", eventType: "evento" },

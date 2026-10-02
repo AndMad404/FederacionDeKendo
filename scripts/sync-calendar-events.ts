@@ -1,3 +1,21 @@
+import type {
+  RegistryEvent,
+  Registry,
+  IcsProperty,
+  RevisionReason,
+  PendingRevision,
+  Decision,
+  Difference,
+  HistoricalReport,
+  HistoricalChange,
+  Execution,
+  Notification,
+  NotificationReport,
+  CalendarError,
+  SyncOptions,
+} from "./calendar-sync-types.ts";
+import type { CalendarEvent } from "../src/app/types";
+
 import { createHash } from "node:crypto";
 import {
   appendFile,
@@ -16,15 +34,15 @@ import {
   calculateGalleryDeadlineAt,
   getArchiveEligibleAt,
   isArchiveEligible,
-} from "../src/app/utils/eventArchive.js";
+} from "../src/app/utils/eventArchive.ts";
 import {
   addCalendarDays,
   getCalendarDateTimeSortKey,
-} from "../src/app/utils/calendarDate.js";
+} from "../src/app/utils/calendarDate.ts";
 import {
   replaceTransaction,
   synchronizeEventGalleries,
-} from "./sync-event-galleries.mjs";
+} from "./sync-event-galleries.ts";
 import eventTranslations from "../src/app/data/eventTranslations.json" with { type: "json" };
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -45,7 +63,7 @@ const defaultRegistryPath = path.join(
 );
 const defaultTimeZone = process.env.CALENDAR_TIME_ZONE ?? "America/Costa_Rica";
 const draftPrefix = "[BORRADOR]";
-const inferredEventTypes = [
+const inferredEventTypes: [string, RegExp][] = [
   ["torneo", /(?:^|\s)torneos?(?:$|\s)/],
   ["examen", /(?:^|\s)examen(?:es)?(?:$|\s)/],
 ];
@@ -60,12 +78,15 @@ export const MASS_DISAPPEARANCE_MINIMUM = 2;
 export const MASS_DISAPPEARANCE_RATIO = 0.5;
 
 export function getTranslationPublicationCounts(
-  events,
-  translations = eventTranslations,
+  events: (Pick<CalendarEvent, "title" | "summary"> & { id?: string })[],
+  translations: Record<
+    string,
+    { source: { title: string; summary?: string } }
+  > = eventTranslations,
 ) {
   return events.reduce(
     (counts, event) => {
-      const translation = translations[event.id];
+      const translation = translations[String(event.id)];
       if (!translation) {
         counts.missing += 1;
       } else if (
@@ -82,7 +103,7 @@ export function getTranslationPublicationCounts(
   );
 }
 
-export const HISTORICAL_COMPARISON_FIELDS = [
+export const HISTORICAL_COMPARISON_FIELDS: (keyof RegistryEvent)[] = [
   "slug",
   "archiveEligibleAt",
   "title",
@@ -98,7 +119,7 @@ export const HISTORICAL_COMPARISON_FIELDS = [
   "timeZone",
 ];
 
-export const HISTORICAL_SNAPSHOT_FIELDS = [
+export const HISTORICAL_SNAPSHOT_FIELDS: (keyof RegistryEvent)[] = [
   "sourceId",
   "slug",
   "aliases",
@@ -114,15 +135,17 @@ export const HISTORICAL_SNAPSHOT_FIELDS = [
 const driveUrl =
   /https?:\/\/(?:[A-Za-z0-9-]+\.)?drive\.google\.com\/[^\s<>)\]]+/gi;
 
-export function getPrivateAlbumUrl(event) {
+export function getPrivateAlbumUrl(
+  event: (RegistryEvent & { [albumUrlSymbol]?: string }) | undefined,
+) {
   return event?.[albumUrlSymbol];
 }
 
-function getGoogleDriveFolderId(url) {
+function getGoogleDriveFolderId(url: string) {
   return new URL(url).pathname.split("/").at(-1);
 }
 
-function unfoldIcsLines(icsText) {
+function unfoldIcsLines(icsText: string) {
   return icsText
     .replace(/\r\n/g, "\n")
     .replace(/\r/g, "\n")
@@ -135,10 +158,10 @@ function unfoldIcsLines(icsText) {
       }
 
       return lines;
-    }, []);
+    }, [] as string[]);
 }
 
-function decodeIcsText(value) {
+function decodeIcsText(value: string) {
   return value
     .replace(/\\n/gi, "\n")
     .replace(/\\,/g, ",")
@@ -147,7 +170,7 @@ function decodeIcsText(value) {
     .trim();
 }
 
-function parseIcsProperty(line) {
+function parseIcsProperty(line: string) {
   const colonIndex = line.indexOf(":");
   if (colonIndex === -1) return undefined;
 
@@ -174,7 +197,7 @@ function parseIcsProperty(line) {
   };
 }
 
-export function parseVEvents(icsText) {
+export function parseVEvents(icsText: string) {
   if (!/BEGIN:VCALENDAR/.test(icsText) || !/END:VCALENDAR/.test(icsText)) {
     throw new Error(
       "Invalid iCalendar feed: VCALENDAR boundaries are missing.",
@@ -182,7 +205,7 @@ export function parseVEvents(icsText) {
   }
 
   const events = [];
-  let currentEventLines;
+  let currentEventLines: string[] | undefined;
 
   for (const line of unfoldIcsLines(icsText)) {
     if (line === "BEGIN:VEVENT") {
@@ -214,11 +237,11 @@ export function parseVEvents(icsText) {
   });
 }
 
-function pad(value) {
+function pad(value: number) {
   return String(value).padStart(2, "0");
 }
 
-function parseBasicDate(value) {
+function parseBasicDate(value: string) {
   return {
     year: Number.parseInt(value.slice(0, 4), 10),
     month: Number.parseInt(value.slice(4, 6), 10),
@@ -226,7 +249,7 @@ function parseBasicDate(value) {
   };
 }
 
-function parseBasicDateTime(value) {
+function parseBasicDateTime(value: string) {
   return {
     ...parseBasicDate(value),
     hours: Number.parseInt(value.slice(9, 11), 10),
@@ -234,7 +257,7 @@ function parseBasicDateTime(value) {
   };
 }
 
-function parseUtcCalendarTimestamp(property) {
+function parseUtcCalendarTimestamp(property: IcsProperty | undefined) {
   const match = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z$/.exec(
     property?.rawValue ?? "",
   );
@@ -257,11 +280,19 @@ function parseUtcCalendarTimestamp(property) {
   return iso === expected ? iso : undefined;
 }
 
-function formatDate({ year, month, day }) {
+function formatDate({
+  year,
+  month,
+  day,
+}: {
+  year: number;
+  month: number;
+  day: number;
+}) {
   return `${year}-${pad(month)}-${pad(day)}`;
 }
 
-function formatDateTimeInZone(date, timeZone) {
+function formatDateTimeInZone(date: Date, timeZone: string) {
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone,
     year: "numeric",
@@ -280,7 +311,11 @@ function formatDateTimeInZone(date, timeZone) {
   };
 }
 
-function parseIcsDate(property) {
+function parseIcsDate(
+  property: IcsProperty | undefined,
+):
+  | { date: string; time?: string; isDateOnly: boolean; timeZone: string }
+  | undefined {
   if (!property) return undefined;
   const isDateOnly =
     property.params.VALUE === "DATE" || /^\d{8}$/.test(property.rawValue);
@@ -323,7 +358,7 @@ function parseIcsDate(property) {
   };
 }
 
-function slugify(value) {
+function slugify(value: string) {
   return value
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
@@ -333,15 +368,18 @@ function slugify(value) {
     .slice(0, 72);
 }
 
-function hash(value, length = 24) {
+function hash(value: string, length: number = 24) {
   return createHash("sha256").update(value).digest("hex").slice(0, length);
 }
 
-export function createCanonicalSlug(title) {
+export function createCanonicalSlug(title: string) {
   return slugify(title) || "actividad";
 }
 
-function parseTechnicalDescription(description, title) {
+function parseTechnicalDescription(
+  description: string | undefined,
+  title: string,
+) {
   if (!description) return { publicDescription: undefined };
 
   const lines = description.replace(/\r\n?/g, "\n").split("\n");
@@ -375,7 +413,9 @@ function parseTechnicalDescription(description, title) {
     const anchorMatches = [...line.matchAll(embeddedGoogleDriveFolderAnchor)];
     const matches = [
       ...anchorMatches.map((match) => match[1]),
-      ...line.matchAll(embeddedGoogleDriveFolderUrl).map((match) => match[0]),
+      ...Array.from(line.matchAll(embeddedGoogleDriveFolderUrl)).map(
+        (match) => match[0],
+      ),
     ];
     for (const match of matches) {
       if (
@@ -405,14 +445,14 @@ function parseTechnicalDescription(description, title) {
   };
 }
 
-export function normalizePublicDescription(description) {
+export function normalizePublicDescription(description: string) {
   return description
     .replace(/<br\s*\/?\s*>/gi, "\n")
     .replace(/<[^>]*>/g, "")
     .trim();
 }
 
-function inferEventType(title) {
+function inferEventType(title: string) {
   const normalizedTitle = slugify(title).replace(/-/g, " ");
   const inferred = inferredEventTypes.find(([, pattern]) =>
     pattern.test(normalizedTitle),
@@ -421,14 +461,17 @@ function inferEventType(title) {
   return "seminario";
 }
 
-function getOrganizer(property) {
+function getOrganizer(property: IcsProperty | undefined) {
   if (!property) return undefined;
   return property.params.CN
     ? decodeIcsText(property.params.CN)
     : property.value.replace(/^mailto:/i, "");
 }
 
-export function parseCalendarEvent(properties, warnings = []) {
+export function parseCalendarEvent(
+  properties: Map<string, IcsProperty>,
+  warnings: string[] = [],
+): RegistryEvent | undefined {
   const rawTitle = properties.get("SUMMARY")?.value;
   if (rawTitle?.toUpperCase().startsWith(draftPrefix)) {
     warnings.push(
@@ -452,8 +495,8 @@ export function parseCalendarEvent(properties, warnings = []) {
   const missingRequired = [
     !rawTitle?.trim() && "title",
     !start && "date",
-  ].filter(Boolean);
-  if (!uid || missingRequired.length) {
+  ].filter((value): value is NonNullable<typeof value> => Boolean(value));
+  if (!uid || !rawTitle?.trim() || !start || missingRequired.length) {
     const reason = !uid ? "UID" : missingRequired.join(" and ");
     warnings.push(
       `Event omitted because required ${reason} is missing: ${rawTitle || "(untitled)"}`,
@@ -470,7 +513,7 @@ export function parseCalendarEvent(properties, warnings = []) {
   const sourceUpdatedAt = parseUtcCalendarTimestamp(
     properties.get("LAST-MODIFIED"),
   );
-  const event = {
+  const event: RegistryEvent = {
     sourceId: hash(uid),
     ...(sourceUpdatedAt ? { sourceUpdatedAt } : {}),
     slug: createCanonicalSlug(title),
@@ -521,7 +564,7 @@ export function parseCalendarEvent(properties, warnings = []) {
   return event;
 }
 
-function getEventIdentity(event, matchedAs) {
+function getEventIdentity(event: RegistryEvent, matchedAs?: string) {
   return {
     sourceId: event.sourceId,
     slug: event.slug,
@@ -537,13 +580,13 @@ function createCalendarIdentityConflict({
   identity,
   before,
   after,
-}) {
-  const error = new Error(message);
+}: NonNullable<CalendarError["calendarNotification"]> & { message: string }) {
+  const error: CalendarError = new Error(message);
   error.calendarNotification = { kind, identity, before, after };
   return error;
 }
 
-function assertUniqueCurrentSlugs(events) {
+function assertUniqueCurrentSlugs(events: RegistryEvent[]) {
   const ownerBySlug = new Map();
   for (const event of events) {
     for (const slug of [event.slug, ...(event.aliases ?? [])]) {
@@ -572,7 +615,10 @@ function assertUniqueCurrentSlugs(events) {
   }
 }
 
-export function assertSafeCalendarInput(previousRegistry, parsedEvents) {
+export function assertSafeCalendarInput(
+  previousRegistry: Registry,
+  parsedEvents: RegistryEvent[],
+) {
   if (parsedEvents.length === 0) {
     throw new Error(
       "Calendar feed contains no valid events; no files were changed.",
@@ -612,10 +658,10 @@ export function assertSafeCalendarInput(previousRegistry, parsedEvents) {
 }
 
 export function mergeRegistry(
-  previousRegistry,
-  currentEvents,
-  now = new Date(),
-) {
+  previousRegistry: Registry,
+  currentEvents: RegistryEvent[],
+  now: Date = new Date(),
+): Registry {
   const registryVersion = 4;
   assertUniqueCurrentSlugs(currentEvents);
   const historicalEvents = (previousRegistry.events ?? []).filter(
@@ -635,7 +681,7 @@ export function mergeRegistry(
   const previousBySourceId = new Map(
     (previousRegistry.events ?? []).map((event) => [event.sourceId, event]),
   );
-  const freezeHistoricalSnapshot = (event) => ({
+  const freezeHistoricalSnapshot = (event: RegistryEvent): RegistryEvent => ({
     ...event,
     archiveEligibleAt: getArchiveEligibleAt(event).toISOString(),
     historical: true,
@@ -659,10 +705,10 @@ export function mergeRegistry(
       previousEvent?.historical === true ||
       (previousEvent ? isArchiveEligible(previousEvent, now) : false);
     const becomesHistorical =
-      new Date(currentEvent.archiveEligibleAt).getTime() <= now.getTime();
+      new Date(currentEvent.archiveEligibleAt!).getTime() <= now.getTime();
 
     if (wasHistorical) {
-      const published = freezeHistoricalSnapshot(previousEvent);
+      const published = freezeHistoricalSnapshot(previousEvent!);
       const matchesPublished = HISTORICAL_COMPARISON_FIELDS.every(
         (field) =>
           JSON.stringify(published[field]) ===
@@ -677,7 +723,7 @@ export function mergeRegistry(
         currentEvent,
         "historical_change",
         now,
-        previousEvent.pendingRevision,
+        previousEvent!.pendingRevision,
       );
     }
 
@@ -726,7 +772,7 @@ export function mergeRegistry(
       if (
         event.editorialDecision?.action === "reject_deletion" &&
         event.editorialDecision.evidenceFingerprint ===
-          pending.pendingRevision.evidence.fingerprint
+          pending.pendingRevision!.evidence.fingerprint
       ) {
         return published;
       }
@@ -742,7 +788,10 @@ export function mergeRegistry(
   return { version: registryVersion, events: merged };
 }
 
-function editorialRevisionId(event, reason) {
+function editorialRevisionId(
+  event: RegistryEvent | undefined,
+  reason: RevisionReason,
+) {
   return fingerprintOrderedFields({ reason, ...(event ?? {}) }, [
     "reason",
     "sourceId",
@@ -750,22 +799,22 @@ function editorialRevisionId(event, reason) {
   ]);
 }
 
-const evidenceFields = [
+const evidenceFields: (keyof RegistryEvent)[] = [
   "sourceId",
   ...HISTORICAL_COMPARISON_FIELDS,
   "aliases",
   "historical",
 ];
 
-function redactEvidenceValue(value) {
-  if (Array.isArray(value)) return value.map(redactEvidenceValue);
+function redactEvidenceValue<T>(value: T): T {
+  if (Array.isArray(value)) return value.map(redactEvidenceValue) as T;
   if (value && typeof value === "object") {
     return Object.fromEntries(
       Object.entries(value).map(([key, item]) => [
         key,
         redactEvidenceValue(item),
       ]),
-    );
+    ) as T;
   }
   if (typeof value !== "string") return value;
   return value
@@ -773,10 +822,12 @@ function redactEvidenceValue(value) {
     .replace(
       /(?:webcal:|https?):\/\/[^\s<>)\]]+\.ics(?:[?#][^\s<>)\]]*)?/gi,
       "[redacted]",
-    );
+    ) as T;
 }
 
-function evidenceSnapshot(event) {
+function evidenceSnapshot(
+  event: RegistryEvent | undefined,
+): Record<string, unknown> | null {
   if (!event) return null;
   return Object.fromEntries(
     evidenceFields
@@ -794,6 +845,12 @@ export function fingerprintEditorialEvidence({
   reason,
   published,
   proposed,
+}: {
+  sourceId: string;
+  revisionId: string;
+  reason: RevisionReason;
+  published: unknown;
+  proposed: unknown;
 }) {
   return fingerprintOrderedFields(
     { sourceId, revisionId, reason, published, proposed },
@@ -802,12 +859,12 @@ export function fingerprintEditorialEvidence({
 }
 
 function createPendingRevision(
-  publishedEvent,
-  proposedEvent,
-  reason,
-  now = new Date(),
-  previousRevision,
-) {
+  publishedEvent: RegistryEvent,
+  proposedEvent: RegistryEvent | undefined,
+  reason: RevisionReason,
+  now: Date = new Date(),
+  previousRevision: PendingRevision | undefined,
+): RegistryEvent {
   const published = Object.fromEntries(
     Object.entries(publishedEvent).filter(
       ([field]) => !["pendingRevision", "editorialDecision"].includes(field),
@@ -815,7 +872,9 @@ function createPendingRevision(
   );
   const id = editorialRevisionId(proposedEvent, reason);
   const observedAt = now.toISOString();
-  const publishedEvidence = evidenceSnapshot(published);
+  const publishedEvidence = evidenceSnapshot(
+    published as unknown as RegistryEvent,
+  );
   const proposed = evidenceSnapshot(proposedEvent);
   const firstDetectedAt =
     previousRevision?.id === id
@@ -846,7 +905,7 @@ function createPendingRevision(
     return publishedEvent;
   }
   return {
-    ...published,
+    ...(published as unknown as RegistryEvent),
     editorialState: "pendiente",
     pendingRevision: {
       id,
@@ -863,7 +922,10 @@ function createPendingRevision(
   };
 }
 
-export function decidePendingDeletion(event, decision) {
+export function decidePendingDeletion(
+  event: RegistryEvent,
+  decision: Decision,
+): RegistryEvent {
   if (event.editorialState !== "pendiente") {
     throw new Error(
       "Only a pending editorial revision can receive a deletion decision.",
@@ -916,7 +978,7 @@ export function decidePendingDeletion(event, decision) {
   throw new Error("Unsupported editorial decision.");
 }
 
-function requireDecisionRecord(decision) {
+function requireDecisionRecord(decision: Decision) {
   if (
     !/^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$/.test(decision.decisionRecordId ?? "")
   ) {
@@ -928,7 +990,10 @@ function requireDecisionRecord(decision) {
 
 // This is the operational boundary for Phase 5.  The lower-level transition
 // helper above remains available to describe the v4 state machine in isolation.
-export function applyEditorialDecision(registry, decision) {
+export function applyEditorialDecision(
+  registry: Registry,
+  decision: Decision,
+): Registry {
   if (registry?.version !== 4 || !Array.isArray(registry.events)) {
     throw new Error(
       "Editorial decisions require a current v4 calendar registry.",
@@ -971,30 +1036,33 @@ export function applyEditorialDecision(registry, decision) {
   return { ...registry, events };
 }
 
-function canonicalValue(value) {
+function canonicalValue(value: unknown) {
   return value === undefined ? { absent: true } : value;
 }
 
-export function fingerprintOrderedFields(value, fields) {
+export function fingerprintOrderedFields(value: object, fields: string[]) {
   const canonical = fields.map((field) => [
     field,
-    canonicalValue(value[field]),
+    canonicalValue((value as Record<string, unknown>)[field]),
   ]);
   return createHash("sha256").update(JSON.stringify(canonical)).digest("hex");
 }
 
-export function fingerprintHistoricalSnapshot(event) {
+export function fingerprintHistoricalSnapshot(event: RegistryEvent) {
   return fingerprintOrderedFields(event, HISTORICAL_SNAPSHOT_FIELDS);
 }
 
-export function fingerprintHistoricalProposal(sourceId, differences) {
+export function fingerprintHistoricalProposal(
+  sourceId: string,
+  differences: Difference[],
+) {
   const byField = new Map(
     differences.map((difference) => [difference.field, difference]),
   );
   const canonical = HISTORICAL_COMPARISON_FIELDS.filter((field) =>
     byField.has(field),
   ).map((field) => {
-    const difference = byField.get(field);
+    const difference = byField.get(field)!;
     return [field, difference.type, canonicalValue(difference.proposed)];
   });
   return createHash("sha256")
@@ -1002,17 +1070,17 @@ export function fingerprintHistoricalProposal(sourceId, differences) {
     .digest("hex");
 }
 
-function reportValue(value) {
+function reportValue(value: unknown) {
   if (value === undefined) return null;
   if (typeof value === "string") return value.replace(driveUrl, "[redacted]");
   return value;
 }
 
 export function detectHistoricalChanges(
-  previousRegistry,
-  currentEvents,
-  now = new Date(),
-) {
+  previousRegistry: Registry,
+  currentEvents: RegistryEvent[],
+  now: Date = new Date(),
+): HistoricalReport {
   const currentBySourceId = new Map(
     currentEvents.map((event) => [event.sourceId, event]),
   );
@@ -1048,7 +1116,7 @@ export function detectHistoricalChanges(
     }
 
     if (differences.length) {
-      const change = {
+      const change: HistoricalChange = {
         sourceId: publishedEvent.sourceId,
         publicIdentity: {
           slug: publishedEvent.slug,
@@ -1080,8 +1148,11 @@ export function detectHistoricalChanges(
   return { version: 2, historicalChanges: changes };
 }
 
-function redactReportSecrets(report, secrets) {
-  const redact = (value) => {
+function redactReportSecrets(
+  report: HistoricalReport,
+  secrets: (string | undefined)[],
+) {
+  const redact = (value: unknown): unknown => {
     if (Array.isArray(value)) return value.map(redact);
     if (value && typeof value === "object") {
       return Object.fromEntries(
@@ -1090,40 +1161,45 @@ function redactReportSecrets(report, secrets) {
     }
     if (typeof value !== "string") return value;
     return secrets
-      .filter((secret) => typeof secret === "string" && secret.length > 0)
+      .filter(
+        (secret): secret is string =>
+          typeof secret === "string" && secret.length > 0,
+      )
       .reduce((text, secret) => text.replaceAll(secret, "[redacted]"), value);
   };
-  return redact(report);
+  return redact(report) as HistoricalReport;
 }
 
-function redactNotificationValue(value) {
-  if (Array.isArray(value)) return value.map(redactNotificationValue);
+function redactNotificationValue<T>(value: T): T {
+  if (Array.isArray(value)) return value.map(redactNotificationValue) as T;
   if (value && typeof value === "object") {
     return Object.fromEntries(
       Object.entries(value).map(([key, item]) => [
         key,
         redactNotificationValue(item),
       ]),
-    );
+    ) as T;
   }
   if (typeof value !== "string") return value;
   return redactEvidenceValue(value).replace(
     /(?:webcal:|https?):\/\/[^\s<>)\]]+/gi,
     "[redacted]",
-  );
+  ) as T;
 }
 
-function getNotificationExecution(environment = process.env) {
+function getNotificationExecution(
+  environment: NodeJS.ProcessEnv = process.env,
+) {
   const runId = /^\d+$/.test(environment.GITHUB_RUN_ID ?? "")
-    ? environment.GITHUB_RUN_ID
+    ? environment.GITHUB_RUN_ID!
     : null;
   const attempt = /^\d+$/.test(environment.GITHUB_RUN_ATTEMPT ?? "")
-    ? environment.GITHUB_RUN_ATTEMPT
+    ? environment.GITHUB_RUN_ATTEMPT!
     : null;
   const trigger = ["schedule", "workflow_dispatch"].includes(
-    environment.GITHUB_EVENT_NAME,
+    environment.GITHUB_EVENT_NAME ?? "",
   )
-    ? environment.GITHUB_EVENT_NAME
+    ? environment.GITHUB_EVENT_NAME!
     : null;
   return {
     origin: runId ? "github_actions" : "local",
@@ -1152,9 +1228,9 @@ const pendingNotificationDetails = {
 };
 
 export function createCalendarNotifications(
-  registry,
-  execution = getNotificationExecution(),
-) {
+  registry: Registry,
+  execution: Execution = getNotificationExecution(),
+): NotificationReport {
   const notifications = new Map();
   for (const event of registry.events ?? []) {
     if (event.editorialState !== "pendiente" || !event.pendingRevision)
@@ -1198,7 +1274,10 @@ export function createCalendarNotifications(
   };
 }
 
-export function recordCalendarNotifications(registry, notificationReport) {
+export function recordCalendarNotifications(
+  registry: Registry,
+  notificationReport: NotificationReport,
+): Registry {
   const notificationIds = new Set(
     (notificationReport?.notifications ?? []).map(
       (notification) => notification.id,
@@ -1210,7 +1289,7 @@ export function recordCalendarNotifications(registry, notificationReport) {
     events: registry.events.map((event) => {
       const revision = event.pendingRevision;
       const id = revision?.evidence?.fingerprint ?? revision?.id;
-      if (!id || !notificationIds.has(id)) return event;
+      if (!revision || !id || !notificationIds.has(id)) return event;
       return {
         ...event,
         pendingRevision: {
@@ -1223,9 +1302,9 @@ export function recordCalendarNotifications(registry, notificationReport) {
 }
 
 export function createCalendarFailureNotification(
-  error,
-  execution = getNotificationExecution(),
-) {
+  error: CalendarError,
+  execution: Execution = getNotificationExecution(),
+): NotificationReport {
   const structuredFailure = error?.calendarNotification;
   const message = redactNotificationValue(
     error instanceof Error ? error.message : String(error),
@@ -1280,14 +1359,14 @@ export function createCalendarFailureNotification(
   };
 }
 
-function escapeWorkflowCommandMessage(value) {
+function escapeWorkflowCommandMessage(value: unknown) {
   return String(value)
     .replace(/%/g, "%25")
     .replace(/\r/g, "%0D")
     .replace(/\n/g, "%0A");
 }
 
-const notificationTitles = {
+const notificationTitles: Record<string, string> = {
   id_fuente_duplicado: "IDs de Calendar duplicados",
   url_evento_duplicada: "URLs duplicadas de eventos",
   fuente_inaccesible: "No se pudo leer la fuente del calendario",
@@ -1297,48 +1376,52 @@ const notificationTitles = {
   verificacion_fallida: "Fallo una verificacion de la publicacion",
 };
 
-function notificationTitle(kind) {
+function notificationTitle(kind: string) {
   return notificationTitles[kind] ?? "Alerta operativa del calendario";
 }
 
-function notificationIdentity(notification) {
+function notificationIdentity(notification: Notification) {
   const identity = notification.identity ?? {};
   return identity.slug ?? identity.sourceId ?? "no aplica";
 }
 
-function formatWorkflowWarning(notification) {
+function formatWorkflowWarning(notification: Notification) {
   return `${notificationTitle(notification.kind)}. Afectado: ${notificationIdentity(notification)}. ${notification.cause} ${notification.actionRequired}`;
 }
 
-export function getCalendarNotificationWarnings(notificationReport) {
+export function getCalendarNotificationWarnings(
+  notificationReport: NotificationReport,
+) {
   return (notificationReport?.notifications ?? []).map(
     (notification) =>
       `::warning title=${escapeWorkflowCommandMessage(`Calendario: ${notificationTitle(notification.kind)}`)}::${escapeWorkflowCommandMessage(formatWorkflowWarning(notification))}`,
   );
 }
 
-function serializeProperty(name, value, isLast) {
+function serializeProperty(name: string, value: unknown, isLast: boolean) {
   return `    ${name}: ${JSON.stringify(value)}${isLast ? "" : ","}`;
 }
 
-function serializeCalendarEvent(event) {
-  const entries = [
-    ["id", event.slug],
-    ["aliases", event.aliases],
-    ["archiveEligibleAt", event.archiveEligibleAt],
-    ["sourceUpdatedAt", event.sourceUpdatedAt],
-    ["title", event.title],
-    ["date", event.date],
-    ["endDate", event.endDate],
-    ["startTime", event.startTime],
-    ["endTime", event.endTime],
-    ["location", event.location],
-    ["summary", event.summary],
-    ["eventType", event.eventType],
-    ["organizer", event.organizer],
-    ["infoUrl", event.infoUrl],
-    ["timeZone", event.timeZone],
-  ].filter(
+function serializeCalendarEvent(event: RegistryEvent) {
+  const entries = (
+    [
+      ["id", event.slug],
+      ["aliases", event.aliases],
+      ["archiveEligibleAt", event.archiveEligibleAt],
+      ["sourceUpdatedAt", event.sourceUpdatedAt],
+      ["title", event.title],
+      ["date", event.date],
+      ["endDate", event.endDate],
+      ["startTime", event.startTime],
+      ["endTime", event.endTime],
+      ["location", event.location],
+      ["summary", event.summary],
+      ["eventType", event.eventType],
+      ["organizer", event.organizer],
+      ["infoUrl", event.infoUrl],
+      ["timeZone", event.timeZone],
+    ] as [string, unknown][]
+  ).filter(
     ([, value]) =>
       value !== undefined && (!Array.isArray(value) || value.length),
   );
@@ -1351,7 +1434,7 @@ function serializeCalendarEvent(event) {
   ].join("\n");
 }
 
-export function serializeCalendarEvents(events) {
+export function serializeCalendarEvents(events: RegistryEvent[]) {
   return `import type { CalendarEvent } from "../types";
 
 // Auto-generated from Google Calendar. Do not edit manually.
@@ -1366,7 +1449,7 @@ ${events
 `;
 }
 
-export async function readCalendarSource(source) {
+export async function readCalendarSource(source: string) {
   if (/^https?:\/\//i.test(source)) {
     const response = await fetch(source);
     if (!response.ok) {
@@ -1379,7 +1462,7 @@ export async function readCalendarSource(source) {
   return readFile(path.resolve(repoRoot, source), "utf8");
 }
 
-async function readRegistry(registryPath) {
+async function readRegistry(registryPath: string): Promise<Registry> {
   try {
     const registry = JSON.parse(await readFile(registryPath, "utf8"));
     if (
@@ -1389,7 +1472,9 @@ async function readRegistry(registryPath) {
       throw new Error("Unsupported calendar event registry.");
     }
     return registry;
-  } catch (error) {
+  } catch (caught) {
+    const error = caught as CalendarError;
+
     if (error?.code === "ENOENT") return { version: 3, events: [] };
     throw error;
   }
@@ -1399,7 +1484,11 @@ export async function applyEditorialDecisionToFiles({
   registryPath = defaultRegistryPath,
   outputPath = defaultOutputPath,
   decision,
-} = {}) {
+}: {
+  registryPath?: string;
+  outputPath?: string;
+  decision: Decision;
+}) {
   const registry = await readRegistry(registryPath);
   const updatedRegistry = applyEditorialDecision(registry, decision);
   await writeAtomically([
@@ -1409,7 +1498,7 @@ export async function applyEditorialDecisionToFiles({
   return updatedRegistry;
 }
 
-export async function writeAtomically(files) {
+export async function writeAtomically(files: [string, string][]) {
   const temporaryFiles = [];
   const backupFiles = [];
   const publishedFiles = [];
@@ -1425,7 +1514,9 @@ export async function writeAtomically(files) {
       try {
         await rename(filePath, backupPath);
         backupFiles.push([backupPath, filePath]);
-      } catch (error) {
+      } catch (caught) {
+        const error = caught as CalendarError;
+
         if (error?.code !== "ENOENT") throw error;
       }
     }
@@ -1436,7 +1527,9 @@ export async function writeAtomically(files) {
     await Promise.allSettled(
       backupFiles.map(([backupPath]) => unlink(backupPath)),
     );
-  } catch (error) {
+  } catch (caught) {
+    const error = caught as CalendarError;
+
     await Promise.allSettled(
       temporaryFiles.map(([temporaryPath]) => unlink(temporaryPath)),
     );
@@ -1450,17 +1543,17 @@ export async function writeAtomically(files) {
   }
 }
 
-async function stageTextFile(filePath, contents) {
+async function stageTextFile(filePath: string, contents: string) {
   await mkdir(path.dirname(filePath), { recursive: true });
   const staged = `${filePath}.${process.pid}.stage`;
   await writeFile(staged, contents, "utf8");
   return { target: filePath, staged };
 }
 
-function escapeActionText(value) {
+function escapeActionText(value: unknown) {
   return [...String(value)]
     .map((character) => {
-      const codePoint = character.codePointAt(0);
+      const codePoint = character.codePointAt(0)!;
       return codePoint <= 31 || codePoint === 127 ? " " : character;
     })
     .join("")
@@ -1470,10 +1563,10 @@ function escapeActionText(value) {
     .replace(/([\\`*_{[\]}()#+.!|~-])/g, "\\$1");
 }
 
-function escapeSummaryHtml(value) {
+function escapeSummaryHtml(value: unknown) {
   return [...String(value ?? "")]
     .map((character) => {
-      const codePoint = character.codePointAt(0);
+      const codePoint = character.codePointAt(0)!;
       return codePoint <= 31 || codePoint === 127 ? " " : character;
     })
     .join("")
@@ -1486,18 +1579,18 @@ function escapeSummaryHtml(value) {
     .replace(/\*/g, "&#42;");
 }
 
-function escapeDiagnosticJson(value) {
+function escapeDiagnosticJson(value: unknown) {
   return JSON.stringify(value, null, 2)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 }
 
-function summaryInlineCode(value) {
+function summaryInlineCode(value: unknown) {
   return `\`${escapeSummaryHtml(value).replace(/`/g, "'")}\``;
 }
 
-function formatNotificationComparison(notification) {
+function formatNotificationComparison(notification: Notification) {
   const fields = [
     ["ID de origen", "sourceId"],
     ["Titulo", "title"],
@@ -1505,7 +1598,9 @@ function formatNotificationComparison(notification) {
     ["URL canonica", "slug"],
     ["Tipo de coincidencia", "matchedAs"],
   ].filter(
-    ([, field]) => notification.before?.[field] || notification.after?.[field],
+    ([, field]) =>
+      (notification.before as Record<string, unknown> | null)?.[field] ||
+      (notification.after as Record<string, unknown> | null)?.[field],
   );
   if (!fields.length) return [];
   return [
@@ -1515,13 +1610,13 @@ function formatNotificationComparison(notification) {
     "| --- | --- | --- |",
     ...fields.map(
       ([label, field]) =>
-        `| ${label} | ${escapeSummaryHtml(notification.before?.[field] ?? "sin dato")} | ${escapeSummaryHtml(notification.after?.[field] ?? "sin dato")} |`,
+        `| ${label} | ${escapeSummaryHtml((notification.before as Record<string, unknown> | null)?.[field] ?? "sin dato")} | ${escapeSummaryHtml((notification.after as Record<string, unknown> | null)?.[field] ?? "sin dato")} |`,
     ),
     "",
   ];
 }
 
-function formatNotificationDiagnostic(notification) {
+function formatNotificationDiagnostic(notification: Notification) {
   const diagnostic = {
     kind: notification.kind,
     identity: notification.identity,
@@ -1543,7 +1638,7 @@ function formatNotificationDiagnostic(notification) {
   ];
 }
 
-function formatNotificationSummary(notification, index) {
+function formatNotificationSummary(notification: Notification, index: number) {
   const execution = notification.execution ?? {};
   return [
     `### ${index + 1}. ${notificationTitle(notification.kind)}`,
@@ -1559,24 +1654,30 @@ function formatNotificationSummary(notification, index) {
   ];
 }
 
-export async function writeHistoricalChangesReport(report, reportPath) {
+export async function writeHistoricalChangesReport(
+  report: HistoricalReport,
+  reportPath: string | undefined,
+) {
   if (!reportPath) return;
   await mkdir(path.dirname(reportPath), { recursive: true });
   await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
 }
 
-export async function writeCalendarNotificationsReport(report, reportPath) {
+export async function writeCalendarNotificationsReport(
+  report: NotificationReport,
+  reportPath: string | undefined,
+) {
   if (!reportPath) return;
   await mkdir(path.dirname(reportPath), { recursive: true });
   await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
 }
 
 export async function writeActionSummary(
-  warnings,
-  eventCount,
-  historicalReport,
-  summaryPath = process.env.GITHUB_STEP_SUMMARY,
-  operationalCounts = {},
+  warnings: string[],
+  eventCount: number,
+  historicalReport: HistoricalReport | undefined,
+  summaryPath: string | undefined = process.env.GITHUB_STEP_SUMMARY,
+  operationalCounts: Record<string, number> = {},
 ) {
   if (!summaryPath) return;
   const historicalChanges = historicalReport?.historicalChanges ?? [];
@@ -1635,8 +1736,8 @@ export async function writeActionSummary(
 }
 
 export async function writeCalendarNotificationsSummary(
-  notificationReport,
-  summaryPath = process.env.GITHUB_STEP_SUMMARY,
+  notificationReport: NotificationReport,
+  summaryPath: string | undefined = process.env.GITHUB_STEP_SUMMARY,
 ) {
   if (!summaryPath) return;
   const notifications = notificationReport?.notifications ?? [];
@@ -1658,7 +1759,7 @@ export async function synchronizeCalendar({
   registryPath = defaultRegistryPath,
   now = new Date(),
   galleryOptions,
-} = {}) {
+}: SyncOptions = {}) {
   if (!source) {
     throw new Error(
       "Missing CALENDAR_ICS_URL. Add it as a GitHub Actions secret or pass an ICS URL/file path as the first argument.",
@@ -1666,10 +1767,10 @@ export async function synchronizeCalendar({
   }
 
   const icsText = await readCalendarSource(source);
-  const warnings = [];
+  const warnings: string[] = [];
   const parsed = parseVEvents(icsText)
     .map((properties) => parseCalendarEvent(properties, warnings))
-    .filter(Boolean);
+    .filter((value): value is NonNullable<typeof value> => Boolean(value));
   const previousRegistry = await readRegistry(registryPath);
   assertSafeCalendarInput(previousRegistry, parsed);
   const currentBySourceId = new Map(
@@ -1706,7 +1807,7 @@ export async function synchronizeCalendar({
           deadlineAt.getTime() <= now.getTime() ? "final" : "first",
       };
     })
-    .filter(Boolean);
+    .filter((value): value is NonNullable<typeof value> => Boolean(value));
   let galleryResult;
   if (galleryEvents.length || galleryOptions?.force) {
     galleryResult = await synchronizeEventGalleries({
@@ -1734,7 +1835,9 @@ export async function synchronizeCalendar({
       stageTextFile(registryPath, `${JSON.stringify(registry, null, 2)}\n`),
       stageTextFile(outputPath, serializeCalendarEvents(registry.events)),
     ]);
-  } catch (error) {
+  } catch (caught) {
+    const error = caught as CalendarError;
+
     await Promise.all(
       (galleryResult?.publication ?? []).map(({ staged }) =>
         rm(staged, { recursive: true, force: true }),
@@ -1793,7 +1896,7 @@ async function main() {
       importedGalleries: result.galleryResult?.importedCount ?? 0,
       frozenGalleries: Object.keys(result.galleryResult?.state.galleries ?? {})
         .length,
-      driveChanges: result.historicalReport.galleryChanges.filter(
+      driveChanges: result.historicalReport.galleryChanges!.filter(
         (change) => change.status === "galeria_congelada_cambio_detectado",
       ).length,
       validTranslations: translationCounts.valid,

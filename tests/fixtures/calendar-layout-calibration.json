@@ -1,0 +1,94 @@
+{
+  "sourceEvent": "2026-09-12-gasshuku-monteverde",
+  "purpose": "Calibración geométrica de una página densa; sus cantidades no son límites de publicación.",
+  "event": {
+    "id": "calibration-dense",
+    "archiveEligibleAt": "2026-09-15T06:00:00.000Z",
+    "title": "Gasshuku Monteverde",
+    "date": "2026-09-12",
+    "endDate": "2026-09-14",
+    "location": "El Establo Mountain Hotel, Provincia de Puntarenas, Monteverde, Costa Rica",
+    "summary": "La participación incluye:\n\n* Transporte ida y vuelta\n* Almuerzo primer día\n* Desayuno del segundo día\n* Habitación compartida\n* Acceso a las instalaciones y senderos del hotel\n* Uso de los salones de entrenamiento\n* Experiencia intensiva de entrenamiento a cargo de senséis de alto nivel\n\nEste encuentro guiado por cuatro senséis japoneses de alto rango nace con el propósito de vivir el kendo más allá del entrenamiento habitual: compartir dos días de disciplina, convivencia y aprendizaje.\n\nEl Gasshuku se desarrollará en el Establo Mountain Hotel, Monteverde. Sus instalaciones y salones de madera ofrecerán un espacio para entrenar, alejarnos por unos días de la rutina y disfrutar de una experiencia diferente alrededor del kendo.",
+    "eventType": "seminario",
+    "timeZone": "America/Costa_Rica"
+  },
+  "photoCount": 20,
+  "viewports": [
+    {
+      "width": 360,
+      "description": {
+        "min": 596,
+        "max": 730
+      },
+      "article": {
+        "min": 969,
+        "max": 1185
+      },
+      "photo": {
+        "min": 171,
+        "max": 211
+      },
+      "thumbnail": {
+        "min": 50,
+        "max": 62
+      }
+    },
+    {
+      "width": 390,
+      "description": {
+        "min": 573,
+        "max": 701
+      },
+      "article": {
+        "min": 926,
+        "max": 1132
+      },
+      "photo": {
+        "min": 187,
+        "max": 229
+      },
+      "thumbnail": {
+        "min": 50,
+        "max": 62
+      }
+    },
+    {
+      "width": 768,
+      "description": {
+        "min": 391,
+        "max": 479
+      },
+      "article": {
+        "min": 744,
+        "max": 910
+      },
+      "photo": {
+        "min": 362,
+        "max": 444
+      },
+      "thumbnail": {
+        "min": 72,
+        "max": 88
+      }
+    },
+    {
+      "width": 1366,
+      "description": {
+        "min": 391,
+        "max": 479
+      },
+      "article": {
+        "min": 657,
+        "max": 805
+      },
+      "photo": {
+        "min": 533,
+        "max": 653
+      },
+      "thumbnail": {
+        "min": 115,
+        "max": 141
+      }
+    }
+  ]
+}

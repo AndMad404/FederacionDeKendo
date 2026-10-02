@@ -1,3 +1,11 @@
+import type {
+  RegistryEvent,
+  Registry,
+  HistoricalReport,
+  Correction,
+  CorrectionOptions,
+} from "./calendar-sync-types.ts";
+
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -8,7 +16,7 @@ import {
   normalizePublicDescription,
   serializeCalendarEvents,
   writeAtomically,
-} from "./sync-calendar-events.mjs";
+} from "./sync-calendar-events.ts";
 
 export { fingerprintHistoricalProposal, fingerprintHistoricalSnapshot };
 
@@ -39,9 +47,12 @@ const safeIdentifierPattern = /^[A-Za-z0-9_-]{1,128}$/;
 const forbiddenPrivateText =
   /ALBUM_FOTOS|webcal:|https?:\/\/[^\s]*drive\.google\.com|https?:\/\/[^\s]*\.ics(?:[?#\s]|$)/i;
 
-function containsControlCharacter(value, allowLineBreaks = false) {
+function containsControlCharacter(
+  value: string,
+  allowLineBreaks: boolean = false,
+) {
   return [...value].some((character) => {
-    const codePoint = character.codePointAt(0);
+    const codePoint = character.codePointAt(0)!;
     return (
       (codePoint <= 31 &&
         (!allowLineBreaks || ![10, 13].includes(codePoint))) ||
@@ -50,7 +61,10 @@ function containsControlCharacter(value, allowLineBreaks = false) {
   });
 }
 
-function assertSafeReportValue(value, allowLineBreaks = false) {
+function assertSafeReportValue(
+  value: unknown,
+  allowLineBreaks: boolean = false,
+) {
   if (value === null) return;
   if (
     typeof value !== "string" ||
@@ -61,7 +75,7 @@ function assertSafeReportValue(value, allowLineBreaks = false) {
   }
 }
 
-function assertFieldValue(field, value, type) {
+function assertFieldValue(field: string, value: unknown, type: string) {
   if (type === "eliminado") return;
   assertSafeReportValue(value, field === "summary");
   if (typeof value !== "string")
@@ -86,7 +100,7 @@ function assertFieldValue(field, value, type) {
     throw new Error("Invalid proposed information URL.");
 }
 
-function assertExactKeys(value, keys, label) {
+function assertExactKeys(value: unknown, keys: string[], label: string) {
   if (!value || typeof value !== "object" || Array.isArray(value))
     throw new Error(`${label} must be an object.`);
   if (
@@ -97,7 +111,7 @@ function assertExactKeys(value, keys, label) {
   }
 }
 
-function validateReport(report) {
+function validateReport(report: HistoricalReport) {
   assertExactKeys(
     report,
     ["version", "historicalChanges", "galleryChanges"],
@@ -109,13 +123,15 @@ function validateReport(report) {
     !Array.isArray(report.galleryChanges)
   )
     throw new Error("Unsupported historical changes report.");
-  for (const [index, change] of report.galleryChanges.entries()) {
+  for (const [index, change] of report.galleryChanges!.entries()) {
     assertExactKeys(
       change,
       ["slug", "status", "reason"],
       `Gallery change ${index}`,
     );
-    Object.values(change).forEach(assertSafeReportValue);
+    Object.values(change).forEach((value, index) =>
+      assertSafeReportValue(value, Boolean(index)),
+    );
   }
   const seenSourceIds = new Set();
   for (const [index, change] of report.historicalChanges.entries()) {
@@ -139,8 +155,8 @@ function validateReport(report) {
       throw new Error("Report contains an invalid or ambiguous sourceId.");
     seenSourceIds.add(change.sourceId);
     if (
-      !fingerprintPattern.test(change.revisionId) ||
-      !fingerprintPattern.test(change.evidenceFingerprint)
+      !fingerprintPattern.test(change.revisionId ?? "") ||
+      !fingerprintPattern.test(change.evidenceFingerprint ?? "")
     )
       throw new Error("Report contains an invalid evidence fingerprint.");
     assertExactKeys(
@@ -148,7 +164,9 @@ function validateReport(report) {
       ["slug", "title", "date"],
       "Public identity",
     );
-    Object.values(change.publicIdentity).forEach(assertSafeReportValue);
+    Object.values(change.publicIdentity).forEach((value, index) =>
+      assertSafeReportValue(value, Boolean(index)),
+    );
     if (!Array.isArray(change.differences) || change.differences.length === 0)
       throw new Error("Report change must contain differences.");
     if (
@@ -167,8 +185,9 @@ function validateReport(report) {
         difference.field === "feed" &&
         difference.type === "desaparecido_del_feed";
       const validField =
-        HISTORICAL_COMPARISON_FIELDS.includes(difference.field) &&
-        ["modificado", "eliminado"].includes(difference.type);
+        HISTORICAL_COMPARISON_FIELDS.includes(
+          difference.field as keyof RegistryEvent,
+        ) && ["modificado", "eliminado"].includes(difference.type);
       if ((!validFeed && !validField) || seenFields.has(difference.field))
         throw new Error("Report contains an unknown or ambiguous difference.");
       if (difference.type === "eliminado" && difference.proposed !== null)
@@ -195,7 +214,7 @@ function validateArguments({
   publishedFingerprint,
   proposalFingerprint,
   fields,
-}) {
+}: Correction) {
   if (!safeIdentifierPattern.test(sourceId ?? ""))
     throw new Error("Invalid sourceId.");
   if (!fingerprintPattern.test(publishedFingerprint ?? ""))
@@ -212,7 +231,7 @@ function validateArguments({
     throw new Error("Accepted fields must not repeat.");
 }
 
-function assertUniqueSlugs(events) {
+function assertUniqueSlugs(events: RegistryEvent[]) {
   const owners = new Map();
   for (const event of events) {
     for (const slug of [event.slug, ...(event.aliases ?? [])]) {
@@ -228,7 +247,7 @@ export async function applyHistoricalCorrections({
   outputPath,
   reportPath,
   corrections,
-}) {
+}: CorrectionOptions) {
   if (!Array.isArray(corrections) || corrections.length === 0) {
     throw new Error("At least one historical correction is required.");
   }
@@ -242,8 +261,8 @@ export async function applyHistoricalCorrections({
     readFile(registryPath, "utf8"),
     readFile(reportPath, "utf8"),
   ]);
-  const registry = JSON.parse(registryText);
-  const report = JSON.parse(reportText);
+  const registry: Registry = JSON.parse(registryText);
+  const report: HistoricalReport = JSON.parse(reportText);
   if (![3, 4].includes(registry.version) || !Array.isArray(registry.events))
     throw new Error("Unsupported calendar event registry.");
   validateReport(report);
@@ -285,7 +304,7 @@ export async function applyHistoricalCorrections({
       change.differences.map((difference) => [difference.field, difference]),
     );
     for (const field of fields) {
-      if (!HISTORICAL_COMPARISON_FIELDS.includes(field))
+      if (!HISTORICAL_COMPARISON_FIELDS.includes(field as keyof RegistryEvent))
         throw new Error(`Field is not allowed: ${field}.`);
       if (!differenceByField.has(field))
         throw new Error(`Field is not present in the report: ${field}.`);
@@ -295,7 +314,7 @@ export async function applyHistoricalCorrections({
     );
     const corrected = structuredClone(event);
     for (const field of acceptedFields) {
-      const difference = differenceByField.get(field);
+      const difference = differenceByField.get(field)!;
       if (
         field === "slug" &&
         difference.type !== "eliminado" &&
@@ -306,10 +325,12 @@ export async function applyHistoricalCorrections({
         ];
       if (difference.type === "eliminado") delete corrected[field];
       else
-        corrected[field] =
-          field === "summary"
-            ? normalizePublicDescription(difference.proposed)
-            : difference.proposed;
+        Object.assign(corrected, {
+          [field]:
+            field === "summary"
+              ? normalizePublicDescription(difference.proposed as string)
+              : difference.proposed,
+        });
     }
     correctedBySourceId.set(sourceId, corrected);
     results.push({
@@ -331,7 +352,9 @@ export async function applyHistoricalCorrections({
   return results;
 }
 
-export async function applyHistoricalCorrection(options) {
+export async function applyHistoricalCorrection(
+  options: Omit<CorrectionOptions, "corrections"> & Correction,
+) {
   const [result] = await applyHistoricalCorrections({
     registryPath: options.registryPath,
     outputPath: options.outputPath,
@@ -341,7 +364,7 @@ export async function applyHistoricalCorrection(options) {
   return result;
 }
 
-function parseCliArguments(args) {
+function parseCliArguments(args: string[]) {
   const allowed = new Set([
     "--report",
     "--source-id",
@@ -349,7 +372,7 @@ function parseCliArguments(args) {
     "--proposal-fingerprint",
     "--fields",
   ]);
-  const parsed = {};
+  const parsed: Record<string, string> = {};
   for (let index = 0; index < args.length; index += 2) {
     const name = args[index];
     const value = args[index + 1];
@@ -365,11 +388,11 @@ function parseCliArguments(args) {
     sourceId: parsed["--source-id"],
     publishedFingerprint: parsed["--published-fingerprint"],
     proposalFingerprint: parsed["--proposal-fingerprint"],
-    fields: parsed["--fields"]?.split(","),
+    fields: parsed["--fields"]?.split(",") as string[],
   };
 }
 
-function safeAuditValue(value) {
+function safeAuditValue(value: unknown) {
   return [...String(value)]
     .map((character) => (containsControlCharacter(character) ? " " : character))
     .join("")

@@ -1,5 +1,4 @@
 name: Apply approved historical calendar range
-
 on:
   workflow_dispatch:
     inputs:
@@ -15,26 +14,21 @@ on:
         description: Inclusive last historical event date (YYYY-MM-DD)
         required: true
         type: string
-
 permissions:
   actions: read
   contents: write
-
 concurrency:
   group: correct-calendar-history-range
   cancel-in-progress: false
-
 jobs:
   correct-history:
     name: Apply approved historical range
     runs-on: ubuntu-latest
     env:
       CALENDAR_ICS_URL: ${{ secrets.CALENDAR_ICS_URL }}
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
-
       - name: Download approved historical changes report
         uses: actions/download-artifact@v5
         with:
@@ -42,35 +36,27 @@ jobs:
           run-id: ${{ inputs.report_run_id }}
           github-token: ${{ github.token }}
           path: .
-
       - name: Enable Corepack
         run: corepack enable
-
       - name: Set up Node
         uses: actions/setup-node@v5
         with:
           node-version: 22
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
       - name: Apply approved historical range
         run: pnpm run correct:calendar-history-range --report calendar-historical-changes.json --from "${{ inputs.from }}" --to "${{ inputs.to }}"
-
       - name: Import approved historical galleries
         run: pnpm run sync:approved-historical-galleries --report calendar-historical-changes.json --from "${{ inputs.from }}" --to "${{ inputs.to }}"
-
       - name: Remove downloaded reports
         run: rm -f calendar-historical-changes.json calendar-notifications.json
-
       - name: Directed historical correction tests
-        run: node --test tests/data/calendar-history-correction.test.mjs
-
+        run: node --import tsx --test tests/data/calendar-history-correction.test.mjs
       - name: Verify generated site
         uses: ./.github/actions/verify-site
         with:
           unit-script: test:unit:without-history-correction
-
+          mode: calendar
       - name: Commit approved historical range
         run: |
           sync_paths=(
@@ -92,3 +78,18 @@ jobs:
           git add -A -- "${sync_paths[@]}"
           git commit -m "chore: correct historical calendar range"
           git push
+        id: publication
+      - name: Emit verification failure notification
+        if: ${{ failure() }}
+        run: node --import tsx scripts/write-calendar-verification-notification.mjs
+        env:
+          CALENDAR_NOTIFICATIONS_REPORT_PATH: ${{ runner.temp }}/calendar-notifications.json
+          CALENDAR_FAILED_STEP: calendar publication or blocking verification
+      - name: Review calendar design and notify
+        if: ${{ always() }}
+        uses: ./.github/actions/calendar-design-review
+        with:
+          git-saved: ${{ steps.publication.outcome == 'success' }}
+          smtp-username: ${{ secrets.CALENDAR_ALERT_SMTP_USERNAME }}
+          smtp-password: ${{ secrets.CALENDAR_ALERT_SMTP_APP_PASSWORD }}
+          recipient: ${{ secrets.CALENDAR_ALERT_RECIPIENT }}

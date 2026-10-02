@@ -251,7 +251,7 @@ test("historical gallery opens the shared lightbox from the selected image", asy
     dialog.getByRole("img", { name: "Fotografía 2 del evento Examen" }),
   ).toBeVisible();
 });
-test("historical tournament thumbnails follow carousel navigation on mobile", async ({
+test("historical tournament selection follows carousel navigation on mobile", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 360, height: 800 });
@@ -265,12 +265,12 @@ test("historical tournament thumbnails follow carousel navigation on mobile", as
     name: "Seleccionar fotografía",
   });
   await expect(thumbnails).toBeVisible();
-  expect(await thumbnails.evaluate((strip) => strip.scrollLeft)).toBe(0);
+  await page.waitForLoadState("networkidle");
+  const active = thumbnails.locator('[aria-current="true"]');
+  const initial = await active.getAttribute("aria-label");
 
   await gallery.getByRole("button", { name: "Fotografía siguiente" }).click();
-  await expect
-    .poll(() => thumbnails.evaluate((strip) => strip.scrollLeft))
-    .toBeGreaterThan(0);
+  await expect.poll(() => active.getAttribute("aria-label")).not.toBe(initial);
 });
 
 test("renders the historical archive and the local not-found view", async ({

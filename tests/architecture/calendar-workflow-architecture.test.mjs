@@ -51,6 +51,31 @@ test("Phase 6: writer workflows run their directed test and shared gate before c
     );
     assert.ok(directed < gate, `${file}: directed test must precede gate`);
     assert.ok(gate < commit, `${file}: gate must precede commit`);
+    assert.equal(steps[gate].with.mode, "calendar");
+    assert.equal(steps[commit].id, "publication");
+    assert.equal(
+      steps[commit].if,
+      undefined,
+      "design cannot condition publication",
+    );
+    const review = stepIndex(
+      steps,
+      (step) => step.uses === "./.github/actions/calendar-design-review",
+      `${file}: post-publication review`,
+    );
+    assert.ok(
+      commit < review,
+      `${file}: review and notification must follow push`,
+    );
+    assert.equal(steps[review].if, "${{ always() }}");
+    assert.equal(
+      steps[review].with["git-saved"],
+      "${{ steps.publication.outcome == 'success' }}",
+    );
+    assert.match(
+      steps[review].with.recipient,
+      /secrets.CALENDAR_ALERT_RECIPIENT/,
+    );
   }
 });
 
@@ -66,6 +91,32 @@ test("Calendar synchronization only commits staged content changes", async () =>
     'git commit -m "chore: sync calendar events"',
   );
   assert.ok(stage >= 0 && stage < diff && diff < write);
+});
+
+test("post-publication design review, fallback, delivery and artifacts remain independent of Git publication", async () => {
+  const steps = actionSteps(
+    await loadYamlDocument(".github/actions/calendar-design-review/action.yml"),
+  );
+  const review = steps.find((step) => step.id === "review");
+  assert.equal(review.continueOnError ?? review["continue-on-error"], true);
+  assert.match(review.if, /inputs.git-saved == 'true'/);
+  const fallback = steps.find(
+    (step) => step.name === "Report incomplete design review",
+  );
+  assert.equal(fallback.env.CALENDAR_LAYOUT_FORCE_INCOMPLETE, "true");
+  assert.match(fallback.if, /steps.review.outcome == 'failure'/);
+  const send = steps.find((step) => step.id === "delivery");
+  assert.match(send.run, /smtp.gmail.com:465/);
+  assert.match(send.if, /always\(\)/);
+  assert.ok(
+    steps
+      .filter((step) => step.uses === "actions/upload-artifact@v5")
+      .every((step) => step.if === "${{ always() }}"),
+  );
+  assert.doesNotMatch(
+    steps.map((step) => step.run ?? "").join("\n"),
+    /git (?:reset|revert|checkout|push|commit)/,
+  );
 });
 
 test("Phase 6: the shared gate and human CI coverage remain complete", async () => {
@@ -124,15 +175,31 @@ test("Phase 6: historical correction downloads the artifact produced by synchron
     ),
   );
   const artifactName = "calendar-notification-reports";
-  const upload = syncSteps.find(
+  assert.ok(
+    syncSteps.some(
+      (step) => step.uses === "./.github/actions/calendar-design-review",
+    ),
+  );
+  const reviewAction = await loadYamlDocument(
+    ".github/actions/calendar-design-review/action.yml",
+  );
+  const upload = actionSteps(reviewAction).find(
     (step) => step.uses === "actions/upload-artifact@v5",
+    // Evidence has a separate artifact from the historical correction report.
   );
   const download = correctionSteps.find(
     (step) => step.uses === "actions/download-artifact@v5",
   );
-  assert.equal(upload?.with?.name, artifactName);
+  const reportUpload = actionSteps(reviewAction).find(
+    (step) => step.with?.name === artifactName,
+  );
+  assert.ok(upload);
+  assert.equal(reportUpload?.with?.name, artifactName);
   assert.equal(download?.with?.name, artifactName);
-  assert.match(upload?.with?.path ?? "", /calendar-historical-changes\.json/);
+  assert.match(
+    reportUpload?.with?.path ?? "",
+    /calendar-historical-changes\.json/,
+  );
   assert.equal(syncWorkflow.permissions?.issues, undefined);
   assert.equal(
     syncSteps.some((step) => step.run?.match(/exit\s+1/)),

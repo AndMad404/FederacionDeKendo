@@ -7,7 +7,7 @@ import {
   parseCalendarEvent,
   parseVEvents,
   serializeCalendarEvents,
-} from "../../scripts/sync-calendar-events.mjs";
+} from "../../scripts/sync-calendar-events.ts";
 const fixturePath = new URL("../fixtures/calendar-events.ics", import.meta.url);
 test("creates the same opaque 24-character sourceId for the same UID", async () => {
   const [properties] = parseVEvents(await readFile(fixturePath, "utf8"));

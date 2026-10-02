@@ -12,7 +12,7 @@ import {
   serializeCalendarEvents,
   synchronizeCalendar,
   writeActionSummary,
-} from "../../scripts/sync-calendar-events.mjs";
+} from "../../scripts/sync-calendar-events.ts";
 import {
   REMOVED_HISTORICAL_FIELDS,
   makeHistoricalEvent,

@@ -20,7 +20,7 @@ import {
   getArchiveYears,
   normalizeArchiveFilters,
   type ArchiveEventType,
-} from "../utils/eventArchive.js";
+} from "../utils/eventArchive.ts";
 import { MediaPageBanner } from "./ui/MediaPageBanner";
 import { useLanguage } from "../config/i18n";
 import { getLocalizedEvents } from "../utils/localizedEvents";

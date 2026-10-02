@@ -1,7 +1,7 @@
 import type { Page } from "@playwright/test";
 
-export async function getReachability(page: Page) {
-  return page.evaluate(() => {
+export async function getReachability(page: Page, calendarExceptions = false) {
+  return page.evaluate((calendarExceptions) => {
     const root = document.documentElement;
     const main = document.querySelector("main");
     const appShell = document.querySelector("#root > div");
@@ -12,6 +12,13 @@ export async function getReachability(page: Page) {
     ).filter((element) => element.getClientRects().length > 0);
 
     const clippedContent = contentElements.flatMap((element) => {
+      if (
+        calendarExceptions &&
+        (element.closest(".sr-only, .line-clamp-2, .max-h-10") ||
+          (element instanceof HTMLImageElement &&
+            getComputedStyle(element).objectFit === "cover"))
+      )
+        return [];
       const elementRect = element.getBoundingClientRect();
       let ancestor = element.parentElement;
       let reachableLeft = elementRect.left;
@@ -53,6 +60,32 @@ export async function getReachability(page: Page) {
                   element.outerHTML.slice(0, 80),
                 tag: element.tagName.toLowerCase(),
                 clippedBy: ancestor.tagName.toLowerCase(),
+                ownerEvent: calendarExceptions
+                  ? element
+                      .closest("li")
+                      ?.querySelector<HTMLAnchorElement>(
+                        'a[href^="/eventos/"], a[href^="/en/events/"]',
+                      )
+                      ?.pathname.split("/")
+                      .filter(Boolean)
+                      .at(-1)
+                  : undefined,
+                ...(calendarExceptions
+                  ? {
+                      element: {
+                        left: elementRect.left,
+                        right: elementRect.right,
+                        top: elementRect.top,
+                        bottom: elementRect.bottom,
+                      },
+                      container: {
+                        left: ancestorRect.left,
+                        right: ancestorRect.right,
+                        top: ancestorRect.top,
+                        bottom: ancestorRect.bottom,
+                      },
+                    }
+                  : {}),
               },
             ];
           }
@@ -93,5 +126,5 @@ export async function getReachability(page: Page) {
       clippedContent,
       internalVerticalScrollOwners,
     };
-  });
+  }, calendarExceptions);
 }

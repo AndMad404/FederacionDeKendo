@@ -1,5 +1,4 @@
 name: Confirm or reject pending calendar event deletion
-
 on:
   workflow_dispatch:
     inputs:
@@ -19,7 +18,9 @@ on:
         description: Recorded decision
         required: true
         type: choice
-        options: [approve_deletion, reject_deletion]
+        options:
+          - approve_deletion
+          - reject_deletion
       decision_record_id:
         description: Non-sensitive human decision record identifier
         required: true
@@ -28,10 +29,8 @@ on:
         description: Optional public-safe rationale
         required: false
         type: string
-
 permissions:
   contents: write
-
 jobs:
   apply-decision:
     name: Apply Presidency's recorded decision
@@ -62,6 +61,7 @@ jobs:
         uses: ./.github/actions/verify-site
         with:
           unit-script: test:unit:without-sync
+          mode: calendar
       - name: Commit recorded decision
         run: |
           git add src/app/data/calendarEventRegistry.json src/app/data/calendarEvents.ts
@@ -70,3 +70,18 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "chore: apply calendar editorial decision"
           git push
+        id: publication
+      - name: Emit verification failure notification
+        if: ${{ failure() }}
+        run: node --import tsx scripts/write-calendar-verification-notification.mjs
+        env:
+          CALENDAR_NOTIFICATIONS_REPORT_PATH: ${{ runner.temp }}/calendar-notifications.json
+          CALENDAR_FAILED_STEP: calendar publication or blocking verification
+      - name: Review calendar design and notify
+        if: ${{ always() }}
+        uses: ./.github/actions/calendar-design-review
+        with:
+          git-saved: ${{ steps.publication.outcome == 'success' }}
+          smtp-username: ${{ secrets.CALENDAR_ALERT_SMTP_USERNAME }}
+          smtp-password: ${{ secrets.CALENDAR_ALERT_SMTP_APP_PASSWORD }}
+          recipient: ${{ secrets.CALENDAR_ALERT_RECIPIENT }}

@@ -9,7 +9,7 @@ import {
   applyEditorialDecisionToFiles,
   serializeCalendarEvents,
   synchronizeCalendar,
-} from "../../scripts/sync-calendar-events.mjs";
+} from "../../scripts/sync-calendar-events.ts";
 import { makePendingRevision } from "../helpers/event-history-fixtures.mjs";
 
 test("F5: a stale file-backed decision leaves the persisted registry and published output untouched", async (t) => {

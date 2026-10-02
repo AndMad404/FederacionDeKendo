@@ -67,7 +67,7 @@
         "src/app/data/gallery-asset-hashes.json",
         "src/app/data/gallery.ts",
         "scripts/sync-approved-historical-galleries.mjs",
-        "scripts/sync-event-galleries.mjs",
+        "scripts/sync-event-galleries.ts",
         "public/images/events/**",
         "public/images/gallery/**"
       ],
@@ -77,7 +77,8 @@
         "tests/data/event-history-publication.test.mjs",
         "tests/data/event-history-sync-contract.test.mjs",
         "tests/data/gallery-data.test.mjs",
-        "tests/data/static-public-content.test.mjs"
+        "tests/data/static-public-content.test.mjs",
+        "tests/data/calendar-migration-parity.test.mjs"
       ]
     },
     {
@@ -148,8 +149,13 @@
       "changes": [
         "scripts/apply-calendar-editorial-decision.mjs",
         "scripts/correct-calendar-history-range.mjs",
-        "scripts/correct-calendar-history.mjs",
-        "scripts/sync-calendar-events.mjs",
+        "scripts/correct-calendar-history.ts",
+        "scripts/sync-calendar-events.ts",
+        "scripts/calendar-sync-types.ts",
+        "scripts/review-calendar-design.ts",
+        "scripts/calendar-design-report.ts",
+        "scripts/write-calendar-notification-email.mjs",
+        ".github/actions/calendar-design-review/action.yml",
         ".github/workflows/apply-calendar-editorial-decision.yml",
         ".github/workflows/correct-calendar-history-range.yml",
         ".github/workflows/sync-calendar.yml"
@@ -166,7 +172,11 @@
         "tests/data/event-history-notifications.test.mjs",
         "tests/data/event-history-publication.test.mjs",
         "tests/data/event-history-reports.test.mjs",
-        "tests/data/event-history-sync-contract.test.mjs"
+        "tests/data/event-history-sync-contract.test.mjs",
+        "tests/data/calendar-design-policy.test.mjs",
+        "tests/data/calendar-design-email.test.mjs",
+        "tests/data/calendar-design-report.test.mjs",
+        "tests/data/calendar-migration-parity.test.mjs"
       ]
     },
     {
@@ -210,12 +220,40 @@
       "tests": ["tests/architecture/repository-policy.test.mjs"]
     },
     {
+      "id": "calendar-layout-review",
+      "changes": [
+        "scripts/review-calendar-design.ts",
+        "tests/helpers/calendar-layout.ts",
+        "tests/helpers/calendar-block-measurements.ts",
+        "tests/helpers/event-gallery-geometry.ts",
+        "tests/helpers/content-reachability.ts",
+        "tests/fixtures/calendar-layout/**",
+        "tests/fixtures/calendar-layout-calibration.json",
+        "playwright.calendar-layout.config.ts",
+        ".github/actions/calendar-design-review/action.yml"
+      ],
+      "area": "Revision geometrica no bloqueante del calendario publicado",
+      "tests": [
+        "tests/data/calendar-design-policy.test.mjs",
+        "tests/data/calendar-design-email.test.mjs",
+        "tests/data/calendar-design-report.test.mjs",
+        "tests/design/calendar-layout.spec.ts",
+        "tests/design/calendar-layout-fixtures.spec.ts",
+        "tests/design/calendar-layout-calibration.spec.ts",
+        "tests/behavior/event-gallery-fixtures.spec.ts",
+        "tests/design/calendar-layout-detectors.spec.ts",
+        "tests/design/calendar-card-geometry.spec.ts",
+        "tests/architecture/calendar-workflow-architecture.test.mjs"
+      ]
+    },
+    {
       "id": "repository-tooling",
       "changes": [
         "package.json",
         "pnpm-lock.yaml",
         "eslint.config.js",
         "tsconfig.json",
+        "tsconfig.scripts.json",
         "vite.config.ts",
         "playwright.config.ts",
         "playwright.visual.config.ts",

@@ -12,7 +12,7 @@ import {
   recordCalendarNotifications,
   mergeRegistry,
   writeCalendarNotificationsSummary,
-} from "../../scripts/sync-calendar-events.mjs";
+} from "../../scripts/sync-calendar-events.ts";
 import { formatCalendarNotificationEmail } from "../../scripts/write-calendar-notification-email.mjs";
 import {
   makeHistoricalEvent,

@@ -8,7 +8,7 @@ import {
   decidePendingDeletion,
   mergeRegistry,
   serializeCalendarEvents,
-} from "../../scripts/sync-calendar-events.mjs";
+} from "../../scripts/sync-calendar-events.ts";
 import {
   makeHistoricalEvent,
   makePendingRevision,

@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { createHash } from "node:crypto";
 
 function singleLine(value) {
   return String(value ?? "")
@@ -18,10 +19,24 @@ function formatNotification(notification) {
     `Antes (redactado): ${JSON.stringify(notification.before ?? null)}`,
     `Despues (redactado): ${JSON.stringify(notification.after ?? null)}`,
     `Huella de alerta: ${singleLine(notification.id)}`,
+    ...(notification.after?.executionUrl
+      ? [
+          `Evidencia y capturas: ${singleLine(notification.after.executionUrl)} (artefacto calendar-design-review)`,
+          notification.after.gitSaved
+            ? "Cambios guardados en Git mediante commit y push."
+            : "No se confirmó el commit y push.",
+          "Despliegue de Cloudflare: no verificado.",
+        ]
+      : []),
   ].join("\n");
 }
 
-export function formatCalendarNotificationEmail(report, from, recipient) {
+export function formatCalendarNotificationEmail(
+  report,
+  from,
+  recipient,
+  attachments = [],
+) {
   const notifications = report?.notifications ?? [];
   if (!notifications.length) return null;
   const sender = singleLine(from);
@@ -32,7 +47,7 @@ export function formatCalendarNotificationEmail(report, from, recipient) {
       "Calendar notification sender and recipient must be valid email addresses.",
     );
   }
-  return [
+  const plain = [
     `From: ${sender}`,
     `To: ${recipientAddress}`,
     `Subject: [Federacion de Kendo] ${notifications.length} alerta(s) operativa(s) del calendario`,
@@ -46,6 +61,64 @@ export function formatCalendarNotificationEmail(report, from, recipient) {
       "",
     ]),
   ].join("\n");
+  if (!attachments.length) return plain;
+  const boundary = `calendar-${createHash("sha256").update(plain).digest("hex").slice(0, 24)}`;
+  const [headers, ...body] = plain.split("\n\n");
+  return [
+    headers.replace(
+      "Content-Type: text/plain; charset=UTF-8",
+      `MIME-Version: 1.0\nContent-Type: multipart/mixed; boundary="${boundary}"`,
+    ),
+    "",
+    `--${boundary}`,
+    "Content-Type: text/plain; charset=UTF-8",
+    "",
+    body.join("\n\n"),
+    ...attachments.flatMap((attachment) => [
+      `--${boundary}`,
+      "Content-Type: image/png",
+      "Content-Transfer-Encoding: base64",
+      `Content-Disposition: attachment; filename="${singleLine(attachment.filename).replace(/[^A-Za-z0-9_.-]/g, "_")}"`,
+      "",
+      attachment.contentBase64.match(/.{1,76}/g).join("\n"),
+      "",
+    ]),
+    `--${boundary}--`,
+    "",
+  ].join("\n");
+}
+
+export async function calendarScreenshotAttachments(report, directory) {
+  const screenshots = [
+    ...new Set(
+      report.notifications
+        .filter((notification) => notification.kind === "diseno_roto")
+        .map((notification) => notification.after?.screenshot)
+        .filter(Boolean),
+    ),
+  ];
+  if (!screenshots.length) return [];
+  if (!directory)
+    throw new Error("Calendar screenshot artifact directory is required.");
+  return Promise.all(
+    screenshots.map(async (screenshot, index) => {
+      const absolute = path.resolve(screenshot);
+      const relative = path.relative(path.resolve(directory), absolute);
+      if (
+        !relative ||
+        relative.startsWith("..") ||
+        path.isAbsolute(relative) ||
+        path.extname(absolute) !== ".png"
+      )
+        throw new Error(
+          "Calendar screenshot must belong to the review artifact directory.",
+        );
+      return {
+        filename: `calendar-layout-${index + 1}.png`,
+        contentBase64: (await readFile(absolute)).toString("base64"),
+      };
+    }),
+  );
 }
 
 async function main() {
@@ -54,7 +127,13 @@ async function main() {
   if (!reportPath || !outputPath) {
     throw new Error("Calendar notification email paths are required.");
   }
-  const report = JSON.parse(await readFile(reportPath, "utf8"));
+  let report;
+  try {
+    report = JSON.parse(await readFile(reportPath, "utf8"));
+  } catch (error) {
+    if (error.code !== "ENOENT") throw error;
+    report = { version: 1, notifications: [] };
+  }
   if (report.version !== 1 || !Array.isArray(report.notifications)) {
     throw new Error("Calendar notification report has an invalid schema.");
   }
@@ -62,6 +141,10 @@ async function main() {
     report,
     process.env.CALENDAR_ALERT_SMTP_USERNAME,
     process.env.CALENDAR_ALERT_RECIPIENT,
+    await calendarScreenshotAttachments(
+      report,
+      process.env.CALENDAR_LAYOUT_REPORT_DIR,
+    ),
   );
   if (!email) {
     await writeFile(process.env.GITHUB_OUTPUT, "send=false\n", "utf8");

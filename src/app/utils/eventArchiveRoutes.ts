@@ -1,4 +1,6 @@
-export function getArchivePagePath(page, language = "es") {
+import type { Language } from "../config/i18n";
+
+export function getArchivePagePath(page: number, language: Language = "es") {
   if (language === "en") {
     return page <= 1 ? "/en/events/past/" : `/en/events/past/page/${page}/`;
   }
@@ -6,7 +8,10 @@ export function getArchivePagePath(page, language = "es") {
   return page <= 1 ? "/eventos/pasados/" : `/eventos/pasados/pagina/${page}/`;
 }
 
-export function getArchivePageNumber(pathname, language = "es") {
+export function getArchivePageNumber(
+  pathname: string,
+  language: Language = "es",
+) {
   const match =
     language === "en"
       ? /^\/en\/events\/past\/page\/(\d+)\/$/.exec(pathname)

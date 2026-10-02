@@ -3,8 +3,8 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { CALENDAR_EVENTS } from "../../src/app/data/calendarEvents";
 import type { CalendarEvent } from "../../src/app/types";
-import { addCalendarDays } from "../../src/app/utils/calendarDate.js";
-import { calculatePublicPastAt } from "../../src/app/utils/eventArchive.js";
+import { addCalendarDays } from "../../src/app/utils/calendarDate.ts";
+import { calculatePublicPastAt } from "../../src/app/utils/eventArchive.ts";
 
 interface TranslationRecord {
   source: { title: string; summary?: string };

@@ -1,6 +1,6 @@
 import type { CalendarEvent } from "../types";
-import { addCalendarDays } from "./calendarDate.js";
-import { calculatePublicPastAt } from "./eventArchive.js";
+import { addCalendarDays } from "./calendarDate.ts";
+import { calculatePublicPastAt } from "./eventArchive.ts";
 
 export interface UpcomingEventGroup {
   monthKey: string;

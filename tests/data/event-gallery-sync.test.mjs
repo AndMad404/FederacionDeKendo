@@ -15,7 +15,7 @@ import {
   extractDriveFiles,
   getDriveFolderId,
   synchronizeEventGalleries,
-} from "../../scripts/sync-event-galleries.mjs";
+} from "../../scripts/sync-event-galleries.ts";
 
 async function image(color, width = 640, height = 480, format = "jpeg") {
   const pipeline = sharp({

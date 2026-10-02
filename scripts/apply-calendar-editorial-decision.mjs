@@ -1,4 +1,4 @@
-import { applyEditorialDecisionToFiles } from "./sync-calendar-events.mjs";
+import { applyEditorialDecisionToFiles } from "./sync-calendar-events.ts";
 
 function required(name) {
   const value = process.env[name];

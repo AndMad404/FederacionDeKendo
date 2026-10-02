@@ -88,7 +88,10 @@ export function captureWorkspaceFingerprint(root) {
   return hash.digest("hex");
 }
 
-export function verificationSteps(unitScript = "test:unit") {
+export function verificationSteps(unitScript = "test:unit", mode = "full") {
+  if (!["full", "calendar"].includes(mode)) {
+    throw new Error(`Unsupported verification mode: ${mode}`);
+  }
   if (!ALLOWED_UNIT_SCRIPTS.has(unitScript)) {
     throw new Error(`Unsupported unit script: ${unitScript}`);
   }
@@ -111,8 +114,8 @@ export function verificationSteps(unitScript = "test:unit") {
     ["pnpm", "exec", "playwright", "install", "--with-deps", "chromium"],
     ["pnpm", "exec", "playwright", "test", "tests/data"],
     ["pnpm", "run", "test:behavior"],
-    ["pnpm", "run", "test:design"],
   );
+  if (mode === "full") steps.push(["pnpm", "run", "test:design"]);
 
   return steps;
 }
@@ -148,6 +151,7 @@ function runStep(root, [tool, ...args]) {
 export function runVerification({
   root,
   unitScript,
+  mode = "full",
   captureFingerprint = captureWorkspaceFingerprint,
   executeStep = runStep,
 }) {
@@ -156,7 +160,7 @@ export function runVerification({
   let failedStep;
 
   try {
-    for (const step of verificationSteps(unitScript)) {
+    for (const step of verificationSteps(unitScript, mode)) {
       failedStep = step;
       executeStep(root, step);
     }
@@ -187,6 +191,9 @@ if (isDirectExecution) {
     runVerification({
       root: process.cwd(),
       unitScript: parseUnitScript(process.argv.slice(2)),
+      mode: process.argv.includes("--mode")
+        ? process.argv[process.argv.indexOf("--mode") + 1]
+        : "full",
     });
   } catch (error) {
     await writeVerificationFailureSummary(error);

@@ -1,17 +1,13 @@
 name: Sync calendar events
-
 on:
   schedule:
-    - cron: "0 9 * * *"
-  workflow_dispatch:
-
+    - cron: 0 9 * * *
+  workflow_dispatch: null
 permissions:
   contents: write
-
 concurrency:
   group: sync-calendar-events
   cancel-in-progress: false
-
 jobs:
   sync-calendar:
     name: Sync Google Calendar into site data
@@ -19,78 +15,30 @@ jobs:
     env:
       CALENDAR_ICS_URL: ${{ secrets.CALENDAR_ICS_URL }}
       CALENDAR_TIME_ZONE: America/Costa_Rica
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
-
       - name: Enable Corepack
         run: corepack enable
-
       - name: Set up Node
         uses: actions/setup-node@v5
         with:
           node-version: 22
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
       - name: Sync calendar events
         id: sync
         run: pnpm run sync:calendar
         env:
           HISTORICAL_CHANGES_REPORT_PATH: ${{ runner.temp }}/calendar-historical-changes.json
           CALENDAR_NOTIFICATIONS_REPORT_PATH: ${{ runner.temp }}/calendar-notifications.json
-
       - name: Directed synchronization tests
         run: pnpm run test:sync-directed
-
       - name: Verify generated site
         uses: ./.github/actions/verify-site
         with:
           unit-script: test:unit:without-sync
-
-      - name: Emit verification failure notification
-        if: ${{ failure() && steps.sync.outcome == 'success' }}
-        run: node scripts/write-calendar-verification-notification.mjs
-        env:
-          CALENDAR_NOTIFICATIONS_REPORT_PATH: ${{ runner.temp }}/calendar-notifications.json
-          CALENDAR_FAILED_STEP: post-sync verification
-
-      - name: Prepare calendar notification email
-        id: calendar_notification_email
-        if: ${{ always() }}
-        run: node scripts/write-calendar-notification-email.mjs
-        env:
-          CALENDAR_NOTIFICATIONS_REPORT_PATH: ${{ runner.temp }}/calendar-notifications.json
-          CALENDAR_NOTIFICATION_EMAIL_PATH: ${{ runner.temp }}/calendar-notification-email.txt
-          CALENDAR_ALERT_SMTP_USERNAME: ${{ secrets.CALENDAR_ALERT_SMTP_USERNAME }}
-          CALENDAR_ALERT_RECIPIENT: ${{ secrets.CALENDAR_ALERT_RECIPIENT }}
-
-      - name: Send calendar notification email
-        if: ${{ always() && steps.calendar_notification_email.outputs.send == 'true' }}
-        run: >-
-          curl --fail --silent --show-error --url smtps://smtp.gmail.com:465 --ssl-reqd
-          --user "$CALENDAR_ALERT_SMTP_USERNAME:$CALENDAR_ALERT_SMTP_APP_PASSWORD"
-          --mail-from "$CALENDAR_ALERT_SMTP_USERNAME" --mail-rcpt "$CALENDAR_ALERT_RECIPIENT"
-          --upload-file "$CALENDAR_NOTIFICATION_EMAIL_PATH"
-        env:
-          CALENDAR_ALERT_SMTP_USERNAME: ${{ secrets.CALENDAR_ALERT_SMTP_USERNAME }}
-          CALENDAR_ALERT_SMTP_APP_PASSWORD: ${{ secrets.CALENDAR_ALERT_SMTP_APP_PASSWORD }}
-          CALENDAR_ALERT_RECIPIENT: ${{ secrets.CALENDAR_ALERT_RECIPIENT }}
-          CALENDAR_NOTIFICATION_EMAIL_PATH: ${{ runner.temp }}/calendar-notification-email.txt
-
-      - name: Upload calendar notification reports
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v5
-        with:
-          name: calendar-notification-reports
-          path: |
-            ${{ runner.temp }}/calendar-historical-changes.json
-            ${{ runner.temp }}/calendar-notifications.json
-          if-no-files-found: warn
-          retention-days: 30
-
+          mode: calendar
       - name: Commit calendar changes
         run: |
           sync_paths=(
@@ -114,3 +62,18 @@ jobs:
 
           git commit -m "chore: sync calendar events"
           git push
+        id: publication
+      - name: Emit verification failure notification
+        if: ${{ failure() }}
+        run: node --import tsx scripts/write-calendar-verification-notification.mjs
+        env:
+          CALENDAR_NOTIFICATIONS_REPORT_PATH: ${{ runner.temp }}/calendar-notifications.json
+          CALENDAR_FAILED_STEP: calendar publication or blocking verification
+      - name: Review calendar design and notify
+        if: ${{ always() }}
+        uses: ./.github/actions/calendar-design-review
+        with:
+          git-saved: ${{ steps.publication.outcome == 'success' }}
+          smtp-username: ${{ secrets.CALENDAR_ALERT_SMTP_USERNAME }}
+          smtp-password: ${{ secrets.CALENDAR_ALERT_SMTP_APP_PASSWORD }}
+          recipient: ${{ secrets.CALENDAR_ALERT_RECIPIENT }}

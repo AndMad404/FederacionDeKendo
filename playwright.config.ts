@@ -20,10 +20,19 @@ export default defineConfig({
     baseURL: "http://127.0.0.1:4173",
     trace: "on-first-retry",
   },
-  webServer: {
-    command: "corepack pnpm run preview --host 127.0.0.1",
-    url: "http://127.0.0.1:4173",
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-  },
+  webServer: [
+    {
+      command: "corepack pnpm run preview --host 127.0.0.1",
+      url: "http://127.0.0.1:4173",
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000,
+    },
+    {
+      command:
+        "node node_modules/vite/bin/vite.js --config tests/fixtures/calendar-layout/vite.config.ts",
+      url: "http://127.0.0.1:4174",
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000,
+    },
+  ],
 });

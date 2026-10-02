@@ -71,6 +71,7 @@ test("renders localized upcoming and past event navigation with the active page"
 
   for (const route of routes) {
     await page.goto(route.path);
+    await page.waitForLoadState("networkidle");
     const main = page.locator("main");
     const upcoming = main.getByRole("link", {
       name: route.upcoming,

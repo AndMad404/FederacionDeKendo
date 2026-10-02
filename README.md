@@ -60,6 +60,27 @@ corepack pnpm run test:design
 Las comparaciones visuales se ejecutan por separado con
 `corepack pnpm run test:visual`.
 
+Los flujos de calendario usan `verify:site -- --mode calendar`: datos,
+reglas editoriales, tipos, build y funcionamiento bloquean la publicación.
+Después del commit y push, `review:calendar-design` revisa el mismo build con
+`test:calendar-layout`. Los problemas de diseño y las revisiones incompletas
+producen avisos, correo y artefactos sin revertir los datos. Los avisos distinguen
+el contenido guardado en Git del despliegue de Cloudflare, que no se confirma
+desde esta revisión.
+
+La página densa de Gasshuku calibra alturas de bloques y márgenes en las cuatro
+presentaciones. Sus cantidades de texto, listas y fotos no son límites ni
+producen avisos por sí solas. Las fixtures neutras varían carga de contenido,
+dimensiones y proporciones de una imagen reutilizada; los contenedores conservan
+su geometría independientemente del tamaño natural de la foto. La revisión
+registra medidas incluso sin roturas y resume máximos observados por viewport,
+separando calibración, fixtures y contenido generado. Los máximos son evidencia,
+no topes de altura: se permite crecer con scroll vertical. Solo las roturas o
+revisiones incompletas generan alertas. Informes y capturas quedan en
+`test-results/` o en el directorio temporal del runner, fuera de `dist/`.
+La sincronización y las utilidades de fechas y archivo se ejecutan mediante
+`tsx` y se comprueban estrictamente con `typecheck`, incluidos los scripts.
+
 ## Estructura
 
 | Ruta                 | Responsabilidad                                           |

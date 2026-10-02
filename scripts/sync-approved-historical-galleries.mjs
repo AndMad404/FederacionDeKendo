@@ -2,13 +2,13 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { synchronizeEventGalleries } from "./sync-event-galleries.mjs";
+import { synchronizeEventGalleries } from "./sync-event-galleries.ts";
 import {
   getPrivateAlbumUrl,
   parseCalendarEvent,
   parseVEvents,
   readCalendarSource,
-} from "./sync-calendar-events.mjs";
+} from "./sync-calendar-events.ts";
 
 const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),

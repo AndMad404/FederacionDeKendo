@@ -2,7 +2,7 @@ import {
   createCalendarFailureNotification,
   writeCalendarNotificationsReport,
   writeCalendarNotificationsSummary,
-} from "./sync-calendar-events.mjs";
+} from "./sync-calendar-events.ts";
 import { readFile } from "node:fs/promises";
 
 const reportPath = process.env.CALENDAR_NOTIFICATIONS_REPORT_PATH;
