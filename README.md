@@ -48,7 +48,17 @@ corepack pnpm run verify:site
 
 Este gate ejecuta formato, lint, tipos, build, pruebas y validación del output
 generado. Las suites están separadas por arquitectura, datos, comportamiento y
-diseño; consulta [TESTING.md](TESTING.md) para los comandos dirigidos.
+diseño. Para ejecutar una suite dirigida:
+
+```bash
+corepack pnpm run test:architecture
+corepack pnpm run test:data
+corepack pnpm run test:behavior
+corepack pnpm run test:design
+```
+
+Las comparaciones visuales se ejecutan por separado con
+`corepack pnpm run test:visual`.
 
 ## Estructura
 
