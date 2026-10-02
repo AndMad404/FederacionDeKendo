@@ -127,14 +127,14 @@ test("shared navigation arrows preserve visual interaction states", async ({
   await expect(disabledArrow).toHaveCSS("opacity", "0.35");
 
   const spanishCalendar = page.getByRole("button", {
-    name: "Evento",
+    name: "Calendario",
   });
   await expect(spanishCalendar).toHaveClass(/border-site-accent/);
 
   await page.goto("/en/events/past/");
 
   const englishCalendar = page.getByRole("button", {
-    name: "Event",
+    name: "Calendar",
   });
   await expect(englishCalendar).toHaveClass(/border-site-accent/);
 });

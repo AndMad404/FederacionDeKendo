@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import type { RouteComponent } from "../../src/app/config/routeTypes";
 import { getReachability } from "../helpers/content-reachability";
 import { preparePage } from "../helpers/prepare-page";
+import { APPROVED_VIEWPORTS } from "./design-contract";
 
 const ROUTES = {
   home: { name: "home", path: "/" },
@@ -12,6 +13,41 @@ const ROUTES = {
   pastEvents: { name: "past events", path: "/eventos/pasados/" },
   notFound: { name: "not found", path: "/ruta-responsive-inexistente/" },
 } satisfies Record<RouteComponent, { name: string; path: string }>;
+
+for (const viewport of APPROVED_VIEWPORTS) {
+  test.describe(`${viewport.name} calendar heading`, () => {
+    test.use({ viewport });
+
+    for (const path of ["/eventos/", "/en/events/"]) {
+      test(`${path} keeps its complete banner text visible`, async ({
+        page,
+      }) => {
+        await preparePage(page, path);
+        const heading = page.locator("main h1");
+        if (path === "/eventos/") {
+          await expect(heading).toHaveText("Calendario de Eventos");
+        }
+        expect((await getReachability(page)).clippedContent).toEqual([]);
+
+        // Restore the longer copy that exposed the mobile bug. Shortening the
+        // title alone must not conceal a regression in responsive wrapping.
+        await heading.evaluate((element) => {
+          element.textContent = "Calendario de Próximos Eventos";
+        });
+        expect((await getReachability(page)).clippedContent).toEqual([]);
+        const headingBox = await heading.boundingBox();
+        const descriptionBox = await page
+          .locator("main header p")
+          .boundingBox();
+        expect(headingBox).not.toBeNull();
+        expect(descriptionBox).not.toBeNull();
+        expect(descriptionBox!.y).toBeGreaterThanOrEqual(
+          headingBox!.y + headingBox!.height,
+        );
+      });
+    }
+  });
+}
 
 const ALL_ROUTE_KEYS = Object.keys(ROUTES) as RouteComponent[];
 
@@ -69,6 +105,16 @@ const FLOW_CASES = [
 ] as const;
 
 const REACHABILITY_CASES = [
+  {
+    name: "mobile-calendar-360",
+    viewport: { width: 360, height: 800 },
+    routes: ["calendar"],
+  },
+  {
+    name: "mobile-calendar-390",
+    viewport: { width: 390, height: 844 },
+    routes: ["calendar"],
+  },
   {
     name: "tablet-fit-entry",
     viewport: { width: 768, height: 1024 },

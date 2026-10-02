@@ -59,7 +59,9 @@ for (const viewport of APPROVED_VIEWPORTS) {
             styles.marginBottom,
             approvedPage.design === "event"
               ? 0
-              : SHELL_CONTRACT.routeSurfaceMarginBlock,
+              : approvedPage.design === "pastEvents" && viewport.width === 768
+                ? SHELL_CONTRACT.pastEventsTabletMarginBottom
+                : SHELL_CONTRACT.routeSurfaceMarginBlock,
             "route surface bottom margin",
           );
           expectCssPixels(

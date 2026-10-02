@@ -25,6 +25,7 @@ export const FIXED_TEST_TIME = new Date("2026-08-04T12:00:00-06:00");
 export const SHELL_CONTRACT = {
   mainPaddingInline: 10,
   routeSurfaceMarginBlock: 8,
+  pastEventsTabletMarginBottom: 12,
   routeSurfaceRadius: 14,
   desktopViewport: { width: 1366, height: 768 },
 } as const;
@@ -92,15 +93,27 @@ export function getComponentSpacingContract(
     };
   }
 
-  if (design === "calendar" || design === "pastEvents") {
+  if (design === "calendar") {
     return {
       selector: "[data-page-content-boundary]",
-      paddingTop: viewportWidth >= 1280 ? 15 : 16,
-      paddingRight: viewportWidth >= 640 ? 8 : 12,
-      paddingBottom: viewportWidth >= 1280 ? 15 : 16,
-      paddingLeft: viewportWidth >= 640 ? 8 : 12,
-      rowGap: viewportWidth >= 768 ? 8 : 12,
-      columnGap: viewportWidth >= 768 ? 8 : 12,
+      paddingTop: viewportWidth >= 640 ? 16 : 12,
+      paddingRight: viewportWidth >= 640 ? 16 : 12,
+      paddingBottom: viewportWidth >= 640 ? 16 : 12,
+      paddingLeft: viewportWidth >= 640 ? 16 : 12,
+      rowGap: viewportWidth >= 640 ? 16 : 12,
+      columnGap: viewportWidth >= 640 ? 16 : 12,
+    };
+  }
+
+  if (design === "pastEvents") {
+    return {
+      selector: "[data-page-content-boundary]",
+      paddingTop: viewportWidth >= 640 ? 16 : 12,
+      paddingRight: viewportWidth >= 640 ? 16 : 12,
+      paddingBottom: viewportWidth >= 640 ? 16 : 12,
+      paddingLeft: viewportWidth >= 640 ? 16 : 12,
+      rowGap: viewportWidth >= 640 ? 16 : 12,
+      columnGap: viewportWidth >= 640 ? 16 : 12,
     };
   }
 

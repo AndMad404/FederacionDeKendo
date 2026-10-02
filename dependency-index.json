@@ -171,14 +171,26 @@
     },
     {
       "id": "design-page-preparation",
-      "changes": ["tests/helpers/prepare-page.ts"],
-      "area": "Preparacion de paginas para geometria y comparacion visual",
+      "changes": [
+        "tests/design/design-contract.ts",
+        "tests/helpers/prepare-page.ts"
+      ],
+      "area": "Contratos y preparacion de paginas para geometria y comparacion visual",
       "tests": [
         "tests/design/event-action-geometry.spec.ts",
         "tests/design/geometry-contract.spec.ts",
         "tests/design/responsive-reachability.spec.ts",
         "tests/design/shell-geometry.spec.ts",
         "tests/design/visual-regression.spec.ts"
+      ]
+    },
+    {
+      "id": "design-content-reachability",
+      "changes": ["tests/helpers/content-reachability.ts"],
+      "area": "Deteccion de recorte y alcance del contenido responsive",
+      "tests": [
+        "tests/design/responsive-reachability.spec.ts",
+        "tests/design/shell-geometry.spec.ts"
       ]
     },
     {

@@ -14,15 +14,36 @@ export async function getReachability(page: Page) {
     const clippedContent = contentElements.flatMap((element) => {
       const elementRect = element.getBoundingClientRect();
       let ancestor = element.parentElement;
+      let reachableLeft = elementRect.left;
+      let reachableRight = elementRect.right;
 
       while (ancestor && ancestor !== document.body) {
         const styles = getComputedStyle(ancestor);
-        if (styles.overflowY === "hidden" || styles.overflowY === "clip") {
+        if (
+          ["auto", "scroll"].includes(styles.overflowX) &&
+          ancestor.scrollWidth > ancestor.clientWidth + 1
+        ) {
+          // Offscreen carousel items can be brought into this scrollport.
+          // Its outer ancestors must still contain the scrollport itself.
+          const scrollport = ancestor.getBoundingClientRect();
+          reachableLeft = Math.max(reachableLeft, scrollport.left);
+          reachableRight = Math.min(reachableRight, scrollport.right);
+          if (reachableLeft > reachableRight) {
+            reachableLeft = scrollport.left;
+            reachableRight = scrollport.right;
+          }
+        }
+        const clipsX = ["hidden", "clip"].includes(styles.overflowX);
+        const clipsY = ["hidden", "clip"].includes(styles.overflowY);
+        if (clipsX || clipsY) {
           const ancestorRect = ancestor.getBoundingClientRect();
-          if (
+          const outsideX =
+            reachableLeft < ancestorRect.left - 1 ||
+            reachableRight > ancestorRect.right + 1;
+          const outsideY =
             elementRect.top < ancestorRect.top - 1 ||
-            elementRect.bottom > ancestorRect.bottom + 1
-          ) {
+            elementRect.bottom > ancestorRect.bottom + 1;
+          if ((clipsX && outsideX) || (clipsY && outsideY)) {
             return [
               {
                 label:

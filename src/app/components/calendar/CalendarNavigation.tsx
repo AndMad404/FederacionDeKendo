@@ -30,7 +30,7 @@ export function CalendarNavigation({
   return (
     <nav
       aria-label={copy.calendar.navigation}
-      className="flex items-center justify-center gap-4"
+      className="flex items-center justify-center gap-3 sm:gap-4"
     >
       <span className="md:hidden">
         <NavigationArrowButton

@@ -36,6 +36,29 @@ const publishedGasshuku = CALENDAR_EVENTS.find(
   ({ id }) => id === "2026-09-12-gasshuku-monteverde",
 );
 
+test("event time distinguishes multiple days, timed days and missing hours", async () => {
+  const { formatEventTime } = await loadSourceModule(
+    "/src/app/utils/calendarEventPresentation.ts",
+  );
+
+  assert.equal(formatEventTime(gasshuku), "Todos los días");
+  assert.equal(formatEventTime(gasshuku, "en"), "Every day");
+  assert.equal(formatEventTime(tournament), "13:00 - 17:00");
+  assert.equal(
+    formatEventTime({ ...tournament, endDate: "2026-08-23" }),
+    "Todos los días",
+  );
+  // An all-day Calendar end date is exclusive: next day means one day.
+  assert.equal(
+    formatEventTime({ date: "2026-08-22", endDate: "2026-08-23" }),
+    "Horario por confirmar",
+  );
+  assert.equal(
+    formatEventTime({ date: "2026-08-22" }),
+    "Horario por confirmar",
+  );
+});
+
 test("upcoming events advance at the exact local event end time", async () => {
   const { getUpcomingEvents } = await loadSourceModule(
     "/src/app/utils/calendarEvents.ts",

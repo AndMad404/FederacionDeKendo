@@ -47,10 +47,17 @@ export function getEventDateLabel(
 }
 
 export function formatEventTime(
-  { startTime, endTime }: CalendarEvent,
+  event: CalendarEvent,
   language: Language = "es",
 ) {
-  if (!startTime) return language === "en" ? "All day" : "Todo el día";
+  const endDate = getEventInclusiveEndDate(event);
+  if (endDate && endDate > event.date) {
+    return language === "en" ? "Every day" : "Todos los días";
+  }
+  const { startTime, endTime } = event;
+  if (!startTime) {
+    return language === "en" ? "Time to be confirmed" : "Horario por confirmar";
+  }
   return endTime ? `${startTime} - ${endTime}` : startTime;
 }
 

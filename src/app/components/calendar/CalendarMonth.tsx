@@ -27,12 +27,15 @@ export function CalendarMonth({
   const headingId = `calendar-month-${group.monthKey}`;
 
   return (
-    <section aria-labelledby={headingId} className="flex flex-col gap-2">
+    <section
+      aria-labelledby={headingId}
+      className="flex flex-col gap-2 page-fit:h-full page-fit:min-h-0"
+    >
       <h2 id={headingId} className="sr-only">
         {monthLabel}
       </h2>
 
-      <ul className="mx-auto grid w-full gap-2">
+      <ul className="mx-auto grid w-full gap-3 sm:gap-4 page-fit:flex-1 page-fit:grid-rows-2">
         {visibleEvents.map((event) => (
           <CalendarEventCard key={event.id} event={event} />
         ))}

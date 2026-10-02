@@ -31,7 +31,7 @@ export function EventSectionNavigation({
       aria-label={
         active === "upcoming" ? copy.calendar.upcomingLabel : copy.archive.title
       }
-      className="flex flex-nowrap items-center justify-center gap-2 sm:gap-3"
+      className="grid w-fit max-w-full grid-cols-2 self-center gap-3 sm:gap-4"
     >
       {items.map((item) => {
         const isActive = item.id === active;

@@ -63,11 +63,3 @@ export function getPastEvents(now = new Date()) {
         new Date(`${a.date}T${a.startTime ?? "00:00"}`).getTime(),
     );
 }
-
-export function getArchivePageFromPathname(pathname: string) {
-  if (/^\/(?:eventos\/pasados|en\/events\/past)\/?$/.test(pathname)) return 1;
-  const match = pathname.match(
-    /^\/(?:eventos\/pasados\/pagina|en\/events\/past\/page)\/(\d+)\/?$/,
-  );
-  return match ? Number.parseInt(match[1], 10) : undefined;
-}
