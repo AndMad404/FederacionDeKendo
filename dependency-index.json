@@ -170,6 +170,16 @@
       ]
     },
     {
+      "id": "source-module-loader",
+      "changes": ["tests/helpers/load-source-module.mjs"],
+      "area": "Carga de modulos fuente para pruebas de datos",
+      "tests": [
+        "tests/data/event-runtime.test.mjs",
+        "tests/data/meta-descriptions-approval.test.mjs",
+        "tests/data/static-public-content.test.mjs"
+      ]
+    },
+    {
       "id": "design-page-preparation",
       "changes": [
         "tests/design/design-contract.ts",

@@ -7,7 +7,8 @@ async function getServer() {
     appType: "custom",
     configFile: false,
     optimizeDeps: { noDiscovery: true },
-    server: { middlewareMode: true },
+    // Source-only tests do not need a WebSocket or hot reload.
+    server: { middlewareMode: true, ws: false, hmr: false },
   });
 
   return serverPromise;
