@@ -34,7 +34,9 @@
         "tests/data/calendar-timezone-localization.spec.ts",
         "tests/data/event-history-filters.test.mjs",
         "tests/data/event-history-sync-contract.test.mjs",
-        "tests/data/event-runtime.test.mjs"
+        "tests/data/event-runtime.test.mjs",
+        "tests/data/generated-redirects.test.mjs",
+        "tests/behavior/events.spec.ts"
       ]
     },
     {

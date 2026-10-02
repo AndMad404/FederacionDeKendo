@@ -12,6 +12,7 @@ import {
   getArchivePagePath,
   getPastEvents,
   getEventPath,
+  getEventLegacySlugs,
 } from "../utils/eventRoutes";
 import { getLanguageFromPathname, type Language } from "./i18n";
 import {
@@ -594,7 +595,7 @@ export function getEventRedirects() {
       const spanishPath = getEventPath(event, "es");
       const englishPath = getEventPath(event, "en");
       const archived = spanishPath.startsWith("/eventos/pasados/");
-      const aliases = event.aliases ?? [];
+      const aliases = getEventLegacySlugs(event);
 
       const spanishSources = new Set([
         `/eventos/${event.id}/`,

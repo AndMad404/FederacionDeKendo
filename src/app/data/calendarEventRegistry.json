@@ -3,7 +3,7 @@
   "events": [
     {
       "sourceId": "7bd8989c63db48fab752ce0f",
-      "slug": "2026-05-02-examen",
+      "slug": "1er-examen-2026",
       "title": "Examen",
       "date": "2026-05-02",
       "timeZone": "America/Costa_Rica",
@@ -11,7 +11,8 @@
       "eventType": "examen",
       "historical": true,
       "aliases": [
-        "2026-05-02-federacion-examen"
+        "2026-05-02-federacion-examen",
+        "2026-05-02-examen"
       ],
       "editorialState": "pendiente",
       "pendingRevision": {
@@ -62,7 +63,7 @@
     },
     {
       "sourceId": "462f5f7da99a1d17474471bd",
-      "slug": "2026-05-29-clak-seminario-instructores-chile",
+      "slug": "clak-seminario-instructores-chile",
       "title": "CLAK Seminario Instructores CHILE",
       "date": "2026-05-29",
       "timeZone": "America/Costa_Rica",
@@ -73,7 +74,8 @@
       "editorialState": "pendiente",
       "summary": "#EventoExterno",
       "aliases": [
-        "2026-05-30-federacion-seminario-y-reunion"
+        "2026-05-30-federacion-seminario-y-reunion",
+        "2026-05-29-clak-seminario-instructores-chile"
       ],
       "pendingRevision": {
         "id": "d341dabf315f1d1719a4ab03926d9102d018efc7112d259b7f3399b3bf37ce72",
@@ -140,7 +142,7 @@
     },
     {
       "sourceId": "89d31aa2d6937a78b1866283",
-      "slug": "2026-08-08-examen",
+      "slug": "2do-examen-2026",
       "title": "Examen",
       "date": "2026-08-08",
       "timeZone": "America/Costa_Rica",
@@ -205,11 +207,14 @@
         "notification": {
           "evidenceFingerprint": "2d72ecd44c17a34ca2e28217ef95a4776e1ca9fb56dae3ab9cbd1a42d99106c4"
         }
-      }
+      },
+      "aliases": [
+        "2026-08-08-examen"
+      ]
     },
     {
       "sourceId": "72f0b1f2f02e0f5d73ae28ec",
-      "slug": "2026-08-22-3er-torneo",
+      "slug": "3er-torneo",
       "title": "3er Torneo",
       "date": "2026-08-22",
       "timeZone": "America/Costa_Rica",
@@ -274,11 +279,14 @@
         "notification": {
           "evidenceFingerprint": "32f8f42319f4f80fc3d1b0186ccbe2a3b2bb2f91c8909bbc535d0fa88e92c01a"
         }
-      }
+      },
+      "aliases": [
+        "2026-08-22-3er-torneo"
+      ]
     },
     {
       "sourceId": "45c4376b5e5e0fcf347835d0",
-      "slug": "2026-09-12-gasshuku-monteverde",
+      "slug": "gasshuku-monteverde",
       "title": "Gasshuku Monteverde",
       "date": "2026-09-12",
       "timeZone": "America/Costa_Rica",
@@ -339,7 +347,10 @@
         "notification": {
           "evidenceFingerprint": "940e9fe85fc22988c9ab000cdb1571c4ce8b4bf426d99d2265c9e79d7c671ebd"
         }
-      }
+      },
+      "aliases": [
+        "2026-09-12-gasshuku-monteverde"
+      ]
     },
     {
       "sourceId": "e25ca7168de483e195f1aaf1",

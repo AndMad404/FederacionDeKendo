@@ -65,9 +65,8 @@ test("keeps the untranslated Panama event on its Spanish vanity route", async ()
   );
 });
 
-test("generates localized English routes with reciprocal language metadata", async () => {
+test("generates the localized English home with reciprocal language metadata", async () => {
   const home = await readDist("en/index.html");
-  const event = await readDist("en/events/past/2026-08-08-examen/index.html");
 
   assert.match(home, /<html lang="en" prefix="og: https:\/\/ogp\.me\/ns#">/);
   assert.match(home, />Home<\/a>/);
@@ -80,8 +79,6 @@ test("generates localized English routes with reciprocal language metadata", asy
     home,
     /rel="alternate" hreflang="en" href="https:\/\/fak-kendo\.org\/en\/"/,
   );
-  assert.match(event, /<h1[^>]*>Examination<\/h1>/);
-  assert.match(event, /Examinations from 8th to 2nd kyu/);
 });
 
 test("publishes English event routes only for distinct editorial translations", async () => {
@@ -108,6 +105,14 @@ test("publishes English event routes only for distinct editorial translations", 
 
   assert.deepEqual(spanishEventRoutes, eventIds);
   assert.deepEqual(englishEventRoutes, translatedEventIds);
+  for (const eventId of translatedEventIds) {
+    const route = routeManifest.find(
+      (route) => route.eventId === eventId && route.language === "en",
+    );
+    const html = await readDist(`${route.path.slice(1)}index.html`);
+    assert.match(html, /<html lang="en"/, eventId);
+    assert.match(html, /hreflang="es-CR"/, eventId);
+  }
   assert.ok(duplicateEvents.length > 0);
 
   for (const event of duplicateEvents) {

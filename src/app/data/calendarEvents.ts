@@ -3,8 +3,8 @@ import type { CalendarEvent } from "../types";
 // Auto-generated from Google Calendar. Do not edit manually.
 export const CALENDAR_EVENTS: CalendarEvent[] = [
   {
-    id: "2026-05-02-examen",
-    aliases: ["2026-05-02-federacion-examen"],
+    id: "1er-examen-2026",
+    aliases: ["2026-05-02-federacion-examen","2026-05-02-examen"],
     archiveEligibleAt: "2026-05-04T06:00:00.000Z",
     title: "Examen",
     date: "2026-05-02",
@@ -12,8 +12,8 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
     timeZone: "America/Costa_Rica"
   },
   {
-    id: "2026-05-29-clak-seminario-instructores-chile",
-    aliases: ["2026-05-30-federacion-seminario-y-reunion"],
+    id: "clak-seminario-instructores-chile",
+    aliases: ["2026-05-30-federacion-seminario-y-reunion","2026-05-29-clak-seminario-instructores-chile"],
     archiveEligibleAt: "2026-06-02T06:00:00.000Z",
     title: "CLAK Seminario Instructores CHILE",
     date: "2026-05-29",
@@ -23,7 +23,8 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
     timeZone: "America/Costa_Rica"
   },
   {
-    id: "2026-08-08-examen",
+    id: "2do-examen-2026",
+    aliases: ["2026-08-08-examen"],
     archiveEligibleAt: "2026-08-10T06:00:00.000Z",
     title: "Examen",
     date: "2026-08-08",
@@ -35,7 +36,8 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
     timeZone: "America/Costa_Rica"
   },
   {
-    id: "2026-08-22-3er-torneo",
+    id: "3er-torneo",
+    aliases: ["2026-08-22-3er-torneo"],
     archiveEligibleAt: "2026-08-24T06:00:00.000Z",
     title: "3er Torneo",
     date: "2026-08-22",
@@ -47,7 +49,8 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
     timeZone: "America/Costa_Rica"
   },
   {
-    id: "2026-09-12-gasshuku-monteverde",
+    id: "gasshuku-monteverde",
+    aliases: ["2026-09-12-gasshuku-monteverde"],
     archiveEligibleAt: "2026-09-15T06:00:00.000Z",
     title: "Gasshuku Monteverde",
     date: "2026-09-12",

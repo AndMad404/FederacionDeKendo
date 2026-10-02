@@ -1,30 +1,30 @@
 {
   "version": 2,
   "galleries": {
-    "2026-08-08-examen": {
+    "2do-examen-2026": {
       "fingerprint": "2164e8b1aa9e2137057d27be603d707fb25d0c2b8c31e5ed1be3912763284fe8"
     },
-    "2026-08-22-3er-torneo": {
+    "3er-torneo": {
       "fingerprint": "5cbd7351da72eb1e6102d6c0ca7ff00c14d4ce7be66701295d787af74361734d"
     },
-    "2026-09-12-gasshuku-monteverde": {
+    "gasshuku-monteverde": {
       "fingerprint": "82896ffb0c046080c5083b1f67d8e456ef145b7809ccbffe146c1591891971ef"
     }
   },
   "checks": {
-    "2026-05-02-examen": {
+    "1er-examen-2026": {
       "phase": "final"
     },
-    "2026-05-29-clak-seminario-instructores-chile": {
+    "clak-seminario-instructores-chile": {
       "phase": "final"
     },
-    "2026-08-22-3er-torneo": {
+    "3er-torneo": {
       "phase": "final"
     },
     "2026-05-30-seminario": {
       "phase": "final"
     },
-    "2026-09-12-gasshuku-monteverde": {
+    "gasshuku-monteverde": {
       "phase": "final"
     }
   }

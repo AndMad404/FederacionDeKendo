@@ -12,7 +12,7 @@ interface EventGalleryImage {
 export interface EventGallery { fingerprint: string; images: EventGalleryImage[] }
 
 export const EVENT_GALLERIES: Record<string, EventGallery> = {
-  "2026-08-08-examen": {
+  "2do-examen-2026": {
     "fingerprint": "2164e8b1aa9e2137057d27be603d707fb25d0c2b8c31e5ed1be3912763284fe8",
     "images": [
       {
@@ -53,7 +53,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
       }
     ]
   },
-  "2026-08-22-3er-torneo": {
+  "3er-torneo": {
     "fingerprint": "5cbd7351da72eb1e6102d6c0ca7ff00c14d4ce7be66701295d787af74361734d",
     "images": [
       {
@@ -118,7 +118,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
       }
     ]
   },
-  "2026-09-12-gasshuku-monteverde": {
+  "gasshuku-monteverde": {
     "fingerprint": "82896ffb0c046080c5083b1f67d8e456ef145b7809ccbffe146c1591891971ef",
     "images": [
       {

@@ -2,10 +2,10 @@ import { expect, test, type Page } from "@playwright/test";
 import { expectInteractiveReady } from "../helpers/interactive-ready";
 
 const FIXED_UPCOMING_TIME = new Date("2026-08-23T12:00:00-06:00");
-const TOURNAMENT_EVENT_PATH = "/eventos/2026-08-22-3er-torneo/";
-const GASSHUKU_EVENT_PATH = "/eventos/2026-09-12-gasshuku-monteverde/";
-const HISTORICAL_EVENT_PATH = "/eventos/pasados/2026-08-08-examen/";
-const HISTORICAL_TOURNAMENT_PATH = "/eventos/pasados/2026-08-22-3er-torneo/";
+const TOURNAMENT_EVENT_PATH = "/eventos/3er-torneo/";
+const GASSHUKU_EVENT_PATH = "/eventos/gasshuku-monteverde/";
+const HISTORICAL_EVENT_PATH = "/eventos/pasados/2do-examen-2026/";
+const HISTORICAL_TOURNAMENT_PATH = "/eventos/pasados/3er-torneo/";
 const FIXED_HISTORICAL_TIME = new Date("2026-08-24T12:00:00-06:00");
 const FIXED_ARCHIVE_TIME = new Date("2028-01-01T12:00:00-06:00");
 

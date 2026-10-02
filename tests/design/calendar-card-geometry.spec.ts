@@ -8,7 +8,7 @@ test("historical tournament thumbnails scroll to follow carousel selection on mo
 }) => {
   await page.setViewportSize({ width: 360, height: 800 });
   await page.clock.setFixedTime(new Date("2026-08-24T12:00:00-06:00"));
-  await page.goto("/eventos/pasados/2026-08-22-3er-torneo/");
+  await page.goto("/eventos/pasados/3er-torneo/");
   await page.waitForLoadState("networkidle");
   const gallery = page.getByRole("region", { name: /Fotografías del evento/ });
   const thumbnails = gallery.getByRole("group", {

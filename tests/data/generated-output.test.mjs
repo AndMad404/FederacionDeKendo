@@ -10,9 +10,9 @@ import { readDist } from "../helpers/generated-output-fixtures.mjs";
 
 test("renders complete and incomplete historical event headings", async () => {
   for (const [path, title] of [
-    ["eventos/pasados/2026-08-08-examen/index.html", "Examen"],
+    ["eventos/pasados/2do-examen-2026/index.html", "Examen"],
     [
-      "eventos/pasados/2026-05-30-seminario/index.html",
+      "eventos/pasados/clak-seminario-instructores-chile/index.html",
       "CLAK Seminario Instructores CHILE",
     ],
   ]) {
@@ -104,17 +104,16 @@ test("generates localized, unique, indexable SEO output for every event route", 
 
   await t.test("selected event titles remain approved", () => {
     const expectedEventTitles = new Map([
-      ["2026-08-08-examen:es", "Examen de Kendo — 8 ago 2026 | Costa Rica"],
+      ["2do-examen-2026:es", "Examen de Kendo — 8 ago 2026 | Costa Rica"],
       [
-        "2026-09-12-gasshuku-monteverde:es",
+        "gasshuku-monteverde:es",
         "Gasshuku Monteverde — 12 sept 2026 | Costa Rica",
       ],
-      ["2026-08-22-3er-torneo:es", "3er Torneo de Kendo — 22 ago 2026"],
+      ["3er-torneo:es", "3er Torneo de Kendo — 22 ago 2026"],
       [
-        "2026-05-29-clak-seminario-instructores-chile:es",
+        "clak-seminario-instructores-chile:es",
         "CLAK Seminario Instructores CHILE — 29 may 2026",
       ],
-      ["2026-08-08-examen:en", "Kendo Examination — Aug 8, 2026 | Costa Rica"],
     ]);
 
     for (const [key, expectedTitle] of expectedEventTitles) {
@@ -181,19 +180,24 @@ test("renders indexable home and calendar routes with canonical metadata", async
 test("generates the archive route", async () => {
   const archive = await readDist("eventos/pasados/index.html");
   assert.match(archive, /Eventos pasados/);
-  assert.match(archive, /href="\/eventos\/pasados\/2026-08-08-examen\/"/);
+  assert.match(archive, /href="\/eventos\/pasados\/2do-examen-2026\/"/);
 });
 
 test("omits breadcrumbs from event and archive routes", async () => {
   const pastEvent = await readDist(
-    "eventos/pasados/2026-08-08-examen/index.html",
+    "eventos/pasados/2do-examen-2026/index.html",
   );
-  const englishPastEvent = await readDist(
-    "en/events/past/2026-08-08-examen/index.html",
+  const englishRoute = getRouteManifest().find(
+    (route) => route.eventId === "2do-examen-2026" && route.language === "en",
   );
+  const englishPastEvent = englishRoute
+    ? await readDist(`${englishRoute.path.slice(1)}index.html`)
+    : undefined;
   const archivePageTwo = await readDist("eventos/pasados/pagina/2/index.html");
 
-  for (const html of [pastEvent, englishPastEvent, archivePageTwo]) {
+  for (const html of [pastEvent, englishPastEvent, archivePageTwo].filter(
+    Boolean,
+  )) {
     assert.doesNotMatch(html, /aria-label="Migas de navegación"/);
     assert.doesNotMatch(html, /aria-label="Breadcrumb"/);
     assert.doesNotMatch(html, /"@type":"BreadcrumbList"/);

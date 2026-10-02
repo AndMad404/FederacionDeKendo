@@ -759,7 +759,6 @@ export function mergeRegistry(
           ? freezeHistoricalSnapshot(legacyCompatibleEvent)
           : legacyCompatibleEvent;
       if (event.editorialState === "eliminado") return published;
-      if (event.editorialState === "pendiente") return published;
       const pending = createPendingRevision(
         published,
         undefined,
@@ -1087,6 +1086,7 @@ export function detectHistoricalChanges(
   const changes = [];
 
   for (const publishedEvent of previousRegistry.events ?? []) {
+    if (publishedEvent.editorialState === "eliminado") continue;
     const isHistorical =
       publishedEvent.historical === true ||
       isArchiveEligible(publishedEvent, now);
@@ -1211,12 +1211,14 @@ function getNotificationExecution(
 
 const pendingNotificationDetails = {
   future_missing: {
-    cause: "El evento futuro ya no aparece en la fuente.",
+    cause:
+      "Posible eliminacion detectada: el evento futuro ya no aparece en Calendar.",
     actionRequired:
       "Confirmar en Calendar si corresponde retirarlo; no se aplica ninguna decision automaticamente.",
   },
   historical_missing: {
-    cause: "El evento historico ya no aparece en la fuente.",
+    cause:
+      "Posible eliminacion detectada: el evento historico ya no aparece en Calendar.",
     actionRequired:
       "Revisar la ausencia y conservar la version publicada hasta una decision humana posterior.",
   },

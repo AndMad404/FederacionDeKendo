@@ -9,7 +9,7 @@ const REPRESENTATIVE_ROUTES = [
   "/galeria/",
   "/afiliados/",
   "/eventos/pasados/",
-  "/eventos/pasados/2026-08-08-examen/",
+  "/eventos/pasados/2do-examen-2026/",
   "/en/",
 ];
 

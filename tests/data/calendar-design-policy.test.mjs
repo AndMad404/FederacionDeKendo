@@ -13,6 +13,19 @@ import {
 
 test("valid data with excess content stays published when the post-publication review detects broken design", async (t) => {
   const directory = await temporaryDirectory(t, "calendar-policy-");
+  const summaryPath = path.join(directory, "workflow-summary.md");
+  const notificationPath = path.join(directory, "workflow-notifications.json");
+  await writeFile(summaryPath, "Real workflow summary");
+  await writeFile(notificationPath, "Real workflow notifications");
+  const previousSummary = process.env.GITHUB_STEP_SUMMARY;
+  const previousNotifications = process.env.CALENDAR_NOTIFICATIONS_REPORT_PATH;
+  t.after(() => {
+    if (previousSummary === undefined) delete process.env.GITHUB_STEP_SUMMARY;
+    else process.env.GITHUB_STEP_SUMMARY = previousSummary;
+    if (previousNotifications === undefined)
+      delete process.env.CALENDAR_NOTIFICATIONS_REPORT_PATH;
+    else process.env.CALENDAR_NOTIFICATIONS_REPORT_PATH = previousNotifications;
+  });
   const source = path.join(directory, "source.ics");
   const outputPath = path.join(directory, "calendarEvents.ts");
   const registryPath = path.join(directory, "registry.json");
@@ -49,6 +62,8 @@ test("valid data with excess content stays published when the post-publication r
       },
     ],
   };
+  process.env.GITHUB_STEP_SUMMARY = summaryPath;
+  process.env.CALENDAR_NOTIFICATIONS_REPORT_PATH = notificationPath;
   const report = await runDesignReview({
     directory,
     gitSaved: true,
@@ -85,6 +100,11 @@ test("valid data with excess content stays published when the post-publication r
     },
   });
   assert.equal(report.gitSaved, true);
+  assert.equal(await readFile(summaryPath, "utf8"), "Real workflow summary");
+  assert.equal(
+    await readFile(notificationPath, "utf8"),
+    "Real workflow notifications",
+  );
   assert.ok(report.findings.some((finding) => finding.kind === "diseno_roto"));
   assert.equal(await readFile(outputPath, "utf8"), published);
   const notifications = JSON.parse(
@@ -132,6 +152,7 @@ test("a runner startup failure after publication alerts without rolling back dat
   const report = await runDesignReview({
     directory,
     gitSaved: true,
+    captureFingerprint: async () => "generated-content",
     execute: () => {
       throw new Error("browser unavailable");
     },

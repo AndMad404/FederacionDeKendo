@@ -13,6 +13,19 @@ function getEventPublicSlug(event: Pick<CalendarEvent, "id">) {
   return EVENT_VANITY_SLUGS[event.id] ?? event.id;
 }
 
+export function getEventLegacySlugs(
+  event: Pick<CalendarEvent, "id" | "aliases">,
+) {
+  return [
+    ...new Set([
+      ...(event.aliases ?? []),
+      ...[event.id, ...(event.aliases ?? [])]
+        .map((slug) => EVENT_VANITY_SLUGS[slug])
+        .filter((slug): slug is string => Boolean(slug)),
+    ]),
+  ];
+}
+
 export function getEventPath(
   event: CalendarEvent,
   language: Language = "es",
@@ -35,7 +48,7 @@ function findEventBySlug(slug: string) {
     (event) =>
       event.id === slug ||
       getEventPublicSlug(event) === slug ||
-      event.aliases?.includes(slug),
+      getEventLegacySlugs(event).includes(slug),
   );
 }
 

@@ -25,13 +25,14 @@ test("redirects legacy calendar and archived event URLs to their canonical route
       route.language === "es",
   )?.path;
   assert.ok(panamaPath);
-  const chilePath = "/eventos/pasados/2026-05-30-seminario/";
+  const chilePath = "/eventos/pasados/clak-seminario-instructores-chile/";
   const chileSlug = "2026-05-29-clak-seminario-instructores-chile";
   const expected = [
     ["/calendario/", "/eventos/"],
     ["/eventos/pasados/page/2/", "/eventos/pasados/pagina/2/"],
     ["/en/events/past/pagina/2/", "/en/events/past/page/2/"],
-    ["/eventos/2026-08-08-examen/", "/eventos/pasados/2026-08-08-examen/"],
+    ["/eventos/2026-08-08-examen/", "/eventos/pasados/2do-examen-2026/"],
+    ["/eventos/pasados/2026-05-30-seminario/", chilePath],
     [`/eventos/${PANAMA_LEGACY_SLUG}/`, panamaPath],
     [`/en/events/${PANAMA_LEGACY_SLUG}/`, panamaPath],
     [`/eventos/${chileSlug}/`, chilePath],

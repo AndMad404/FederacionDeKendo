@@ -9,7 +9,7 @@ const ROUTES = {
   calendar: { name: "calendar", path: "/eventos/" },
   gallery: { name: "gallery", path: "/galeria/" },
   affiliates: { name: "affiliates", path: "/afiliados/" },
-  event: { name: "event", path: "/eventos/pasados/2026-08-08-examen/" },
+  event: { name: "event", path: "/eventos/pasados/2do-examen-2026/" },
   pastEvents: { name: "past events", path: "/eventos/pasados/" },
   notFound: { name: "not found", path: "/ruta-responsive-inexistente/" },
 } satisfies Record<RouteComponent, { name: string; path: string }>;

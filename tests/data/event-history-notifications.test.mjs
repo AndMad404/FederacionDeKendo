@@ -82,6 +82,119 @@ test("F4: an emitted pending revision is not notified again until its evidence c
   assert.equal(createCalendarNotifications(revised).notifications.length, 1);
 });
 
+test("F4: newly missing events alert once while approved deletions stay resolved", async (t) => {
+  for (const historical of [true, false]) {
+    const missing = makeHistoricalEvent({
+      sourceId: "newly-missing",
+      slug: "newly-missing",
+      aliases: [],
+      historical,
+      ...(historical
+        ? {}
+        : {
+            date: "2026-12-01",
+            endDate: "2026-12-02",
+            archiveEligibleAt: "2026-12-04T06:00:00.000Z",
+          }),
+    });
+    const deleted = makeHistoricalEvent({
+      sourceId: "approved-deletion",
+      slug: "approved-deletion",
+      aliases: [],
+      editorialState: "eliminado",
+    });
+    const present = makeHistoricalEvent();
+    const registry = mergeRegistry(
+      makeRegistry({ events: [missing, deleted, present] }),
+      [present],
+      new Date("2026-03-01T00:00:00Z"),
+    );
+    const report = createCalendarNotifications(registry);
+    assert.equal(report.notifications.length, 1);
+    assert.equal(report.notifications[0].identity.slug, missing.slug);
+    assert.match(
+      report.notifications[0].cause,
+      /Posible eliminacion detectada/,
+    );
+    assert.equal(
+      report.notifications[0].temporality,
+      historical ? "historico" : "futuro",
+    );
+    assert.equal(
+      registry.events.find((event) => event.sourceId === missing.sourceId)
+        .editorialState,
+      "pendiente",
+    );
+    assert.match(
+      getCalendarNotificationWarnings(report)[0],
+      /Posible eliminacion detectada/,
+    );
+    assert.match(
+      formatCalendarNotificationEmail(
+        report,
+        "sender@example.com",
+        "recipient@example.com",
+      ),
+      /Posible eliminacion detectada/,
+    );
+    const directory = await temporaryDirectory(t, "fak-missing-alert-");
+    const summaryPath = path.join(directory, "summary.md");
+    await writeCalendarNotificationsSummary(report, summaryPath);
+    assert.match(
+      await readFile(summaryPath, "utf8"),
+      /Posible eliminacion detectada/,
+    );
+    const recorded = recordCalendarNotifications(registry, report);
+    const repeated = mergeRegistry(
+      recorded,
+      [present],
+      new Date("2026-03-02T00:00:00Z"),
+    );
+    assert.equal(createCalendarNotifications(repeated).notifications.length, 0);
+  }
+});
+
+test("F4: disappearance after a notified historical change emits a new deletion alert", () => {
+  const changed = makePendingRevision();
+  const present = makeHistoricalEvent({
+    sourceId: "still-present",
+    slug: "still-present",
+    aliases: [],
+  });
+  const initial = makeRegistry({ events: [changed, present] });
+  const recorded = recordCalendarNotifications(
+    initial,
+    createCalendarNotifications(initial),
+  );
+  const missing = mergeRegistry(
+    recorded,
+    [present],
+    new Date("2026-03-02T00:00:00Z"),
+  );
+  const event = missing.events.find(
+    (event) => event.sourceId === changed.sourceId,
+  );
+  assert.equal(event.pendingRevision.reason, "historical_missing");
+  assert.notEqual(
+    event.pendingRevision.evidence.fingerprint,
+    changed.pendingRevision.evidence.fingerprint,
+  );
+  assert.deepEqual(
+    event.pendingRevision.evidence.lastReceived,
+    changed.pendingRevision.evidence.lastReceived,
+  );
+  assert.equal(event.title, changed.title);
+  const report = createCalendarNotifications(missing);
+  assert.equal(report.notifications.length, 1);
+  assert.match(report.notifications[0].cause, /Posible eliminacion detectada/);
+  const repeated = mergeRegistry(
+    recordCalendarNotifications(missing, report),
+    [present],
+    new Date("2026-03-03T00:00:00Z"),
+  );
+  assert.equal(createCalendarNotifications(repeated).notifications.length, 0);
+});
+
 test("F4: source, parser, mass-disappearance, and verification failures have safe actionable notifications", () => {
   const duplicateSourceError = captureError(() =>
     assertSafeCalendarInput({ version: 4, events: [] }, [

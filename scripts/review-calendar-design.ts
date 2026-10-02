@@ -36,6 +36,9 @@ async function generatedFingerprint() {
 export async function runDesignReview({
   directory,
   gitSaved,
+  summaryPath,
+  notificationsPath = path.join(directory, "calendar-notifications.json"),
+  emitWorkflowWarnings = false,
   captureFingerprint = generatedFingerprint,
   execute = (output: string) =>
     spawnSync(
@@ -57,6 +60,9 @@ export async function runDesignReview({
 }: {
   directory: string;
   gitSaved: boolean;
+  summaryPath?: string;
+  notificationsPath?: string;
+  emitWorkflowWarnings?: boolean;
   execute?: (directory: string) => number | null;
   captureFingerprint?: () => Promise<string>;
 }) {
@@ -126,9 +132,6 @@ export async function runDesignReview({
     path.join(directory, "calendar-design.json"),
     JSON.stringify(report, null, 2),
   );
-  const notificationsPath =
-    process.env.CALENDAR_NOTIFICATIONS_REPORT_PATH ??
-    path.join(directory, "calendar-notifications.json");
   let notifications: { version: number; notifications: unknown[] } = {
     version: 1,
     notifications: [],
@@ -173,12 +176,12 @@ export async function runDesignReview({
     "",
   ].join("\n");
   await writeFile(path.join(directory, "summary.md"), summary);
-  if (process.env.GITHUB_STEP_SUMMARY)
-    await appendFile(process.env.GITHUB_STEP_SUMMARY, summary);
-  for (const kind of new Set(findings.map((item) => item.kind)))
-    console.log(
-      `::warning title=Calendario::${kind}: consultar el informe y las capturas de calendar-design-review.`,
-    );
+  if (summaryPath) await appendFile(summaryPath, summary);
+  if (emitWorkflowWarnings)
+    for (const kind of new Set(findings.map((item) => item.kind)))
+      console.log(
+        `::warning title=Calendario::${kind}: consultar el informe y las capturas de calendar-design-review.`,
+      );
   return report;
 }
 if (
@@ -190,5 +193,8 @@ if (
       process.env.CALENDAR_LAYOUT_REPORT_DIR ?? "test-results/calendar-design",
     ),
     gitSaved: process.env.CALENDAR_GIT_SAVED === "true",
+    summaryPath: process.env.GITHUB_STEP_SUMMARY,
+    notificationsPath: process.env.CALENDAR_NOTIFICATIONS_REPORT_PATH,
+    emitWorkflowWarnings: true,
   });
 }
