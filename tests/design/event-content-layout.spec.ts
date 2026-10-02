@@ -141,6 +141,66 @@ for (const viewport of [
   { width: 768, height: 1024 },
   { width: 1366, height: 768 },
 ]) {
+  test(`Monteverde keeps text and actions beside its gallery only on desktop at ${viewport.width}x${viewport.height}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport);
+    await page.clock.setFixedTime(new Date("2026-10-01T12:00:00-06:00"));
+    await page.goto("/eventos/pasados/2026-09-12-gasshuku-monteverde/");
+
+    const article = page.locator("main article");
+    const gallery = page.getByRole("region", {
+      name: "Fotografías del evento Gasshuku Monteverde",
+    });
+    const archiveLink = article.getByRole("link", {
+      name: "Eventos pasados",
+    });
+    await expect(gallery).toBeVisible();
+    await expect(archiveLink).toBeVisible();
+    const [textBox, galleryBox, actionBox, figureBox, thumbnailsBox] =
+      await Promise.all([
+        article.boundingBox(),
+        gallery.boundingBox(),
+        archiveLink.boundingBox(),
+        gallery.locator("figure").boundingBox(),
+        gallery.getByRole("group").boundingBox(),
+      ]);
+    if (!textBox || !galleryBox || !actionBox || !figureBox || !thumbnailsBox) {
+      throw new Error("Expected event columns and thumbnails to be measurable");
+    }
+    expect(thumbnailsBox.y).toBeGreaterThanOrEqual(
+      figureBox.y + figureBox.height,
+    );
+    expect(figureBox.height).toBeGreaterThan(170);
+    if (viewport.width >= 1280) {
+      expect(figureBox.height).toBeGreaterThan(300);
+      expect(textBox.x + textBox.width).toBeLessThan(galleryBox.x);
+      expect(actionBox.x + actionBox.width).toBeLessThan(galleryBox.x);
+      expect(galleryBox.y).toBeCloseTo(textBox.y, 0);
+    } else {
+      expect(galleryBox.y).toBeGreaterThanOrEqual(textBox.y + textBox.height);
+    }
+    expect(
+      await page.evaluate(
+        () =>
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth,
+      ),
+    ).toBeLessThanOrEqual(0);
+    const firstThumbnail = gallery.getByRole("button", {
+      name: "Ver imagen: Fotografía 1",
+      exact: true,
+    });
+    await firstThumbnail.click();
+    await expect(firstThumbnail).toHaveAttribute("aria-current", "true");
+    await gallery
+      .getByRole("button", {
+        name: "Abrir Fotografía 1 del evento Gasshuku Monteverde",
+      })
+      .click();
+    await expect(page.getByRole("dialog")).toBeVisible();
+  });
+
   test(`optional historical gallery remains contained at ${viewport.width}x${viewport.height}`, async ({
     page,
   }) => {
@@ -173,11 +233,131 @@ for (const viewport of [
       };
     });
     expect(geometry.figureWidth).toBeCloseTo(geometry.galleryWidth, 0);
-    expect(geometry.footerGap).toBeCloseTo(10, 0);
+    if (viewport.width >= 1280) {
+      expect(geometry.footerGap).toBeGreaterThanOrEqual(10);
+    } else {
+      expect(geometry.footerGap).toBeCloseTo(10, 0);
+    }
     expect(geometry.documentOverflow).toBeLessThanOrEqual(0);
     if (viewport.width < 640) {
       expect(geometry.figureWidth).toBeCloseTo(geometry.eventWidth, 0);
       expect(geometry.thumbnailWidth).toBeGreaterThan(geometry.thumbnailHeight);
     }
+  });
+}
+
+for (const slug of [
+  "2026-09-12-gasshuku-monteverde",
+  "2026-08-22-3er-torneo",
+  "2026-08-08-examen",
+]) {
+  test(`${slug} keeps fixed gallery spacing and grows to fit the content`, async ({
+    page,
+  }) => {
+    await page.clock.setFixedTime(new Date("2026-10-01T12:00:00-06:00"));
+    await page.goto(`/eventos/pasados/${slug}/`);
+    for (const width of [1366, 1920, 1280]) {
+      await page.setViewportSize({ width, height: 900 });
+      const gallery = page.getByRole("region", {
+        name: /Fotografías del evento/,
+      });
+      await expect(gallery).toBeVisible();
+      await expect
+        .poll(async () => {
+          const [actions, photo, thumbnails, card, footer] = await Promise.all([
+            page.locator("main article aside").boundingBox(),
+            gallery.locator("figure").boundingBox(),
+            gallery.getByRole("group").boundingBox(),
+            page.locator("main article").boundingBox(),
+            page.locator("footer").boundingBox(),
+          ]);
+          if (!actions || !photo || !thumbnails || !card || !footer)
+            return false;
+          return (
+            Math.abs(thumbnails.y - photo.y - photo.height - 10) <= 1 &&
+            Math.abs(footer.y - thumbnails.y - thumbnails.height - 10) <= 1 &&
+            thumbnails.height <= actions.height + 1 &&
+            thumbnails.y + thumbnails.height >= card.y + card.height - 1
+          );
+        })
+        .toBe(true);
+    }
+  });
+}
+
+test("events without photos keep text and actions in one column", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await page.clock.setFixedTime(new Date("2026-10-01T12:00:00-06:00"));
+  await page.goto("/eventos/pasados/2026-05-02-examen/");
+  await expect(page.getByText("Actividad finalizada")).toBeVisible();
+  await expect(
+    page.getByRole("region", { name: /Fotografías del evento/ }),
+  ).toHaveCount(0);
+  const description = page
+    .getByRole("heading", { name: "Descripción", level: 2 })
+    .locator("..");
+  const actions = page.locator("main article aside");
+  const [descriptionBox, actionsBox] = await Promise.all([
+    description.boundingBox(),
+    actions.boundingBox(),
+  ]);
+  if (!descriptionBox || !actionsBox)
+    throw new Error("Expected event content to be measurable");
+  expect(actionsBox.y).toBeGreaterThanOrEqual(
+    descriptionBox.y + descriptionBox.height,
+  );
+  await expect
+    .poll(() =>
+      page
+        .locator("main article")
+        .locator("..")
+        .evaluate(
+          (element) =>
+            getComputedStyle(element).gridTemplateColumns.split(" ").length,
+        ),
+    )
+    .toBe(1);
+});
+
+for (const viewport of [
+  { width: 1366, height: 768 },
+  { width: 1920, height: 900 },
+]) {
+  test(`short tournament fills spare viewport height without scrolling at ${viewport.width}x${viewport.height}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport);
+    await page.clock.setFixedTime(new Date("2026-10-01T12:00:00-06:00"));
+    await page.goto("/eventos/pasados/2026-08-22-3er-torneo/");
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          const gallery = document
+            .querySelector("main figure")!
+            .closest("section")!
+            .getBoundingClientRect();
+          const description = document
+            .querySelector("main article h2")!
+            .parentElement!.getBoundingClientRect();
+          const actions = document
+            .querySelector("main article aside")!
+            .getBoundingClientRect();
+          const footer = document
+            .querySelector("footer")!
+            .getBoundingClientRect();
+          const photo = document
+            .querySelector("main figure")!
+            .getBoundingClientRect();
+          return (
+            footer.top - gallery.bottom <= 11 &&
+            actions.top - description.bottom <= 11 &&
+            photo.height > 300 &&
+            document.documentElement.scrollHeight <= window.innerHeight + 1
+          );
+        }),
+      )
+      .toBe(true);
   });
 }

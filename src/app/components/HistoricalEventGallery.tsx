@@ -13,6 +13,9 @@ const Lightbox = lazy(() =>
   import("./Lightbox").then((module) => ({ default: module.Lightbox })),
 );
 
+const FEATURED_IMAGE_SIZES =
+  "(min-width: 1280px) calc((100vw - 84px) / 2), (min-width: 640px) calc(100vw - 52px), 100vw";
+
 interface HistoricalEventGalleryProps {
   eventId: string;
   eventTitle: string;
@@ -28,7 +31,7 @@ export function HistoricalEventGallery({
       id: image.order,
       src: image.src,
       srcSet: image.srcSet.webp,
-      sizes: image.sizes,
+      sizes: FEATURED_IMAGE_SIZES,
       width: image.width,
       height: image.height,
       thumbnailSrc: image.src,
@@ -74,9 +77,9 @@ export function HistoricalEventGallery({
   return (
     <section
       aria-label={`Fotografías del evento ${eventTitle}`}
-      className="-mx-3 grid w-[calc(100%_+_1.5rem)] gap-2 sm:mx-0 sm:w-full"
+      className={`-mx-3 grid min-w-0 w-[calc(100%_+_1.5rem)] content-start gap-2.5 sm:mx-0 sm:w-full xl:[&_[role=group]]:h-[var(--event-thumbnail-height)] ${images.length > 6 ? "sm:[&_[role=group]]:justify-start" : ""}`}
     >
-      <figure className="group relative h-[clamp(11rem,28vw,12.5rem)] cursor-pointer overflow-hidden rounded-xl bg-site-media">
+      <figure className="group relative aspect-video cursor-pointer overflow-hidden rounded-xl bg-site-media xl:aspect-auto xl:h-[var(--event-featured-height)]">
         <picture>
           <source
             srcSet={EVENT_GALLERIES[eventId].images[index].srcSet.avif}

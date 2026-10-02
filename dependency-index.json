@@ -94,7 +94,9 @@
       ],
       "area": "Interfaz y comportamiento de galerias",
       "tests": [
+        "tests/behavior/events.spec.ts",
         "tests/behavior/lightbox-behavior.spec.ts",
+        "tests/design/event-content-layout.spec.ts",
         "tests/design/interaction-states.spec.ts",
         "tests/design/visual-regression.spec.ts",
         "tests/design/shell-geometry.spec.ts"

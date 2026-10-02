@@ -7,7 +7,7 @@ import {
   MapPin,
   Share2,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router";
 import { useLanguage } from "../config/i18n";
 import { getLocalizedEvent } from "../utils/localizedEvents";
@@ -29,6 +29,7 @@ import { MediaPageBanner } from "./ui/MediaPageBanner";
 import { HistoricalEventGallery } from "./HistoricalEventGallery";
 import { useHydratedNow } from "../hooks/useHydratedNow";
 import { EventSummary } from "./EventSummary";
+import { EVENT_GALLERIES } from "../data/eventGalleries";
 
 const SOCIAL_PREVIEW_VERSION = "20260825";
 
@@ -57,12 +58,61 @@ export function EventPage() {
   const sourceEvent = findEventByPathname(location.pathname);
   const [copied, setCopied] = useState(false);
   const now = useHydratedNow();
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const content = contentRef.current;
+    const article = content?.querySelector("article");
+    const actions = article?.querySelector("aside");
+    const footer = document.querySelector("footer");
+    if (
+      !content ||
+      !article ||
+      !actions ||
+      !footer ||
+      !content.querySelector("figure")
+    )
+      return;
+
+    // Keep short text compact while the gallery fills available space or grows with content.
+    const measure = () => {
+      const contentTop = content.getBoundingClientRect().top + window.scrollY;
+      const availableHeight =
+        window.innerHeight -
+        footer.getBoundingClientRect().height -
+        contentTop -
+        10;
+      const articleBox = article.getBoundingClientRect();
+      const actionsBox = actions.getBoundingClientRect();
+      const galleryHeight = Math.max(articleBox.height, availableHeight);
+      content.style.setProperty(
+        "--event-featured-height",
+        `${Math.max(1, galleryHeight - actionsBox.height - 10)}px`,
+      );
+      content.style.setProperty(
+        "--event-thumbnail-height",
+        `${actionsBox.height}px`,
+      );
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(article);
+    observer.observe(actions);
+    observer.observe(footer);
+    window.addEventListener("resize", measure);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [language, location.pathname, now]);
 
   if (!sourceEvent) return null;
   const event = getLocalizedEvent(sourceEvent, language);
   if (!event) return null;
 
   const isPast = now ? isPastEvent(event, now) : false;
+  const hasGallery =
+    isPast && Boolean(EVENT_GALLERIES[event.id]?.images.length);
   const locationUrl = event.location
     ? getLocationMapUrl(event.location)
     : undefined;
@@ -112,12 +162,17 @@ export function EventPage() {
         }}
       />
 
-      <div className="relative z-20 -mt-11 grid w-full justify-items-stretch gap-3 px-3 pb-2.5 pt-3 sm:-mt-13 sm:px-4 sm:pb-2.5 sm:pt-4 tall-md:py-4 tall-md:pb-2.5 lg:px-0 land-sm:gap-2 land-sm:px-3 land-sm:pb-2.5 land-sm:pt-3 land-compact:-mt-8">
-        <div className="mx-auto grid w-full max-w-5xl gap-3 land-sm:gap-2">
+      <div
+        className={`relative z-20 -mt-11 grid w-full justify-items-stretch gap-3 px-3 pb-2.5 pt-3 sm:-mt-13 sm:px-4 sm:pb-2.5 sm:pt-4 tall-md:py-4 tall-md:pb-2.5 ${hasGallery ? "lg:px-4" : "lg:px-0"} land-sm:gap-2 land-sm:px-3 land-sm:pb-2.5 land-sm:pt-3 land-compact:-mt-8`}
+      >
+        <div
+          ref={contentRef}
+          className={`mx-auto grid w-full items-start gap-3 land-sm:gap-2 ${hasGallery ? "xl:grid-cols-2 xl:gap-8" : "max-w-5xl"}`}
+        >
           <article
-            className={`grid gap-3 px-5 py-3 md:px-5 md:py-3 land-sm:gap-2 land-sm:p-3 ${panelSurfaceClass}`}
+            className={`grid min-w-0 gap-3 px-5 py-3 md:px-5 md:py-3 land-sm:gap-2 land-sm:p-3 ${panelSurfaceClass}`}
           >
-            <div className="grid gap-x-4 gap-y-2.5 md:grid-cols-[minmax(0,1fr)_minmax(16rem,0.8fr)] land-sm:gap-2">
+            <div className="flex min-w-0 flex-col gap-2.5 land-sm:gap-2">
               <div className="grid min-w-0 content-start gap-3 land-sm:gap-2">
                 <p className="text-sm font-bold uppercase tracking-wider text-site-accent">
                   {isPast ? copy.event.completed : copy.event.scheduled}
@@ -202,7 +257,7 @@ export function EventPage() {
                 </div>
               </div>
 
-              <aside className="grid self-center gap-3 rounded-xl bg-site-media p-4 land-sm:gap-2">
+              <aside className="grid gap-3 rounded-xl bg-site-media p-4 land-sm:gap-2">
                 {!isPast ? (
                   <p className="text-sm leading-relaxed">
                     {isExternalEvent(event) ? (
@@ -260,7 +315,7 @@ export function EventPage() {
               </aside>
             </div>
           </article>
-          {isPast ? (
+          {hasGallery ? (
             <HistoricalEventGallery
               eventId={event.id}
               eventTitle={eventTitle}
