@@ -214,7 +214,7 @@ export const COPY = {
       viewDetailsLabel: "Consultar detalles del evento",
       addToCalendar: "Añade a tu calendario",
       audienceNotice:
-        "Acceso del público: gratuito. Participación: para conocer los requisitos, la inscripción y las condiciones de participación, comuníquese con la organización.",
+        "Acceso del público: gratuito. Para conocer los requisitos, la inscripción y reglamento, comuníquese con la organización.",
       externalAudienceNoticeLabel: "Costo y participación:",
       externalAudienceNotice:
         "consulte la convocatoria oficial o comuníquese con la organización del evento para conocer precios, requisitos e inscripción.",
@@ -356,7 +356,7 @@ export const COPY = {
       viewDetailsLabel: "View details for",
       addToCalendar: "Add to calendar",
       audienceNotice:
-        "Public access: free. Participation: contact the organization for eligibility requirements, registration, and participation terms.",
+        "Public access: free. Contact the organization for eligibility requirements, registration, and regulations.",
       externalAudienceNoticeLabel: "Cost and participation:",
       externalAudienceNotice:
         "consult the official announcement or contact the event organization for pricing, eligibility requirements, and registration.",

@@ -78,7 +78,7 @@ test("scheduled event pages offer an add-to-calendar button", async ({
   expect(new URL(href!).searchParams.get("text")).toBe(title);
   await expect(
     page.getByText(
-      "Acceso del público: gratuito. Participación: para conocer los requisitos, la inscripción y las condiciones de participación, comuníquese con la organización.",
+      "Acceso del público: gratuito. Para conocer los requisitos, la inscripción y reglamento, comuníquese con la organización.",
     ),
   ).toBeVisible();
 });

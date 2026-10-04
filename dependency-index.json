@@ -11,6 +11,12 @@
   ],
   "rules": [
     {
+      "id": "event-audience-copy",
+      "changes": ["src/app/config/i18n.ts"],
+      "area": "Textos bilingues de acceso y participacion en eventos",
+      "tests": ["tests/behavior/events.spec.ts"]
+    },
+    {
       "id": "calendar-event-data",
       "changes": [
         "src/app/config/events.ts",
