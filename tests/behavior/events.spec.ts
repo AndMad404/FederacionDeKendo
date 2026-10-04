@@ -319,6 +319,67 @@ test("switches languages while preserving the current section", async ({
   await expect(page).toHaveURL(/\/galeria\/$/);
 });
 
+for (const width of [320, 390, 1366]) {
+  for (const path of [
+    "/eventos/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/",
+    "/eventos/pasados/clak-seminario-instructores-chile/",
+  ]) {
+    test(`${width}px ${path} replaces language links when English is unavailable`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 844 });
+      await page.clock.setFixedTime(new Date("2026-10-03T12:00:00-06:00"));
+      await page.goto(path);
+      await expect(page.locator("main h1")).toBeVisible();
+      const nav = page.getByRole("navigation", {
+        name: "Navegación principal",
+      });
+      if (width < 768) {
+        await page.getByRole("button", { name: "Abrir menú" }).click();
+      }
+      const label = nav.getByText(
+        width < 768 ? "Page only in Spanish" : "Spanish only",
+        { exact: true },
+      );
+      await expect(label).toBeVisible();
+      await expect(label).toHaveAttribute("lang", "en");
+      await expect(
+        nav.getByRole("link", { name: "View site in English" }),
+      ).toHaveCount(0);
+      await expect(
+        nav.getByRole("link", { name: "Ver sitio en español" }),
+      ).toHaveCount(0);
+      await expect(
+        label.locator("xpath=ancestor::a | ancestor::button"),
+      ).toHaveCount(0);
+      const box = await label.boundingBox();
+      expect(box!.x).toBeGreaterThanOrEqual(0);
+      expect(box!.x + box!.width).toBeLessThanOrEqual(width);
+      await label.click();
+      await expect(page).toHaveURL(new RegExp(`${path}$`));
+    });
+  }
+
+  test(`${width}px translated event switches languages without leaving the event`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 844 });
+    await page.clock.setFixedTime(FIXED_UPCOMING_TIME);
+    await page.goto(GASSHUKU_EVENT_PATH);
+    if (width < 768) {
+      await page.getByRole("button", { name: "Abrir menú" }).click();
+    }
+    await page.getByRole("link", { name: "View site in English" }).click();
+    await expect(page).toHaveURL(/\/en\/events\/gasshuku-monteverde\/$/);
+    await expect(page.locator("main h1")).toHaveText("Gasshuku Monteverde");
+    if (width < 768) {
+      await page.getByRole("button", { name: "Open menu" }).click();
+    }
+    await page.getByRole("link", { name: "Ver sitio en español" }).click();
+    await expect(page).toHaveURL(new RegExp(`${GASSHUKU_EVENT_PATH}$`));
+  });
+}
+
 test("exposes language controls inside the mobile menu", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/en/");

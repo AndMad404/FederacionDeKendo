@@ -3,6 +3,8 @@ import { Link, NavLink, useLocation } from "react-router";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { focusRingClass } from "../styles/shared";
 import { getLocalizedPath, useLanguage } from "../config/i18n";
+import { findEventByPathname } from "../utils/eventRoutes";
+import { hasDistinctEventTranslation } from "../utils/localizedEvents";
 
 const navInteractionClass =
   "transition-[background-color,border-color,color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-sm focus-visible:-translate-y-0.5 focus-visible:shadow-sm active:translate-y-0 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:focus-visible:translate-y-0 motion-reduce:active:scale-100";
@@ -262,6 +264,19 @@ function LanguageSelector({
   onNavigate?: () => void;
 }) {
   const { copy } = useLanguage();
+  const event = findEventByPathname(pathname);
+  if (event && !hasDistinctEventTranslation(event)) {
+    return (
+      <div className="inline-flex rounded-lg border border-site-on-dark/40 bg-site-on-dark/10 p-0.5">
+        <span
+          lang="en"
+          className="inline-flex min-h-11 items-center justify-center px-2 text-sm text-site-on-dark/85"
+        >
+          {labels === "full" ? "Page only in Spanish" : "Spanish only"}
+        </span>
+      </div>
+    );
+  }
   return (
     <div
       className="inline-flex rounded-lg border border-site-on-dark/40 bg-site-on-dark/10 p-0.5"
