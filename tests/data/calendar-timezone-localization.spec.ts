@@ -1,31 +1,17 @@
 import { expect, test, type Browser } from "@playwright/test";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import path from "node:path";
+import { tsImport } from "tsx/esm/api";
 import { CALENDAR_EVENTS } from "../../src/app/data/calendarEvents";
 import type { CalendarEvent } from "../../src/app/types";
 import { addCalendarDays } from "../../src/app/utils/calendarDate.ts";
 import { calculatePublicPastAt } from "../../src/app/utils/eventArchive.ts";
 
-interface TranslationRecord {
-  source: { title: string; summary?: string };
-  translation: { title: string; summary?: string };
-}
-
-const eventTranslations = JSON.parse(
-  readFileSync(path.resolve("src/app/data/eventTranslations.json"), "utf8"),
-) as Record<string, TranslationRecord>;
-
-function getValidEnglishTranslation(event: CalendarEvent) {
-  const record =
-    eventTranslations[event.id] ??
-    event.aliases?.map((alias) => eventTranslations[alias]).find(Boolean);
-  return record?.source.title === event.title &&
-    record.source.summary === event.summary &&
-    (record.translation.title !== event.title ||
-      record.translation.summary !== event.summary)
-    ? record.translation
-    : undefined;
-}
+// Load the app's publication policy with its JSON translations through tsx.
+const { getLocalizedEvent, hasDistinctEventTranslation } = (await tsImport(
+  "../../src/app/utils/localizedEvents.ts",
+  import.meta.url,
+)) as typeof import("../../src/app/utils/localizedEvents.ts");
 
 function requireEvent(
   description: string,
@@ -48,7 +34,7 @@ function routeOutputExists(routePath: string) {
   );
 }
 
-function getGeneratedFixture(event: CalendarEvent, language: "es" | "en" = "en") {
+function getGeneratedFixture(event: CalendarEvent, language: "es" | "en") {
   const currentPath =
     language === "en" ? `/en/events/${event.id}/` : `/eventos/${event.id}/`;
   const pastPath =
@@ -58,7 +44,9 @@ function getGeneratedFixture(event: CalendarEvent, language: "es" | "en" = "en")
   const currentExists = routeOutputExists(currentPath);
   const pastExists = routeOutputExists(pastPath);
   if (currentExists === pastExists) {
-    throw new Error(`Expected one generated ${language} route for ${event.id}.`);
+    throw new Error(
+      `Expected one generated ${language} route for ${event.id}.`,
+    );
   }
 
   const publicPastAt = calculatePublicPastAt(
@@ -82,23 +70,16 @@ function getGeneratedFixture(event: CalendarEvent, language: "es" | "en" = "en")
 }
 
 const timedEvent = requireEvent(
-  "translated timed tournament",
-  (event) =>
-    event.eventType === "torneo" &&
-    Boolean(event.startTime) &&
-    Boolean(event.endTime) &&
-    Boolean(getValidEnglishTranslation(event)),
+  "timed event",
+  (event) => Boolean(event.startTime) && Boolean(event.endTime),
 );
 const allDayEvent = requireEvent(
   "single-day all-day event",
   (event) => !event.startTime && !event.endTime && !event.endDate,
 );
-const timedFixture = getGeneratedFixture(timedEvent);
+// Time-zone behavior applies to every event, including Spanish-only pages.
+const timedFixture = getGeneratedFixture(timedEvent, "es");
 const allDayFixture = getGeneratedFixture(allDayEvent, "es");
-const translatedTimedEvent = getValidEnglishTranslation(timedEvent);
-if (!translatedTimedEvent) {
-  throw new Error(`Missing English translation for ${timedEvent.id}.`);
-}
 
 async function expectActivityStatusInTimeZone(
   browser: Browser,
@@ -147,13 +128,19 @@ test("all-day events end at the next midnight in the event time zone", async ({
   );
 });
 
-test("known tournament titles use their English dictionary translations", async ({
+test("events with publishable English translations use their localized titles", async ({
   page,
 }) => {
-  await page.clock.setFixedTime(timedFixture.now);
-  await page.goto(timedFixture.path);
+  const event = requireEvent(
+    "event with a publishable English translation",
+    hasDistinctEventTranslation,
+  );
+  const fixture = getGeneratedFixture(event, "en");
+  const localizedEvent = getLocalizedEvent(event, "en");
+  await page.clock.setFixedTime(fixture.now);
+  await page.goto(fixture.path);
 
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    translatedTimedEvent.title,
+    localizedEvent!.title,
   );
 });
