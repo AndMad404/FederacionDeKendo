@@ -267,12 +267,14 @@
         "vite.config.ts",
         "playwright.config.ts",
         "playwright.visual.config.ts",
+        ".github/actions/setup-project/action.yml",
         ".github/actions/verify-site/action.yml",
         ".github/workflows/ci.yml",
         "scripts/verify-site.mjs"
       ],
       "area": "Tooling, CI y verificacion del repositorio",
       "tests": [
+        "tests/architecture/calendar-workflow-architecture.test.mjs",
         "tests/architecture/repository-policy.test.mjs",
         "tests/architecture/verify-site.test.mjs"
       ]

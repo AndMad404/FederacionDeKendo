@@ -13,6 +13,75 @@ function stepIndex(steps, predicate, description) {
   return index;
 }
 
+test("shared project setup configures Node before enabling pnpm and disables premature caching", async () => {
+  const action = await loadYamlDocument(
+    ".github/actions/setup-project/action.yml",
+  );
+  assert.equal(action.runs.using, "composite");
+  const steps = actionSteps(action);
+  const node = stepIndex(
+    steps,
+    (step) => step.uses === "actions/setup-node@v5",
+    "Node setup",
+  );
+  assert.equal(steps[node].with["node-version"], 22);
+  assert.equal(steps[node].with["package-manager-cache"], false);
+  assert.equal(steps[node].with.cache, undefined);
+  const corepack = stepIndex(
+    steps,
+    (step) => step.run === "corepack enable",
+    "Corepack",
+  );
+  const install = stepIndex(
+    steps,
+    (step) => step.run === "pnpm install --frozen-lockfile",
+    "dependency installation",
+  );
+  assert.ok(node < corepack && corepack < install);
+  for (const step of steps.filter((step) => step.run)) {
+    assert.equal(step.shell, "bash");
+  }
+});
+
+test("all workflows use shared project setup after checkout and before project commands", async () => {
+  for (const file of [
+    ".github/workflows/ci.yml",
+    ".github/workflows/sync-calendar.yml",
+    ".github/workflows/correct-calendar-history-range.yml",
+    ".github/workflows/apply-calendar-editorial-decision.yml",
+  ]) {
+    const steps = workflowSteps(await loadYamlDocument(file));
+    const setup = stepIndex(
+      steps,
+      (step) => step.uses === "./.github/actions/setup-project",
+      `${file}: project setup`,
+    );
+    const checkout = stepIndex(
+      steps,
+      (step) => step.uses === "actions/checkout@v5",
+      `${file}: checkout`,
+    );
+    assert.ok(checkout < setup, file);
+    assert.equal(
+      steps.filter((step) => step.uses === "./.github/actions/setup-project")
+        .length,
+      1,
+      file,
+    );
+    assert.equal(
+      steps.some((step) => step.uses?.startsWith("actions/setup-node@")),
+      false,
+      file,
+    );
+    for (const [index, step] of steps.entries()) {
+      if (step.run) {
+        assert.doesNotMatch(step.run, /corepack enable|pnpm install/, file);
+        assert.ok(setup < index, `${file}: setup must precede commands`);
+      }
+    }
+  }
+});
+
 test("Phase 6: writer workflows run their directed test and shared gate before committing", async () => {
   const cases = [
     [

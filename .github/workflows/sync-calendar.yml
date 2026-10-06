@@ -18,14 +18,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
-      - name: Enable Corepack
-        run: corepack enable
-      - name: Set up Node
-        uses: actions/setup-node@v5
-        with:
-          node-version: 22
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Set up project
+        uses: ./.github/actions/setup-project
       - name: Sync calendar events
         id: sync
         run: pnpm run sync:calendar

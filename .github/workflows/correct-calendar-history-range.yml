@@ -36,14 +36,8 @@ jobs:
           run-id: ${{ inputs.report_run_id }}
           github-token: ${{ github.token }}
           path: .
-      - name: Enable Corepack
-        run: corepack enable
-      - name: Set up Node
-        uses: actions/setup-node@v5
-        with:
-          node-version: 22
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Set up project
+        uses: ./.github/actions/setup-project
       - name: Apply approved historical range
         run: pnpm run correct:calendar-history-range --report calendar-historical-changes.json --from "${{ inputs.from }}" --to "${{ inputs.to }}"
       - name: Import approved historical galleries

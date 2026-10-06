@@ -21,20 +21,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Set up Node
-        uses: actions/setup-node@v5
-        with:
-          node-version: 22
+      - name: Set up project
+        uses: ./.github/actions/setup-project
 
       - name: Validate pull request metadata
         if: github.event_name == 'pull_request'
         run: node scripts/validate-pull-request.mjs
-
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
 
       - name: Verify site
         uses: ./.github/actions/verify-site

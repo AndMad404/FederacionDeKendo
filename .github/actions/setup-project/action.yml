@@ -1,0 +1,17 @@
+name: Set up project
+description: Configure Node and Corepack, then install the pinned project dependencies.
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Node
+      uses: actions/setup-node@v5
+      with:
+        node-version: 22
+        package-manager-cache: false
+    - name: Enable Corepack
+      shell: bash
+      run: corepack enable
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install --frozen-lockfile
