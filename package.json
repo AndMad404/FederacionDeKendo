@@ -11,6 +11,7 @@
     "format:line-endings": "node scripts/normalize-line-endings.mjs",
     "format:line-endings:check": "node scripts/normalize-line-endings.mjs --check",
     "format:check": "prettier . --check --ignore-unknown",
+    "format:files": "prettier",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix --max-warnings=0",
     "check": "pnpm run typecheck && pnpm run lint && pnpm run format:check && pnpm run test:all",

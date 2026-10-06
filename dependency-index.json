@@ -14,7 +14,10 @@
       "id": "event-audience-copy",
       "changes": ["src/app/config/i18n.ts"],
       "area": "Textos bilingues de acceso y participacion en eventos",
-      "tests": ["tests/behavior/events.spec.ts"]
+      "tests": [
+        "tests/behavior/events.spec.ts",
+        "tests/data/calendar-timezone-localization.spec.ts"
+      ]
     },
     {
       "id": "calendar-event-data",
@@ -60,6 +63,7 @@
       ],
       "area": "Interfaz de calendario, eventos y archivo historico",
       "tests": [
+        "tests/data/calendar-timezone-localization.spec.ts",
         "tests/behavior/calendar-behavior.spec.ts",
         "tests/behavior/event-history-filters.spec.ts",
         "tests/behavior/events.spec.ts",

@@ -218,7 +218,7 @@ test("historical gallery opens the shared lightbox from the selected image", asy
   await page.goto(HISTORICAL_EVENT_PATH);
 
   const gallery = page.getByRole("region", {
-    name: "Fotografías del evento Examen",
+    name: "Fotografías del evento 2do Examen 2026",
   });
   await expect(gallery).toBeVisible();
 
@@ -239,16 +239,20 @@ test("historical gallery opens the shared lightbox from the selected image", asy
   await gallery.getByRole("button", { name: "Fotografía siguiente" }).click();
 
   const opener = gallery.getByRole("button", {
-    name: "Abrir Fotografía 2 del evento Examen",
+    name: "Abrir Fotografía 2 del evento 2do Examen 2026",
   });
   await expect(opener).toBeVisible();
   await opener.click();
 
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
-  await expect(dialog).toHaveAccessibleName("Fotografía 2 del evento Examen");
+  await expect(dialog).toHaveAccessibleName(
+    "Fotografía 2 del evento 2do Examen 2026",
+  );
   await expect(
-    dialog.getByRole("img", { name: "Fotografía 2 del evento Examen" }),
+    dialog.getByRole("img", {
+      name: "Fotografía 2 del evento 2do Examen 2026",
+    }),
   ).toBeVisible();
 });
 test("historical tournament selection follows carousel navigation on mobile", async ({
