@@ -110,7 +110,7 @@ test("post-publication design review, fallback, delivery and artifacts remain in
   assert.match(send.if, /always\(\)/);
   assert.ok(
     steps
-      .filter((step) => step.uses === "actions/upload-artifact@v5")
+      .filter((step) => step.uses === "actions/upload-artifact@v6")
       .every((step) => step.if === "${{ always() }}"),
   );
   assert.doesNotMatch(
@@ -184,7 +184,7 @@ test("Phase 6: historical correction downloads the artifact produced by synchron
     ".github/actions/calendar-design-review/action.yml",
   );
   const upload = actionSteps(reviewAction).find(
-    (step) => step.uses === "actions/upload-artifact@v5",
+    (step) => step.uses === "actions/upload-artifact@v6",
     // Evidence has a separate artifact from the historical correction report.
   );
   const download = correctionSteps.find(

@@ -68,7 +68,7 @@ runs:
         echo "El envío del correo falló. Los cambios guardados en Git permanecen y la evidencia está en los artefactos." >> "$GITHUB_STEP_SUMMARY"
     - name: Upload calendar design evidence
       if: ${{ always() }}
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: calendar-design-review
         path: ${{ runner.temp }}/calendar-design-review
@@ -76,7 +76,7 @@ runs:
         retention-days: 30
     - name: Upload calendar notification reports
       if: ${{ always() }}
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: calendar-notification-reports
         path: |

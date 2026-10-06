@@ -10,7 +10,8 @@ import { readDist } from "../helpers/generated-output-fixtures.mjs";
 
 test("renders complete and incomplete historical event headings", async () => {
   for (const [path, title] of [
-    ["eventos/pasados/2do-examen-2026/index.html", "Examen"],
+    ["eventos/pasados/1er-examen-2026/index.html", "1er Examen 2026"],
+    ["eventos/pasados/2do-examen-2026/index.html", "2do Examen 2026"],
     [
       "eventos/pasados/clak-seminario-instructores-chile/index.html",
       "CLAK Seminario Instructores CHILE",
@@ -104,7 +105,8 @@ test("generates localized, unique, indexable SEO output for every event route", 
 
   await t.test("selected event titles remain approved", () => {
     const expectedEventTitles = new Map([
-      ["2do-examen-2026:es", "Examen de Kendo — 8 ago 2026 | Costa Rica"],
+      ["1er-examen-2026:es", "1er Examen 2026 — 2 may 2026 | Costa Rica"],
+      ["2do-examen-2026:es", "2do Examen 2026 — 8 ago 2026 | Costa Rica"],
       [
         "gasshuku-monteverde:es",
         "Gasshuku Monteverde — 12 sept 2026 | Costa Rica",

@@ -6,7 +6,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
     id: "1er-examen-2026",
     aliases: ["2026-05-02-federacion-examen","2026-05-02-examen"],
     archiveEligibleAt: "2026-05-04T06:00:00.000Z",
-    title: "Examen",
+    title: "1er Examen 2026",
     date: "2026-05-02",
     eventType: "examen",
     timeZone: "America/Costa_Rica"
@@ -26,7 +26,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
     id: "2do-examen-2026",
     aliases: ["2026-08-08-examen"],
     archiveEligibleAt: "2026-08-10T06:00:00.000Z",
-    title: "Examen",
+    title: "2do Examen 2026",
     date: "2026-08-08",
     startTime: "13:00",
     endTime: "15:00",
