@@ -48,13 +48,17 @@ function routeOutputExists(routePath: string) {
   );
 }
 
-function getGeneratedFixture(event: CalendarEvent) {
-  const currentPath = `/en/events/${event.id}/`;
-  const pastPath = `/en/events/past/${event.id}/`;
+function getGeneratedFixture(event: CalendarEvent, language: "es" | "en" = "en") {
+  const currentPath =
+    language === "en" ? `/en/events/${event.id}/` : `/eventos/${event.id}/`;
+  const pastPath =
+    language === "en"
+      ? `/en/events/past/${event.id}/`
+      : `/eventos/pasados/${event.id}/`;
   const currentExists = routeOutputExists(currentPath);
   const pastExists = routeOutputExists(pastPath);
   if (currentExists === pastExists) {
-    throw new Error(`Expected one generated English route for ${event.id}.`);
+    throw new Error(`Expected one generated ${language} route for ${event.id}.`);
   }
 
   const publicPastAt = calculatePublicPastAt(
@@ -66,7 +70,14 @@ function getGeneratedFixture(event: CalendarEvent) {
     event,
     path: archived ? pastPath : currentPath,
     now: new Date(publicPastAt.getTime() + (archived ? 0 : -1_000)),
-    status: archived ? "Completed activity" : "Scheduled activity",
+    status:
+      language === "en"
+        ? archived
+          ? "Completed activity"
+          : "Scheduled activity"
+        : archived
+          ? "Actividad finalizada"
+          : "Actividad programada",
   };
 }
 
@@ -79,15 +90,11 @@ const timedEvent = requireEvent(
     Boolean(getValidEnglishTranslation(event)),
 );
 const allDayEvent = requireEvent(
-  "translated single-day all-day event",
-  (event) =>
-    !event.startTime &&
-    !event.endTime &&
-    !event.endDate &&
-    Boolean(getValidEnglishTranslation(event)),
+  "single-day all-day event",
+  (event) => !event.startTime && !event.endTime && !event.endDate,
 );
 const timedFixture = getGeneratedFixture(timedEvent);
-const allDayFixture = getGeneratedFixture(allDayEvent);
+const allDayFixture = getGeneratedFixture(allDayEvent, "es");
 const translatedTimedEvent = getValidEnglishTranslation(timedEvent);
 if (!translatedTimedEvent) {
   throw new Error(`Missing English translation for ${timedEvent.id}.`);
