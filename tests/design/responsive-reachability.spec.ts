@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import type { RouteComponent } from "../../src/app/config/routeTypes";
 import { getReachability } from "../helpers/content-reachability";
 import { preparePage } from "../helpers/prepare-page";
+import { getGeneratedEventPath } from "../helpers/generated-pages";
 import { APPROVED_VIEWPORTS } from "./design-contract";
 
 const ROUTES = {
@@ -9,7 +10,7 @@ const ROUTES = {
   calendar: { name: "calendar", path: "/eventos/" },
   gallery: { name: "gallery", path: "/galeria/" },
   affiliates: { name: "affiliates", path: "/afiliados/" },
-  event: { name: "event", path: "/eventos/pasados/2do-examen-2026/" },
+  event: { name: "event", path: getGeneratedEventPath("2026-08-08-examen") },
   pastEvents: { name: "past events", path: "/eventos/pasados/" },
   notFound: { name: "not found", path: "/ruta-responsive-inexistente/" },
 } satisfies Record<RouteComponent, { name: string; path: string }>;

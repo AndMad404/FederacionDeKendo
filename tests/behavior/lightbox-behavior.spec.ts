@@ -2,6 +2,18 @@ import { expect, test, type Page } from "@playwright/test";
 
 const FIXED_TEST_TIME = new Date("2026-08-04T12:00:00-06:00");
 
+async function expectRestoredApplication(page: Page) {
+  await expect
+    .poll(() =>
+      page.evaluate(() => [
+        document.querySelector("#root")?.hasAttribute("inert"),
+        document.documentElement.style.overflow,
+        document.body.style.overflow,
+      ]),
+    )
+    .toEqual([false, "", ""]);
+}
+
 async function openLightbox(page: Page) {
   for (let attempt = 0; attempt < 2; attempt += 1) {
     await page.clock.setFixedTime(FIXED_TEST_TIME);
@@ -87,19 +99,7 @@ test("restores the application after closing the lightbox", async ({
   await page.keyboard.press("Escape");
 
   await expect(dialog).toBeHidden();
-  await expect
-    .poll(() =>
-      page.evaluate(() =>
-        document.querySelector("#root")?.hasAttribute("inert"),
-      ),
-    )
-    .toBe(false);
-  await expect
-    .poll(() => page.evaluate(() => document.documentElement.style.overflow))
-    .toBe("");
-  await expect
-    .poll(() => page.evaluate(() => document.body.style.overflow))
-    .toBe("");
+  await expectRestoredApplication(page);
   await expect(opener).toBeFocused();
 });
 
@@ -110,13 +110,7 @@ test("cleans up isolation after backdrop closure", async ({ page }) => {
   await backdrop.click({ position: { x: 1, y: 1 } });
 
   await expect(dialog).toBeHidden();
-  await expect
-    .poll(() =>
-      page.evaluate(() =>
-        document.querySelector("#root")?.hasAttribute("inert"),
-      ),
-    )
-    .toBe(false);
+  await expectRestoredApplication(page);
   await expect(opener).toBeFocused();
 });
 
@@ -132,19 +126,7 @@ test("cleans up isolation when the gallery route unmounts", async ({
 
   await expect(dialog).toBeHidden();
   await expect(page.locator("main h1")).toBeVisible();
-  await expect
-    .poll(() =>
-      page.evaluate(() =>
-        document.querySelector("#root")?.hasAttribute("inert"),
-      ),
-    )
-    .toBe(false);
-  await expect
-    .poll(() => page.evaluate(() => document.documentElement.style.overflow))
-    .toBe("");
-  await expect
-    .poll(() => page.evaluate(() => document.body.style.overflow))
-    .toBe("");
+  await expectRestoredApplication(page);
 });
 
 test("resets pinch zoom when the lightbox image changes and reopens", async ({

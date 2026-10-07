@@ -1,10 +1,10 @@
 import { expect, type Page } from "@playwright/test";
-import { FIXED_TEST_TIME } from "../design/design-contract";
+import { getGeneratedSiteTime } from "./generated-site.mjs";
 
 export async function preparePage(
   page: Page,
   path: string,
-  referenceTime = FIXED_TEST_TIME,
+  referenceTime = getGeneratedSiteTime(),
 ) {
   await page.clock.setFixedTime(referenceTime);
   await page.goto(path);

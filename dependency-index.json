@@ -47,7 +47,11 @@
         "tests/data/generated-redirects.test.mjs",
         "tests/behavior/events.spec.ts",
         "tests/data/generated-translations.test.mjs",
-        "tests/data/generated-output.test.mjs"
+        "tests/data/generated-output.test.mjs",
+        "tests/data/generated-sitemap.test.mjs",
+        "tests/data/llms-txt.test.mjs",
+        "tests/design/geometry-contract.spec.ts",
+        "tests/design/calendar-layout.spec.ts"
       ]
     },
     {
@@ -144,6 +148,8 @@
         "src/entry-server.tsx",
         "scripts/generate-crawler-files.mjs",
         "scripts/generate-route-html.mjs",
+        "tests/helpers/generated-output-fixtures.mjs",
+        "tests/helpers/generated-site.mjs",
         "public/llms.txt",
         "public/robots.txt"
       ],
@@ -207,10 +213,16 @@
       "id": "design-page-preparation",
       "changes": [
         "tests/design/design-contract.ts",
+        "tests/helpers/generated-pages.ts",
+        "tests/helpers/generated-site.mjs",
         "tests/helpers/prepare-page.ts"
       ],
       "area": "Contratos y preparacion de paginas para geometria y comparacion visual",
       "tests": [
+        "tests/behavior/calendar-behavior.spec.ts",
+        "tests/data/generated-redirects.test.mjs",
+        "tests/design/calendar-card-geometry.spec.ts",
+        "tests/design/calendar-layout.spec.ts",
         "tests/design/event-action-geometry.spec.ts",
         "tests/design/geometry-contract.spec.ts",
         "tests/design/responsive-reachability.spec.ts",

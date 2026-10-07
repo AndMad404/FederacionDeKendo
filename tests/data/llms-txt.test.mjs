@@ -70,12 +70,14 @@ test("the generated robots.txt includes every published event route", async () =
   assert.match(robots, /^User-agent: \*$/m);
   assert.match(robots, /^Allow: \/$/m);
   assert.match(robots, /^Sitemap: https:\/\/fak-kendo\.org\/sitemap\.xml$/m);
-  for (const path of eventPaths) {
-    assert.match(
-      robots,
-      new RegExp(`^Allow: ${path.replaceAll("/", "\\/")}$`, "m"),
-    );
-  }
+  const allowedEventPaths = [...robots.matchAll(/^Allow: (\/[^\s]+)$/gm)].map(
+    ([, path]) => path,
+  );
+  assert.deepEqual(
+    allowedEventPaths.sort(),
+    [...eventPaths].sort(),
+    "robots.txt must list exactly the current canonical events in both languages",
+  );
 });
 
 test("the observer returns false and alarms for an invalid file", () => {

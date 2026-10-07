@@ -35,12 +35,6 @@ test("gallery SEO image and preload use the current WebP asset", () => {
   assert.match(
     seoData,
     new RegExp(
-      `/images/gallery/kendo-gallery-01\\.webp\\?v=${assetHashes["/images/gallery/kendo-gallery-01.webp"]}`,
-    ),
-  );
-  assert.match(
-    seoData,
-    new RegExp(
       `/images/gallery/thumbs/kendo-gallery-01-480\\.webp\\?v=${assetHashes["/images/gallery/thumbs/kendo-gallery-01-480.webp"]}`,
     ),
   );

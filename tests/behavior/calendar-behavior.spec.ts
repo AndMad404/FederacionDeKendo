@@ -1,5 +1,6 @@
 import { swipeLeft } from "../helpers/swipe";
 import { expect, test, type Page } from "@playwright/test";
+import { preparePage } from "../helpers/prepare-page";
 
 test.describe.configure({ mode: "serial" });
 
@@ -8,15 +9,7 @@ const FIXED_CALENDAR_TIME = new Date("2026-08-04T12:00:00-06:00");
 const FIXED_PAGINATION_TIME = new Date("2026-05-01T12:00:00-06:00");
 
 async function openCalendar(page: Page, now = FIXED_CALENDAR_TIME) {
-  await page.clock.setFixedTime(now);
-  await page.goto(CALENDAR_PATH);
-  await page.waitForLoadState("networkidle");
-  await expect(
-    page.getByRole("heading", {
-      name: "Calendario de Eventos",
-      level: 1,
-    }),
-  ).toBeVisible();
+  await preparePage(page, CALENDAR_PATH, now);
 }
 
 function calendarNavigation(page: Page) {

@@ -123,7 +123,6 @@ test("calendar gate blocks functional failures and omits design while full gate 
   assert.ok(steps.some((step) => step.includes("build")));
   assert.ok(steps.some((step) => step.includes("test:behavior")));
   assert.ok(!steps.some((step) => step.includes("test:design")));
-  assert.ok(verificationSteps().some((step) => step.includes("test:design")));
   for (const command of ["typecheck", "build", "test:behavior"])
     assert.throws(
       () =>

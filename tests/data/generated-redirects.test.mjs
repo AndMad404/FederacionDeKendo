@@ -1,114 +1,79 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-
+import { getGeneratedEventPath } from "../helpers/generated-pages.ts";
 import {
   CALENDAR_EVENTS,
   getEventRedirects,
   getRouteManifest,
 } from "../../dist-ssr/entry-server.js";
-import {
-  readDist,
-  getPanamaEvent,
-  PANAMA_LEGACY_SLUG,
-} from "../helpers/generated-output-fixtures.mjs";
+import { readDist } from "../helpers/generated-output-fixtures.mjs";
 
-test("redirects legacy calendar and archived event URLs to their canonical routes", async () => {
-  const generated = new Set((await readDist("_redirects")).split(/\r?\n/));
-  const configured = new Map(
-    getEventRedirects().map(({ from, to }) => [from, to]),
+test("redirects and browser selection use current canonical routes in both languages", async () => {
+  const redirects = getEventRedirects();
+  const destinations = new Map(redirects.map(({ from, to }) => [from, to]));
+  const generated = new Set(
+    (await readDist("_redirects")).split(/\r?\n/).filter(Boolean),
   );
-  const panamaId = getPanamaEvent().id;
-  const panamaPath = getRouteManifest().find(
-    (route) =>
-      route.component === "event" &&
-      route.eventId === panamaId &&
-      route.language === "es",
-  )?.path;
-  assert.ok(panamaPath);
-  const chilePath = "/eventos/pasados/clak-seminario-instructores-chile/";
-  const chileSlug = "2026-05-29-clak-seminario-instructores-chile";
-  const expected = [
-    ["/calendario/", "/eventos/"],
-    ["/eventos/pasados/page/2/", "/eventos/pasados/pagina/2/"],
-    ["/en/events/past/pagina/2/", "/en/events/past/page/2/"],
-    ["/eventos/2026-08-08-examen/", "/eventos/pasados/2do-examen-2026/"],
-    ["/eventos/pasados/2026-05-30-seminario/", chilePath],
-    [`/eventos/${PANAMA_LEGACY_SLUG}/`, panamaPath],
-    [`/en/events/${PANAMA_LEGACY_SLUG}/`, panamaPath],
-    [`/eventos/${chileSlug}/`, chilePath],
-    [`/eventos/pasados/${chileSlug}/`, chilePath],
-    [`/en/events/${chileSlug}/`, chilePath],
-    [`/en/events/past/${chileSlug}/`, chilePath],
-  ];
-  for (const [from, to] of expected) {
-    assert.equal(configured.get(from), to, `${from}: configured destination`);
-    assert.ok(
-      generated.has(`${from} ${to} 301`),
-      `${from}: generated redirect`,
-    );
-  }
-});
-
-test("redirects every previous event URL to its current URL in each published language", async () => {
-  const redirects = await readDist("_redirects");
-  const redirectLines = new Set(redirects.split(/\r?\n/).filter(Boolean));
-  const redirectSources = new Set(
-    [...redirectLines].map((line) => line.split(" ")[0]),
-  );
-  const eventRoutes = getRouteManifest().filter(
+  const routes = getRouteManifest().filter(
     (route) => route.component === "event",
   );
-  const configuredRedirects = getEventRedirects();
-  const configuredSources = new Set(
-    configuredRedirects.map(({ from }) => from),
-  );
-  const renamedEvents = CALENDAR_EVENTS.filter(
-    ({ aliases }) => aliases?.length,
-  );
 
-  assert.ok(renamedEvents.length > 0);
-  assert.equal(configuredSources.size, configuredRedirects.length);
-  for (const { from, to } of configuredRedirects) {
+  assert.equal(
+    destinations.size,
+    redirects.length,
+    "redirect sources must be unique",
+  );
+  assert.deepEqual(
+    generated,
+    new Set(redirects.map(({ from, to }) => `${from} ${to} 301`)),
+  );
+  for (const { from, to } of redirects) {
     assert.notEqual(from, to, `${from} must not redirect to itself`);
     assert.equal(
-      configuredSources.has(to),
+      destinations.has(to),
       false,
-      `${from} must redirect directly to the final canonical URL`,
+      `${from} must reach the final canonical URL`,
     );
   }
 
-  for (const event of renamedEvents) {
-    const routes = eventRoutes.filter((route) => route.eventId === event.id);
-    assert.ok(
-      routes.some((route) => route.language === "es"),
-      `${event.id}: missing Spanish route`,
+  for (const event of CALENDAR_EVENTS) {
+    const spanish = routes.find(
+      (route) => route.eventId === event.id && route.language === "es",
     );
-
-    for (const route of routes) {
+    assert.ok(spanish, `${event.id}: missing Spanish route`);
+    for (const language of ["es", "en"]) {
+      const route =
+        routes.find(
+          (candidate) =>
+            candidate.eventId === event.id && candidate.language === language,
+        ) ?? spanish;
       const [current, past] =
-        route.language === "en"
+        language === "en"
           ? ["/en/events/", "/en/events/past/"]
           : ["/eventos/", "/eventos/pasados/"];
-      const prefixes = route.path.startsWith(past)
-        ? [current, past]
-        : [current];
-
-      for (const slug of [event.id, ...event.aliases]) {
-        for (const prefix of prefixes) {
-          const from = `${prefix}${slug}/`;
-          if (from === route.path) continue;
-          assert.ok(
-            redirectLines.has(`${from} ${route.path} 301`),
-            `${from} must redirect to ${route.path}`,
-          );
-        }
-      }
-
+      const archived = /\/(pasados|past)\//.test(route.path);
       assert.equal(
-        redirectSources.has(route.path),
+        destinations.has(route.path),
         false,
         `${route.path} must not redirect elsewhere`,
       );
+      for (const slug of [event.id, ...(event.aliases ?? [])]) {
+        assert.equal(
+          getGeneratedEventPath(slug, language),
+          route.path,
+          `${language}/${slug}: browser canonical page`,
+        );
+        for (const prefix of archived ? [current, past] : [current]) {
+          const from = `${prefix}${slug}/`;
+          if (from !== route.path) {
+            assert.equal(
+              destinations.get(from),
+              route.path,
+              `${from}: canonical destination`,
+            );
+          }
+        }
+      }
     }
   }
 });

@@ -1,37 +1,11 @@
 import { expect, test, type Page } from "@playwright/test";
+import { preparePage } from "../helpers/prepare-page";
 
 const CALENDAR_PATH = "/eventos/";
 const FIXED_CALENDAR_TIME = new Date("2026-08-04T12:00:00-06:00");
 
-test("historical tournament thumbnails scroll to follow carousel selection on mobile", async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 360, height: 800 });
-  await page.clock.setFixedTime(new Date("2026-08-24T12:00:00-06:00"));
-  await page.goto("/eventos/pasados/3er-torneo/");
-  await page.waitForLoadState("networkidle");
-  const gallery = page.getByRole("region", { name: /Fotografías del evento/ });
-  const thumbnails = gallery.getByRole("group", {
-    name: "Seleccionar fotografía",
-  });
-  await expect(thumbnails).toBeVisible();
-  expect(await thumbnails.evaluate((strip) => strip.scrollLeft)).toBe(0);
-  await gallery.getByRole("button", { name: "Fotografía siguiente" }).click();
-  await expect
-    .poll(() => thumbnails.evaluate((strip) => strip.scrollLeft))
-    .toBeGreaterThan(0);
-});
-
 async function openCalendar(page: Page, now = FIXED_CALENDAR_TIME) {
-  await page.clock.setFixedTime(now);
-  await page.goto(CALENDAR_PATH);
-  await page.waitForLoadState("networkidle");
-  await expect(
-    page.getByRole("heading", {
-      name: "Calendario de Eventos",
-      level: 1,
-    }),
-  ).toBeVisible();
+  await preparePage(page, CALENDAR_PATH, now);
 }
 
 for (const viewport of [

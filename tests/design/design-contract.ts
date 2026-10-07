@@ -27,6 +27,8 @@ export const SHELL_CONTRACT = {
   routeSurfaceMarginBlock: 8,
   pastEventsTabletMarginBottom: 12,
   routeSurfaceRadius: 14,
+  eventDesktopPaddingInline: 0,
+  eventGalleryDesktopPaddingInline: 16,
   desktopViewport: { width: 1366, height: 768 },
 } as const;
 

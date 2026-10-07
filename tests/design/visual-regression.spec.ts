@@ -1,17 +1,17 @@
 import { expect, test } from "@playwright/test";
-import { APPROVED_VIEWPORTS, FIXED_TEST_TIME } from "./design-contract";
+import { APPROVED_VIEWPORTS } from "./design-contract";
 import {
   generatedPages,
+  getGeneratedEventPath,
   representativePages as selectRepresentatives,
 } from "../helpers/generated-pages";
 import { preparePage } from "../helpers/prepare-page";
 const VISUAL_VIEWPORTS = APPROVED_VIEWPORTS.filter(
   ({ name }) => name !== "mobile-390x844",
 );
-const HISTORICAL_EVENT_REFERENCE_TIME = new Date("2026-08-20T12:00:00-06:00");
 const representativePages = selectRepresentatives(
   generatedPages({ spanishOnly: true }),
-  { event: "/eventos/pasados/2026-08-08-examen/" },
+  { event: getGeneratedEventPath("2026-08-08-examen") },
 );
 for (const viewport of VISUAL_VIEWPORTS) {
   test.describe(`${viewport.name} approved visual designs`, () => {
@@ -21,13 +21,7 @@ for (const viewport of VISUAL_VIEWPORTS) {
       test(`${approvedPage.design} matches its approved design`, async ({
         page,
       }) => {
-        await preparePage(
-          page,
-          approvedPage.path,
-          approvedPage.design === "event"
-            ? HISTORICAL_EVENT_REFERENCE_TIME
-            : FIXED_TEST_TIME,
-        );
+        await preparePage(page, approvedPage.path);
         await expect(page).toHaveScreenshot(
           `${approvedPage.design}-${viewport.name}.png`,
         );

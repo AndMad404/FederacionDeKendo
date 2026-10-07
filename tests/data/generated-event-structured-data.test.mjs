@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import "../helpers/generated-output-fixtures.mjs";
 
 import {
   CALENDAR_EVENTS,

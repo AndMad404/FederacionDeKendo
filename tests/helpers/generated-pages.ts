@@ -1,6 +1,38 @@
-import { readdirSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { relative, resolve, sep } from "node:path";
 import type { ApprovedPage, PageDesign } from "../design/design-contract";
+
+export function getGeneratedEventPath(
+  slug: string,
+  language: "es" | "en" = "es",
+) {
+  // Published redirects account for aliases, vanity slugs, archive dates and
+  // fallback to Spanish for events without a distinct English translation.
+  const redirects = new Map(
+    readFileSync(resolve(process.cwd(), "dist/_redirects"), "utf8")
+      .split(/\r?\n/)
+      .filter(Boolean)
+      .map((line) => {
+        const [from, to] = line.split(/\s+/);
+        return [from, to];
+      }),
+  );
+  const prefixes =
+    language === "en"
+      ? ["/en/events/", "/en/events/past/"]
+      : ["/eventos/", "/eventos/pasados/"];
+  const pages = generatedPages();
+  for (const prefix of prefixes) {
+    const source = `${prefix}${slug}/`;
+    const path = redirects.get(source) ?? source;
+    if (pages.some((page) => page.path === path && page.design === "event")) {
+      return path;
+    }
+  }
+  throw new Error(
+    `Missing canonical generated event page: ${language}/${slug}`,
+  );
+}
 
 function getPageDesign(path: string): PageDesign {
   if (path === "/" || path === "/en/") return "home";

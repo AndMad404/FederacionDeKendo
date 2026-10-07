@@ -25,6 +25,12 @@ for (const viewport of APPROVED_VIEWPORTS) {
         page,
       }) => {
         await preparePage(page, approvedPage.path);
+        if (approvedPage.design === "event") {
+          await expect(
+            page.locator('main > section[aria-labelledby="event-page-title"]'),
+            `${approvedPage.path} must render an event before checking its geometry`,
+          ).toBeVisible();
+        }
         await test.step("content semantics", async () => {
           await expectRelativeContent(page);
           await expectNoDuplicateIds(page);

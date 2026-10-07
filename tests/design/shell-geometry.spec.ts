@@ -141,6 +141,7 @@ test.describe("event details preserve desktop document flow", () => {
           scrollHeight: root.scrollHeight,
           sectionScrollHeight: section?.scrollHeight ?? 0,
           sectionClientHeight: section?.clientHeight ?? 0,
+          hasGallery: Boolean(section?.querySelector("figure")),
           contentWrapperPaddingInline: {
             left: Number.parseFloat(contentWrapperStyles?.paddingLeft ?? "0"),
             right: Number.parseFloat(contentWrapperStyles?.paddingRight ?? "0"),
@@ -155,12 +156,16 @@ test.describe("event details preserve desktop document flow", () => {
       );
       expectCssPixels(
         geometry.contentWrapperPaddingInline.left,
-        0,
+        geometry.hasGallery
+          ? SHELL_CONTRACT.eventGalleryDesktopPaddingInline
+          : SHELL_CONTRACT.eventDesktopPaddingInline,
         "event desktop content wrapper left padding",
       );
       expectCssPixels(
         geometry.contentWrapperPaddingInline.right,
-        0,
+        geometry.hasGallery
+          ? SHELL_CONTRACT.eventGalleryDesktopPaddingInline
+          : SHELL_CONTRACT.eventDesktopPaddingInline,
         "event desktop content wrapper right padding",
       );
       if (geometry.scrollHeight > geometry.clientHeight + 1) {

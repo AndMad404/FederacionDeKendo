@@ -4,6 +4,7 @@ import { recordCalendarLayout } from "../helpers/calendar-layout";
 import { APPROVED_VIEWPORTS } from "./design-contract";
 import { CALENDAR_EVENTS } from "../../src/app/data/calendarEvents";
 import { EVENT_GALLERIES } from "../../src/app/data/eventGalleries";
+import { getGeneratedSiteTime } from "../helpers/generated-site.mjs";
 
 const pages = generatedPages().filter((page) =>
   ["calendar", "pastEvents", "event"].includes(page.design),
@@ -13,6 +14,7 @@ for (const viewport of APPROVED_VIEWPORTS) {
     test.use({ viewport, reducedMotion: "reduce" });
     for (const route of pages) {
       test(`calendar layout ${route.path}`, async ({ page }, info) => {
+        await page.clock.setFixedTime(getGeneratedSiteTime());
         await page.goto(route.path);
         const slug = route.path.split("/").filter(Boolean).at(-1);
         const event =

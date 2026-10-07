@@ -272,9 +272,13 @@ test("historical tournament selection follows carousel navigation on mobile", as
   await page.waitForLoadState("networkidle");
   const active = thumbnails.locator('[aria-current="true"]');
   const initial = await active.getAttribute("aria-label");
+  expect(await thumbnails.evaluate((strip) => strip.scrollLeft)).toBe(0);
 
   await gallery.getByRole("button", { name: "Fotografía siguiente" }).click();
   await expect.poll(() => active.getAttribute("aria-label")).not.toBe(initial);
+  await expect
+    .poll(() => thumbnails.evaluate((strip) => strip.scrollLeft))
+    .toBeGreaterThan(0);
 });
 
 test("renders the historical archive and the local not-found view", async ({

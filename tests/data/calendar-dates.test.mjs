@@ -19,11 +19,19 @@ test("calendar date helpers cross month and year boundaries independently of the
   );
 });
 
-test("Given an event at month end, When the 48-hour calendar checkpoint arrives, Then it is eligible", () => {
-  assert.equal(
-    calculateArchiveEligibleAt("2026-01-31").toISOString(),
-    "2026-02-02T06:00:00.000Z",
-  );
+test("archive eligibility crosses month, year and daylight-saving boundaries", () => {
+  for (const [date, expected] of [
+    ["2026-01-31", "2026-02-02T06:00:00.000Z"],
+    ["2026-12-31", "2027-01-02T06:00:00.000Z"],
+    ["2026-03-08", "2026-03-10T06:00:00.000Z"],
+    ["2026-11-01", "2026-11-03T06:00:00.000Z"],
+  ]) {
+    assert.equal(
+      calculateArchiveEligibleAt(date).toISOString(),
+      expected,
+      date,
+    );
+  }
 });
 
 test("separates public expiry, the first gallery check, and the final 48-hour deadline", () => {
@@ -42,23 +50,5 @@ test("separates public expiry, the first gallery check, and the final 48-hour de
   assert.equal(
     calculateArchiveEligibleAt("2026-08-22").toISOString(),
     "2026-08-24T06:00:00.000Z",
-  );
-});
-
-test("Given an event at year end, When the 48-hour calendar checkpoint arrives, Then eligibility crosses the year", () => {
-  assert.equal(
-    calculateArchiveEligibleAt("2026-12-31").toISOString(),
-    "2027-01-02T06:00:00.000Z",
-  );
-});
-
-test("Given foreign daylight-saving dates, When eligibility is calculated, Then Costa Rica midnight stays stable", () => {
-  assert.equal(
-    calculateArchiveEligibleAt("2026-03-08").toISOString(),
-    "2026-03-10T06:00:00.000Z",
-  );
-  assert.equal(
-    calculateArchiveEligibleAt("2026-11-01").toISOString(),
-    "2026-11-03T06:00:00.000Z",
   );
 });
