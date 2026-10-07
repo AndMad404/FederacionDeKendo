@@ -59,15 +59,6 @@ const SHARED_SPACING: Partial<Record<PageDesign, ComponentSpacingContract>> = {
     rowGap: 12,
     columnGap: 12,
   },
-  pastEvents: {
-    selector: "main > section > div:last-child > div",
-    paddingTop: 16,
-    paddingRight: 16,
-    paddingBottom: 16,
-    paddingLeft: 16,
-    rowGap: 12,
-    columnGap: 12,
-  },
   notFound: {
     selector: "main > section",
     paddingTop: 48,
@@ -95,19 +86,7 @@ export function getComponentSpacingContract(
     };
   }
 
-  if (design === "calendar") {
-    return {
-      selector: "[data-page-content-boundary]",
-      paddingTop: viewportWidth >= 640 ? 16 : 12,
-      paddingRight: viewportWidth >= 640 ? 16 : 12,
-      paddingBottom: viewportWidth >= 640 ? 16 : 12,
-      paddingLeft: viewportWidth >= 640 ? 16 : 12,
-      rowGap: viewportWidth >= 640 ? 16 : 12,
-      columnGap: viewportWidth >= 640 ? 16 : 12,
-    };
-  }
-
-  if (design === "pastEvents") {
+  if (design === "calendar" || design === "pastEvents") {
     return {
       selector: "[data-page-content-boundary]",
       paddingTop: viewportWidth >= 640 ? 16 : 12,

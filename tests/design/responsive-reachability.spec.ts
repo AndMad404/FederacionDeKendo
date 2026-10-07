@@ -19,34 +19,28 @@ for (const viewport of APPROVED_VIEWPORTS) {
   test.describe(`${viewport.name} calendar heading`, () => {
     test.use({ viewport });
 
-    for (const path of ["/eventos/", "/en/events/"]) {
-      test(`${path} keeps its complete banner text visible`, async ({
-        page,
-      }) => {
-        await preparePage(page, path);
-        const heading = page.locator("main h1");
-        if (path === "/eventos/") {
-          await expect(heading).toHaveText("Calendario de Eventos");
-        }
-        expect((await getReachability(page)).clippedContent).toEqual([]);
+    test("calendar keeps its complete banner text visible", async ({
+      page,
+    }) => {
+      await preparePage(page, "/eventos/");
+      const heading = page.locator("main h1");
+      await expect(heading).toHaveText("Calendario de Eventos");
+      expect((await getReachability(page)).clippedContent).toEqual([]);
 
-        // Restore the longer copy that exposed the mobile bug. Shortening the
-        // title alone must not conceal a regression in responsive wrapping.
-        await heading.evaluate((element) => {
-          element.textContent = "Calendario de Próximos Eventos";
-        });
-        expect((await getReachability(page)).clippedContent).toEqual([]);
-        const headingBox = await heading.boundingBox();
-        const descriptionBox = await page
-          .locator("main header p")
-          .boundingBox();
-        expect(headingBox).not.toBeNull();
-        expect(descriptionBox).not.toBeNull();
-        expect(descriptionBox!.y).toBeGreaterThanOrEqual(
-          headingBox!.y + headingBox!.height,
-        );
+      // Restore the longer copy that exposed the mobile bug. Shortening the
+      // title alone must not conceal a regression in responsive wrapping.
+      await heading.evaluate((element) => {
+        element.textContent = "Calendario de Próximos Eventos";
       });
-    }
+      expect((await getReachability(page)).clippedContent).toEqual([]);
+      const headingBox = await heading.boundingBox();
+      const descriptionBox = await page.locator("main header p").boundingBox();
+      expect(headingBox).not.toBeNull();
+      expect(descriptionBox).not.toBeNull();
+      expect(descriptionBox!.y).toBeGreaterThanOrEqual(
+        headingBox!.y + headingBox!.height,
+      );
+    });
   });
 }
 

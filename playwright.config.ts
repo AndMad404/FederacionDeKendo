@@ -2,7 +2,11 @@ import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./tests",
-  testIgnore: ["**/*.test.mjs", "**/visual-regression.spec.ts"],
+  testIgnore: [
+    "**/*.test.mjs",
+    "**/visual-regression.spec.ts",
+    "**/calendar-layout-full.spec.ts",
+  ],
   snapshotPathTemplate: "{testDir}/{testFilePath}-snapshots/{arg}{ext}",
   fullyParallel: true,
   failOnFlakyTests: true,

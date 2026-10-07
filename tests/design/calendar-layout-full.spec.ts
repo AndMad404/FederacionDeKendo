@@ -1,8 +1,8 @@
-import { designRepresentatives } from "../helpers/design-representatives";
+import { generatedPages } from "../helpers/generated-pages";
 import { registerCalendarLayoutTests } from "../helpers/calendar-layout-suite";
 
 registerCalendarLayoutTests(
-  designRepresentatives().filter((page) =>
+  generatedPages({ spanishOnly: true }).filter((page) =>
     ["calendar", "pastEvents", "event"].includes(page.design),
   ),
 );

@@ -213,6 +213,7 @@
       "id": "design-page-preparation",
       "changes": [
         "tests/design/design-contract.ts",
+        "tests/helpers/design-representatives.ts",
         "tests/helpers/generated-pages.ts",
         "tests/helpers/generated-site.mjs",
         "tests/helpers/prepare-page.ts"
@@ -222,9 +223,13 @@
         "tests/behavior/calendar-behavior.spec.ts",
         "tests/data/generated-redirects.test.mjs",
         "tests/design/calendar-card-geometry.spec.ts",
+        "tests/design/calendar-layout-calibration.spec.ts",
+        "tests/design/calendar-layout-fixtures.spec.ts",
+        "tests/design/calendar-layout-full.spec.ts",
         "tests/design/calendar-layout.spec.ts",
         "tests/design/event-action-geometry.spec.ts",
         "tests/design/geometry-contract.spec.ts",
+        "tests/design/interaction-states.spec.ts",
         "tests/design/responsive-reachability.spec.ts",
         "tests/design/shell-geometry.spec.ts",
         "tests/design/visual-regression.spec.ts"
@@ -250,6 +255,7 @@
       "changes": [
         "scripts/review-calendar-design.ts",
         "tests/helpers/calendar-layout.ts",
+        "tests/helpers/calendar-layout-suite.ts",
         "tests/helpers/calendar-block-measurements.ts",
         "tests/helpers/event-gallery-geometry.ts",
         "tests/helpers/content-reachability.ts",
@@ -264,6 +270,7 @@
         "tests/data/calendar-design-email.test.mjs",
         "tests/data/calendar-design-report.test.mjs",
         "tests/design/calendar-layout.spec.ts",
+        "tests/design/calendar-layout-full.spec.ts",
         "tests/design/calendar-layout-fixtures.spec.ts",
         "tests/design/calendar-layout-calibration.spec.ts",
         "tests/behavior/event-gallery-fixtures.spec.ts",

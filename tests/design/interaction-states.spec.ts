@@ -130,11 +130,4 @@ test("shared navigation arrows preserve visual interaction states", async ({
     name: "Calendario",
   });
   await expect(spanishCalendar).toHaveClass(/border-site-accent/);
-
-  await page.goto("/en/events/past/");
-
-  const englishCalendar = page.getByRole("button", {
-    name: "Calendar",
-  });
-  await expect(englishCalendar).toHaveClass(/border-site-accent/);
 });

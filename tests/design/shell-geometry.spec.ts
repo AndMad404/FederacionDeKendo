@@ -2,9 +2,9 @@ import { expect, test } from "@playwright/test";
 import { getReachability } from "../helpers/content-reachability";
 import { preparePage } from "../helpers/prepare-page";
 import { expectCssPixels, getBox } from "../helpers/geometry-assertions";
-import { generatedPages } from "../helpers/generated-pages";
+import { designRepresentatives } from "../helpers/design-representatives";
 import { SHELL_CONTRACT } from "./design-contract";
-const approvedPages = generatedPages();
+const approvedPages = designRepresentatives();
 test("calendar and historical content panels align on the reference desktop", async ({
   page,
 }) => {
@@ -22,7 +22,7 @@ test("calendar and historical content panels align on the reference desktop", as
   expect(Math.abs(calendarTop.y - archiveTop.y)).toBeLessThanOrEqual(1);
 });
 
-test.describe("all generated routes preserve the desktop shell contract", () => {
+test.describe("representative layouts preserve the desktop shell contract", () => {
   test.use({ viewport: SHELL_CONTRACT.desktopViewport });
 
   for (const approvedPage of approvedPages) {

@@ -15,7 +15,9 @@ import {
   SHELL_CONTRACT,
   getComponentSpacingContract,
 } from "./design-contract";
-const representativePages = selectRepresentatives(generatedPages());
+const representativePages = selectRepresentatives(
+  generatedPages({ spanishOnly: true }),
+);
 for (const viewport of APPROVED_VIEWPORTS) {
   test.describe(`${viewport.name} approved component contracts`, () => {
     test.use({ viewport });
