@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { recordCalendarLayout, settleCalendarLayout } from "./calendar-layout";
+import { recordCalendarLayout } from "./calendar-layout";
 import {
   APPROVED_VIEWPORTS,
   type ApprovedPage,
@@ -82,8 +82,8 @@ export function registerCalendarLayoutTests(pages: ApprovedPage[]) {
                 throw new Error("Calendar traversal did not complete");
             }
           }
-          // Archive page layouts are measured by their own cases. Traverse
-          // navigation only from the first page at each viewport.
+          // Archive pagination keeps the URL unchanged. Traverse and measure
+          // every set of cards from the first page at each viewport.
           if (
             route.design === "pastEvents" &&
             route.path === "/eventos/pasados/"
@@ -91,6 +91,8 @@ export function registerCalendarLayoutTests(pages: ApprovedPage[]) {
             const next = page.getByRole("button", {
               name: /^(Siguiente|Next)$/,
             });
+            const archiveUrl = page.url();
+            const eventLinks = page.locator("main li a");
             for (
               let pagination = 0;
               pagination < 1000 &&
@@ -98,12 +100,25 @@ export function registerCalendarLayoutTests(pages: ApprovedPage[]) {
               (await next.isEnabled());
               pagination++
             ) {
-              await next.click();
-              await expect(page).toHaveURL(
-                new URL(`${route.path}pagina/${pagination + 2}/`, page.url())
-                  .href,
+              const previousLinks = await eventLinks.evaluateAll((links) =>
+                links.map((link) => link.getAttribute("href")),
               );
-              await settleCalendarLayout(page);
+              await next.click();
+              await expect
+                .poll(() =>
+                  eventLinks.evaluateAll((links) =>
+                    links.map((link) => link.getAttribute("href")),
+                  ),
+                )
+                .not.toEqual(previousLinks);
+              await expect(page).toHaveURL(archiveUrl);
+              findings.push(
+                ...(await recordCalendarLayout(
+                  page,
+                  info,
+                  `archive-page-${pagination + 2}`,
+                )),
+              );
               if (pagination === 999)
                 throw new Error("Archive traversal did not complete");
             }
