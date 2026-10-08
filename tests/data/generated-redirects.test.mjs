@@ -7,6 +7,44 @@ import {
   getRouteManifest,
 } from "../../dist-ssr/entry-server.js";
 import { readDist } from "../helpers/generated-output-fixtures.mjs";
+import { access } from "node:fs/promises";
+
+test("redirects retired archive page URLs to the localized main archive", async () => {
+  const redirects = await readDist("_redirects");
+  const sitemap = await readDist("sitemap.xml");
+  for (const [prefix, target] of [
+    ["eventos/pasados/pagina", "eventos/pasados"],
+    ["eventos/pasados/page", "eventos/pasados"],
+    ["en/events/past/page", "eventos/pasados"],
+    ["en/events/past/pagina", "eventos/pasados"],
+  ]) {
+    assert.ok(redirects.includes(`/${prefix}/* /${target}/ 301`));
+    assert.equal(sitemap.includes(`/${prefix}/`), false);
+    await assert.rejects(access(`dist/${prefix}/2/index.html`), {
+      code: "ENOENT",
+    });
+  }
+});
+
+test("retires untranslated English listings without redirect chains or English hreflang", async () => {
+  const redirects = await readDist("_redirects");
+  const sitemap = await readDist("sitemap.xml");
+  for (const [from, to] of [
+    ["en/events", "eventos"],
+    ["en/events/past", "eventos/pasados"],
+  ]) {
+    assert.ok(redirects.includes(`/${from}/ /${to}/ 301`));
+    await assert.rejects(access(`dist/${from}/index.html`), { code: "ENOENT" });
+    assert.equal(
+      sitemap.includes(`<loc>https://fak-kendo.org/${from}/</loc>`),
+      false,
+    );
+    const html = await readDist(`${to}/index.html`);
+    assert.match(html, /name="robots" content="index, follow"/);
+    assert.doesNotMatch(html, /hreflang="en"/);
+    assert.match(html, /Spanish only/);
+  }
+});
 
 test("redirects and browser selection use current canonical routes in both languages", async () => {
   const redirects = getEventRedirects();
@@ -87,7 +125,6 @@ test("uses only current event URLs in sitemap, internal links, canonical, and hr
   const sitemap = await readDist("sitemap.xml");
   const listingPaths = [
     "eventos/index.html",
-    "en/events/index.html",
     ...routeManifest
       .filter((route) => route.component === "pastEvents")
       .map((route) => `${route.path.slice(1)}index.html`),

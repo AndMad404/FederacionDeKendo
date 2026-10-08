@@ -22,12 +22,12 @@ test("persists combined filters on reload and localized routes", async ({
   await expect(page).toHaveURL(/year=2026&type=examen/);
 
   await page.goto("/en/events/past/?year=2026&type=examen");
-  await expect(page).toHaveURL(/\/en\/events\/past\/\?year=2026&type=examen$/);
+  await expect(page).toHaveURL(/\/eventos\/pasados\/\?year=2026&type=examen$/);
   await expect(
-    page.getByRole("combobox", { name: "Year", exact: true }),
+    page.getByRole("combobox", { name: "Año", exact: true }),
   ).toHaveValue("2026");
   await expect(
-    page.getByRole("combobox", { name: "Type", exact: true }),
+    page.getByRole("combobox", { name: "Tipo", exact: true }),
   ).toHaveValue("examen");
 });
 
@@ -49,22 +49,6 @@ test("renders localized upcoming and past event navigation with the active page"
       pastPath: "/eventos/pasados/",
       upcoming: "Próximos eventos",
       past: "Eventos pasados",
-      active: "past",
-    },
-    {
-      path: "/en/events/",
-      upcomingPath: "/en/events/",
-      pastPath: "/en/events/past/",
-      upcoming: "Upcoming events",
-      past: "Past events",
-      active: "upcoming",
-    },
-    {
-      path: "/en/events/past/",
-      upcomingPath: "/en/events/",
-      pastPath: "/en/events/past/",
-      upcoming: "Upcoming events",
-      past: "Past events",
       active: "past",
     },
   ] as const;
@@ -107,26 +91,24 @@ test("preserves filters in pagination and resets to page one when changed", asyn
   await expect(next).toBeVisible();
   await expect(next).toBeEnabled();
   await expect(next.locator("svg")).toHaveCount(1);
+  const headings = page.locator("main li h2");
+  const firstPageTitles = await headings.allTextContents();
   await next.click();
-  await expect(page).toHaveURL(/pagina\/2\/$/);
+  await expect(page).toHaveURL(/eventos\/pasados\/$/);
+  await expect(async () => {
+    expect(await headings.allTextContents()).not.toEqual(firstPageTitles);
+  }).toPass();
   const previous = page.getByRole("button", { name: "Anterior" });
   await expect(previous).toBeEnabled();
   await expect(previous.locator("svg")).toHaveCount(1);
   await previous.click();
   await expect(page).toHaveURL(/eventos\/pasados\/$/);
+  await expect(headings).toHaveText(firstPageTitles);
 
-  await page.goto("/en/events/past/");
-  await expectInteractiveReady(page, "past-events");
-  const englishNext = page.getByRole("button", { name: "Next" });
-  await expect(englishNext).toBeEnabled();
-  await englishNext.click();
-  await expect(page).toHaveURL(/en\/events\/past\/page\/2\/$/);
-  const englishPrevious = page.getByRole("button", { name: "Previous" });
-  await expect(englishPrevious).toBeEnabled();
+  await page.getByRole("button", { name: "Siguiente" }).click();
   await page.reload();
-  await expect(page).toHaveURL(/en\/events\/past\/page\/2\/$/);
-  await page.getByRole("button", { name: "Previous" }).click();
-  await expect(page).toHaveURL(/en\/events\/past\/$/);
+  await expect(page).toHaveURL(/eventos\/pasados\/$/);
+  await expect(page.getByRole("button", { name: "Anterior" })).toBeDisabled();
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/eventos/pasados/?type=examen");
@@ -138,16 +120,34 @@ test("preserves filters in pagination and resets to page one when changed", asyn
   await expect(page).toHaveURL(/\/eventos\/pasados\/\?year=2026&type=examen$/);
 });
 
-test("normalizes legacy page query parameters to localized archive URLs", async ({
+test("normalizes legacy page queries to the Spanish archive", async ({
   page,
 }) => {
-  await page.goto("/eventos/pasados/?page=2");
-  await expect(page).toHaveURL(/eventos\/pasados\/pagina\/2\/$/);
-  await expect(page.getByRole("button", { name: "Anterior" })).toBeEnabled();
+  for (const source of ["/eventos/pasados/", "/en/events/past/"]) {
+    await page.goto(source + "?page=2");
+    await expect(page).toHaveURL(/eventos\/pasados\/$/);
+    await expect(page.getByRole("button", { name: "Anterior" })).toBeDisabled();
+  }
+});
 
-  await page.goto("/en/events/past/?page=2");
-  await expect(page).toHaveURL(/en\/events\/past\/page\/2\/$/);
-  await expect(page.getByRole("button", { name: "Previous" })).toBeEnabled();
+test("redirects retired listing routes and preserves archive filters", async ({
+  page,
+}) => {
+  for (const [source, target] of [
+    ["/eventos/pasados/pagina/2/", "/eventos/pasados/"],
+    ["/en/events/past/page/2/", "/eventos/pasados/"],
+    ["/en/events/past/", "/eventos/pasados/"],
+  ]) {
+    await page.goto(source + "?year=2026&type=examen");
+    await expect(page).toHaveURL(
+      new RegExp(target + "\\?year=2026&type=examen$"),
+    );
+    await expect(page.locator('select[name="year"]')).toHaveValue("2026");
+    await expect(page.locator('select[name="type"]')).toHaveValue("examen");
+  }
+  await page.goto("/en/events/");
+  await expect(page).toHaveURL(/\/eventos\/$/);
+  await expect(page.locator("html")).toHaveAttribute("lang", "es");
 });
 
 test("touch swipe paginates the historical archive on mobile", async ({
@@ -160,11 +160,12 @@ test("touch swipe paginates the historical archive on mobile", async ({
   await swipeLeft(
     page,
     page.locator("[data-page-content-boundary]"),
-    async () => /pagina\/2\/\?type=examen$/.test(page.url()),
+    async () => page.getByRole("button", { name: "Anterior" }).isEnabled(),
     240,
   );
 
-  await expect(page).toHaveURL(/pagina\/2\/\?type=examen$/);
+  await expect(page).toHaveURL(/eventos\/pasados\/\?type=examen$/);
+  await expect(page.getByRole("button", { name: "Anterior" })).toBeEnabled();
 });
 
 test("filters apply available values and the empty state remains available", async ({

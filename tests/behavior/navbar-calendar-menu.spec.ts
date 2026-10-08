@@ -64,11 +64,11 @@ test("calendar menu opens on focus, closes with Escape and restores focus", asyn
   await expect(calendarButton).toBeFocused();
 });
 
-test("calendar menu closes on an outside click and keeps English destinations active", async ({
+test("English navigation links directly to the Spanish event listings", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1366, height: 768 });
-  await page.goto("/en/events/");
+  await page.goto("/en/");
 
   const calendarButton = page.getByRole("button", {
     name: "Calendar",
@@ -84,7 +84,7 @@ test("calendar menu closes on an outside click and keeps English destinations ac
     .getByRole("list", { name: "Calendar options" })
     .getByRole("link", { name: "Past events", exact: true })
     .click();
-  await expect(page).toHaveURL(/\/en\/events\/past\/$/);
+  await expect(page).toHaveURL(/\/eventos\/pasados\/$/);
 });
 
 test("calendar section expands inside the mobile navigation", async ({

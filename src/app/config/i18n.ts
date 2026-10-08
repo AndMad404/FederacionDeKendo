@@ -15,10 +15,8 @@ export function getLanguageFromPathname(pathname: string): Language {
 
 const STATIC_ROUTE_PAIRS = [
   ["/", "/en/"],
-  ["/eventos/", "/en/events/"],
   ["/galeria/", "/en/gallery/"],
   ["/afiliados/", "/en/affiliates/"],
-  ["/eventos/pasados/", "/en/events/past/"],
 ] as const;
 
 function normalizePathname(pathname: string) {
@@ -28,6 +26,14 @@ function normalizePathname(pathname: string) {
 
 export function getLocalizedPath(pathname: string, language: Language) {
   const normalized = normalizePathname(pathname);
+  if (normalized === "/eventos/" || normalized === "/en/events/")
+    return "/eventos/";
+  if (
+    /^\/(?:eventos\/pasados|en\/events\/past)\/(?:$|(?:pagina|page)\/\d+\/$)/.test(
+      normalized,
+    )
+  )
+    return "/eventos/pasados/";
 
   for (const [spanishPath, englishPath] of STATIC_ROUTE_PAIRS) {
     if (normalized === spanishPath || normalized === englishPath) {
@@ -43,7 +49,7 @@ export function getLocalizedPath(pathname: string, language: Language) {
     const event = findEventByPathname(normalized);
     return event && hasDistinctEventTranslation(event)
       ? getEventPath(event, "en")
-      : "/en/events/past/";
+      : "/eventos/pasados/";
   }
 
   const englishArchivedEvent = normalized.match(
@@ -61,30 +67,12 @@ export function getLocalizedPath(pathname: string, language: Language) {
     const event = findEventByPathname(normalized);
     return event && hasDistinctEventTranslation(event)
       ? getEventPath(event, "en")
-      : "/en/events/";
+      : "/eventos/";
   }
 
   const englishEvent = normalized.match(/^\/en\/events\/([^/]+)\/$/);
   if (englishEvent && englishEvent[1] !== "past") {
     return language === "es" ? `/eventos/${englishEvent[1]}/` : normalized;
-  }
-
-  const spanishArchivePage = normalized.match(
-    /^\/eventos\/pasados\/pagina\/(\d+)\/$/,
-  );
-  if (spanishArchivePage) {
-    return language === "en"
-      ? `/en/events/past/page/${spanishArchivePage[1]}/`
-      : normalized;
-  }
-
-  const englishArchivePage = normalized.match(
-    /^\/en\/events\/past\/page\/(\d+)\/$/,
-  );
-  if (englishArchivePage) {
-    return language === "es"
-      ? `/eventos/pasados/pagina/${englishArchivePage[1]}/`
-      : normalized;
   }
 
   return language === "en" ? "/en/" : "/";
@@ -261,7 +249,7 @@ export const COPY = {
       pastEvents: "Past events",
       links: [
         { id: "home", path: "/en/", label: "Home" },
-        { id: "calendar", path: "/en/events/", label: "Calendar" },
+        { id: "calendar", path: "/eventos/", label: "Calendar" },
         { id: "gallery", path: "/en/gallery/", label: "Gallery" },
         { id: "affiliates", path: "/en/affiliates/", label: "Affiliates" },
       ],

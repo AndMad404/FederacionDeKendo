@@ -27,7 +27,6 @@ test("every configured static route has complete public metadata", async () => {
     for (const field of [
       "language",
       "locale",
-      "alternatePath",
       "component",
       "title",
       "description",
@@ -39,6 +38,9 @@ test("every configured static route has complete public metadata", async () => {
       assert.ok(route[field], `${path} is missing ${field}`);
     }
     assert.ok(Number.isInteger(route.imageWidth) && route.imageWidth > 0, path);
+    if (route.component !== "calendar" && route.component !== "pastEvents") {
+      assert.ok(route.alternatePath, `${path} is missing alternatePath`);
+    }
     assert.ok(
       Number.isInteger(route.imageHeight) && route.imageHeight > 0,
       path,
@@ -58,9 +60,7 @@ test("every configured static route has complete public metadata", async () => {
   }
 
   for (const path of ["/en/events/", "/en/events/past/"]) {
-    assert.equal(seo.routes[path].indexable, false, path);
-    assert.equal(seo.routes[path].noindex, true, path);
-    assert.equal(seo.routes[path].canonicalWhileNoindex, true, path);
+    assert.equal(seo.routes[path], undefined, path);
   }
 });
 

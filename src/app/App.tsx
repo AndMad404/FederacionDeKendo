@@ -1,5 +1,5 @@
 import { Suspense, useEffect, useRef, type ComponentType } from "react";
-import { Route, Routes, useLocation } from "react-router";
+import { Navigate, Route, Routes, useLocation } from "react-router";
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
 import {
@@ -53,7 +53,7 @@ function AppShell({
   routeComponents: RouteComponentRegistry;
 }) {
   const { copy } = useLanguage();
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
   const routeComponent = getRouteMeta(pathname).component;
   const NotFoundComponent = routeComponents.routes.notFound;
   const allowsTabletContainment =
@@ -98,6 +98,26 @@ function AppShell({
         }`}
       >
         <Routes>
+          <Route
+            path="/en/events/"
+            element={<Navigate to={`/eventos/${search}`} replace />}
+          />
+          <Route
+            path="/en/events/past/"
+            element={<Navigate to={`/eventos/pasados/${search}`} replace />}
+          />
+          {["pagina", "page"].flatMap((segment) =>
+            [
+              ["/eventos/pasados/", "es"],
+              ["/en/events/past/", "en"],
+            ].map(([archivePath, language]) => (
+              <Route
+                key={`${language}:${segment}`}
+                path={`${archivePath}${segment}/*`}
+                element={<Navigate to={`/eventos/pasados/${search}`} replace />}
+              />
+            )),
+          )}
           {getRouteManifest().map((route) => {
             const Component = routeComponents.routes[route.component];
             return (

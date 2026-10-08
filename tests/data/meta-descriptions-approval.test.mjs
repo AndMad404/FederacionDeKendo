@@ -23,10 +23,8 @@ const STATIC_ROUTE_PATHS = [
   "/afiliados/",
   "/eventos/pasados/",
   "/en/",
-  "/en/events/",
   "/en/gallery/",
   "/en/affiliates/",
-  "/en/events/past/",
 ];
 const FORBIDDEN_FRAGMENTS =
   /este y|this and|doscientos metros|two hundred meters|includes:/iu;

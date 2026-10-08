@@ -30,10 +30,7 @@ export function Navbar() {
   const homeLink = copy.nav.links.find((link) => link.id === "home")!;
   const calendarLink = copy.nav.links.find((link) => link.id === "calendar")!;
 
-  const calendarPaths =
-    language === "en"
-      ? ["/en/events/", "/en/events/past/"]
-      : ["/eventos/", "/eventos/pasados/"];
+  const calendarPaths = ["/eventos/", "/eventos/pasados/"];
   const calendarActive = calendarPaths.some((path) =>
     pathname.startsWith(path),
   );
@@ -265,7 +262,11 @@ function LanguageSelector({
 }) {
   const { copy } = useLanguage();
   const event = findEventByPathname(pathname);
-  if (event && !hasDistinctEventTranslation(event)) {
+  if (
+    pathname === "/eventos/" ||
+    pathname === "/eventos/pasados/" ||
+    (event && !hasDistinctEventTranslation(event))
+  ) {
     return (
       <div className="inline-flex rounded-lg border border-site-on-dark/40 bg-site-on-dark/10 p-0.5">
         <span

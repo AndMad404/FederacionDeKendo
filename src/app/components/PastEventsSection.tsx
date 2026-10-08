@@ -1,4 +1,4 @@
-import { useEffect, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { ChevronDown } from "lucide-react";
 import {
@@ -16,7 +16,6 @@ import { EVENT_GALLERIES } from "../data/eventGalleries";
 import {
   buildArchiveUrl,
   filterAndSortArchiveEvents,
-  getArchivePageNumber,
   getArchiveYears,
   normalizeArchiveFilters,
   type ArchiveEventType,
@@ -56,7 +55,7 @@ function getEventThumbnail(eventId: string) {
 
 export function PastEventsSection() {
   const { language, copy } = useLanguage();
-  const { pathname, search } = useLocation();
+  const { search } = useLocation();
   const navigate = useNavigate();
   const isHydrated = useIsHydrated();
   const isMobile = useSyncExternalStore(
@@ -76,22 +75,15 @@ export function PastEventsSection() {
     language,
   );
   const years = getArchiveYears(historicalEvents);
-  const routePage = getArchivePageNumber(pathname, language);
-  // Mobile pages have canonical routes. Keep them readable if opened on a wider screen.
-  const desktopPageCount = Math.max(
-    1,
-    Math.ceil(events.length / PAST_EVENTS_PAGE_SIZE),
-  );
-  const pageSize =
-    isMobile || routePage > desktopPageCount
-      ? MOBILE_PAST_EVENTS_PAGE_SIZE
-      : PAST_EVENTS_PAGE_SIZE;
+  const pageSize = isMobile
+    ? MOBILE_PAST_EVENTS_PAGE_SIZE
+    : PAST_EVENTS_PAGE_SIZE;
   const pageCount = Math.max(1, Math.ceil(events.length / pageSize));
-  const legacyPage = Number(searchParams.get("page"));
-  const requestedPage =
-    Number.isInteger(legacyPage) && legacyPage > 0 ? legacyPage : routePage;
+  const paginationKey = `${language}:${search}`;
+  const [pagination, setPagination] = useState({ key: paginationKey, page: 1 });
+  const requestedPage = pagination.key === paginationKey ? pagination.page : 1;
   const page = Math.min(requestedPage, pageCount);
-  const canonicalPageUrl = buildArchiveUrl(page, language, filters);
+  const canonicalPageUrl = buildArchiveUrl(1, language, filters);
   const hasLegacyPageQuery = searchParams.has("page");
   const pageEvents = events.slice((page - 1) * pageSize, page * pageSize);
   const eventTypes: ArchiveEventType[] = ["torneo", "examen", "seminario"];
@@ -102,7 +94,7 @@ export function PastEventsSection() {
 
   const navigateToPage = (targetPage: number) => {
     if (targetPage < 1 || targetPage > pageCount) return;
-    navigate(buildArchiveUrl(targetPage, language, filters));
+    setPagination({ key: paginationKey, page: targetPage });
   };
   const { swipeHandlers } = useSwipeNavigation({
     onSwipeLeft: () => navigateToPage(page + 1),
@@ -112,6 +104,7 @@ export function PastEventsSection() {
   });
 
   function changeFilter(name: "year" | "type", value: string) {
+    setPagination({ key: paginationKey, page: 1 });
     navigate(
       buildArchiveUrl(1, language, {
         ...filters,

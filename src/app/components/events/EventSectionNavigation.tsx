@@ -12,11 +12,8 @@ interface EventSectionNavigationProps {
 export function EventSectionNavigation({
   active,
 }: EventSectionNavigationProps) {
-  const { language, copy } = useLanguage();
-  const paths =
-    language === "en"
-      ? { upcoming: "/en/events/", past: "/en/events/past/" }
-      : { upcoming: "/eventos/", past: "/eventos/pasados/" };
+  const { copy } = useLanguage();
+  const paths = { upcoming: "/eventos/", past: "/eventos/pasados/" };
   const items = [
     {
       id: "upcoming",

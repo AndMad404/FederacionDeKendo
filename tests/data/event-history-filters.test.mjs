@@ -59,14 +59,14 @@ test("the all option applies no filters and invalid values are ignored", () => {
   assert.deepEqual(normalizeArchiveFilters({ year: "bad", type: "dojo" }), {});
 });
 
-test("builds equivalent localized URLs and preserves filters across pages", () => {
+test("keeps pagination on the localized archive URL and preserves filters", () => {
   assert.equal(
     buildArchiveUrl(2, "es", { year: "2025", type: "torneo" }),
-    "/eventos/pasados/pagina/2/?year=2025&type=torneo",
+    "/eventos/pasados/?year=2025&type=torneo",
   );
   assert.equal(
     buildArchiveUrl(2, "en", { year: "2025", type: "torneo" }),
-    "/en/events/past/page/2/?year=2025&type=torneo",
+    "/eventos/pasados/?year=2025&type=torneo",
   );
   assert.equal(
     buildArchiveUrl(1, "es", { year: "2025" }),

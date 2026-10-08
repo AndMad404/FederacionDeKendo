@@ -53,7 +53,6 @@ async function shareEvent(title: string, url: string) {
 
 export function EventPage() {
   const { language, copy } = useLanguage();
-  const english = language === "en";
   const location = useLocation();
   const sourceEvent = findEventByPathname(location.pathname);
   const [copied, setCopied] = useState(false);
@@ -276,13 +275,13 @@ export function EventPage() {
                   {isPast ? (
                     <>
                       <Link
-                        to={english ? "/en/events/past/" : "/eventos/pasados/"}
+                        to="/eventos/pasados/"
                         className={`${eventNavigationLinkClass} border-site-action bg-site-surface text-site-action ${focusRingClass}`}
                       >
                         {copy.event.viewArchive}
                       </Link>
                       <Link
-                        to={english ? "/en/events/" : "/eventos/"}
+                        to="/eventos/"
                         className={`${eventNavigationLinkClass} border-site-action bg-site-action text-site-on-dark shadow-sm ${focusRingClass}`}
                       >
                         {copy.archive.upcomingEvents}
@@ -305,7 +304,7 @@ export function EventPage() {
                   ) : null}
                   {!isPast ? (
                     <Link
-                      to={english ? "/en/events/" : "/eventos/"}
+                      to="/eventos/"
                       className={`${eventNavigationLinkClass} border-site-action bg-site-action text-site-on-dark shadow-sm ${focusRingClass}`}
                     >
                       {copy.event.backToCalendar}

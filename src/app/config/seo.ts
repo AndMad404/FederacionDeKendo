@@ -6,11 +6,9 @@ import {
   getEventInclusiveEndDate,
   isExternalEvent,
 } from "../utils/calendarEvents";
-import { EVENT_INDEXING_ENABLED, MOBILE_PAST_EVENTS_PAGE_SIZE } from "./events";
+import { EVENT_INDEXING_ENABLED } from "./events";
 import {
   findEventByPathname,
-  getArchivePagePath,
-  getPastEvents,
   getEventPath,
   getEventLegacySlugs,
 } from "../utils/eventRoutes";
@@ -150,7 +148,9 @@ function assertSeoData(value: unknown): asserts value is SeoData {
       route.path !== routeKey ||
       (route.language !== "es" && route.language !== "en") ||
       !route.locale ||
-      !route.alternatePath ||
+      (!route.alternatePath &&
+        route.component !== "calendar" &&
+        route.component !== "pastEvents") ||
       !route.title ||
       !route.description ||
       !route.image ||
@@ -185,7 +185,10 @@ const AUTHOR = DATA.author;
 const ROUTE_META = DATA.routes;
 const CALENDAR_META: Record<Language, RouteMeta> = {
   es: ROUTE_META["/eventos/"],
-  en: ROUTE_META["/en/events/"],
+  en: {
+    ...ROUTE_META["/eventos/"],
+    imageAlt: "Kendo practitioners seated in the dojo after an activity",
+  },
 };
 
 function normalizeRoutePath(pathname: string) {
@@ -538,59 +541,27 @@ export function getRouteMeta(pathname: string) {
 }
 
 export function getRouteManifest() {
-  const pastPageCount = Math.max(
-    1,
-    Math.ceil(getPastEvents().length / MOBILE_PAST_EVENTS_PAGE_SIZE),
-  );
-  const archiveRoutes = Array.from({ length: pastPageCount }, (_, index) =>
-    createArchiveRouteMeta(index + 1),
-  );
-
   return [
-    ...Object.values(ROUTE_META).filter(
-      (route) => route.component !== "pastEvents",
-    ),
+    ...Object.values(ROUTE_META),
     ...CALENDAR_EVENTS.flatMap((event) => {
       const spanishRoute = createEventRouteMeta(event, "es");
       return hasDistinctEventTranslation(event)
         ? [spanishRoute, createEventRouteMeta(event, "en")]
         : [spanishRoute];
     }),
-    ...archiveRoutes,
-    ...Array.from({ length: pastPageCount }, (_, index) =>
-      createArchiveRouteMeta(index + 1, "en"),
-    ),
   ];
 }
 
 export function getEventRedirects() {
-  const archivePageCount = Math.max(
-    1,
-    Math.ceil(getPastEvents().length / MOBILE_PAST_EVENTS_PAGE_SIZE),
-  );
   const redirects = [
     { from: "/calendario/", to: "/eventos/" },
-    { from: "/en/calendar/", to: "/en/events/" },
-    ...Array.from(
-      { length: archivePageCount },
-      (_, index) => index + 1,
-    ).flatMap((page) => {
-      const spanishPath = getArchivePagePath(page, "es");
-      const englishPath = getArchivePagePath(page, "en");
-      const redirects = [];
-      if (page === 1) {
-        redirects.push(
-          { from: "/eventos/pasados/pagina/1/", to: spanishPath },
-          { from: "/en/events/past/page/1/", to: englishPath },
-        );
-      } else {
-        redirects.push(
-          { from: `/eventos/pasados/page/${page}/`, to: spanishPath },
-          { from: `/en/events/past/pagina/${page}/`, to: englishPath },
-        );
-      }
-      return redirects;
-    }),
+    { from: "/en/calendar/", to: "/eventos/" },
+    { from: "/en/events/", to: "/eventos/" },
+    { from: "/en/events/past/", to: "/eventos/pasados/" },
+    { from: "/eventos/pasados/pagina/*", to: "/eventos/pasados/" },
+    { from: "/eventos/pasados/page/*", to: "/eventos/pasados/" },
+    { from: "/en/events/past/page/*", to: "/eventos/pasados/" },
+    { from: "/en/events/past/pagina/*", to: "/eventos/pasados/" },
     ...CALENDAR_EVENTS.flatMap((event) => {
       const spanishPath = getEventPath(event, "es");
       const englishPath = getEventPath(event, "en");
@@ -686,41 +657,6 @@ function createEventRouteMeta(
     schemaType: "WebPage",
     indexable: EVENT_INDEXING_ENABLED,
     noindex: !EVENT_INDEXING_ENABLED,
-    canonicalWhileNoindex: true,
-  };
-}
-
-function createArchiveRouteMeta(
-  page: number,
-  language: Language = "es",
-): RouteMeta {
-  const english = language === "en";
-  const indexable = !english;
-  const calendarMeta = CALENDAR_META[language];
-  const archiveDescription =
-    ROUTE_META[english ? "/en/events/past/" : "/eventos/pasados/"].description;
-  return {
-    path: getArchivePagePath(page, language),
-    language,
-    locale: english ? "en_US" : "es_CR",
-    alternatePath: getArchivePagePath(page, english ? "es" : "en"),
-    component: "pastEvents",
-    archivePage: page,
-    title: english
-      ? `Past Kendo Events${page > 1 ? ` — page ${page}` : ""} | Costa Rica`
-      : `Eventos pasados de Kendo${page > 1 ? ` — página ${page}` : ""} | Costa Rica`,
-    description:
-      page > 1
-        ? `${archiveDescription} ${english ? "Page" : "Página"} ${page}.`
-        : archiveDescription,
-    image: calendarMeta.image,
-    imageAlt: calendarMeta.imageAlt,
-    imageWidth: calendarMeta.imageWidth,
-    imageHeight: calendarMeta.imageHeight,
-    imageType: calendarMeta.imageType,
-    schemaType: "CollectionPage",
-    indexable,
-    noindex: !indexable,
     canonicalWhileNoindex: true,
   };
 }

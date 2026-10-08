@@ -89,18 +89,9 @@ test("publishes only defensible event lastmod values in the sitemap", async () =
   }
 });
 
-test("keeps only the English calendar listings out of the index", () => {
-  const routeManifest = getRouteManifest();
-
-  for (const route of routeManifest) {
-    const shouldBeNoindex =
-      route.path === "/en/events/" ||
-      (route.component === "pastEvents" && route.language === "en");
-    assert.equal(
-      getRouteSeoPayload(route).robots,
-      shouldBeNoindex ? "noindex, follow" : "index, follow",
-      route.path,
-    );
+test("indexes every published route", () => {
+  for (const route of getRouteManifest()) {
+    assert.equal(getRouteSeoPayload(route).robots, "index, follow", route.path);
   }
 });
 
@@ -118,19 +109,8 @@ test("publishes sitemap images for approved routes", async () => {
   );
 });
 
-test("indexes the Spanish archive and excludes the English archive listings", async () => {
+test("indexes the Spanish archive", async () => {
   const pastEvents = await readDist("eventos/pasados/index.html");
-  const englishPastEvents = await readDist("en/events/past/index.html");
-  const englishPastEventsPageTwo = await readDist(
-    "en/events/past/page/2/index.html",
-  );
-
   assert.match(pastEvents, /name="robots" content="index, follow"/);
   assert.match(pastEvents, /application\/ld\+json/);
-
-  for (const html of [englishPastEvents, englishPastEventsPageTwo]) {
-    assert.match(html, /name="robots" content="noindex, follow"/);
-    assert.match(html, /rel="canonical"/);
-    assert.doesNotMatch(html, /application\/ld\+json/);
-  }
 });

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "project": "FederacionDeKendo",
   "ignoreGlobs": [
     "dist/**",
@@ -16,7 +16,10 @@
       "area": "Textos bilingues de acceso y participacion en eventos",
       "tests": [
         "tests/behavior/events.spec.ts",
-        "tests/data/calendar-timezone-localization.spec.ts"
+        "tests/data/calendar-timezone-localization.spec.ts",
+        "tests/data/generated-redirects.test.mjs",
+        "tests/data/generated-translations.test.mjs",
+        "tests/behavior/event-history-filters.spec.ts"
       ]
     },
     {
@@ -51,7 +54,8 @@
         "tests/data/generated-sitemap.test.mjs",
         "tests/data/llms-txt.test.mjs",
         "tests/design/geometry-contract.spec.ts",
-        "tests/design/calendar-layout.spec.ts"
+        "tests/design/calendar-layout.spec.ts",
+        "tests/behavior/event-history-filters.spec.ts"
       ]
     },
     {
@@ -137,7 +141,8 @@
         "tests/behavior/events.spec.ts",
         "tests/behavior/navbar-calendar-menu.spec.ts",
         "tests/design/responsive-reachability.spec.ts",
-        "tests/design/shell-geometry.spec.ts"
+        "tests/design/shell-geometry.spec.ts",
+        "tests/behavior/event-history-filters.spec.ts"
       ]
     },
     {
@@ -161,7 +166,8 @@
         "tests/data/generated-sitemap.test.mjs",
         "tests/data/generated-translations.test.mjs",
         "tests/data/llms-txt.test.mjs",
-        "tests/data/meta-descriptions-approval.test.mjs"
+        "tests/data/meta-descriptions-approval.test.mjs",
+        "tests/behavior/event-history-filters.spec.ts"
       ]
     },
     {
@@ -246,7 +252,7 @@
     },
     {
       "id": "source-style-policy",
-      "changes": ["src/**/*.css", "src/**/*.js", "src/**/*.ts", "src/**/*.tsx"],
+      "changes": ["src/**/*.css", "src/**/*.ts", "src/**/*.tsx"],
       "area": "Prohibicion de declaraciones CSS y utilidades Tailwind importantes",
       "tests": ["tests/architecture/repository-policy.test.mjs"]
     },
@@ -302,5 +308,11 @@
         "tests/architecture/verify-site.test.mjs"
       ]
     }
-  ]
+  ],
+  "graphSnapshot": {
+    "generatorVersion": 1,
+    "relationCount": 340,
+    "algorithm": "sha256",
+    "digest": "a80c69c6cad6b1f8fa798c2bbc2dda40c0e9557f96ebd804f3cdac13cbb5e768"
+  }
 }

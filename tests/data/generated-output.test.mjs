@@ -91,10 +91,8 @@ test("generates localized, unique, indexable SEO output for every event route", 
       ["/afiliados/", "Dojos de Kendo en Costa Rica"],
       ["/eventos/pasados/", "Eventos pasados de Kendo | Costa Rica"],
       ["/en/", "Federation of Kendo Associations | Costa Rica"],
-      ["/en/events/", "Kendo Events in Costa Rica"],
       ["/en/gallery/", "Kendo Gallery | Costa Rica"],
       ["/en/affiliates/", "Kendo Dojos in Costa Rica"],
-      ["/en/events/past/", "Past Kendo Events | Costa Rica"],
     ]);
 
     for (const [path, expectedTitle] of expectedStaticTitles) {
@@ -133,16 +131,13 @@ test("generates localized, unique, indexable SEO output for every event route", 
     }
   });
 
-  await t.test("archive pagination titles are localized", () => {
-    const archivePageTwoTitles = routeManifest
-      .filter(
-        (route) => route.component === "pastEvents" && route.archivePage === 2,
-      )
-      .map((route) => route.title);
-    assert.deepEqual(archivePageTwoTitles, [
-      "Eventos pasados de Kendo — página 2 | Costa Rica",
-      "Past Kendo Events — page 2 | Costa Rica",
-    ]);
+  await t.test("publishes only the main archive route in each language", () => {
+    assert.deepEqual(
+      routeManifest
+        .filter((route) => route.component === "pastEvents")
+        .map((route) => route.path),
+      ["/eventos/pasados/"],
+    );
   });
 });
 
@@ -195,11 +190,9 @@ test("omits breadcrumbs from event and archive routes", async () => {
   const englishPastEvent = englishRoute
     ? await readDist(`${englishRoute.path.slice(1)}index.html`)
     : undefined;
-  const archivePageTwo = await readDist("eventos/pasados/pagina/2/index.html");
+  const archive = await readDist("eventos/pasados/index.html");
 
-  for (const html of [pastEvent, englishPastEvent, archivePageTwo].filter(
-    Boolean,
-  )) {
+  for (const html of [pastEvent, englishPastEvent, archive].filter(Boolean)) {
     assert.doesNotMatch(html, /aria-label="Migas de navegación"/);
     assert.doesNotMatch(html, /aria-label="Breadcrumb"/);
     assert.doesNotMatch(html, /"@type":"BreadcrumbList"/);

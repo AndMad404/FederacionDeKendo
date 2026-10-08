@@ -1,11 +1,12 @@
 import type { Language } from "../config/i18n";
 
-export function getArchivePagePath(page: number, language: Language = "es") {
-  if (language === "en") {
-    return page <= 1 ? "/en/events/past/" : `/en/events/past/page/${page}/`;
-  }
+const archivePaths: Record<Language, string> = {
+  es: "/eventos/pasados/",
+  en: "/eventos/pasados/",
+};
 
-  return page <= 1 ? "/eventos/pasados/" : `/eventos/pasados/pagina/${page}/`;
+export function getArchivePagePath(_page: number, language: Language = "es") {
+  return archivePaths[language];
 }
 
 export function getArchivePageNumber(

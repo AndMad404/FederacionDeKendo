@@ -12,7 +12,8 @@ test("generates the localized English home with reciprocal language metadata", a
 
   assert.match(home, /<html lang="en" prefix="og: https:\/\/ogp\.me\/ns#">/);
   assert.match(home, />Home<\/a>/);
-  assert.match(home, /href="\/en\/events\/"/);
+  assert.match(home, /href="\/eventos\/"/);
+  assert.doesNotMatch(home, /href="\/en\/events\/"/);
   assert.match(
     home,
     /rel="alternate" hreflang="es-CR" href="https:\/\/fak-kendo\.org\/"/,
