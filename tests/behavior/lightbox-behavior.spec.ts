@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { expectInteractiveReady } from "../helpers/interactive-ready";
 
 const FIXED_TEST_TIME = new Date("2026-08-04T12:00:00-06:00");
 
@@ -15,23 +16,14 @@ async function expectRestoredApplication(page: Page) {
 }
 
 async function openLightbox(page: Page) {
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    await page.clock.setFixedTime(FIXED_TEST_TIME);
-    await page.goto("/galeria/");
-    const opener = page.locator(".gallery-featured-frame > button");
-    await expect(opener).toBeVisible();
-    await opener.click();
-
-    const dialog = page.getByRole("dialog");
-    try {
-      await expect(dialog).toBeVisible({ timeout: 5_000 });
-      return { dialog, opener };
-    } catch (error) {
-      if (attempt === 1) throw error;
-    }
-  }
-
-  throw new Error("Unreachable");
+  await page.clock.setFixedTime(FIXED_TEST_TIME);
+  await page.goto("/galeria/");
+  await expectInteractiveReady(page, "gallery");
+  const opener = page.locator(".gallery-featured-frame > button");
+  await opener.click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  return { dialog, opener };
 }
 
 test("isolates the open lightbox from the application", async ({ page }) => {

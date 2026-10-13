@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { expectInteractiveReady } from "../helpers/interactive-ready";
+import { preparePage } from "../helpers/prepare-page";
 
 const FIXED_UPCOMING_TIME = new Date("2026-08-23T12:00:00-06:00");
 const TOURNAMENT_EVENT_PATH = "/eventos/3er-torneo/";
@@ -214,8 +215,7 @@ test("historical gallery opens the shared lightbox from the selected image", asy
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.clock.setFixedTime(FIXED_HISTORICAL_TIME);
-  await page.goto(HISTORICAL_EVENT_PATH);
+  await preparePage(page, HISTORICAL_EVENT_PATH, FIXED_HISTORICAL_TIME);
 
   const gallery = page.getByRole("region", {
     name: "Fotografías del evento 2do Examen 2026",

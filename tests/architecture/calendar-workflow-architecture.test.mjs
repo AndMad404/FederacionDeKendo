@@ -50,7 +50,8 @@ test("all workflows use shared project setup after checkout and before project c
     ".github/workflows/correct-calendar-history-range.yml",
     ".github/workflows/apply-calendar-editorial-decision.yml",
   ]) {
-    const steps = workflowSteps(await loadYamlDocument(file));
+    const document = await loadYamlDocument(file);
+    const steps = document.jobs.verify?.steps ?? workflowSteps(document);
     const setup = stepIndex(
       steps,
       (step) => step.uses === "./.github/actions/setup-project",
@@ -82,7 +83,7 @@ test("all workflows use shared project setup after checkout and before project c
   }
 });
 
-test("Phase 6: writer workflows run their directed test and shared gate before committing", async () => {
+test("writer workflows verify once before guarded publication and finalize afterwards", async () => {
   const cases = [
     [
       ".github/workflows/sync-calendar.yml",
@@ -101,13 +102,8 @@ test("Phase 6: writer workflows run their directed test and shared gate before c
     ],
   ];
 
-  for (const [file, directedTest, commitName] of cases) {
+  for (const [file, , commitName] of cases) {
     const steps = workflowSteps(await loadYamlDocument(file));
-    const directed = stepIndex(
-      steps,
-      (step) => step.run?.includes(directedTest),
-      `${file}: directed test`,
-    );
     const gate = stepIndex(
       steps,
       (step) => step.uses === "./.github/actions/verify-site",
@@ -118,8 +114,16 @@ test("Phase 6: writer workflows run their directed test and shared gate before c
       (step) => step.name === commitName,
       `${file}: commit`,
     );
-    assert.ok(directed < gate, `${file}: directed test must precede gate`);
     assert.ok(gate < commit, `${file}: gate must precede commit`);
+    assert.match(steps[commit].run, /node scripts\/publish-changes\.mjs/);
+    const workflow = await loadYamlDocument(file);
+    assert.equal(workflow.concurrency.group, "site-writer-${{ github.ref }}");
+    assert.equal(workflow.concurrency["cancel-in-progress"], false);
+    assert.equal(workflow.concurrency.queue, "max");
+    assert.equal(
+      steps.some((step) => step.run?.includes("test:sync-directed")),
+      false,
+    );
     assert.equal(steps[gate].with.mode, "calendar");
     assert.equal(steps[commit].id, "publication");
     assert.equal(
@@ -146,20 +150,6 @@ test("Phase 6: writer workflows run their directed test and shared gate before c
       /secrets.CALENDAR_ALERT_RECIPIENT/,
     );
   }
-});
-
-test("Calendar synchronization only commits staged content changes", async () => {
-  const steps = workflowSteps(
-    await loadYamlDocument(".github/workflows/sync-calendar.yml"),
-  );
-  const commit = steps.find((step) => step.name === "Commit calendar changes");
-  assert.ok(commit?.run, "missing calendar commit script");
-  const stage = commit.run.indexOf('git add -A -- "${sync_paths[@]}"');
-  const diff = commit.run.indexOf("git diff --cached --quiet");
-  const write = commit.run.indexOf(
-    'git commit -m "chore: sync calendar events"',
-  );
-  assert.ok(stage >= 0 && stage < diff && diff < write);
 });
 
 test("post-publication design review, fallback, delivery and artifacts remain independent of Git publication", async () => {
@@ -195,37 +185,49 @@ test("Phase 6: the shared gate and human CI coverage remain complete", async () 
   const commands = actionSteps(action)
     .map((step) => step.run)
     .filter(Boolean);
-  assert.equal(commands.length, 1);
-  assert.match(commands[0], /pnpm run verify:site/);
-  assert.match(commands[0], /inputs\.unit-script/);
+  assert.ok(
+    commands.some((command) => command.includes("pnpm run quality:fix")),
+  );
+  assert.ok(
+    commands.some((command) => command.includes("pnpm run verify:site")),
+  );
+  assert.ok(
+    actionSteps(action).some(
+      (step) =>
+        step.uses === "actions/upload-artifact@v6" &&
+        step.if === "${{ always() }}",
+    ),
+  );
 
   const { verificationSteps } = await import("../../scripts/verify-site.mjs");
-  assert.deepEqual(verificationSteps(), [
-    ["pnpm", "run", "format:line-endings:check"],
-    ["pnpm", "run", "lint"],
-    ["pnpm", "run", "format:check"],
-    ["git", "diff", "--check"],
-    ["git", "diff", "--cached", "--check"],
-    ["pnpm", "run", "typecheck"],
-    ["pnpm", "run", "build"],
-    ["pnpm", "run", "test:unit"],
-    ["pnpm", "exec", "playwright", "install", "--with-deps", "chromium"],
-    ["pnpm", "exec", "playwright", "test", "tests/data"],
-    ["pnpm", "run", "test:behavior"],
-    ["pnpm", "run", "test:design"],
-  ]);
+  for (const mode of ["full", "calendar"]) {
+    assert.equal(
+      verificationSteps(mode).filter((step) => step.includes("test:unit"))
+        .length,
+      1,
+    );
+    assert.equal(
+      verificationSteps(mode).filter(
+        (step) => step.includes("test") && step.includes("playwright"),
+      ).length,
+      1,
+    );
+  }
   assert.throws(
     () => verificationSteps("arbitrary-command"),
-    /Unsupported unit script/,
+    /Unsupported verification mode/,
   );
 
   const ci = await loadYamlDocument(".github/workflows/ci.yml");
   assert.ok(Object.hasOwn(ci.on ?? {}, "push"));
   assert.ok(Object.hasOwn(ci.on ?? {}, "pull_request"));
   const jobs = Object.values(ci.jobs ?? {});
-  assert.ok(
-    jobs.some((job) => job.if === "github.actor != 'github-actions[bot]'"),
-  );
+  assert.equal(ci.permissions.contents, "read");
+  assert.equal(ci.concurrency.queue, "max");
+  assert.equal(ci.concurrency["cancel-in-progress"], false);
+  assert.equal(ci.jobs["publish-fixes"].permissions.contents, "write");
+  assert.match(ci.jobs["publish-fixes"].if, /event_name == 'push'/);
+  assert.equal(ci.jobs["publish-fixes"].needs, "verify");
   assert.ok(
     jobs.some((job) =>
       job.steps?.some((step) => step.uses === "./.github/actions/verify-site"),
@@ -304,8 +306,7 @@ test("range workflow requires an approved report run and an inclusive date range
     Object.values(workflow.jobs ?? {}).some((job) => job.env?.CALENDAR_ICS_URL),
     "workflow must provide CALENDAR_ICS_URL",
   );
-  assert.match(commands, /eventGalleries\.ts/);
-  assert.match(commands, /eventGalleryState\.json/);
+  assert.match(commands, /publish-changes\.mjs history/);
   assert.doesNotMatch(commands, /correct:calendar-history-range -- --report/);
   assert.equal(workflow.permissions?.issues, undefined);
 });

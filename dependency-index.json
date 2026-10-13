@@ -299,20 +299,26 @@
         ".github/actions/setup-project/action.yml",
         ".github/actions/verify-site/action.yml",
         ".github/workflows/ci.yml",
-        "scripts/verify-site.mjs"
+        "scripts/verify-site.mjs",
+        "scripts/quality.mjs",
+        "scripts/normalize-line-endings.mjs",
+        "scripts/publish-changes.mjs"
       ],
       "area": "Tooling, CI y verificacion del repositorio",
       "tests": [
         "tests/architecture/calendar-workflow-architecture.test.mjs",
         "tests/architecture/repository-policy.test.mjs",
-        "tests/architecture/verify-site.test.mjs"
+        "tests/architecture/verify-site.test.mjs",
+        "tests/architecture/quality.test.mjs",
+        "tests/architecture/publication.test.mjs",
+        "tests/data/calendar-design-policy.test.mjs"
       ]
     }
   ],
   "graphSnapshot": {
     "generatorVersion": 1,
-    "relationCount": 340,
+    "relationCount": 352,
     "algorithm": "sha256",
-    "digest": "a80c69c6cad6b1f8fa798c2bbc2dda40c0e9557f96ebd804f3cdac13cbb5e768"
+    "digest": "0c4bb4b7af6d17b8ef0f6ce0cd3d0d710cf88e7a69851d0b9e8cb9b826551522"
   }
 }

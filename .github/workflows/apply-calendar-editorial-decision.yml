@@ -31,6 +31,10 @@ on:
         type: string
 permissions:
   contents: write
+concurrency:
+  group: site-writer-${{ github.ref }}
+  cancel-in-progress: false
+  queue: max
 jobs:
   apply-decision:
     name: Apply Presidency's recorded decision
@@ -52,32 +56,20 @@ jobs:
           CALENDAR_DECISION_RECORD_ID: ${{ inputs.decision_record_id }}
           CALENDAR_DECISION_REASON: ${{ inputs.reason }}
           CALENDAR_DECISION_ACTOR_ROLE: presidencia
-      - name: Directed synchronization tests
-        run: pnpm run test:sync-directed
       - name: Verify generated site
         uses: ./.github/actions/verify-site
         with:
-          unit-script: test:unit:without-sync
           mode: calendar
       - name: Commit recorded decision
-        run: |
-          git add src/app/data/calendarEventRegistry.json src/app/data/calendarEvents.ts
-          git diff --cached --quiet && exit 0
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "chore: apply calendar editorial decision"
-          git push
-        id: publication
-      - name: Emit verification failure notification
-        if: ${{ failure() }}
-        run: node --import tsx scripts/write-calendar-verification-notification.mjs
+        run: node scripts/publish-changes.mjs decision
         env:
-          CALENDAR_NOTIFICATIONS_REPORT_PATH: ${{ runner.temp }}/calendar-notifications.json
-          CALENDAR_FAILED_STEP: calendar publication or blocking verification
+          VERIFY_SITE_REPORT_DIR: ${{ runner.temp }}/site-verification
+        id: publication
       - name: Review calendar design and notify
         if: ${{ always() }}
         uses: ./.github/actions/calendar-design-review
         with:
+          publication-failed: ${{ failure() }}
           git-saved: ${{ steps.publication.outcome == 'success' }}
           smtp-username: ${{ secrets.CALENDAR_ALERT_SMTP_USERNAME }}
           smtp-password: ${{ secrets.CALENDAR_ALERT_SMTP_APP_PASSWORD }}

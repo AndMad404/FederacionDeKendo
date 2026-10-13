@@ -12,7 +12,11 @@ export default defineConfig({
   failOnFlakyTests: true,
   forbidOnly: Boolean(process.env.CI),
   retries: 2,
-  reporter: process.env.CI ? "github" : "list",
+  reporter: process.env.PLAYWRIGHT_JSON_OUTPUT_NAME
+    ? [[process.env.CI ? "github" : "list"], ["json"]]
+    : process.env.CI
+      ? "github"
+      : "list",
   expect: {
     toHaveScreenshot: {
       animations: "disabled",

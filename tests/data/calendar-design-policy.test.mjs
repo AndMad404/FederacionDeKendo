@@ -46,7 +46,7 @@ test("valid data with excess content stays published when the post-publication r
     mode: "calendar",
     captureFingerprint: () => "valid-data",
     executeStep: (_, step) => {
-      assert.ok(!step.includes("test:design"));
+      assert.ok(!step.includes("tests/design"));
     },
   });
   const measured = {
@@ -118,12 +118,13 @@ test("valid data with excess content stays published when the post-publication r
 });
 
 test("calendar gate blocks functional failures and omits design while full gate retains it", () => {
-  const steps = verificationSteps("test:unit", "calendar");
+  const steps = verificationSteps("calendar");
   assert.ok(steps.some((step) => step.includes("typecheck")));
   assert.ok(steps.some((step) => step.includes("build")));
-  assert.ok(steps.some((step) => step.includes("test:behavior")));
-  assert.ok(!steps.some((step) => step.includes("test:design")));
-  for (const command of ["typecheck", "build", "test:behavior"])
+  assert.ok(steps.some((step) => step.includes("tests/behavior")));
+  assert.ok(!steps.some((step) => step.includes("tests/design")));
+  assert.ok(verificationSteps().some((step) => step.includes("tests/design")));
+  for (const command of ["typecheck", "build", "tests/behavior"])
     assert.throws(
       () =>
         runVerification({
@@ -137,7 +138,7 @@ test("calendar gate blocks functional failures and omits design while full gate 
       /controlled failure/,
     );
   assert.throws(
-    () => verificationSteps("test:unit", "untrusted"),
+    () => verificationSteps("untrusted"),
     /Unsupported verification mode/,
   );
 });

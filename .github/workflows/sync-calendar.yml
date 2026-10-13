@@ -6,8 +6,9 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: sync-calendar-events
+  group: site-writer-${{ github.ref }}
   cancel-in-progress: false
+  queue: max
 jobs:
   sync-calendar:
     name: Sync Google Calendar into site data
@@ -26,47 +27,20 @@ jobs:
         env:
           HISTORICAL_CHANGES_REPORT_PATH: ${{ runner.temp }}/calendar-historical-changes.json
           CALENDAR_NOTIFICATIONS_REPORT_PATH: ${{ runner.temp }}/calendar-notifications.json
-      - name: Directed synchronization tests
-        run: pnpm run test:sync-directed
       - name: Verify generated site
         uses: ./.github/actions/verify-site
         with:
-          unit-script: test:unit:without-sync
           mode: calendar
       - name: Commit calendar changes
-        run: |
-          sync_paths=(
-            src/app/data/calendarEvents.ts
-            src/app/data/calendarEventRegistry.json
-            src/app/data/eventGalleries.ts
-            src/app/data/eventGalleryState.json
-          )
-          if [[ -d public/images/events ]] || git ls-files --error-unmatch public/images/events >/dev/null 2>&1; then
-            sync_paths+=(public/images/events)
-          fi
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A -- "${sync_paths[@]}"
-
-          if git diff --cached --quiet; then
-            echo "No calendar changes to commit."
-            exit 0
-          fi
-
-          git commit -m "chore: sync calendar events"
-          git push
-        id: publication
-      - name: Emit verification failure notification
-        if: ${{ failure() }}
-        run: node --import tsx scripts/write-calendar-verification-notification.mjs
+        run: node scripts/publish-changes.mjs calendar
         env:
-          CALENDAR_NOTIFICATIONS_REPORT_PATH: ${{ runner.temp }}/calendar-notifications.json
-          CALENDAR_FAILED_STEP: calendar publication or blocking verification
+          VERIFY_SITE_REPORT_DIR: ${{ runner.temp }}/site-verification
+        id: publication
       - name: Review calendar design and notify
         if: ${{ always() }}
         uses: ./.github/actions/calendar-design-review
         with:
+          publication-failed: ${{ failure() }}
           git-saved: ${{ steps.publication.outcome == 'success' }}
           smtp-username: ${{ secrets.CALENDAR_ALERT_SMTP_USERNAME }}
           smtp-password: ${{ secrets.CALENDAR_ALERT_SMTP_APP_PASSWORD }}
