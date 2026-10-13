@@ -8,18 +8,20 @@ permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && format('site-writer-{0}', github.ref) || format('ci-{0}', github.ref) }}
+  cancel-in-progress: false
+  queue: max
 
 jobs:
   verify:
     name: Unit, typecheck, build and browser tests
-    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+        with:
+          persist-credentials: false
 
       - name: Set up project
         uses: ./.github/actions/setup-project
@@ -30,3 +32,39 @@ jobs:
 
       - name: Verify site
         uses: ./.github/actions/verify-site
+
+  publish-fixes:
+    name: Save verified automatic corrections
+    needs: verify
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      VERIFY_SITE_REPORT_DIR: .cache/verification
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - uses: actions/download-artifact@v5
+        with:
+          name: site-verification
+          path: ${{ env.VERIFY_SITE_REPORT_DIR }}
+      - name: Restore verified corrections
+        shell: bash
+        run: |
+          if [[ -s "$VERIFY_SITE_REPORT_DIR/corrections.patch" ]]; then
+            git apply --binary "$VERIFY_SITE_REPORT_DIR/corrections.patch"
+          fi
+      - name: Commit and push verified corrections
+        run: node scripts/publish-changes.mjs site
+      - name: Retain Git publication result
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: site-publication
+          path: ${{ env.VERIFY_SITE_REPORT_DIR }}/publication.json
+          if-no-files-found: warn
+          retention-days: 30

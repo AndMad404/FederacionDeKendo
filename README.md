@@ -48,7 +48,27 @@ corepack pnpm run verify:site
 
 Este gate ejecuta formato, lint, tipos, build, pruebas y validación del output
 generado. Las suites están separadas por arquitectura, datos, comportamiento y
-diseño. Para ejecutar una suite dirigida:
+diseño.
+
+ESLint y Prettier pueden corregir el código automáticamente con
+`corepack pnpm run quality:fix`. `quality:check` comprueba el resultado sin
+modificar archivos y registra ambos diagnósticos aunque una herramienta falle.
+Los reportes JSON versionados y Markdown quedan en `.cache/verification/`;
+`VERIFY_SITE_REPORT_DIR` permite elegir otra carpeta ignorada o externa al repo.
+El gate construye antes de ejecutar una sola suite Node y una sola invocación
+Playwright por modo; `check` es un alias de `verify:site`.
+
+Actions aplica las correcciones antes del gate y retiene reportes y un parche
+durante 30 días. En pushes a `main`, un job separado guarda las correcciones
+verificadas; en PR entrega el parche sin escribir. Los flujos del calendario
+incluyen las correcciones en su commit. Las escrituras comparten bloqueo y
+rechazan cambios fuera de los paths aprobados o una rama que haya avanzado.
+Un fallo restante detiene el autocommit y deja evidencia recuperable.
+Cloudflare mantiene el despliegue directo; los reportes distinguen guardar en
+Git de confirmar un despliegue. El token de Actions no dispara otro CI con su
+push: la evidencia del árbol verificado y del commit final queda en el run original.
+
+Para ejecutar una suite dirigida:
 
 ```bash
 corepack pnpm run test:architecture

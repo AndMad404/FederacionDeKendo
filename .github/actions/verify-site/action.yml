@@ -6,14 +6,43 @@ inputs:
     description: full for code changes, calendar for blocking calendar verification.
     required: false
     default: full
-  unit-script:
-    description: Approved package script for the unit-test portion of this gate.
-    required: false
-    default: test:unit
-
 runs:
   using: composite
   steps:
+    - name: Correct code quality automatically
+      continue-on-error: true
+      shell: bash
+      run: pnpm run quality:fix
+      env:
+        VERIFY_SITE_REPORT_DIR: ${{ runner.temp }}/site-verification
     - name: Run immutable site verification gate
       shell: bash
-      run: pnpm run verify:site -- --unit-script "${{ inputs.unit-script }}" --mode "${{ inputs.mode }}"
+      run: pnpm run verify:site -- --mode "$VERIFICATION_MODE"
+      env:
+        VERIFICATION_MODE: ${{ inputs.mode }}
+        VERIFY_SITE_REPORT_DIR: ${{ runner.temp }}/site-verification
+        PLAYWRIGHT_JSON_OUTPUT_NAME: ${{ runner.temp }}/site-verification/playwright.json
+    - name: Retain recoverable changes
+      if: ${{ always() }}
+      shell: bash
+      run: |
+        mkdir -p "$VERIFY_SITE_REPORT_DIR"
+        git diff --binary HEAD > "$VERIFY_SITE_REPORT_DIR/corrections.patch"
+      env:
+        VERIFY_SITE_REPORT_DIR: ${{ runner.temp }}/site-verification
+    - name: Upload site verification evidence
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v6
+      with:
+        name: site-verification
+        path: ${{ runner.temp }}/site-verification
+        if-no-files-found: warn
+        retention-days: 30
+    - name: Upload browser failure evidence
+      if: ${{ failure() }}
+      uses: actions/upload-artifact@v6
+      with:
+        name: browser-failure-evidence
+        path: test-results
+        if-no-files-found: ignore
+        retention-days: 30

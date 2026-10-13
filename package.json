@@ -14,7 +14,7 @@
     "format:files": "prettier",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix --max-warnings=0",
-    "check": "pnpm run typecheck && pnpm run lint && pnpm run format:check && pnpm run test:all",
+    "check": "pnpm run verify:site",
     "preview": "vite preview",
     "test:architecture": "node --import tsx --test tests/architecture/*.test.mjs",
     "test:data:node": "node --import tsx --test tests/data/*.test.mjs",
@@ -29,10 +29,8 @@
     "test:llms": "node --import tsx --test tests/data/llms-txt.test.mjs",
     "test:meta-descriptions": "node --import tsx --test tests/data/meta-descriptions-approval.test.mjs",
     "test:lint-priorities": "node --import tsx --test --test-name-pattern=\"source CSS does not use important declarations\" tests/architecture/repository-policy.test.mjs",
-    "test:unit": "pnpm run test:architecture && pnpm run test:data:node",
+    "test:unit": "node --import tsx --test tests/architecture/*.test.mjs tests/data/*.test.mjs",
     "test:sync-directed": "node --import tsx --test tests/data/calendar-sync.test.mjs tests/data/calendar-parsing.test.mjs tests/data/calendar-dates.test.mjs tests/data/event-gallery-sync.test.mjs tests/data/event-history-sync-contract.test.mjs tests/data/event-history-editorial-decisions.test.mjs tests/data/event-history-reports.test.mjs tests/data/event-history-notifications.test.mjs tests/data/event-history-publication.test.mjs tests/architecture/calendar-workflow-architecture.test.mjs tests/data/calendar-design-policy.test.mjs tests/data/calendar-design-email.test.mjs tests/data/calendar-design-report.test.mjs tests/data/calendar-migration-parity.test.mjs",
-    "test:unit:without-sync": "node --import tsx --test tests/data/event-history-filters.test.mjs tests/data/calendar-history-correction.test.mjs tests/data/gallery-data.test.mjs tests/architecture/pull-request-metadata.test.mjs tests/architecture/repository-policy.test.mjs tests/architecture/verify-site.test.mjs tests/data/event-runtime.test.mjs tests/data/llms-txt.test.mjs tests/data/meta-descriptions-approval.test.mjs tests/data/performance-delivery.test.mjs tests/data/static-public-content.test.mjs tests/data/calendar-design-policy.test.mjs tests/data/calendar-design-email.test.mjs tests/data/calendar-design-report.test.mjs tests/data/calendar-migration-parity.test.mjs",
-    "test:unit:without-history-correction": "node --import tsx --test tests/data/calendar-sync.test.mjs tests/data/calendar-parsing.test.mjs tests/data/calendar-dates.test.mjs tests/data/event-gallery-sync.test.mjs tests/data/event-history-filters.test.mjs tests/data/event-history-sync-contract.test.mjs tests/data/event-history-editorial-decisions.test.mjs tests/data/event-history-reports.test.mjs tests/data/event-history-notifications.test.mjs tests/data/event-history-publication.test.mjs tests/data/gallery-data.test.mjs tests/architecture/calendar-workflow-architecture.test.mjs tests/architecture/pull-request-metadata.test.mjs tests/architecture/repository-policy.test.mjs tests/architecture/verify-site.test.mjs tests/data/event-runtime.test.mjs tests/data/llms-txt.test.mjs tests/data/meta-descriptions-approval.test.mjs tests/data/performance-delivery.test.mjs tests/data/static-public-content.test.mjs tests/data/calendar-design-policy.test.mjs tests/data/calendar-design-email.test.mjs tests/data/calendar-design-report.test.mjs tests/data/calendar-migration-parity.test.mjs",
     "test:event-galleries": "node --import tsx --test tests/data/event-gallery-sync.test.mjs",
     "typecheck": "tsc --noEmit && tsc -p tsconfig.scripts.json",
     "verify:site": "node scripts/verify-site.mjs",
@@ -42,7 +40,9 @@
     "correct:calendar-history-range": "node --import tsx scripts/correct-calendar-history-range.mjs",
     "sync:approved-historical-galleries": "node --import tsx scripts/sync-approved-historical-galleries.mjs",
     "test:calendar-layout": "playwright test --config=playwright.calendar-layout.config.ts",
-    "review:calendar-design": "tsx scripts/review-calendar-design.ts"
+    "review:calendar-design": "tsx scripts/review-calendar-design.ts",
+    "quality:fix": "node scripts/quality.mjs --fix",
+    "quality:check": "node scripts/quality.mjs"
   },
   "dependencies": {
     "lucide-react": "0.487.0",

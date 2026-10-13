@@ -21,12 +21,9 @@ export default tseslint.config(
         "error",
         { varsIgnorePattern: "^_", ignoreRestSiblings: true },
       ],
-      "no-control-regex": "error",
-      "no-regex-spaces": "error",
       // Prettier may wrap computed property access across lines; formatting is
       // enforced exclusively by the Prettier check.
       "no-unexpected-multiline": "off",
-      "no-useless-escape": "error",
     },
   },
   {
@@ -37,8 +34,6 @@ export default tseslint.config(
     ],
     rules: {
       "react-hooks/exhaustive-deps": "error",
-      "react-hooks/set-state-in-effect": "error",
-      "react-refresh/only-export-components": "error",
     },
   },
   {

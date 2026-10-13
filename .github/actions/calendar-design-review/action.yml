@@ -4,6 +4,10 @@ inputs:
   git-saved:
     description: Whether the commit and push step succeeded.
     required: true
+  publication-failed:
+    description: Whether a blocking verification or Git publication step failed.
+    required: false
+    default: "false"
   smtp-username:
     required: true
     description: Existing calendar alert SMTP sender.
@@ -16,6 +20,13 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Emit verification failure notification
+      if: ${{ inputs.publication-failed == 'true' }}
+      shell: bash
+      run: node --import tsx scripts/write-calendar-verification-notification.mjs
+      env:
+        CALENDAR_NOTIFICATIONS_REPORT_PATH: ${{ runner.temp }}/calendar-notifications.json
+        CALENDAR_FAILED_STEP: calendar publication or blocking verification
     - name: Review generated calendar design
       id: review
       if: ${{ inputs.git-saved == 'true' }}
@@ -71,7 +82,9 @@ runs:
       uses: actions/upload-artifact@v6
       with:
         name: calendar-design-review
-        path: ${{ runner.temp }}/calendar-design-review
+        path: |
+          ${{ runner.temp }}/calendar-design-review
+          ${{ runner.temp }}/site-verification/publication.json
         if-no-files-found: warn
         retention-days: 30
     - name: Upload calendar notification reports

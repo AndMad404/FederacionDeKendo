@@ -7,6 +7,11 @@ import {
   getRouteSeoPayload,
 } from "../../dist-ssr/entry-server.js";
 import { readDist } from "../helpers/generated-output-fixtures.mjs";
+import { MOBILE_PAST_EVENTS_PAGE_SIZE } from "../../src/app/config/events.ts";
+import {
+  getEventPath,
+  getPastEvents,
+} from "../../src/app/utils/eventRoutes.ts";
 
 test("renders complete and incomplete historical event headings", async () => {
   for (const [path, title] of [
@@ -174,10 +179,21 @@ test("renders indexable home and calendar routes with canonical metadata", async
   assert.match(home, /rel="canonical" href="https:\/\/fak-kendo\.org\/"/);
 });
 
-test("generates the archive route", async () => {
+test("generates the first archive page for the recorded prerender date", async () => {
   const archive = await readDist("eventos/pasados/index.html");
   assert.match(archive, /Eventos pasados/);
-  assert.match(archive, /href="\/eventos\/pasados\/2do-examen-2026\/"/);
+  const timestamp = archive.match(
+    /<meta name="app-prerendered-at" content="([^"]+)" \/>/,
+  )?.[1];
+  assert.ok(timestamp, "archive must record its prerender date");
+  const now = new Date(timestamp);
+  const expected = getPastEvents(now)
+    .slice(0, MOBILE_PAST_EVENTS_PAGE_SIZE)
+    .map((event) => getEventPath(event, "es", now));
+  const links = [
+    ...archive.matchAll(/href="(\/eventos\/pasados\/[^"/]+\/)"/g),
+  ].map((match) => match[1]);
+  assert.deepEqual(links, expected);
 });
 
 test("omits breadcrumbs from event and archive routes", async () => {

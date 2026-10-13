@@ -1,36 +1,46 @@
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { appendFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const ALLOWED_UNIT_SCRIPTS = new Set([
-  "test:unit",
-  "test:unit:without-history-correction",
-  "test:unit:without-sync",
-]);
+export const reportDirectory = (root = process.cwd()) =>
+  path.resolve(
+    root,
+    process.env.VERIFY_SITE_REPORT_DIR ?? ".cache/verification",
+  );
 
-const VERIFICATION_STEP_LABELS = new Map([
-  ["pnpm run format:line-endings:check", "Finales de linea"],
-  ["pnpm run lint", "Lint (ESLint)"],
-  ["pnpm run format:check", "Formato (Prettier)"],
-  ["git diff --check", "Espacios en cambios sin preparar"],
-  ["git diff --cached --check", "Espacios en cambios preparados"],
-  ["pnpm run typecheck", "Tipos (TypeScript)"],
-  ["pnpm run build", "Build y prerenderizado"],
-  ["pnpm run test:unit", "Pruebas unitarias"],
-  ["pnpm run test:unit:without-history-correction", "Pruebas unitarias"],
-  ["pnpm run test:unit:without-sync", "Pruebas unitarias"],
-  ["pnpm run test:generated", "Salida HTML generada"],
-  [
-    "pnpm exec playwright install --with-deps chromium",
-    "Instalacion de Chromium",
-  ],
-  ["pnpm exec playwright test tests/data", "Pruebas de datos en navegador"],
-  ["pnpm run test:behavior", "Pruebas de comportamiento en navegador"],
-  ["pnpm run test:design", "Pruebas de diseno en navegador"],
-]);
+function phases(mode = "full") {
+  if (!["full", "calendar"].includes(mode))
+    throw new Error(`Unsupported verification mode: ${mode}`);
+  return [
+    ["Calidad (ESLint, Prettier y LF)", ["pnpm", "run", "quality:check"]],
+    ["Espacios sin preparar", ["git", "diff", "--check"]],
+    ["Espacios preparados", ["git", "diff", "--cached", "--check"]],
+    ["Tipos (TypeScript)", ["pnpm", "run", "typecheck"]],
+    ["Build y prerenderizado", ["pnpm", "run", "build"]],
+    ["Pruebas Node (arquitectura y datos)", ["pnpm", "run", "test:unit"]],
+    [
+      "Instalacion de Chromium",
+      ["pnpm", "exec", "playwright", "install", "--with-deps", "chromium"],
+    ],
+    [
+      "Pruebas de navegador",
+      [
+        "pnpm",
+        "exec",
+        "playwright",
+        "test",
+        "tests/data",
+        "tests/behavior",
+        ...(mode === "full"
+          ? ["tests/design", "--grep-invert", "@visual"]
+          : []),
+      ],
+    ],
+  ];
+}
 
 function commandFor(step) {
   return step.join(" ");
@@ -39,7 +49,8 @@ function commandFor(step) {
 export function formatVerificationFailure(step, error) {
   const command = commandFor(step);
   const label =
-    VERIFICATION_STEP_LABELS.get(command) ?? "Verificacion del sitio";
+    phases().find(([, candidate]) => commandFor(candidate) === command)?.[0] ??
+    "Verificacion del sitio";
   return [
     "## Verificacion del sitio: fallo",
     "",
@@ -88,43 +99,8 @@ export function captureWorkspaceFingerprint(root) {
   return hash.digest("hex");
 }
 
-export function verificationSteps(unitScript = "test:unit", mode = "full") {
-  if (!["full", "calendar"].includes(mode)) {
-    throw new Error(`Unsupported verification mode: ${mode}`);
-  }
-  if (!ALLOWED_UNIT_SCRIPTS.has(unitScript)) {
-    throw new Error(`Unsupported unit script: ${unitScript}`);
-  }
-  const steps = [
-    ["pnpm", "run", "format:line-endings:check"],
-    ["pnpm", "run", "lint"],
-    ["pnpm", "run", "format:check"],
-    ["git", "diff", "--check"],
-    ["git", "diff", "--cached", "--check"],
-    ["pnpm", "run", "typecheck"],
-    ["pnpm", "run", "build"],
-    ["pnpm", "run", unitScript],
-  ];
-
-  if (unitScript !== "test:unit") {
-    steps.push(["pnpm", "run", "test:generated"]);
-  }
-
-  steps.push(
-    ["pnpm", "exec", "playwright", "install", "--with-deps", "chromium"],
-    ["pnpm", "exec", "playwright", "test", "tests/data"],
-    ["pnpm", "run", "test:behavior"],
-  );
-  if (mode === "full") steps.push(["pnpm", "run", "test:design"]);
-
-  return steps;
-}
-
-function parseUnitScript(args) {
-  const index = args.indexOf("--unit-script");
-  if (index === -1) return "test:unit";
-  if (!args[index + 1]) throw new Error("--unit-script requires a value");
-  return args[index + 1];
+export function verificationSteps(mode = "full") {
+  return phases(mode).map(([, command]) => command);
 }
 
 function runStep(root, [tool, ...args]) {
@@ -141,44 +117,94 @@ function runStep(root, [tool, ...args]) {
     cwd: root,
     shell: false,
     stdio: "inherit",
+    env: {
+      ...process.env,
+      PLAYWRIGHT_JSON_OUTPUT_NAME: path.join(
+        reportDirectory(root),
+        "playwright.json",
+      ),
+    },
   });
   if (result.error) throw result.error;
   if (result.status !== 0) {
-    throw new Error(`${command} failed with exit code ${result.status}`);
+    throw Object.assign(
+      new Error(`${command} failed with exit code ${result.status}`),
+      { exitCode: result.status },
+    );
   }
 }
 
 export function runVerification({
   root,
-  unitScript,
   mode = "full",
   captureFingerprint = captureWorkspaceFingerprint,
   executeStep = runStep,
+  directory = reportDirectory(),
 }) {
   const initialFingerprint = captureFingerprint(root);
+  const report = {
+    schemaVersion: 1,
+    sha: process.env.GITHUB_SHA ?? null,
+    mode,
+    status: "passed",
+    steps: phases(mode).map(([label, command]) => ({
+      label,
+      command,
+      status: "not-executed",
+    })),
+  };
   let stepError;
   let failedStep;
 
   try {
-    for (const step of verificationSteps(unitScript, mode)) {
-      failedStep = step;
-      executeStep(root, step);
+    for (const step of report.steps) {
+      failedStep = step.command;
+      step.status = "running";
+      executeStep(root, step.command);
+      step.status = "passed";
     }
   } catch (error) {
     stepError = error;
   }
 
   const finalFingerprint = captureFingerprint(root);
+  report.fingerprint = finalFingerprint;
   if (finalFingerprint !== initialFingerprint) {
-    throw new Error(
+    stepError = new Error(
       "Verification changed the workspace. Its results are invalid; inspect the diff and rerun the complete gate.",
       { cause: stepError },
     );
+    report.status = "invalid";
   }
   if (stepError) {
+    report.status = report.status === "invalid" ? "invalid" : "failed";
+    const failed = report.steps.find((step) => step.status === "running");
+    if (failed) {
+      failed.status = "failed";
+      failed.message = stepError.message;
+      failed.exitCode = stepError.exitCode ?? null;
+    }
+    report.message = stepError.message;
     stepError.verificationStep = failedStep;
-    throw stepError;
   }
+  mkdirSync(directory, { recursive: true });
+  writeFileSync(
+    path.join(directory, "verification.json"),
+    JSON.stringify(report, null, 2) + "\n",
+  );
+  writeFileSync(
+    path.join(directory, "verification.md"),
+    `## Verificacion: ${report.status}\n\n` +
+      report.steps
+        .map(
+          (step) =>
+            `- ${step.label}: **${step.status}**${step.message ? ` — ${step.message}` : ""}`,
+        )
+        .join("\n") +
+      "\n",
+  );
+  if (stepError) throw stepError;
+  return report;
 }
 
 const isDirectExecution =
@@ -190,7 +216,6 @@ if (isDirectExecution) {
   try {
     runVerification({
       root: process.cwd(),
-      unitScript: parseUnitScript(process.argv.slice(2)),
       mode: process.argv.includes("--mode")
         ? process.argv[process.argv.indexOf("--mode") + 1]
         : "full",
