@@ -13,6 +13,31 @@ function stepIndex(steps, predicate, description) {
   return index;
 }
 
+test("workflow expressions use contexts available before and after runner allocation", async () => {
+  for (const file of [
+    ".github/workflows/ci.yml",
+    ".github/workflows/sync-calendar.yml",
+    ".github/workflows/correct-calendar-history-range.yml",
+    ".github/workflows/apply-calendar-editorial-decision.yml",
+  ]) {
+    const workflow = await loadYamlDocument(file);
+    for (const job of Object.values(workflow.jobs)) {
+      assert.doesNotMatch(
+        JSON.stringify(job.env ?? {}),
+        /\$\{\{[^}]*\brunner\./,
+        `${file}: job env cannot use the runner context`,
+      );
+      for (const step of job.steps) {
+        assert.doesNotMatch(
+          JSON.stringify(step.with ?? {}),
+          /\$\{\{[^}]*\b(?:failure|success|always|cancelled)\s*\(/,
+          `${file}: status functions belong in step conditions, not action inputs`,
+        );
+      }
+    }
+  }
+});
+
 test("shared project setup configures Node before enabling pnpm and disables premature caching", async () => {
   const action = await loadYamlDocument(
     ".github/actions/setup-project/action.yml",
@@ -85,24 +110,18 @@ test("all workflows use shared project setup after checkout and before project c
 
 test("writer workflows verify once before guarded publication and finalize afterwards", async () => {
   const cases = [
-    [
-      ".github/workflows/sync-calendar.yml",
-      "pnpm run test:sync-directed",
-      "Commit calendar changes",
-    ],
+    [".github/workflows/sync-calendar.yml", "Commit calendar changes"],
     [
       ".github/workflows/apply-calendar-editorial-decision.yml",
-      "pnpm run test:sync-directed",
       "Commit recorded decision",
     ],
     [
       ".github/workflows/correct-calendar-history-range.yml",
-      "tests/data/calendar-history-correction.test.mjs",
       "Commit approved historical range",
     ],
   ];
 
-  for (const [file, , commitName] of cases) {
+  for (const [file, commitName] of cases) {
     const steps = workflowSteps(await loadYamlDocument(file));
     const gate = stepIndex(
       steps,
@@ -141,6 +160,10 @@ test("writer workflows verify once before guarded publication and finalize after
       `${file}: review and notification must follow push`,
     );
     assert.equal(steps[review].if, "${{ always() }}");
+    assert.equal(
+      steps[review].with["publication-failed"],
+      "${{ job.status == 'failure' }}",
+    );
     assert.equal(
       steps[review].with["git-saved"],
       "${{ steps.publication.outcome == 'success' }}",
@@ -228,6 +251,18 @@ test("Phase 6: the shared gate and human CI coverage remain complete", async () 
   assert.equal(ci.jobs["publish-fixes"].permissions.contents, "write");
   assert.match(ci.jobs["publish-fixes"].if, /event_name == 'push'/);
   assert.equal(ci.jobs["publish-fixes"].needs, "verify");
+  const publisher = ci.jobs["publish-fixes"];
+  const download = publisher.steps.find(
+    (step) => step.uses === "actions/download-artifact@v5",
+  );
+  const upload = publisher.steps.find(
+    (step) => step.uses === "actions/upload-artifact@v6",
+  );
+  assert.equal(download.with.path, "${{ env.VERIFY_SITE_REPORT_DIR }}");
+  assert.equal(
+    upload.with.path,
+    "${{ env.VERIFY_SITE_REPORT_DIR }}/publication.json",
+  );
   assert.ok(
     jobs.some((job) =>
       job.steps?.some((step) => step.uses === "./.github/actions/verify-site"),

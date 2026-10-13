@@ -41,7 +41,7 @@ jobs:
     permissions:
       contents: write
     env:
-      VERIFY_SITE_REPORT_DIR: ${{ runner.temp }}/site-verification
+      VERIFY_SITE_REPORT_DIR: .cache/verification
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -51,7 +51,7 @@ jobs:
       - uses: actions/download-artifact@v5
         with:
           name: site-verification
-          path: ${{ runner.temp }}/site-verification
+          path: ${{ env.VERIFY_SITE_REPORT_DIR }}
       - name: Restore verified corrections
         shell: bash
         run: |
@@ -65,6 +65,6 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: site-publication
-          path: ${{ runner.temp }}/site-verification/publication.json
+          path: ${{ env.VERIFY_SITE_REPORT_DIR }}/publication.json
           if-no-files-found: warn
           retention-days: 30

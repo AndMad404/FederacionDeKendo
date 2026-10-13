@@ -69,7 +69,7 @@ jobs:
         if: ${{ always() }}
         uses: ./.github/actions/calendar-design-review
         with:
-          publication-failed: ${{ failure() }}
+          publication-failed: ${{ job.status == 'failure' }}
           git-saved: ${{ steps.publication.outcome == 'success' }}
           smtp-username: ${{ secrets.CALENDAR_ALERT_SMTP_USERNAME }}
           smtp-password: ${{ secrets.CALENDAR_ALERT_SMTP_APP_PASSWORD }}
