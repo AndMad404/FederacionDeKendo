@@ -19,15 +19,16 @@ async function fixture(t, source) {
   await writeFile(path.join(root, "notes.txt"), "Note\r\n");
   execFileSync("git", ["init", "--quiet"], { cwd: root });
   execFileSync("git", ["add", "--all"], { cwd: root });
-  return root;
+  return { root, directory: path.join(root, ".cache/verification") };
 }
 
 test("quality autofix is idempotent, retains reports and normalizes files outside Prettier", async (t) => {
-  const root = await fixture(t, "const answer=42\r\n");
+  const options = await fixture(t, "const answer=42\r\n");
+  const { root } = options;
   await writeFile(path.join(root, ".gitignore"), ".cache/\ntmp/\n");
   await mkdir(path.join(root, "tmp"));
   await writeFile(path.join(root, "tmp/generated.js"), "debugger;const =;\n");
-  const first = await runQuality({ root, fix: true });
+  const first = await runQuality({ ...options, fix: true });
   assert.equal(first.status, "corrected");
   assert.ok(first.fixedFiles.includes("example.js"));
   assert.ok(first.fixedFiles.includes("notes.txt"));
@@ -36,14 +37,14 @@ test("quality autofix is idempotent, retains reports and normalizes files outsid
     "const answer = 42;\n",
   );
   assert.equal(await readFile(path.join(root, "notes.txt"), "utf8"), "Note\n");
-  const second = await runQuality({ root, fix: true });
+  const second = await runQuality({ ...options, fix: true });
   assert.equal(second.status, "clean");
   assert.deepEqual(second.fixedFiles, []);
   assert.equal(
     await readFile(path.join(root, "tmp/generated.js"), "utf8"),
     "debugger;const =;\n",
   );
-  const check = await runQuality({ root });
+  const check = await runQuality(options);
   assert.equal(check.status, "clean");
   const json = JSON.parse(
     await readFile(
@@ -56,9 +57,10 @@ test("quality autofix is idempotent, retains reports and normalizes files outsid
 });
 
 test("quality check reports lint and formatting together without changing the source", async (t) => {
-  const root = await fixture(t, "debugger;const answer=42\n");
+  const options = await fixture(t, "debugger;const answer=42\n");
+  const { root } = options;
   const before = await readFile(path.join(root, "example.js"));
-  const result = await runQuality({ root });
+  const result = await runQuality(options);
   assert.equal(result.status, "failed");
   assert.ok(
     result.tools
@@ -74,7 +76,7 @@ test("quality check reports lint and formatting together without changing the so
       .diagnostics.some((d) => d.file === "example.js"),
   );
   assert.deepEqual(await readFile(path.join(root, "example.js")), before);
-  const fixed = await runQuality({ root, fix: true });
+  const fixed = await runQuality({ ...options, fix: true });
   assert.equal(fixed.status, "failed");
   assert.match(
     await readFile(
@@ -86,8 +88,9 @@ test("quality check reports lint and formatting together without changing the so
 });
 
 test("invalid syntax and a broken lint configuration remain explicit while Prettier still runs", async (t) => {
-  const root = await fixture(t, "const =;\n");
-  const syntax = await runQuality({ root, fix: true });
+  const options = await fixture(t, "const =;\n");
+  const { root } = options;
+  const syntax = await runQuality({ ...options, fix: true });
   assert.equal(syntax.status, "failed");
   assert.ok(
     syntax.tools
@@ -102,7 +105,7 @@ test("invalid syntax and a broken lint configuration remain explicit while Prett
     'throw new Error("Broken fixture configuration");\n',
   );
   await writeFile(path.join(root, "example.js"), "const answer=42\n");
-  const broken = await runQuality({ root, fix: true });
+  const broken = await runQuality({ ...options, fix: true });
   assert.equal(broken.status, "failed");
   assert.equal(
     broken.tools.find((tool) => tool.name === "ESLint").status,
