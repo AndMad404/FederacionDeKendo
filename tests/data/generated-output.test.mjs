@@ -64,7 +64,7 @@ test("generates localized, unique, indexable SEO output for every event route", 
         );
         if (event.startTime) {
           assert.ok(
-            /<dd>\d{1,2}:\d{2} (?:[ap]\. m\.|[AP]M)[^<]*<span[^>]*>\s*\(UTC−6\)<\/span><\/dd>/.test(
+            /<dd>\d{1,2}:\d{2}(?:[ap]\.m\.| [AP]M)[^<]*<span[^>]*>\s*\(UTC−6\)<\/span><\/dd>/.test(
               visibleHtml,
             ),
             `${route.path}: publish a 12-hour Costa Rica time with its UTC−6 offset`,

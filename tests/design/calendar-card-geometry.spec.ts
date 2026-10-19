@@ -24,7 +24,7 @@ for (const viewport of [
       panel.getByText("Todos los días", { exact: true }),
     ).toHaveCount(2);
     await expect(
-      panel.getByText("1:00 p. m. - 3:00 p. m.", { exact: true }),
+      panel.getByText("1:00p.m. - 3:00p.m.", { exact: true }),
     ).toBeVisible();
     const geometry = await panel.evaluate((element) => {
       const rect = element.getBoundingClientRect();

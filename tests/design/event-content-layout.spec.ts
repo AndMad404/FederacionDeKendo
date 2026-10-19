@@ -86,7 +86,7 @@ for (const viewport of [
       has: page.locator("dt", { hasText: /^Horario$/ }),
     });
     await expect(time.locator("dd")).toHaveText(
-      /\d{1,2}:\d{2} [ap]\. m\..*\(UTC−6\)/,
+      /\d{1,2}:\d{2}[ap]\.m\..*\(UTC−6\)/,
     );
     await expect
       .poll(() =>

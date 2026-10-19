@@ -65,12 +65,12 @@ export function formatEventTime(
     const period =
       language === "en"
         ? hour < 12
-          ? "AM"
-          : "PM"
+          ? " AM"
+          : " PM"
         : hour < 12
-          ? "a. m."
-          : "p. m.";
-    return `${hour % 12 || 12}:${minutes} ${period}`;
+          ? "a.m."
+          : "p.m.";
+    return `${hour % 12 || 12}:${minutes}${period}`;
   };
   return endTime
     ? `${formatTime(startTime)} - ${formatTime(endTime)}`
