@@ -615,72 +615,6 @@ function assertUniqueCurrentSlugs(events: RegistryEvent[]) {
   }
 }
 
-function resolveCalendarSlugs(
-  previousRegistry: Registry,
-  events: RegistryEvent[],
-) {
-  // Published canonicals and vanity URLs keep their owner, even after deletion.
-  assertUniqueCurrentSlugs(previousRegistry.events ?? []);
-  const previousBySourceId = new Map(
-    (previousRegistry.events ?? []).map((event) => [event.sourceId, event]),
-  );
-  const owners = new Map<string, string>();
-  for (const event of [...(previousRegistry.events ?? []), ...events]) {
-    for (const slug of [
-      ...(previousBySourceId.get(event.sourceId) === event ? [event.slug] : []),
-      ...(event.aliases ?? []),
-    ]) {
-      const owner = owners.get(slug);
-      if (owner && owner !== event.sourceId) {
-        throw new Error(`Duplicate calendar vanity ownership: ${slug}.`);
-      }
-      owners.set(slug, event.sourceId);
-    }
-  }
-  const resolved = new Map<string, string>();
-  const ordered = [...events].sort(
-    (a, b) =>
-      a.date.localeCompare(b.date) || a.sourceId.localeCompare(b.sourceId),
-  );
-  const preferredSlug = (event: RegistryEvent) => {
-    const previous = previousBySourceId.get(event.sourceId);
-    return previous &&
-      previous.title === event.title &&
-      (event.slug === createCanonicalSlug(event.title) ||
-        event.slug === previous.slug)
-      ? previous.slug
-      : event.slug;
-  };
-  // Reserve natural title URLs before allocating date-qualified alternatives.
-  for (const event of ordered) {
-    const slug = preferredSlug(event);
-    if (!owners.has(slug) || owners.get(slug) === event.sourceId) {
-      owners.set(slug, event.sourceId);
-      resolved.set(event.sourceId, slug);
-    }
-  }
-  for (const event of ordered) {
-    if (resolved.has(event.sourceId)) continue;
-    const dated = `${event.slug}-${event.date}`;
-    let slug = dated;
-    let ordinal = 2;
-    while (owners.has(slug) && owners.get(slug) !== event.sourceId) {
-      slug = `${dated}-${ordinal++}`;
-    }
-    owners.set(slug, event.sourceId);
-    resolved.set(event.sourceId, slug);
-  }
-  return events.map((event) => {
-    // Preserve the non-enumerable private album metadata used by gallery sync.
-    const result = Object.defineProperties(
-      {},
-      Object.getOwnPropertyDescriptors(event),
-    ) as RegistryEvent;
-    result.slug = resolved.get(event.sourceId)!;
-    return result;
-  });
-}
-
 export function assertSafeCalendarInput(
   previousRegistry: Registry,
   parsedEvents: RegistryEvent[],
@@ -729,7 +663,6 @@ export function mergeRegistry(
   now: Date = new Date(),
 ): Registry {
   const registryVersion = 4;
-  currentEvents = resolveCalendarSlugs(previousRegistry, currentEvents);
   assertUniqueCurrentSlugs(currentEvents);
   const historicalEvents = (previousRegistry.events ?? []).filter(
     (event) => event.historical === true || isArchiveEligible(event, now),
@@ -849,8 +782,7 @@ export function mergeRegistry(
   merged.sort(
     (a, b) =>
       getCalendarDateTimeSortKey(a.date, a.startTime) -
-        getCalendarDateTimeSortKey(b.date, b.startTime) ||
-      a.sourceId.localeCompare(b.sourceId),
+      getCalendarDateTimeSortKey(b.date, b.startTime),
   );
   return { version: registryVersion, events: merged };
 }
@@ -1394,7 +1326,7 @@ export function createCalendarFailureNotification(
     kind === "id_fuente_duplicado"
       ? "Corregir los IDs duplicados en Calendar y reejecutar; la publicacion fue interrumpida y conserva el ultimo conjunto valido."
       : kind === "url_evento_duplicada"
-        ? "Revisar y corregir la propiedad de canonicas y aliases en el registro publicado y reejecutar; los titulos repetidos se resuelven automaticamente y el ultimo conjunto valido permanece sin cambios."
+        ? "Corregir los titulos para que produzcan URLs unicas y reejecutar; la publicacion fue interrumpida y conserva el ultimo conjunto valido."
         : kind === "desaparicion_masiva"
           ? "Revisar la fuente antes de reintentar; el umbral bloqueo la publicacion y conserva el ultimo conjunto valido."
           : kind === "verificacion_fallida"
@@ -1838,12 +1770,11 @@ export async function synchronizeCalendar({
 
   const icsText = await readCalendarSource(source);
   const warnings: string[] = [];
-  let parsed = parseVEvents(icsText)
+  const parsed = parseVEvents(icsText)
     .map((properties) => parseCalendarEvent(properties, warnings))
     .filter((value): value is NonNullable<typeof value> => Boolean(value));
   const previousRegistry = await readRegistry(registryPath);
   assertSafeCalendarInput(previousRegistry, parsed);
-  parsed = resolveCalendarSlugs(previousRegistry, parsed);
   const currentBySourceId = new Map(
     parsed.map((event) => [event.sourceId, event]),
   );

@@ -21,9 +21,7 @@ Google Calendar → sincronización y validación → datos versionados
   manifiesto de rutas e incorporan automáticamente los eventos publicados; los
   archivos de `public/` sirven como respaldo para desarrollo.
 - La identidad de un evento está desacoplada de su URL. Los cambios de URL
-  conservan aliases vanity y redirects 301. Los títulos repetidos reciben una
-  URL única con fecha y, si hace falta, un número; las URLs publicadas conservan
-  su propietario y no se reutilizan para otro evento.
+  conservan redirects y las colisiones bloquean la publicación.
 - Una sincronización inválida no reemplaza el último estado válido. El HTML
   generado se verifica antes del despliegue.
 

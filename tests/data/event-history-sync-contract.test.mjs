@@ -229,7 +229,7 @@ test("a current title change preserves the previous URL as a redirect alias", ()
   ]);
 });
 
-test("a new title URL receives a unique alternative without reusing an existing alias", () => {
+test("a new title URL cannot reuse an existing alias", () => {
   const previous = {
     version: 4,
     events: [
@@ -269,20 +269,11 @@ test("a new title URL receives a unique alternative without reusing an existing 
     },
   ];
 
-  const result = mergeRegistry(
-    previous,
-    current,
-    new Date("2026-09-24T00:00:00.000Z"),
+  assert.throws(
+    () =>
+      mergeRegistry(previous, current, new Date("2026-09-24T00:00:00.000Z")),
+    /Duplicate calendar canonical slug or alias: copa-nacional-de-kendo/,
   );
-  const renamed = result.events.find(
-    ({ sourceId }) => sourceId === "renamed-source",
-  );
-  const owner = result.events.find(
-    ({ sourceId }) => sourceId === "owner-source",
-  );
-  assert.equal(renamed.slug, "copa-nacional-de-kendo-2026-11-30");
-  assert.deepEqual(renamed.aliases, ["torneo-de-verano"]);
-  assert.deepEqual(owner.aliases, ["copa-nacional-de-kendo"]);
 });
 
 test("the measured mass-disappearance threshold blocks publication while one absence remains pending", () => {
