@@ -43,7 +43,19 @@ test("event time distinguishes multiple days, timed days and missing hours", asy
 
   assert.equal(formatEventTime(gasshuku), "Todos los días");
   assert.equal(formatEventTime(gasshuku, "en"), "Every day");
-  assert.equal(formatEventTime(tournament), "13:00 - 17:00");
+  assert.equal(formatEventTime(tournament), "1:00 p. m. - 5:00 p. m.");
+  assert.equal(formatEventTime(tournament, "en"), "1:00 PM - 5:00 PM");
+  for (const [startTime, expected] of [
+    ["00:00", "12:00 a. m."],
+    ["09:05", "9:05 a. m."],
+    ["12:00", "12:00 p. m."],
+    ["23:30", "11:30 p. m."],
+  ]) {
+    assert.equal(
+      formatEventTime({ ...tournament, startTime, endTime: undefined }),
+      expected,
+    );
+  }
   assert.equal(
     formatEventTime({ ...tournament, endDate: "2026-08-23" }),
     "Todos los días",

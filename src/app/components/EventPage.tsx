@@ -116,17 +116,6 @@ export function EventPage() {
     : undefined;
   const canonicalPath = getEventPath(event, language, now);
   const eventTitle = event.title;
-  const timeZoneLabel =
-    event.timeZone && event.startTime
-      ? new Intl.DateTimeFormat("en", {
-          timeZone: event.timeZone,
-          timeZoneName: "shortOffset",
-        })
-          .formatToParts(new Date(`${event.date}T12:00:00Z`))
-          .find((part) => part.type === "timeZoneName")
-          ?.value.replace("GMT", "UTC")
-          .replace("-", "−")
-      : undefined;
 
   async function handleShare() {
     const shareUrl = new URL(canonicalPath, window.location.origin);
@@ -193,15 +182,7 @@ export function EventPage() {
                       aria-hidden="true"
                     />
                     <dt className="font-bold">{copy.event.date}</dt>
-                    <dd>
-                      {getEventDateLabel(event, language)}
-                      {timeZoneLabel ? (
-                        <span className="whitespace-nowrap text-xs text-site-muted">
-                          {" "}
-                          ({timeZoneLabel})
-                        </span>
-                      ) : null}
-                    </dd>
+                    <dd>{getEventDateLabel(event, language)}</dd>
                   </div>
                   <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2">
                     <Clock
@@ -209,7 +190,14 @@ export function EventPage() {
                       aria-hidden="true"
                     />
                     <dt className="font-bold">{copy.event.time}</dt>
-                    <dd>{formatEventTime(event, language)}</dd>
+                    <dd>
+                      {formatEventTime(event, language)}
+                      {event.startTime ? (
+                        <span className="whitespace-nowrap text-xs text-site-muted">
+                          {" (UTC−6)"}
+                        </span>
+                      ) : null}
+                    </dd>
                   </div>
                   <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2">
                     <MapPin

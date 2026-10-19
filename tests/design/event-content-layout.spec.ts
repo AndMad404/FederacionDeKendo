@@ -82,13 +82,12 @@ for (const viewport of [
     const details = addToCalendar.locator("xpath=ancestor::dl");
     await expect(details).toHaveCount(1);
     await expect(details.locator(":scope > div")).toHaveCount(4);
-    const date = details.locator("div").filter({
-      has: page.locator("dt", { hasText: /^Fecha$/ }),
+    const time = details.locator("div").filter({
+      has: page.locator("dt", { hasText: /^Horario$/ }),
     });
-    await expect(date.locator("dd")).toContainText("(UTC−6)");
-    await expect(
-      details.getByText("Zona horaria", { exact: true }),
-    ).toHaveCount(0);
+    await expect(time.locator("dd")).toHaveText(
+      /\d{1,2}:\d{2} [ap]\. m\..*\(UTC−6\)/,
+    );
     await expect
       .poll(() =>
         details.evaluate(

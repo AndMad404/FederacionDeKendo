@@ -58,16 +58,16 @@ test("generates localized, unique, indexable SEO output for every event route", 
         assert.ok(event.timeZone, `${route.path}: event time zone is missing`);
         const visibleHtml = html.replace(/<!--[\s\S]*?-->/g, "");
         assert.equal(
-          /<dd>[^<]*<span[^>]*>\s*\(UTC(?:[+−]\d{1,2}(?::\d{2})?)?\)<\/span><\/dd>/.test(
-            visibleHtml,
-          ),
+          /<dd>[^<]*<span[^>]*>\s*\(UTC−6\)<\/span><\/dd>/.test(visibleHtml),
           Boolean(event.startTime),
-          `${route.path}: show the abbreviated time zone beside the date only when a start time is published`,
+          `${route.path}: show the abbreviated time zone beside the time only when a start time is published`,
         );
-        if (event.startTime && event.timeZone === "America/Costa_Rica") {
+        if (event.startTime) {
           assert.ok(
-            visibleHtml.includes("(UTC−6)"),
-            `${route.path}: Costa Rica events must show the UTC−6 offset`,
+            /<dd>\d{1,2}:\d{2} (?:[ap]\. m\.|[AP]M)[^<]*<span[^>]*>\s*\(UTC−6\)<\/span><\/dd>/.test(
+              visibleHtml,
+            ),
+            `${route.path}: publish a 12-hour Costa Rica time with its UTC−6 offset`,
           );
         }
         assert.ok(

@@ -58,7 +58,23 @@ export function formatEventTime(
   if (!startTime) {
     return language === "en" ? "Time to be confirmed" : "Horario por confirmar";
   }
-  return endTime ? `${startTime} - ${endTime}` : startTime;
+  // Calendar times are published in Costa Rica's local time (UTC−6).
+  const formatTime = (time: string) => {
+    const [hours, minutes] = time.split(":");
+    const hour = Number(hours);
+    const period =
+      language === "en"
+        ? hour < 12
+          ? "AM"
+          : "PM"
+        : hour < 12
+          ? "a. m."
+          : "p. m.";
+    return `${hour % 12 || 12}:${minutes} ${period}`;
+  };
+  return endTime
+    ? `${formatTime(startTime)} - ${formatTime(endTime)}`
+    : formatTime(startTime);
 }
 
 export function getLocationMapUrl(location: string) {
