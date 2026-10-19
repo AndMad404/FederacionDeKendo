@@ -9,10 +9,12 @@ async function openCalendar(page: Page, now = FIXED_CALENDAR_TIME) {
 }
 
 for (const viewport of [
+  { width: 1280, height: 768 },
   { width: 1366, height: 768 },
+  { width: 1440, height: 900 },
   { width: 1920, height: 906 },
 ]) {
-  test(`calendar October cards fit with equal gaps at ${viewport.width}`, async ({
+  test(`calendar October cards keep block margins without scroll at ${viewport.width}`, async ({
     page,
   }) => {
     await page.setViewportSize(viewport);
@@ -28,10 +30,25 @@ for (const viewport of [
       const rect = element.getBoundingClientRect();
       const style = getComputedStyle(element);
       return {
-        contentBottom: rect.bottom - Number.parseFloat(style.paddingBottom) - 1,
+        minimumBlockMargin:
+          Number.parseFloat(
+            getComputedStyle(document.documentElement).fontSize,
+          ) * 0.5,
+        topMargin:
+          element.firstElementChild!.getBoundingClientRect().top -
+          rect.top -
+          Number.parseFloat(style.borderTopWidth),
+        innerBottom: rect.bottom - Number.parseFloat(style.borderBottomWidth),
         cardBottoms: Array.from(element.querySelectorAll("li")).map(
           (card) => card.getBoundingClientRect().bottom,
         ),
+        internalScrollOwners: [element, ...element.querySelectorAll("*")]
+          .filter(
+            (child) =>
+              child.scrollHeight > child.clientHeight + 1 &&
+              /^(auto|scroll)$/.test(getComputedStyle(child).overflowY),
+          )
+          .map((child) => child.tagName),
         gaps: [
           style.gap,
           ...Array.from(element.children).map(
@@ -42,12 +59,21 @@ for (const viewport of [
           ),
         ],
         documentHeight: document.documentElement.scrollHeight,
+        documentWidth: document.documentElement.scrollWidth,
         viewportHeight: window.innerHeight,
+        viewportWidth: window.innerWidth,
       };
     });
+    expect(geometry.topMargin).toBeGreaterThanOrEqual(
+      geometry.minimumBlockMargin,
+    );
     for (const bottom of geometry.cardBottoms)
-      expect(bottom).toBeLessThanOrEqual(geometry.contentBottom + 1);
+      expect(geometry.innerBottom - bottom).toBeGreaterThanOrEqual(
+        geometry.minimumBlockMargin,
+      );
     expect(new Set(geometry.gaps)).toEqual(new Set(["16px"]));
     expect(geometry.documentHeight).toBe(geometry.viewportHeight);
+    expect(geometry.documentWidth).toBe(geometry.viewportWidth);
+    expect(geometry.internalScrollOwners).toEqual([]);
   });
 }
