@@ -3,7 +3,6 @@ import {
   CalendarPlus,
   Check,
   Clock,
-  Globe2,
   MapPin,
   Share2,
 } from "lucide-react";
@@ -117,6 +116,17 @@ export function EventPage() {
     : undefined;
   const canonicalPath = getEventPath(event, language, now);
   const eventTitle = event.title;
+  const timeZoneLabel =
+    event.timeZone && event.startTime
+      ? new Intl.DateTimeFormat("en", {
+          timeZone: event.timeZone,
+          timeZoneName: "shortOffset",
+        })
+          .formatToParts(new Date(`${event.date}T12:00:00Z`))
+          .find((part) => part.type === "timeZoneName")
+          ?.value.replace("GMT", "UTC")
+          .replace("-", "−")
+      : undefined;
 
   async function handleShare() {
     const shareUrl = new URL(canonicalPath, window.location.origin);
@@ -183,7 +193,15 @@ export function EventPage() {
                       aria-hidden="true"
                     />
                     <dt className="font-bold">{copy.event.date}</dt>
-                    <dd>{getEventDateLabel(event, language)}</dd>
+                    <dd>
+                      {getEventDateLabel(event, language)}
+                      {timeZoneLabel ? (
+                        <span className="whitespace-nowrap text-xs text-site-muted">
+                          {" "}
+                          ({timeZoneLabel})
+                        </span>
+                      ) : null}
+                    </dd>
                   </div>
                   <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2">
                     <Clock
@@ -193,16 +211,6 @@ export function EventPage() {
                     <dt className="font-bold">{copy.event.time}</dt>
                     <dd>{formatEventTime(event, language)}</dd>
                   </div>
-                  {event.timeZone && event.startTime ? (
-                    <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2">
-                      <Globe2
-                        className="row-span-2 size-5 shrink-0 text-site-accent-soft"
-                        aria-hidden="true"
-                      />
-                      <dt className="font-bold">{copy.event.timeZone}</dt>
-                      <dd>{event.timeZone}</dd>
-                    </div>
-                  ) : null}
                   <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2">
                     <MapPin
                       className="row-span-2 size-5 shrink-0 text-site-accent-soft"
