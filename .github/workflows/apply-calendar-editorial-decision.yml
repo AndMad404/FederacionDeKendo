@@ -57,6 +57,7 @@ jobs:
           CALENDAR_DECISION_REASON: ${{ inputs.reason }}
           CALENDAR_DECISION_ACTOR_ROLE: presidencia
       - name: Verify generated site
+        id: verification
         uses: ./.github/actions/verify-site
         with:
           mode: calendar
@@ -69,7 +70,8 @@ jobs:
         if: ${{ always() }}
         uses: ./.github/actions/calendar-design-review
         with:
-          publication-failed: ${{ job.status == 'failure' }}
+          publication-failed: ${{ steps.verification.outcome == 'failure' || steps.publication.outcome == 'failure' }}
+          failed-step: ${{ steps.verification.outcome == 'failure' && 'site verification' || 'Git publication' }}
           git-saved: ${{ steps.publication.outcome == 'success' }}
           smtp-username: ${{ secrets.CALENDAR_ALERT_SMTP_USERNAME }}
           smtp-password: ${{ secrets.CALENDAR_ALERT_SMTP_APP_PASSWORD }}

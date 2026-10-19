@@ -210,6 +210,18 @@ html {
   font-size: var(--font-size);
 }
 
+/* Scale rem-based text, controls and content widths together on large displays.
+   Use viewport size so browser zoom and OS scaling remain in control. */
+@media (min-width: 1920px) and (min-height: 1080px) {
+  html {
+    font-size: clamp(
+      var(--font-size),
+      calc(0.5rem + 0.416667vw),
+      calc(var(--font-size) * 1.5)
+    );
+  }
+}
+
 .gallery-featured-image:not(.gallery-featured-image--native-position) {
   object-position: var(
     --gallery-featured-mobile-object-position,

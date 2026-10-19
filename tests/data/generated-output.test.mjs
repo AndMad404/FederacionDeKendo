@@ -56,9 +56,10 @@ test("generates localized, unique, indexable SEO output for every event route", 
         );
         assert.ok(event, `${route.path}: calendar event is missing`);
         assert.ok(event.timeZone, `${route.path}: event time zone is missing`);
-        assert.ok(
+        assert.equal(
           html.includes(`<dd>${event.timeZone}</dd>`),
-          `${route.path}: registered time zone is not visible`,
+          Boolean(event.startTime),
+          `${route.path}: show the time zone only when a start time is published`,
         );
         assert.ok(
           html.includes(

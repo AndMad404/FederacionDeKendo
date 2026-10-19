@@ -193,7 +193,7 @@ export function EventPage() {
                     <dt className="font-bold">{copy.event.time}</dt>
                     <dd>{formatEventTime(event, language)}</dd>
                   </div>
-                  {event.timeZone ? (
+                  {event.timeZone && event.startTime ? (
                     <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2">
                       <Globe2
                         className="row-span-2 size-5 shrink-0 text-site-accent-soft"

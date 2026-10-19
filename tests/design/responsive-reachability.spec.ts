@@ -101,6 +101,21 @@ const FLOW_CASES = [
 
 const REACHABILITY_CASES = [
   {
+    name: "full-hd-desktop",
+    viewport: { width: 1920, height: 1080 },
+    routes: ALL_ROUTE_KEYS,
+  },
+  {
+    name: "qhd-desktop",
+    viewport: { width: 2560, height: 1440 },
+    routes: ALL_ROUTE_KEYS,
+  },
+  {
+    name: "4k-desktop",
+    viewport: { width: 3840, height: 2160 },
+    routes: ALL_ROUTE_KEYS,
+  },
+  {
     name: "mobile-calendar-360",
     viewport: { width: 360, height: 800 },
     routes: ["calendar"],

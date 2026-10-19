@@ -21,7 +21,9 @@ Google Calendar → sincronización y validación → datos versionados
   manifiesto de rutas e incorporan automáticamente los eventos publicados; los
   archivos de `public/` sirven como respaldo para desarrollo.
 - La identidad de un evento está desacoplada de su URL. Los cambios de URL
-  conservan redirects y las colisiones bloquean la publicación.
+  conservan aliases vanity y redirects 301. Los títulos repetidos reciben una
+  URL única con fecha y, si hace falta, un número; las URLs publicadas conservan
+  su propietario y no se reutilizan para otro evento.
 - Una sincronización inválida no reemplaza el último estado válido. El HTML
   generado se verifica antes del despliegue.
 
@@ -87,6 +89,13 @@ Después del commit y push, `review:calendar-design` revisa el mismo build con
 producen avisos, correo y artefactos sin revertir los datos. Los avisos distinguen
 el contenido guardado en Git del despliegue de Cloudflare, que no se confirma
 desde esta revisión.
+
+Las alertas de verificación y publicación se emiten solo si esa etapa falló.
+Si Gmail rechaza la autenticación, revisar `CALENDAR_ALERT_SMTP_USERNAME` y
+renovar `CALENDAR_ALERT_SMTP_APP_PASSWORD` con una contraseña de aplicación de
+la misma cuenta. El envío elimina los espacios de agrupación de esa contraseña;
+el resultado indica si el commit y push terminaron y conserva las alertas en
+`calendar-notification-reports`, incluso si el correo falla.
 
 La página densa de Gasshuku calibra alturas de bloques y márgenes en las cuatro
 presentaciones. Sus cantidades de texto, listas y fotos no son límites ni

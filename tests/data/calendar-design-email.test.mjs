@@ -11,6 +11,65 @@ import {
   formatCalendarNotificationEmail,
   calendarScreenshotAttachments,
 } from "../../scripts/write-calendar-notification-email.mjs";
+import { deliverCalendarNotification } from "../../scripts/send-calendar-notification-email.mjs";
+
+test("SMTP delivery normalizes copied App Password spacing and reports actual Git publication on authentication failure", () => {
+  const env = {
+    CALENDAR_ALERT_SMTP_USERNAME: " sender@example.test \n",
+    CALENDAR_ALERT_SMTP_APP_PASSWORD: "abcd efgh ijkl mnop\n",
+    CALENDAR_ALERT_RECIPIENT: " owner@example.test ",
+    CALENDAR_NOTIFICATION_EMAIL_PATH: "/tmp/email.txt",
+  };
+  for (const gitSaved of ["true", "false"]) {
+    let calls = 0;
+    const result = deliverCalendarNotification(
+      { ...env, CALENDAR_GIT_SAVED: gitSaved },
+      (command, args) => {
+        calls += 1;
+        assert.equal(command, "curl");
+        assert.equal(
+          args[args.indexOf("--user") + 1],
+          "sender@example.test:abcdefghijklmnop",
+        );
+        assert.equal(
+          args[args.indexOf("--mail-rcpt") + 1],
+          "owner@example.test",
+        );
+        return { status: 67, stderr: "sensitive transport output" };
+      },
+    );
+    assert.equal(
+      calls,
+      1,
+      "authentication denial must not cause repeated login attempts",
+    );
+    assert.equal(result.status, 67);
+    assert.match(result.message, /Gmail rechazó la autenticación/);
+    assert.match(
+      result.message,
+      gitSaved === "true"
+        ? /commit y push finalizaron correctamente/
+        : /no completó el commit y push/,
+    );
+    assert.doesNotMatch(
+      result.message,
+      /abcdefghijklmnop|sensitive transport output/,
+    );
+  }
+  assert.deepEqual(
+    deliverCalendarNotification(env, () => ({ status: 0 })),
+    { status: 0, message: null },
+  );
+  const missing = deliverCalendarNotification(
+    { ...env, CALENDAR_ALERT_SMTP_APP_PASSWORD: " " },
+    () => assert.fail("must not send without credentials"),
+  );
+  assert.equal(missing.status, 1);
+  assert.match(missing.message, /Falta configurar/);
+  const transport = deliverCalendarNotification(env, () => ({ status: 7 }));
+  assert.equal(transport.status, 7);
+  assert.match(transport.message, /código 7/);
+});
 
 test("broken-design emails attach captures from the evidence directory and reject unrelated files", async (t) => {
   const directory = await temporaryDirectory(t, "calendar-captures-");

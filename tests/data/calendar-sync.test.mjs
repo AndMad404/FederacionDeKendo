@@ -13,7 +13,14 @@ import sharp from "sharp";
 
 import { createIcs } from "../helpers/calendar-fixtures.mjs";
 
-import { synchronizeCalendar } from "../../scripts/sync-calendar-events.ts";
+import {
+  synchronizeCalendar,
+  mergeRegistry,
+} from "../../scripts/sync-calendar-events.ts";
+import {
+  getEventPath,
+  getEventLegacySlugs,
+} from "../../src/app/utils/eventRoutes.ts";
 
 const phase2FixturePath = new URL(
   "../fixtures/calendar-events-phase-2.ics",
@@ -64,17 +71,6 @@ test("keeps sourceId in the registry and out of the public event URL", async (t)
 
 const REJECTED_FEEDS = [
   {
-    name: "a title-only URL collision across different dates aborts before publication",
-    filename: "collision.ics",
-    version: 2,
-    feed: createIcs([
-      { uid: "first@example.test", date: "20260808", title: "Examen" },
-      { uid: "second@example.test", date: "20261031", title: "Examen" },
-    ]),
-    error: /Duplicate calendar canonical slug: examen/,
-    now: new Date("2026-07-01"),
-  },
-  {
     name: "an invalid feed leaves the last published files untouched",
     filename: "invalid.ics",
     version: 2,
@@ -105,6 +101,118 @@ const REJECTED_FEEDS = [
     error: /Invalid ALBUM_FOTOS/,
   },
 ];
+
+test("repeated titles publish unique URLs, keep them stable and preserve renamed vanity routes", async (t) => {
+  const tempDirectory = await temporaryDirectory(t, "fak-calendar-collision-");
+  const events = [
+    { uid: "first@example.test", date: "20260808", title: "Examen" },
+    { uid: "second@example.test", date: "20261031", title: "Examen" },
+    { uid: "third@example.test", date: "20261031", title: "Examen" },
+    {
+      uid: "natural@example.test",
+      date: "20261031",
+      title: "Examen 2026-10-31",
+    },
+  ];
+  const first = await runSynchronization({
+    tempDirectory,
+    name: "collisions",
+    events,
+  });
+  const slugs = first.registry.events.map(({ slug }) => slug);
+  assert.deepEqual(
+    new Set(slugs),
+    new Set([
+      "examen",
+      "examen-2026-10-31",
+      "examen-2026-10-31-2",
+      "examen-2026-10-31-3",
+    ]),
+  );
+  const output = await readFile(first.outputPath, "utf8");
+  for (const slug of slugs) assert.ok(output.includes(`id: "${slug}"`));
+  const repeated = await runSynchronization({
+    tempDirectory,
+    name: "collisions",
+    registryPath: first.registryPath,
+    events: [...events].reverse(),
+  });
+  assert.deepEqual(repeated.registry, first.registry);
+  const renamed = await runSynchronization({
+    tempDirectory,
+    name: "collisions",
+    registryPath: first.registryPath,
+    events: events.map((event, index) =>
+      index === 0 ? { ...event, title: "Examen nacional" } : event,
+    ),
+  });
+  const changed = renamed.registry.events.find(
+    ({ sourceId }) => sourceId === first.registry.events[0].sourceId,
+  );
+  assert.equal(changed.slug, "examen-nacional");
+  assert.deepEqual(changed.aliases, ["examen"]);
+  const publicEvent = { ...changed, id: changed.slug };
+  assert.ok(getEventLegacySlugs(publicEvent).includes("examen"));
+  assert.equal(
+    getEventPath(publicEvent, "es", new Date("2026-07-01")),
+    "/eventos/examen-nacional/",
+  );
+  assert.match(
+    await readFile(renamed.outputPath, "utf8"),
+    /aliases: \["examen"\]/,
+  );
+});
+
+test("collision allocation is independent of feed order and reserves historical, missing and deleted URLs", () => {
+  const now = new Date("2026-07-01");
+  const historical = {
+    sourceId: "past",
+    title: "Seminario",
+    slug: "2026-05-30-seminario",
+    aliases: ["seminario"],
+    date: "2026-05-30",
+    archiveEligibleAt: "2026-06-01T06:00:00.000Z",
+    historical: true,
+    editorialState: "publicado",
+  };
+  const current = {
+    ...historical,
+    slug: "seminario",
+    aliases: undefined,
+    historical: undefined,
+  };
+  const future = {
+    sourceId: "new",
+    title: "Seminario",
+    slug: "seminario",
+    date: "2026-11-28",
+    archiveEligibleAt: "2026-11-30T06:00:00.000Z",
+  };
+  const previous = { version: 4, events: [historical] };
+  const result = mergeRegistry(previous, [future, current], now);
+  assert.deepEqual(result, mergeRegistry(previous, [current, future], now));
+  assert.equal(result.events[0].slug, historical.slug);
+  assert.equal(result.events[0].pendingRevision, undefined);
+  assert.equal(result.events[1].slug, "seminario-2026-11-28");
+  assert.deepEqual(mergeRegistry(result, [current, future], now), result);
+  for (const editorialState of ["publicado", "eliminado"]) {
+    const missing = {
+      ...future,
+      sourceId: "missing",
+      slug: "seminario-2026-11-28",
+      editorialState,
+    };
+    const retained = mergeRegistry(
+      { version: 4, events: [historical, missing] },
+      [current, future],
+      now,
+    );
+    assert.equal(
+      retained.events.find(({ sourceId }) => sourceId === "new").slug,
+      "seminario-2026-11-28-2",
+    );
+  }
+});
 
 for (const scenario of REJECTED_FEEDS) {
   test(scenario.name, async (t) => {

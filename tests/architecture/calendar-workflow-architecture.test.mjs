@@ -144,6 +144,7 @@ test("writer workflows verify once before guarded publication and finalize after
       false,
     );
     assert.equal(steps[gate].with.mode, "calendar");
+    assert.equal(steps[gate].id, "verification");
     assert.equal(steps[commit].id, "publication");
     assert.equal(
       steps[commit].if,
@@ -162,7 +163,11 @@ test("writer workflows verify once before guarded publication and finalize after
     assert.equal(steps[review].if, "${{ always() }}");
     assert.equal(
       steps[review].with["publication-failed"],
-      "${{ job.status == 'failure' }}",
+      "${{ steps.verification.outcome == 'failure' || steps.publication.outcome == 'failure' }}",
+    );
+    assert.equal(
+      steps[review].with["failed-step"],
+      "${{ steps.verification.outcome == 'failure' && 'site verification' || 'Git publication' }}",
     );
     assert.equal(
       steps[review].with["git-saved"],
@@ -188,13 +193,25 @@ test("post-publication design review, fallback, delivery and artifacts remain in
   assert.equal(fallback.env.CALENDAR_LAYOUT_FORCE_INCOMPLETE, "true");
   assert.match(fallback.if, /steps.review.outcome == 'failure'/);
   const send = steps.find((step) => step.id === "delivery");
-  assert.match(send.run, /smtp.gmail.com:465/);
+  assert.equal(send.run, "node scripts/send-calendar-notification-email.mjs");
+  assert.equal(send.env.CALENDAR_GIT_SAVED, "${{ inputs.git-saved }}");
   assert.match(send.if, /always\(\)/);
   assert.ok(
     steps
       .filter((step) => step.uses === "actions/upload-artifact@v6")
-      .every((step) => step.if === "${{ always() }}"),
+      .every((step) => step.if.includes("always()")),
   );
+  const designUpload = steps.find(
+    (step) => step.with?.name === "calendar-design-review",
+  );
+  assert.match(designUpload.if, /steps.evidence.outputs.available == 'true'/);
+  const evidence = steps.find((step) => step.id === "evidence");
+  assert.match(evidence.run, /-d .*calendar-design-review/);
+  assert.match(evidence.run, /-f .*publication.json/);
+  const failure = steps.find(
+    (step) => step.name === "Emit verification failure notification",
+  );
+  assert.equal(failure.env.CALENDAR_FAILED_STEP, "${{ inputs.failed-step }}");
   assert.doesNotMatch(
     steps.map((step) => step.run ?? "").join("\n"),
     /git (?:reset|revert|checkout|push|commit)/,

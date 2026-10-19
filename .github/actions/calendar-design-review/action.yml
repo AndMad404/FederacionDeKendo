@@ -8,6 +8,9 @@ inputs:
     description: Whether a blocking verification or Git publication step failed.
     required: false
     default: "false"
+  failed-step:
+    description: Name of the verification or publication step that actually failed.
+    default: "unknown verification"
   smtp-username:
     required: true
     description: Existing calendar alert SMTP sender.
@@ -26,7 +29,7 @@ runs:
       run: node --import tsx scripts/write-calendar-verification-notification.mjs
       env:
         CALENDAR_NOTIFICATIONS_REPORT_PATH: ${{ runner.temp }}/calendar-notifications.json
-        CALENDAR_FAILED_STEP: calendar publication or blocking verification
+        CALENDAR_FAILED_STEP: ${{ inputs.failed-step }}
     - name: Review generated calendar design
       id: review
       if: ${{ inputs.git-saved == 'true' }}
@@ -61,24 +64,23 @@ runs:
       id: delivery
       if: ${{ always() && steps.email.outputs.send == 'true' }}
       shell: bash
-      run: >-
-        curl --fail --silent --show-error --url smtps://smtp.gmail.com:465 --ssl-reqd
-        --user "$CALENDAR_ALERT_SMTP_USERNAME:$CALENDAR_ALERT_SMTP_APP_PASSWORD"
-        --mail-from "$CALENDAR_ALERT_SMTP_USERNAME" --mail-rcpt "$CALENDAR_ALERT_RECIPIENT"
-        --upload-file "$CALENDAR_NOTIFICATION_EMAIL_PATH"
+      run: node scripts/send-calendar-notification-email.mjs
       env:
         CALENDAR_ALERT_SMTP_USERNAME: ${{ inputs.smtp-username }}
         CALENDAR_ALERT_SMTP_APP_PASSWORD: ${{ inputs.smtp-password }}
         CALENDAR_ALERT_RECIPIENT: ${{ inputs.recipient }}
         CALENDAR_NOTIFICATION_EMAIL_PATH: ${{ runner.temp }}/calendar-notification-email.txt
-    - name: Report email delivery failure
-      if: ${{ always() && steps.delivery.outcome == 'failure' }}
+        CALENDAR_GIT_SAVED: ${{ inputs.git-saved }}
+    - name: Locate calendar design evidence
+      id: evidence
+      if: ${{ always() }}
       shell: bash
       run: |
-        echo "::error title=Calendario::No se pudo enviar el correo. Los cambios guardados en Git permanecen; consultar los artefactos."
-        echo "El envío del correo falló. Los cambios guardados en Git permanecen y la evidencia está en los artefactos." >> "$GITHUB_STEP_SUMMARY"
+        if [[ -d "$RUNNER_TEMP/calendar-design-review" || -f "$RUNNER_TEMP/site-verification/publication.json" ]]; then
+          echo "available=true" >> "$GITHUB_OUTPUT"
+        fi
     - name: Upload calendar design evidence
-      if: ${{ always() }}
+      if: ${{ always() && steps.evidence.outputs.available == 'true' }}
       uses: actions/upload-artifact@v6
       with:
         name: calendar-design-review

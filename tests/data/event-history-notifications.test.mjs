@@ -213,20 +213,26 @@ test("F4: source, parser, mass-disappearance, and verification failures have saf
     ]),
   );
   const duplicateUrlError = captureError(() =>
-    mergeRegistry({ version: 4, events: [] }, [
+    mergeRegistry(
       {
-        sourceId: "first-source",
-        slug: "evento-duplicado",
-        title: "Evento duplicado",
-        date: "2026-10-01",
+        version: 4,
+        events: [
+          {
+            sourceId: "first-source",
+            slug: "evento-duplicado",
+            title: "Evento duplicado",
+            date: "2026-10-01",
+          },
+          {
+            sourceId: "second-source",
+            slug: "evento-duplicado",
+            title: "Evento duplicado",
+            date: "2026-11-01",
+          },
+        ],
       },
-      {
-        sourceId: "second-source",
-        slug: "evento-duplicado",
-        title: "Evento duplicado",
-        date: "2026-11-01",
-      },
-    ]),
+      [],
+    ),
   );
   const cases = [
     [duplicateSourceError, "id_fuente_duplicado"],
@@ -283,6 +289,14 @@ test("F4: source, parser, mass-disappearance, and verification failures have saf
     slug: "evento-duplicado",
   });
   assert.match(
+    duplicateUrlReport.notifications[0].actionRequired,
+    /propiedad de canonicas y aliases/,
+  );
+  assert.doesNotMatch(
+    duplicateUrlReport.notifications[0].actionRequired,
+    /Corregir los titulos/,
+  );
+  assert.match(
     getCalendarNotificationWarnings(duplicateUrlReport)[0],
     /URLs duplicadas de eventos/,
   );
@@ -290,20 +304,26 @@ test("F4: source, parser, mass-disappearance, and verification failures have saf
 
 test("F4: failure summaries redact private values and retain duplicate details", async (t) => {
   const duplicateUrlError = captureError(() =>
-    mergeRegistry({ version: 4, events: [] }, [
+    mergeRegistry(
       {
-        sourceId: "first-source",
-        slug: "evento-duplicado",
-        title: "Evento duplicado",
-        date: "2026-10-01",
+        version: 4,
+        events: [
+          {
+            sourceId: "first-source",
+            slug: "evento-duplicado",
+            title: "Evento duplicado",
+            date: "2026-10-01",
+          },
+          {
+            sourceId: "second-source",
+            slug: "evento-duplicado",
+            title: "Evento duplicado",
+            date: "2026-11-01",
+          },
+        ],
       },
-      {
-        sourceId: "second-source",
-        slug: "evento-duplicado",
-        title: "Evento duplicado",
-        date: "2026-11-01",
-      },
-    ]),
+      [],
+    ),
   );
   const duplicateUrlReport =
     createCalendarFailureNotification(duplicateUrlError);

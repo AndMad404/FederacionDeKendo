@@ -6,10 +6,10 @@ export function Footer() {
   const { copy } = useLanguage();
   return (
     <footer className="bg-site-navy text-site-on-dark">
-      <div className="mx-auto grid max-w-6xl grid-cols-1 justify-items-center gap-5 p-2.5 text-center md:grid-cols-2 md:gap-10">
+      <div className="mx-auto grid max-w-6xl grid-cols-1 justify-items-center gap-5 p-2.5 text-center md:grid-cols-2 md:gap-10 lg:px-6 lg:py-3 min-[1920px]:py-5">
         <section
           aria-labelledby="footer-purpose-title"
-          className="flex max-w-md flex-col items-center gap-3 md:gap-2"
+          className="flex max-w-md flex-col items-center gap-3 md:gap-2 lg:gap-3 min-[1920px]:gap-4"
         >
           <h2
             id="footer-purpose-title"
@@ -25,7 +25,7 @@ export function Footer() {
 
         <section
           aria-labelledby="footer-contact-title"
-          className="flex max-w-md flex-col items-center gap-3 md:gap-2"
+          className="flex max-w-md flex-col items-center gap-3 md:gap-2 lg:gap-3 min-[1920px]:gap-4"
         >
           <h2
             id="footer-contact-title"
@@ -33,7 +33,7 @@ export function Footer() {
           >
             {copy.footer.contacts}
           </h2>
-          <ul className="flex flex-col gap-1 text-base [align-items:self-start]">
+          <ul className="flex flex-col gap-1 text-base [align-items:self-start] lg:gap-2">
             <li>
               <a
                 className={`inline-flex items-center gap-2 underline-offset-4 hover:text-site-accent-soft hover:underline ${focusRingClass}`}
@@ -51,7 +51,7 @@ export function Footer() {
                 rel="noopener noreferrer"
               >
                 <Instagram aria-hidden="true" className="size-4 shrink-0" />
-                Instagram: @federacionkendocostarica
+                @federacionkendocostarica
               </a>
             </li>
           </ul>
