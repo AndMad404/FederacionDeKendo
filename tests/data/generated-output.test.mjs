@@ -56,11 +56,20 @@ test("generates localized, unique, indexable SEO output for every event route", 
         );
         assert.ok(event, `${route.path}: calendar event is missing`);
         assert.ok(event.timeZone, `${route.path}: event time zone is missing`);
+        const visibleHtml = html.replace(/<!--[\s\S]*?-->/g, "");
         assert.equal(
-          html.includes(`<dd>${event.timeZone}</dd>`),
+          /<dd>[^<]*<span[^>]*>\s*\(UTC(?:[+−]\d{1,2}(?::\d{2})?)?\)<\/span><\/dd>/.test(
+            visibleHtml,
+          ),
           Boolean(event.startTime),
-          `${route.path}: show the time zone only when a start time is published`,
+          `${route.path}: show the abbreviated time zone beside the date only when a start time is published`,
         );
+        if (event.startTime && event.timeZone === "America/Costa_Rica") {
+          assert.ok(
+            visibleHtml.includes("(UTC−6)"),
+            `${route.path}: Costa Rica events must show the UTC−6 offset`,
+          );
+        }
         assert.ok(
           html.includes(
             `hreflang="es-CR" href="https://fak-kendo.org${spanishPath}"`,
