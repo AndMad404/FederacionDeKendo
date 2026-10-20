@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { preparePage } from "../helpers/prepare-page";
 
-const eventPath = "/eventos/pasados/clak-1er-panamericano-brasil/";
+const eventPath = "/eventos/pasados/1er-panamericano-de-kendo/";
 const eventTitle = "1.er Panamericano de Kendo";
 const original = "https://www.instagram.com/p/DeLBKMPkdlM/";
 
@@ -114,19 +114,19 @@ for (const viewport of [
     await expect(
       page.getByRole("heading", { name: eventTitle, exact: true, level: 1 }),
     ).toBeVisible();
-    await expect(description).toContainText("Publicación original de CLAK");
+    await expect(description).toContainText("Link de la publicación original");
     await expect(description).toContainText(
       "El programa, los horarios y las sedes anunciadas pueden consultarse en la publicación original de CLAK.",
     );
     await expect(
       description.getByRole("link", {
-        name: "Publicación original de CLAK",
+        name: "Link de la publicación original",
         exact: true,
       }),
     ).toHaveAttribute("href", original);
     const originalBounds = await description
       .getByRole("link", {
-        name: "Publicación original de CLAK",
+        name: "Link de la publicación original",
         exact: true,
       })
       .boundingBox();

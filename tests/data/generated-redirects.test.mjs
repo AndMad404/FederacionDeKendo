@@ -9,6 +9,57 @@ import {
 import { readDist } from "../helpers/generated-output-fixtures.mjs";
 import { access } from "node:fs/promises";
 
+test("publishes the Panamericano in both languages with direct redirects from its previous names", async () => {
+  const destinations = new Map(
+    getEventRedirects().map(({ from, to }) => [from, to]),
+  );
+  const spanishPath = "/eventos/pasados/1er-panamericano-de-kendo/";
+  const englishPath = "/en/events/past/1st-pan-american-kendo/";
+  const sitemap = await readDist("sitemap.xml");
+  for (const [language, path, currentPrefix, pastPrefix, newSlug] of [
+    [
+      "es",
+      spanishPath,
+      "/eventos/",
+      "/eventos/pasados/",
+      "1er-panamericano-de-kendo",
+    ],
+    [
+      "en",
+      englishPath,
+      "/en/events/",
+      "/en/events/past/",
+      "1st-pan-american-kendo",
+    ],
+  ]) {
+    assert.equal(destinations.has(path), false);
+    assert.equal(destinations.get(`${currentPrefix}${newSlug}/`), path);
+    for (const oldSlug of [
+      "clak-1er-panamericano-brasil",
+      "2026-10-10-clak-1er-panamericano-brasil",
+    ]) {
+      for (const prefix of [currentPrefix, pastPrefix]) {
+        assert.equal(destinations.get(`${prefix}${oldSlug}/`), path);
+      }
+    }
+    const html = await readDist(`${path.slice(1)}index.html`);
+    assert.ok(html.includes(`<html lang="${language}"`));
+    assert.ok(html.includes('name="robots" content="index, follow"'));
+    assert.ok(
+      html.includes(`rel="canonical" href="https://fak-kendo.org${path}"`),
+    );
+    assert.ok(
+      html.includes(
+        `hreflang="es-CR" href="https://fak-kendo.org${spanishPath}"`,
+      ),
+    );
+    assert.ok(
+      html.includes(`hreflang="en" href="https://fak-kendo.org${englishPath}"`),
+    );
+    assert.ok(sitemap.includes(`<loc>https://fak-kendo.org${path}</loc>`));
+  }
+});
+
 test("redirects retired archive page URLs to the localized main archive", async () => {
   const redirects = await readDist("_redirects");
   const sitemap = await readDist("sitemap.xml");

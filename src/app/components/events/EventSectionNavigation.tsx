@@ -20,7 +20,7 @@ export function EventSectionNavigation({
       label: copy.calendar.upcomingLabel,
       path: paths.upcoming,
     },
-    { id: "past", label: copy.archive.title, path: paths.past },
+    { id: "past", label: copy.event.viewArchive, path: paths.past },
   ] as const;
 
   return (

@@ -15,6 +15,18 @@ import {
 
 test.after(async () => closeSourceModuleLoader());
 
+test("language switches use each Panamericano canonical slug in both directions", async () => {
+  const { getLocalizedPath, isLanguageSwitch } = await loadSourceModule(
+    "/src/app/config/i18n.ts",
+  );
+  const spanish = "/eventos/pasados/1er-panamericano-de-kendo/";
+  const english = "/en/events/past/1st-pan-american-kendo/";
+  assert.equal(getLocalizedPath(spanish, "en"), english);
+  assert.equal(getLocalizedPath(english, "es"), spanish);
+  assert.equal(isLanguageSwitch(spanish, english), true);
+  assert.equal(isLanguageSwitch(english, spanish), true);
+});
+
 const tournament = {
   id: "2026-08-22-3er-torneo",
   title: "3er Torneo",

@@ -58,7 +58,7 @@ export function getLocalizedPath(pathname: string, language: Language) {
   if (englishArchivedEvent) {
     if (language === "en") return normalized;
     const event = findEventByPathname(normalized);
-    return event ? `/eventos/pasados/${englishArchivedEvent[1]}/` : "/";
+    return event ? getEventPath(event, "es") : "/";
   }
 
   const spanishEvent = normalized.match(/^\/eventos\/([^/]+)\/$/);
@@ -102,7 +102,7 @@ export const COPY = {
       switchToEnglish: "View site in English",
       calendarMenu: "Opciones del calendario",
       upcomingEvents: "Próximos eventos",
-      pastEvents: "Eventos pasados",
+      pastEvents: "Ver mas Eventos Pasados",
       links: [
         { id: "home", path: "/", label: "Inicio" },
         { id: "calendar", path: "/eventos/", label: "Calendario" },
@@ -148,7 +148,7 @@ export const COPY = {
       upcomingLabel: "Próximos eventos",
       description: "Torneos, exámenes y actividades de kendo.",
       empty: "No hay próximos eventos publicados.",
-      pastEvents: "Eventos pasados",
+      pastEvents: "Ver mas Eventos Pasados",
       copiedAnnouncement: "Enlace del evento copiado al portapapeles.",
       navigation: "Navegación del calendario",
       previousMonth: "Ver mes anterior",
@@ -190,6 +190,10 @@ export const COPY = {
     event: {
       defaultType: "Actividad de kendo",
       external: "Evento externo",
+      officialImage: "Imagen oficial del evento",
+      officialFlyer: "Flyer oficial del",
+      openImage: "Abrir",
+      enlargeFlyer: "Ampliar flyer",
       completed: "Actividad finalizada",
       scheduled: "Actividad programada",
       date: "Fecha",
@@ -198,7 +202,7 @@ export const COPY = {
       location: "Ubicación",
       description: "Descripción",
       backToCalendar: "Volver al calendario",
-      viewArchive: "Eventos pasados",
+      viewArchive: "Ver mas Eventos Pasados",
       directions: "Cómo llegar",
       viewDetailsLabel: "Consultar detalles del evento",
       addToCalendar: "Añade a tu calendario",
@@ -247,7 +251,7 @@ export const COPY = {
       switchToEnglish: "View site in English",
       calendarMenu: "Calendar options",
       upcomingEvents: "Upcoming events",
-      pastEvents: "Past events",
+      pastEvents: "View More Past Events",
       links: [
         { id: "home", path: "/en/", label: "Home" },
         { id: "calendar", path: "/eventos/", label: "Calendar" },
@@ -291,7 +295,7 @@ export const COPY = {
       upcomingLabel: "Upcoming events",
       description: "Kendo tournaments, examinations, and activities.",
       empty: "There are no upcoming published events.",
-      pastEvents: "Past events",
+      pastEvents: "View More Past Events",
       copiedAnnouncement: "Event link copied to the clipboard.",
       navigation: "Calendar navigation",
       previousMonth: "View previous month",
@@ -333,6 +337,10 @@ export const COPY = {
     event: {
       defaultType: "Kendo activity",
       external: "External event",
+      officialImage: "Official image for",
+      officialFlyer: "Official flyer for",
+      openImage: "Open",
+      enlargeFlyer: "Enlarge flyer",
       completed: "Completed activity",
       scheduled: "Scheduled activity",
       date: "Date",
@@ -341,7 +349,7 @@ export const COPY = {
       location: "Location",
       description: "Description",
       backToCalendar: "Back to calendar",
-      viewArchive: "Past events",
+      viewArchive: "View More Past Events",
       directions: "Directions",
       viewDetailsLabel: "View details for",
       addToCalendar: "Add to calendar",

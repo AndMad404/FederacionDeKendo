@@ -1,6 +1,7 @@
 import { lazy, Suspense, useMemo } from "react";
 import type { MouseEvent } from "react";
 import { EVENT_GALLERIES } from "../data/eventGalleries";
+import { useLanguage } from "../config/i18n";
 import { useCarousel } from "../hooks/useCarousel";
 import { useGalleryLightbox } from "../hooks/useGalleryLightbox";
 import { useSwipeNavigation } from "../hooks/useSwipeNavigation";
@@ -25,7 +26,10 @@ export function HistoricalEventGallery({
   eventId,
   eventTitle,
 }: HistoricalEventGalleryProps) {
+  const { language, copy } = useLanguage();
   const posterSource = EVENT_GALLERIES[eventId]?.posterSource;
+  const translatedPosterAlt =
+    language === "en" ? `${copy.event.officialFlyer} ${eventTitle}` : undefined;
   const images = useMemo<GalleryImage[]>(() => {
     const gallery = EVENT_GALLERIES[eventId];
     return (gallery?.images ?? []).map((image) => ({
@@ -39,13 +43,15 @@ export function HistoricalEventGallery({
       thumbnailSrcSet: image.srcSet.webp,
       thumbnailWidth: image.width,
       thumbnailHeight: image.height,
-      title: gallery.posterSource ? image.alt : `Fotografía ${image.order}`,
+      title: gallery.posterSource
+        ? (translatedPosterAlt ?? image.alt)
+        : `Fotografía ${image.order}`,
       tag: eventTitle,
       alt: gallery.posterSource
-        ? image.alt
+        ? (translatedPosterAlt ?? image.alt)
         : `Fotografía ${image.order} del evento ${eventTitle}`,
     }));
-  }, [eventId, eventTitle]);
+  }, [eventId, eventTitle, translatedPosterAlt]);
   const firstLandscapeIndex = images.findIndex(
     (image) => image.width >= image.height,
   );
@@ -79,7 +85,7 @@ export function HistoricalEventGallery({
 
   return (
     <section
-      aria-label={`${posterSource ? "Imagen oficial" : "Fotografías"} del evento ${eventTitle}`}
+      aria-label={`${posterSource ? copy.event.officialImage : "Fotografías del evento"} ${eventTitle}`}
       className={`-mx-3 grid min-w-0 w-[calc(100%_+_1.5rem)] content-start gap-2.5 sm:mx-0 sm:w-full xl:[&_[role=group]]:h-[var(--event-thumbnail-height)] ${images.length > 6 ? "sm:[&_[role=group]]:justify-start" : ""}`}
     >
       <figure className="group relative aspect-video cursor-pointer overflow-hidden rounded-xl bg-site-media xl:aspect-auto xl:h-[var(--event-featured-height)]">
@@ -103,13 +109,13 @@ export function HistoricalEventGallery({
         </picture>
         <button
           type="button"
-          aria-label={`Abrir ${featured.alt}`}
+          aria-label={`${copy.event.openImage} ${featured.alt}`}
           onClick={openFeatured}
           className={`absolute inset-0 touch-pan-y cursor-pointer ${focusRingClass}`}
           {...swipeHandlers}
         >
           <span className="sr-only">
-            {posterSource ? "Ampliar flyer" : "Abrir fotografía"}
+            {posterSource ? copy.event.enlargeFlyer : "Abrir fotografía"}
           </span>
         </button>
         {images.length > 1 ? (

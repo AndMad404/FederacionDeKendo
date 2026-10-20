@@ -40,7 +40,7 @@ test("renders localized upcoming and past event navigation with the active page"
       upcomingPath: "/eventos/",
       pastPath: "/eventos/pasados/",
       upcoming: "Próximos eventos",
-      past: "Eventos pasados",
+      past: "Ver mas Eventos Pasados",
       active: "upcoming",
     },
     {
@@ -48,7 +48,7 @@ test("renders localized upcoming and past event navigation with the active page"
       upcomingPath: "/eventos/",
       pastPath: "/eventos/pasados/",
       upcoming: "Próximos eventos",
-      past: "Eventos pasados",
+      past: "Ver mas Eventos Pasados",
       active: "past",
     },
   ] as const;

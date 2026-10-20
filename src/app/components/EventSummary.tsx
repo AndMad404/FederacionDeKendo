@@ -13,12 +13,14 @@ function SummaryText({ text, compact }: { text: string; compact: boolean }) {
   const parts: ReactNode[] = [];
   let cursor = 0;
   for (const match of text.matchAll(
-    /\[([^\]\r\n]+)\]\((https:\/\/[^\s)]+)\)/gu,
+    /\[([^\]\r\n]+)\]\((https:\/\/[^\s)]+)\)|\*\*([^*\r\n]+)\*\*/gu,
   )) {
     parts.push(text.slice(cursor, match.index));
     // Archive summaries live inside the card link, so they must stay text only.
     parts.push(
-      compact ? (
+      match[3] ? (
+        <strong key={match.index}>{match[3]}</strong>
+      ) : compact ? (
         match[1]
       ) : (
         <a
@@ -26,7 +28,7 @@ function SummaryText({ text, compact }: { text: string; compact: boolean }) {
           href={match[2]}
           target="_blank"
           rel="noopener noreferrer"
-          className={`[overflow-wrap:anywhere] underline underline-offset-4 ${focusRingClass}`}
+          className={`[overflow-wrap:anywhere] text-blue-700 underline underline-offset-4 visited:text-purple-700 hover:text-blue-800 ${focusRingClass}`}
         >
           {match[1]}
         </a>

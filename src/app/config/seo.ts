@@ -11,6 +11,7 @@ import {
   findEventByPathname,
   getEventPath,
   getEventLegacySlugs,
+  getEventPublicSlug,
 } from "../utils/eventRoutes";
 import { getLanguageFromPathname, type Language } from "./i18n";
 import {
@@ -569,6 +570,7 @@ export function getEventRedirects() {
       const aliases = getEventLegacySlugs(event);
 
       const spanishSources = new Set([
+        `/eventos/${getEventPublicSlug(event, "es")}/`,
         `/eventos/${event.id}/`,
         ...(archived ? [`/eventos/pasados/${event.id}/`] : []),
         ...aliases.flatMap((alias) => [
@@ -578,6 +580,7 @@ export function getEventRedirects() {
       ]);
 
       const englishSources = new Set([
+        `/en/events/${getEventPublicSlug(event, "en")}/`,
         `/en/events/${event.id}/`,
         ...(archived ? [`/en/events/past/${event.id}/`] : []),
         ...aliases.flatMap((alias) => [

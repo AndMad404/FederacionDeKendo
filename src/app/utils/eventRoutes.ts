@@ -9,8 +9,24 @@ const EVENT_VANITY_SLUGS: Readonly<Record<string, string>> = {
   "2026-05-29-clak-seminario-instructores-chile": "2026-05-30-seminario",
 };
 
-function getEventPublicSlug(event: Pick<CalendarEvent, "id">) {
-  return EVENT_VANITY_SLUGS[event.id] ?? event.id;
+const EVENT_LOCALIZED_SLUGS: Readonly<
+  Record<string, Readonly<Record<Language, string>>>
+> = {
+  "clak-1er-panamericano-brasil": {
+    es: "1er-panamericano-de-kendo",
+    en: "1st-pan-american-kendo",
+  },
+};
+
+export function getEventPublicSlug(
+  event: Pick<CalendarEvent, "id">,
+  language: Language = "es",
+) {
+  return (
+    EVENT_LOCALIZED_SLUGS[event.id]?.[language] ??
+    EVENT_VANITY_SLUGS[event.id] ??
+    event.id
+  );
 }
 
 export function getEventLegacySlugs(
@@ -32,9 +48,9 @@ export function getEventPath(
   now = new Date(),
 ) {
   const archived = isPastEvent(event, now);
-  const slug = getEventPublicSlug(event);
   const publishEnglishRoute =
     language === "en" && hasDistinctEventTranslation(event);
+  const slug = getEventPublicSlug(event, publishEnglishRoute ? "en" : "es");
 
   if (publishEnglishRoute) {
     return archived ? `/en/events/past/${slug}/` : `/en/events/${slug}/`;
@@ -48,6 +64,7 @@ function findEventBySlug(slug: string) {
     (event) =>
       event.id === slug ||
       getEventPublicSlug(event) === slug ||
+      getEventPublicSlug(event, "en") === slug ||
       getEventLegacySlugs(event).includes(slug),
   );
 }

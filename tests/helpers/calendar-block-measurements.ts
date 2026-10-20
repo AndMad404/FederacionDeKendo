@@ -63,7 +63,7 @@ export async function measureCalendarBlocks(
       ?.getBoundingClientRect();
     const gallery = document
       .querySelector(
-        'main section:is([aria-label^="Fotografías del evento"], [aria-label^="Imagen oficial del evento"])',
+        'main section:is([aria-label^="Fotografías del evento"], [aria-label^="Imagen oficial del evento"], [aria-label^="Official image for"])',
       )
       ?.getBoundingClientRect();
     const footer = document.querySelector("footer")?.getBoundingClientRect();
