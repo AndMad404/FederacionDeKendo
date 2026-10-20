@@ -41,7 +41,9 @@ const getMobileViewport = () => window.matchMedia(mobileArchiveQuery).matches;
 const getServerViewport = () => true;
 
 function getEventThumbnail(eventId: string) {
-  const images = EVENT_GALLERIES[eventId]?.images ?? [];
+  const gallery = EVENT_GALLERIES[eventId];
+  if (gallery?.thumbnail) return gallery.thumbnail;
+  const images = gallery?.images ?? [];
   const targetRatio = 16 / 9;
   const horizontalImages = images.filter(
     (image) => image.width / image.height >= 1.3,
@@ -234,49 +236,52 @@ export function PastEventsSection() {
             <ul className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-4">
               {pageEvents.map((event) => {
                 const thumbnail = getEventThumbnail(event.id);
+                const isPoster = Boolean(
+                  EVENT_GALLERIES[event.id]?.posterSource,
+                );
 
                 return (
                   <li
                     key={event.id}
-                    className="flex flex-col justify-between gap-2 rounded-xl border border-site-border bg-site-canvas p-3"
+                    className="row-span-3 grid grid-rows-subgrid gap-2 rounded-xl border border-site-border bg-site-canvas p-3"
                   >
-                    <div>
+                    <div className="flex flex-col items-center justify-between">
                       <h2 className="font-bold">{event.title}</h2>
-                      <p className="mt-1 inline-block rounded-lg bg-site-media px-2.5 py-2 text-sm font-bold uppercase leading-tight text-site-action lg:px-2 lg:py-1">
+                      <p className="mt-1 inline-block rounded-lg bg-site-media px-2.5 py-2 text-sm font-bold uppercase leading-tight text-site-action lg:px-2 lg:py-1 page-fit:mt-0">
                         {getEventDateLabel(event, language)}
                       </p>
-                      <div className="mt-2">
-                        {thumbnail ? (
-                          <picture
-                            data-event-thumbnail
-                            className="flex aspect-video h-auto w-full max-w-full items-center justify-center overflow-hidden rounded-lg bg-site-surface"
-                          >
-                            <source
-                              srcSet={thumbnail.srcSet.avif}
-                              sizes="(min-width: 1024px) 14rem, (min-width: 768px) 50vw, 100vw"
-                              type="image/avif"
-                            />
-                            <img
-                              src={thumbnail.src}
-                              srcSet={thumbnail.srcSet.webp}
-                              sizes="(min-width: 1024px) 14rem, (min-width: 768px) 50vw, 100vw"
-                              alt=""
-                              width={thumbnail.width}
-                              height={thumbnail.height}
-                              loading="lazy"
-                              decoding="async"
-                              className="block h-full max-h-full w-full max-w-full rounded-lg object-cover object-center"
-                            />
-                          </picture>
-                        ) : (
-                          <EventSummary
-                            summary={
-                              event.summary ?? copy.common.informationPending
-                            }
-                            compact
+                    </div>
+                    <div>
+                      {thumbnail ? (
+                        <picture
+                          data-event-thumbnail
+                          className="flex aspect-video h-auto w-full max-w-full items-center justify-center overflow-hidden rounded-lg bg-site-surface"
+                        >
+                          <source
+                            srcSet={thumbnail.srcSet.avif}
+                            sizes="(min-width: 1024px) 14rem, (min-width: 768px) 50vw, 100vw"
+                            type="image/avif"
                           />
-                        )}
-                      </div>
+                          <img
+                            src={thumbnail.src}
+                            srcSet={thumbnail.srcSet.webp}
+                            sizes="(min-width: 1024px) 14rem, (min-width: 768px) 50vw, 100vw"
+                            alt=""
+                            width={thumbnail.width}
+                            height={thumbnail.height}
+                            loading="lazy"
+                            decoding="async"
+                            className={`block h-full max-h-full w-full max-w-full rounded-lg object-center ${isPoster ? "object-contain" : "object-cover"}`}
+                          />
+                        </picture>
+                      ) : (
+                        <EventSummary
+                          summary={
+                            event.summary ?? copy.common.informationPending
+                          }
+                          compact
+                        />
+                      )}
                     </div>
                     <Link
                       to={getEventPath(event, language)}

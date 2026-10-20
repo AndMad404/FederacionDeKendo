@@ -17,6 +17,7 @@ interface LightboxProps {
   index?: number;
   total?: number;
   showDetails?: boolean;
+  containImage?: boolean;
   triggerRef: RefObject<HTMLElement | null>;
   onClose: () => void;
   onPrev: () => void;
@@ -28,6 +29,7 @@ export function Lightbox({
   index = 0,
   total = 0,
   showDetails = false,
+  containImage = false,
   triggerRef,
   onClose,
   onPrev,
@@ -129,7 +131,7 @@ export function Lightbox({
         aria-describedby={
           showDetails && displayDescription ? "lightbox-description" : undefined
         }
-        className={`relative flex max-h-[calc(100svh-2rem)] w-full max-w-5xl touch-pan-y flex-col items-center text-site-on-dark ${showDetails ? "gap-[10px] sm:gap-3 land-sm:h-[calc(100svh-1rem)] land-sm:max-h-none land-sm:max-w-[calc(100vw-2rem)] land-sm:gap-0" : "land-sm:h-[calc(100svh-1rem)] land-sm:max-h-none land-sm:max-w-[calc(100vw-2rem)]"}`}
+        className={`relative flex max-h-[calc(100svh-2rem)] w-full max-w-5xl touch-pan-y flex-col items-center text-site-on-dark ${containImage ? "pt-14" : ""} ${showDetails ? "gap-[10px] sm:gap-3 land-sm:h-[calc(100svh-1rem)] land-sm:max-h-none land-sm:max-w-[calc(100vw-2rem)] land-sm:gap-0" : "land-sm:h-[calc(100svh-1rem)] land-sm:max-h-none land-sm:max-w-[calc(100vw-2rem)]"}`}
         onPointerDown={(event) => {
           event.stopPropagation();
           const startedPinch = pinchZoomHandlers.onPointerDown(event);
@@ -155,7 +157,7 @@ export function Lightbox({
 
         <div
           data-lightbox-image
-          className="flex h-[min(54svh,32rem)] min-h-0 w-full touch-none items-center justify-center overflow-hidden rounded-xl bg-site-navy sm:h-[min(68svh,36rem)] land-sm:h-full land-sm:flex-none"
+          className={`flex h-[min(54svh,32rem)] min-h-0 w-full touch-none items-center justify-center overflow-hidden rounded-xl bg-site-navy sm:h-[min(68svh,36rem)] land-sm:h-full ${containImage ? "land-sm:flex-1" : "land-sm:flex-none"}`}
         >
           <img
             src={image.src}
@@ -165,7 +167,7 @@ export function Lightbox({
             width={image.width}
             height={image.height}
             decoding="async"
-            className="block h-auto max-h-full w-auto max-w-full rounded-xl object-contain lg:h-full lg:w-full lg:max-w-none lg:object-cover land-sm:h-full land-sm:max-h-none land-sm:w-full land-sm:max-w-none land-sm:object-cover"
+            className={`block h-auto max-h-full w-auto max-w-full rounded-xl object-contain ${containImage ? "" : "lg:h-full lg:w-full lg:max-w-none lg:object-cover land-sm:h-full land-sm:max-h-none land-sm:w-full land-sm:max-w-none land-sm:object-cover"}`}
             style={{ transform: `scale(${scale})`, transformOrigin }}
           />
         </div>
@@ -222,7 +224,7 @@ export function Lightbox({
               className="justify-self-start sm:col-start-3 sm:justify-self-center lg:absolute lg:right-3 lg:top-1/2 lg:-translate-y-1/2 lg:enabled:hover:-translate-y-1/2 lg:enabled:active:-translate-y-1/2 land-sm:absolute land-sm:right-3 land-sm:top-1/2 land-sm:-translate-y-1/2 land-sm:enabled:hover:-translate-y-1/2 land-sm:enabled:active:-translate-y-1/2"
             />
           </div>
-        ) : (
+        ) : total !== 1 ? (
           <div className="flex w-full max-w-[22rem] items-center justify-between pt-2 sm:pointer-events-none sm:absolute sm:inset-0 sm:z-10 sm:max-w-none sm:px-3 sm:pt-0">
             <NavigationArrowButton
               direction="previous"
@@ -245,7 +247,7 @@ export function Lightbox({
               className="sm:pointer-events-auto"
             />
           </div>
-        )}
+        ) : null}
       </div>
     </div>,
     document.body,

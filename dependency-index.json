@@ -47,6 +47,7 @@
         "tests/data/event-history-filters.test.mjs",
         "tests/data/event-history-sync-contract.test.mjs",
         "tests/data/event-runtime.test.mjs",
+        "tests/data/generated-event-structured-data.test.mjs",
         "tests/data/generated-redirects.test.mjs",
         "tests/behavior/events.spec.ts",
         "tests/data/generated-translations.test.mjs",
@@ -55,7 +56,8 @@
         "tests/data/llms-txt.test.mjs",
         "tests/design/geometry-contract.spec.ts",
         "tests/design/calendar-layout.spec.ts",
-        "tests/behavior/event-history-filters.spec.ts"
+        "tests/behavior/event-history-filters.spec.ts",
+        "tests/data/calendar-manual-exception.test.mjs"
       ]
     },
     {
@@ -71,12 +73,14 @@
       ],
       "area": "Interfaz de calendario, eventos y archivo historico",
       "tests": [
+        "tests/behavior/event-poster-gallery.spec.ts",
         "tests/data/calendar-timezone-localization.spec.ts",
         "tests/behavior/calendar-behavior.spec.ts",
         "tests/behavior/event-history-filters.spec.ts",
         "tests/behavior/events.spec.ts",
         "tests/design/event-action-geometry.spec.ts",
         "tests/design/event-content-layout.spec.ts",
+        "tests/design/calendar-layout.spec.ts",
         "tests/design/responsive-reachability.spec.ts",
         "tests/design/shell-geometry.spec.ts"
       ]
@@ -100,7 +104,8 @@
         "tests/data/event-history-sync-contract.test.mjs",
         "tests/data/gallery-data.test.mjs",
         "tests/data/static-public-content.test.mjs",
-        "tests/data/calendar-migration-parity.test.mjs"
+        "tests/data/calendar-migration-parity.test.mjs",
+        "tests/behavior/event-poster-gallery.spec.ts"
       ]
     },
     {
@@ -122,7 +127,8 @@
         "tests/design/event-content-layout.spec.ts",
         "tests/design/interaction-states.spec.ts",
         "tests/design/visual-regression.spec.ts",
-        "tests/design/shell-geometry.spec.ts"
+        "tests/design/shell-geometry.spec.ts",
+        "tests/behavior/event-poster-gallery.spec.ts"
       ]
     },
     {
@@ -202,7 +208,8 @@
         "tests/data/calendar-design-policy.test.mjs",
         "tests/data/calendar-design-email.test.mjs",
         "tests/data/calendar-design-report.test.mjs",
-        "tests/data/calendar-migration-parity.test.mjs"
+        "tests/data/calendar-migration-parity.test.mjs",
+        "tests/data/calendar-manual-exception.test.mjs"
       ]
     },
     {
@@ -238,7 +245,8 @@
         "tests/design/interaction-states.spec.ts",
         "tests/design/responsive-reachability.spec.ts",
         "tests/design/shell-geometry.spec.ts",
-        "tests/design/visual-regression.spec.ts"
+        "tests/design/visual-regression.spec.ts",
+        "tests/behavior/event-poster-gallery.spec.ts"
       ]
     },
     {
@@ -317,8 +325,8 @@
   ],
   "graphSnapshot": {
     "generatorVersion": 1,
-    "relationCount": 352,
+    "relationCount": 358,
     "algorithm": "sha256",
-    "digest": "0c4bb4b7af6d17b8ef0f6ce0cd3d0d710cf88e7a69851d0b9e8cb9b826551522"
+    "digest": "f5ce105a9101199ecd8e9ccbc50783d21e7ab29a42dfd1271a7826bd168da136"
   }
 }

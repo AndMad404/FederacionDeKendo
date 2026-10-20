@@ -25,6 +25,7 @@ export function HistoricalEventGallery({
   eventId,
   eventTitle,
 }: HistoricalEventGalleryProps) {
+  const posterSource = EVENT_GALLERIES[eventId]?.posterSource;
   const images = useMemo<GalleryImage[]>(() => {
     const gallery = EVENT_GALLERIES[eventId];
     return (gallery?.images ?? []).map((image) => ({
@@ -38,9 +39,11 @@ export function HistoricalEventGallery({
       thumbnailSrcSet: image.srcSet.webp,
       thumbnailWidth: image.width,
       thumbnailHeight: image.height,
-      title: `Fotografía ${image.order}`,
+      title: gallery.posterSource ? image.alt : `Fotografía ${image.order}`,
       tag: eventTitle,
-      alt: `Fotografía ${image.order} del evento ${eventTitle}`,
+      alt: gallery.posterSource
+        ? image.alt
+        : `Fotografía ${image.order} del evento ${eventTitle}`,
     }));
   }, [eventId, eventTitle]);
   const firstLandscapeIndex = images.findIndex(
@@ -76,7 +79,7 @@ export function HistoricalEventGallery({
 
   return (
     <section
-      aria-label={`Fotografías del evento ${eventTitle}`}
+      aria-label={`${posterSource ? "Imagen oficial" : "Fotografías"} del evento ${eventTitle}`}
       className={`-mx-3 grid min-w-0 w-[calc(100%_+_1.5rem)] content-start gap-2.5 sm:mx-0 sm:w-full xl:[&_[role=group]]:h-[var(--event-thumbnail-height)] ${images.length > 6 ? "sm:[&_[role=group]]:justify-start" : ""}`}
     >
       <figure className="group relative aspect-video cursor-pointer overflow-hidden rounded-xl bg-site-media xl:aspect-auto xl:h-[var(--event-featured-height)]">
@@ -95,7 +98,7 @@ export function HistoricalEventGallery({
             height={featured.height}
             loading="lazy"
             decoding="async"
-            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:transform-none"
+            className={`h-full w-full ${posterSource ? "object-contain bg-white" : "object-cover transition-transform duration-700 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:transform-none"}`}
           />
         </picture>
         <button
@@ -105,7 +108,9 @@ export function HistoricalEventGallery({
           className={`absolute inset-0 touch-pan-y cursor-pointer ${focusRingClass}`}
           {...swipeHandlers}
         >
-          <span className="sr-only">Abrir fotografía</span>
+          <span className="sr-only">
+            {posterSource ? "Ampliar flyer" : "Abrir fotografía"}
+          </span>
         </button>
         {images.length > 1 ? (
           <div className="pointer-events-none absolute inset-y-0 left-5 right-5 flex items-center justify-between">
@@ -143,6 +148,8 @@ export function HistoricalEventGallery({
         <Suspense fallback={null}>
           <Lightbox
             image={lightboxImage}
+            total={images.length}
+            containImage={Boolean(posterSource)}
             triggerRef={triggerRef}
             onClose={closeLightbox}
             onPrev={showPrev}

@@ -216,12 +216,17 @@ test("uses an assigned gallery thumbnail and falls back to the event description
 
   const eventWithoutGallery = page
     .getByRole("heading", {
-      name: "CLAK 1er Panamericano BRASIL",
+      name: "Seminario Noviembre",
       exact: true,
     })
     .locator("xpath=ancestor::li");
   await expect(
     eventWithoutGallery.locator("[data-event-thumbnail]"),
   ).toHaveCount(0);
-  await expect(eventWithoutGallery.getByText("#EventoExterno")).toBeVisible();
+  await expect(eventWithoutGallery).toContainText(
+    "Seminario Técnico de Kendo con Senseis /mo Dan Haruyo y Genki Kubo.",
+  );
+  await expect(eventWithoutGallery).toContainText(
+    "Abierto para practicantes con y sin bogu.",
+  );
 });

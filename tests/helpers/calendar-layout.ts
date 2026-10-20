@@ -177,7 +177,7 @@ export async function calendarLayoutFindings(
           );
       }
       const gallery = main.querySelector(
-        'section[aria-label^="Fotografías del evento"]',
+        'section:is([aria-label^="Fotografías del evento"], [aria-label^="Imagen oficial del evento"])',
       );
       if (!gallery && expectedPhotos > 0)
         record("componente_ausente", "gallery", { expectedPhotos });
@@ -239,7 +239,7 @@ export async function calendarLayoutFindings(
             "main article dl",
             "main article h2",
             "main article aside",
-            'main section[aria-label^="Fotografías del evento"]',
+            'main section:is([aria-label^="Fotografías del evento"], [aria-label^="Imagen oficial del evento"])',
             "footer",
           ]
         : ["main h1", "[data-page-content-boundary]", "footer"];

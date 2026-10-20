@@ -36,3 +36,21 @@ test("approved clipping exceptions and a recoverable carousel stay valid", async
   );
   expect(await calendarLayoutFindings(page)).toEqual([]);
 });
+
+test("poster galleries are measured and missing poster images are detected", async ({
+  page,
+}) => {
+  await page.setContent(
+    '<style>main{width:300px}figure{position:relative;height:180px;margin:0}figure img{width:300px;height:180px}figure button{position:absolute;inset:0}footer{height:44px}</style><main><h1>Evento</h1><nav>Controles</nav><section aria-label="Imagen oficial del evento"><figure><img alt="Flyer oficial" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"><button type="button">Ampliar flyer</button></figure></section></main><footer>Footer</footer>',
+  );
+  expect(await calendarLayoutFindings(page, 1)).toEqual([]);
+  await page.locator("figure img").evaluate((image) => image.remove());
+  expect(await calendarLayoutFindings(page, 1)).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({
+        rule: "componente_ausente",
+        component: "gallery image",
+      }),
+    ]),
+  );
+});

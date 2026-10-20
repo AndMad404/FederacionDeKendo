@@ -44,6 +44,8 @@ export interface CalendarEvent {
   endTime?: string;
   location?: string;
   summary?: string;
+  /** External announcement; independent of the visible description. */
+  external?: boolean;
   eventType?: CalendarEventType;
   type?: LegacyCalendarEventType;
   organizer?: string;

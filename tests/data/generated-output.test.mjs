@@ -100,7 +100,7 @@ test("generates localized, unique, indexable SEO output for every event route", 
 
   await t.test("static route titles remain approved", () => {
     const expectedStaticTitles = new Map([
-      ["/", "Federación de Asociaciones de Kendo | Costa Rica"],
+      ["/", "Federación de Asociaciones de Kendo en Costa Rica"],
       ["/eventos/", "Eventos de Kendo en Costa Rica"],
       ["/galeria/", "Galería de Kendo | Costa Rica"],
       ["/afiliados/", "Dojos de Kendo en Costa Rica"],

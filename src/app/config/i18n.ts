@@ -118,7 +118,7 @@ export const COPY = {
       title: "Federación de Asociaciones de Kendo",
       lead: "Una comunidad que aprende, entrena y crece unida a través del kendo en Costa Rica.",
       description:
-        "Encuentra un dojo afiliado o consulta nuestros próximos encuentros.",
+        "Encuentra los contactos de nuestros dojos afiliados, los horarios y consulta los próximos eventos de kendo.",
       dojos: "Encuentra un dojo",
       events: "Calendario de Próximos Eventos",
       upcoming: "Calendario de Próximos Eventos",
@@ -171,7 +171,7 @@ export const COPY = {
     },
     affiliates: {
       title: "Dojos afiliados",
-      description: "A encuentra donde practicar kendo.",
+      description: "Encuentra dónde practicar kendo.",
       pagination: "Paginación de dojos afiliados",
       previousPage: "Página anterior de dojos",
       nextPage: "Página siguiente de dojos",
@@ -189,6 +189,7 @@ export const COPY = {
     },
     event: {
       defaultType: "Actividad de kendo",
+      external: "Evento externo",
       completed: "Actividad finalizada",
       scheduled: "Actividad programada",
       date: "Fecha",
@@ -331,6 +332,7 @@ export const COPY = {
     },
     event: {
       defaultType: "Kendo activity",
+      external: "External event",
       completed: "Completed activity",
       scheduled: "Scheduled activity",
       date: "Date",

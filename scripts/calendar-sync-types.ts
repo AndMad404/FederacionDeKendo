@@ -34,6 +34,8 @@ export interface Decision {
   actorRole?: string;
 }
 export interface RegistryEvent extends PublicFields {
+  /** Locally maintained exception: Calendar cannot revise or retire this event. */
+  syncPolicy?: "manual";
   historical?: boolean;
   inactive?: boolean;
   editorialState?: string;
@@ -120,6 +122,8 @@ export interface GalleryEvent {
   date: string;
   albumUrl?: string;
   galleryCheckPhase?: string;
+  localFiles?: { name: string; path: string }[];
+  posterSource?: { label: string; url: string };
 }
 export interface GalleryState {
   version: number;

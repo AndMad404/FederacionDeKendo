@@ -13,7 +13,7 @@ import { getLocalizedEvent } from "../utils/localizedEvents";
 import {
   focusRingClass,
   panelSurfaceClass,
-  secondaryButtonClass,
+  primaryButtonClass,
 } from "../styles/shared";
 import { isExternalEvent, isPastEvent } from "../utils/calendarEvents";
 import {
@@ -174,6 +174,12 @@ export function EventPage() {
               <div className="grid min-w-0 content-start gap-3 land-sm:gap-2">
                 <p className="text-sm font-bold uppercase tracking-wider text-site-accent">
                   {isPast ? copy.event.completed : copy.event.scheduled}
+                  {event.external ? (
+                    <>
+                      {" · "}
+                      <span>{copy.event.external}</span>
+                    </>
+                  ) : null}
                 </p>
                 <dl className="grid gap-2 text-sm land-sm:grid-cols-2 land-tall:grid-cols-2">
                   <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2">
@@ -231,7 +237,7 @@ export function EventPage() {
                           href={getGoogleCalendarUrl(event)}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className={`${secondaryButtonClass} ${focusRingClass}`}
+                          className={`${primaryButtonClass} ${focusRingClass}`}
                         >
                           <CalendarPlus
                             className="mr-2 size-4"

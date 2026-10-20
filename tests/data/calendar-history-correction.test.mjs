@@ -87,6 +87,30 @@ async function run(files, fields, overrides = {}) {
   });
 }
 
+test("an older Calendar report cannot change an event switched to manual maintenance", async (t) => {
+  const files = await fixture(t);
+  files.registry.events[0] = {
+    ...files.registry.events[0],
+    syncPolicy: "manual",
+  };
+  await writeFile(
+    files.registryPath,
+    `${JSON.stringify(files.registry, null, 2)}\n`,
+  );
+  const before = await Promise.all([
+    readFile(files.registryPath, "utf8"),
+    readFile(files.outputPath, "utf8"),
+  ]);
+  await assert.rejects(run(files, ["location"]), /Manually maintained/);
+  assert.deepEqual(
+    await Promise.all([
+      readFile(files.registryPath, "utf8"),
+      readFile(files.outputPath, "utf8"),
+    ]),
+    before,
+  );
+});
+
 test("C3 accepts one field and preserves every unselected field and event", async (t) => {
   const files = await fixture(t);
 

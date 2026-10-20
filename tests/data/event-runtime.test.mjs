@@ -109,7 +109,7 @@ test("public history keeps its separate next-midnight boundary", async () => {
   );
 });
 
-test("identifies #EventoExterno markers in the event description", async () => {
+test("identifies explicit external announcements and legacy #EventoExterno descriptions", async () => {
   const { isExternalEvent } = await loadSourceModule(
     "/src/app/utils/calendarEvents.ts",
   );
@@ -120,6 +120,15 @@ test("identifies #EventoExterno markers in the event description", async () => {
   );
 
   assert.equal(isExternalEvent({ summary: "Seminario" }), false);
+  assert.equal(isExternalEvent({ summary: "Seminario", external: true }), true);
+  assert.equal(
+    isExternalEvent({ summary: "Seminario", external: false }),
+    false,
+  );
+  assert.equal(
+    isExternalEvent({ summary: "#EventoExterno", external: false }),
+    true,
+  );
 });
 
 test("uses the reviewed English Gasshuku translation from the editorial record", () => {

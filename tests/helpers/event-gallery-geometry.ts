@@ -6,7 +6,9 @@ export async function expectEventGalleryGeometry(page: Page) {
       document.querySelector(selector)?.getBoundingClientRect();
     const article = rect("main article")!;
     const actions = rect("main article aside")!;
-    const gallery = rect('main section[aria-label^="Fotografías del evento"]');
+    const gallery = rect(
+      'main section:is([aria-label^="Fotografías del evento"], [aria-label^="Imagen oficial del evento"])',
+    );
     const figure = rect("main figure");
     const stripElement = document.querySelector('main [role="group"]');
     const strip = stripElement?.getBoundingClientRect();

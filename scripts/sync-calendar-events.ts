@@ -641,7 +641,10 @@ export function assertSafeCalendarInput(
   }
 
   const publishedEvents = (previousRegistry.events ?? []).filter(
-    (event) => event.editorialState !== "eliminado" && event.inactive !== true,
+    (event) =>
+      event.editorialState !== "eliminado" &&
+      event.inactive !== true &&
+      event.syncPolicy !== "manual",
   );
   const disappeared = publishedEvents.filter(
     (event) => !currentSourceIds.has(event.sourceId),
@@ -665,7 +668,9 @@ export function mergeRegistry(
   const registryVersion = 4;
   assertUniqueCurrentSlugs(currentEvents);
   const historicalEvents = (previousRegistry.events ?? []).filter(
-    (event) => event.historical === true || isArchiveEligible(event, now),
+    (event) =>
+      event.syncPolicy !== "manual" &&
+      (event.historical === true || isArchiveEligible(event, now)),
   );
   const currentSourceIds = new Set(
     currentEvents.map((event) => event.sourceId),
@@ -688,6 +693,7 @@ export function mergeRegistry(
   });
   const reconciledCurrentEvents = currentEvents.map((currentEvent) => {
     const previousEvent = previousBySourceId.get(currentEvent.sourceId);
+    if (previousEvent?.syncPolicy === "manual") return previousEvent;
     const aliases = previousEvent
       ? [
           ...new Set([
@@ -752,6 +758,7 @@ export function mergeRegistry(
   const retainedEvents = (previousRegistry.events ?? [])
     .filter((event) => !reconciledSourceIds.has(event.sourceId))
     .map((event) => {
+      if (event.syncPolicy === "manual") return event;
       const { inactive, ...legacyCompatibleEvent } = event;
       const published =
         legacyCompatibleEvent.historical === true ||
@@ -1006,6 +1013,11 @@ export function applyEditorialDecision(
     throw new Error("The editorial decision source identity is stale.");
 
   const event = registry.events[index];
+  if (event.syncPolicy === "manual") {
+    throw new Error(
+      "Manually maintained events cannot receive Calendar decisions.",
+    );
+  }
   if (event.editorialState !== "pendiente" || !event.pendingRevision) {
     throw new Error(
       "The editorial decision no longer targets a pending revision.",
@@ -1086,6 +1098,7 @@ export function detectHistoricalChanges(
   const changes = [];
 
   for (const publishedEvent of previousRegistry.events ?? []) {
+    if (publishedEvent.syncPolicy === "manual") continue;
     if (publishedEvent.editorialState === "eliminado") continue;
     const isHistorical =
       publishedEvent.historical === true ||
@@ -1418,6 +1431,7 @@ function serializeCalendarEvent(event: RegistryEvent) {
       ["endTime", event.endTime],
       ["location", event.location],
       ["summary", event.summary],
+      ["external", event.external],
       ["eventType", event.eventType],
       ["organizer", event.organizer],
       ["infoUrl", event.infoUrl],
@@ -1786,6 +1800,7 @@ export async function synchronizeCalendar({
   let registry = mergeRegistry(previousRegistry, parsed, now);
 
   const galleryEvents = registry.events
+    .filter((event) => event.syncPolicy !== "manual")
     .map((event) => {
       const lastEventDate =
         event.endDate && !event.startTime && !event.endTime

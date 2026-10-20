@@ -40,7 +40,9 @@ test("publishes Event JSON-LD only for federation events with a known physical l
 
     assert.ok(event, `${route.path}: calendar event is missing`);
 
-    const external = /(?:^|\s)#EventoExterno\b/iu.test(event?.summary ?? "");
+    const external =
+      event.external === true ||
+      /(?:^|\s)#EventoExterno\b/iu.test(event?.summary ?? "");
 
     if (!event.location?.trim() || external) {
       assert.equal(
@@ -117,6 +119,24 @@ test("publishes Event JSON-LD only for federation events with a known physical l
       `${route.path}: unexpected offer`,
     );
   }
+});
+
+test("the manual Panamericano announcement does not acquire federation organizer metadata when its description changes", () => {
+  const event = CALENDAR_EVENTS.find(
+    (candidate) => candidate.id === "clak-1er-panamericano-brasil",
+  );
+  assert.ok(event);
+  assert.equal(event.external, true);
+  assert.doesNotMatch(event.summary, /#EventoExterno/);
+  const route = getRouteManifest().find(
+    (candidate) => candidate.eventId === event.id,
+  );
+  assert.ok(route);
+  const graph = getRouteSeoPayload(route).structuredData?.["@graph"] ?? [];
+  assert.equal(
+    graph.some((entity) => entity?.["@type"] === "Event"),
+    false,
+  );
 });
 
 test("publishes the correct address country for regional events", () => {

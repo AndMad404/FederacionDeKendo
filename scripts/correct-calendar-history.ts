@@ -282,6 +282,11 @@ export async function applyHistoricalCorrections({
     if (matchingEvents.length !== 1 || !change)
       throw new Error("Event or proposal is missing or ambiguous.");
     const [event] = matchingEvents;
+    if (event.syncPolicy === "manual") {
+      throw new Error(
+        "Manually maintained events cannot receive Calendar corrections.",
+      );
+    }
     if (event.historical !== true) throw new Error("Event is not historical.");
     const localPublishedFingerprint = fingerprintHistoricalSnapshot(event);
     if (

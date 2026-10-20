@@ -25,6 +25,24 @@ Google Calendar → sincronización y validación → datos versionados
 - Una sincronización inválida no reemplaza el último estado válido. El HTML
   generado se verifica antes del despliegue.
 
+Los eventos con `syncPolicy: "manual"` en `calendarEventRegistry.json` son
+excepciones permanentes: Calendar no cambia su contenido, no los retira ni
+propone revisiones o consultas de galería. Se mantienen en el registro y se
+publican mediante `serializeCalendarEvents`; la política no se expone en la web.
+El Panamericano 2026 usa esta excepción por decisión del propietario.
+Su campo `external: true` conserva la condición de anuncio externo al editar
+la descripción. Los eventos anteriores siguen admitiendo `#EventoExterno`.
+
+Para un flyer local, `synchronizeEventGalleries` acepta `localFiles` con nombre
+y ruta de la imagen. Usa la misma validación y variantes WebP/AVIF que los
+álbumes. `posterSource` conserva la etiqueta y URL HTTPS de la publicación
+original; el visor muestra el flyer completo.
+El manifiesto admite `thumbnail` como imagen independiente para las tarjetas
+del archivo. No forma parte de `images` ni aparece en el visor; permite usar
+una miniatura horizontal y conservar un flyer vertical en la galería.
+La primera importación congela la galería. Las correcciones posteriores se
+revisan manualmente antes de actualizar el manifiesto y su estado.
+
 ## Stack
 
 React 18 · TypeScript · React Router 7 · Tailwind CSS 4 · Vite 6 · Playwright ·

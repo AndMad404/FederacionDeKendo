@@ -9,7 +9,7 @@ interface EventGalleryImage {
   sizes: string;
 }
 
-export interface EventGallery { fingerprint: string; images: EventGalleryImage[] }
+export interface EventGallery { fingerprint: string; images: EventGalleryImage[]; thumbnail?: EventGalleryImage; posterSource?: { label: string; url: string } }
 
 export const EVENT_GALLERIES: Record<string, EventGallery> = {
   "2do-examen-2026": {
@@ -362,5 +362,38 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "sizes": "(max-width: 640px) 100vw, 960px"
       }
     ]
+  },
+  "clak-1er-panamericano-brasil": {
+    "fingerprint": "61f8e8147a0096e0dfb87cb2ae923f51507d62a2ae07a722b4e12396fb4950ea",
+    "images": [
+      {
+        "order": 1,
+        "alt": "Flyer oficial del I Campeonato Panamericano de Kendo 2026 — CLAK",
+        "width": 1086,
+        "height": 1448,
+        "src": "/images/events/clak-1er-panamericano-brasil/photo-1-1086.webp",
+        "srcSet": {
+          "webp": "/images/events/clak-1er-panamericano-brasil/photo-1-480.webp 480w, /images/events/clak-1er-panamericano-brasil/photo-1-960.webp 960w, /images/events/clak-1er-panamericano-brasil/photo-1-1086.webp 1086w",
+          "avif": "/images/events/clak-1er-panamericano-brasil/photo-1-480.avif 480w, /images/events/clak-1er-panamericano-brasil/photo-1-960.avif 960w, /images/events/clak-1er-panamericano-brasil/photo-1-1086.avif 1086w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      }
+    ],
+    "posterSource": {
+      "label": "Flyer oficial del I Campeonato Panamericano de Kendo 2026 — CLAK",
+      "url": "https://www.instagram.com/p/DeLBKMPkdlM/"
+    },
+    "thumbnail": {
+      "order": 1,
+      "alt": "Imagen oficial del I Campeonato Panamericano de Kendo 2026 — CLAK",
+      "width": 1600,
+      "height": 534,
+      "src": "/images/events/clak-1er-panamericano-brasil/thumbnail-1600.webp",
+      "srcSet": {
+        "webp": "/images/events/clak-1er-panamericano-brasil/thumbnail-480.webp 480w, /images/events/clak-1er-panamericano-brasil/thumbnail-960.webp 960w, /images/events/clak-1er-panamericano-brasil/thumbnail-1600.webp 1600w",
+        "avif": "/images/events/clak-1er-panamericano-brasil/thumbnail-480.avif 480w, /images/events/clak-1er-panamericano-brasil/thumbnail-960.avif 960w, /images/events/clak-1er-panamericano-brasil/thumbnail-1600.avif 1600w"
+      },
+      "sizes": "(max-width: 640px) 100vw, 960px"
+    }
   }
 };

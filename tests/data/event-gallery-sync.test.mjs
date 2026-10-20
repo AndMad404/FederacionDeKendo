@@ -5,7 +5,7 @@ import {
   expectFilesUnchanged,
 } from "../helpers/temporary-directory.mjs";
 import assert from "node:assert/strict";
-import { readFile, stat } from "node:fs/promises";
+import { readFile, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import sharp from "sharp";
@@ -14,6 +14,7 @@ import {
   EVENT_GALLERY_LIMITS,
   extractDriveFiles,
   getDriveFolderId,
+  serializeManifest,
   synchronizeEventGalleries,
 } from "../../scripts/sync-event-galleries.ts";
 
@@ -67,6 +68,74 @@ test("uses approved input and 4K limits", () => {
   assert.equal(EVENT_GALLERY_LIMITS.maxLongEdge, 3840);
   assert.equal(EVENT_GALLERY_LIMITS.maxPixels, 3840 * 2160);
   assert.equal(getDriveFolderId("https://example.test/folder"), undefined);
+});
+
+test("imports local official material through the same variants pipeline and freezes it", async (t) => {
+  const { directory, options } = await fixture(t, []);
+  const input = path.join(directory, "flyer.png");
+  await writeFile(input, await image("white", 640, 800, "png"));
+  const posterSource = {
+    label: "Official flyer",
+    url: "https://example.test/official-flyer/",
+  };
+  const events = [
+    {
+      slug: "external-event",
+      title: "External event",
+      date: "2026-01-01",
+      localFiles: [{ name: "page-1.png", path: input }],
+      posterSource,
+    },
+  ];
+  const first = await synchronizeEventGalleries({ ...options, events });
+  assert.equal(first.importedCount, 1);
+  assert.deepEqual(
+    first.galleries["external-event"].posterSource,
+    posterSource,
+  );
+  assert.ok(
+    first.galleries["external-event"].images[0].srcSet.avif.includes(".avif"),
+  );
+  first.galleries["external-event"].thumbnail = {
+    ...first.galleries["external-event"].images[0],
+    alt: "Independent archive preview",
+  };
+  await writeFile(options.manifestPath, serializeManifest(first.galleries));
+  await writeFile(input, await image("red", 640, 800, "png"));
+  const second = await synchronizeEventGalleries({ ...options, events });
+  assert.equal(second.importedCount, 0);
+  assert.deepEqual(second.galleries, first.galleries);
+  assert.equal(second.galleries["external-event"].images.length, 1);
+  assert.equal(
+    second.galleries["external-event"].thumbnail.alt,
+    "Independent archive preview",
+  );
+});
+
+test("rejects unsafe poster source links without publishing a gallery", async (t) => {
+  const { directory, options } = await fixture(t, []);
+  const input = path.join(directory, "flyer.png");
+  await writeFile(input, await image("white", 640, 800, "png"));
+  const result = await synchronizeEventGalleries({
+    ...options,
+    events: [
+      {
+        slug: "external-event",
+        title: "Event",
+        date: "2026-01-01",
+        localFiles: [{ name: "page-1.png", path: input }],
+        posterSource: {
+          label: "Source",
+          url: "javascript:alert(1)",
+        },
+      },
+    ],
+  });
+  assert.equal(result.importedCount, 0);
+  assert.equal(result.galleries["external-event"], undefined);
+  assert.ok(
+    result.alarms.some(({ reason }) => reason === "acceso_o_descarga_fallida"),
+  );
 });
 
 test("reads public Drive folder indexes encoded with hexadecimal JavaScript escapes", () => {

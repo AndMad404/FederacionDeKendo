@@ -1,3 +1,6 @@
+import type { ReactNode } from "react";
+import { focusRingClass } from "../styles/shared";
+
 interface EventSummaryProps {
   summary: string;
   compact?: boolean;
@@ -5,6 +8,35 @@ interface EventSummaryProps {
 
 type SummaryBlock =
   { type: "list"; items: string[] } | { type: "paragraph"; text: string };
+
+function SummaryText({ text, compact }: { text: string; compact: boolean }) {
+  const parts: ReactNode[] = [];
+  let cursor = 0;
+  for (const match of text.matchAll(
+    /\[([^\]\r\n]+)\]\((https:\/\/[^\s)]+)\)/gu,
+  )) {
+    parts.push(text.slice(cursor, match.index));
+    // Archive summaries live inside the card link, so they must stay text only.
+    parts.push(
+      compact ? (
+        match[1]
+      ) : (
+        <a
+          key={match.index}
+          href={match[2]}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`[overflow-wrap:anywhere] underline underline-offset-4 ${focusRingClass}`}
+        >
+          {match[1]}
+        </a>
+      ),
+    );
+    cursor = match.index + match[0].length;
+  }
+  parts.push(text.slice(cursor));
+  return <>{parts}</>;
+}
 
 function getSummaryBlocks(summary: string): SummaryBlock[] {
   return summary
@@ -35,7 +67,9 @@ export function EventSummary({ summary, compact = false }: EventSummaryProps) {
         className={`list-disc pl-5 text-left text-sm text-black ${compact ? "max-h-10 overflow-hidden leading-5" : "space-y-1 leading-relaxed"}`}
       >
         {blocks[0].items.map((item, index) => (
-          <li key={`${index}-${item}`}>{item}</li>
+          <li key={`${index}-${item}`}>
+            <SummaryText text={item} compact={compact} />
+          </li>
         ))}
       </ul>
     );
@@ -51,7 +85,9 @@ export function EventSummary({ summary, compact = false }: EventSummaryProps) {
               className="list-disc space-y-1 pl-5 text-left leading-relaxed"
             >
               {block.items.map((item, itemIndex) => (
-                <li key={`${itemIndex}-${item}`}>{item}</li>
+                <li key={`${itemIndex}-${item}`}>
+                  <SummaryText text={item} compact={false} />
+                </li>
               ))}
             </ul>
           ) : (
@@ -59,7 +95,7 @@ export function EventSummary({ summary, compact = false }: EventSummaryProps) {
               key={`paragraph-${blockIndex}`}
               className="whitespace-pre-line leading-relaxed"
             >
-              {block.text}
+              <SummaryText text={block.text} compact={false} />
             </p>
           ),
         )}
@@ -71,7 +107,10 @@ export function EventSummary({ summary, compact = false }: EventSummaryProps) {
     <p
       className={`${compact ? "line-clamp-2" : "whitespace-pre-line leading-relaxed"} text-sm text-black`}
     >
-      {blocks[0]?.type === "paragraph" ? blocks[0].text : summary}
+      <SummaryText
+        text={blocks[0]?.type === "paragraph" ? blocks[0].text : summary}
+        compact={compact}
+      />
     </p>
   );
 }
