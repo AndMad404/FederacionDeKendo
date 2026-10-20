@@ -102,15 +102,16 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
     timeZone: "America/Costa_Rica"
   },
   {
-    id: "seminario-noviembre",
+    id: "seminario-noviembre-2026",
+    aliases: ["seminario-noviembre"],
     archiveEligibleAt: "2026-11-30T06:00:00.000Z",
-    sourceUpdatedAt: "2026-10-19T16:00:10.000Z",
-    title: "Seminario Noviembre",
+    sourceUpdatedAt: "2026-10-19T18:45:34.000Z",
+    title: "Seminario Noviembre 2026",
     date: "2026-11-28",
     startTime: "11:00",
     endTime: "14:00",
     location: "Colegio Europeo, San Pablo del cementerio 125 oeste 100 norte Heredia, Heredia, San Pablo, Puebla, 40901, Costa Rica",
-    summary: "Seminario Técnico de Kendo con Senseis /mo Dan Haruyo y Genki Kubo.\nAbierto para practicantes con y sin bogu.",
+    summary: "Seminario Técnico de Kendo con Senseis 7mo Dan:  Haruyo y Genki Kubo.\nAbierto para practicantes con y sin bogu.",
     eventType: "seminario",
     timeZone: "America/Costa_Rica"
   },
