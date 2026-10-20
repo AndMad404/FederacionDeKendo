@@ -16,12 +16,18 @@ function SummaryText({ text, compact }: { text: string; compact: boolean }) {
     /\[([^\]\r\n]+)\]\((https:\/\/[^\s)]+)\)|\*\*([^*\r\n]+)\*\*/gu,
   )) {
     parts.push(text.slice(cursor, match.index));
+    const boldLabel = match[1]?.match(/^\*\*([^*]+)\*\*$/u)?.[1];
+    const label = boldLabel ? (
+      <strong key={match.index}>{boldLabel}</strong>
+    ) : (
+      match[1]
+    );
     // Archive summaries live inside the card link, so they must stay text only.
     parts.push(
       match[3] ? (
         <strong key={match.index}>{match[3]}</strong>
       ) : compact ? (
-        match[1]
+        label
       ) : (
         <a
           key={match.index}
@@ -30,7 +36,7 @@ function SummaryText({ text, compact }: { text: string; compact: boolean }) {
           rel="noopener noreferrer"
           className={`[overflow-wrap:anywhere] text-blue-700 underline underline-offset-4 visited:text-purple-700 hover:text-blue-800 ${focusRingClass}`}
         >
-          {match[1]}
+          {label}
         </a>
       ),
     );
