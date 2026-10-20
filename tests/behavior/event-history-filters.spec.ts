@@ -40,7 +40,7 @@ test("renders localized upcoming and past event navigation with the active page"
       upcomingPath: "/eventos/",
       pastPath: "/eventos/pasados/",
       upcoming: "Próximos eventos",
-      past: "Ver mas Eventos Pasados",
+      past: "Eventos Pasados",
       active: "upcoming",
     },
     {
@@ -48,7 +48,7 @@ test("renders localized upcoming and past event navigation with the active page"
       upcomingPath: "/eventos/",
       pastPath: "/eventos/pasados/",
       upcoming: "Próximos eventos",
-      past: "Ver mas Eventos Pasados",
+      past: "Eventos Pasados",
       active: "past",
     },
   ] as const;
@@ -199,34 +199,37 @@ test("filters apply available values and the empty state remains available", asy
 test("uses an assigned gallery thumbnail and falls back to the event description", async ({
   page,
 }) => {
-  await page.goto("/eventos/pasados/?year=2026&type=seminario");
+  // Calendar titles, descriptions and galleries can change during a sync.
+  await page.goto(
+    "http://127.0.0.1:4174/eventos/pasados/?year=2026&type=seminario",
+  );
+  await expectInteractiveReady(page, "past-events");
 
-  const eventWithGallery = page
-    .getByRole("heading", { name: "Gasshuku Monteverde", exact: true })
-    .locator("xpath=ancestor::li");
+  const eventWithGallery = page.locator("main li").filter({
+    has: page.locator('a[href="/eventos/pasados/layout-1/"]'),
+  });
+  await expect(eventWithGallery).toBeVisible();
   await expect(
     eventWithGallery.locator("[data-event-thumbnail] img"),
   ).toHaveCount(1);
   await expect(
     eventWithGallery.locator("[data-event-thumbnail] img"),
+  ).toHaveAttribute("src", "/fixture-image/480x320.jpg");
+  await expect(
+    eventWithGallery.locator("[data-event-thumbnail] img"),
   ).toHaveCSS("object-fit", "cover");
   await expect(
-    eventWithGallery.getByText("La participación incluye:", { exact: true }),
+    eventWithGallery.getByText(/Información del encuentro y sus actividades/),
   ).toHaveCount(0);
 
-  const eventWithoutGallery = page
-    .getByRole("heading", {
-      name: "Seminario Noviembre",
-      exact: true,
-    })
-    .locator("xpath=ancestor::li");
+  const eventWithoutGallery = page.locator("main li").filter({
+    has: page.locator('a[href="/eventos/pasados/layout-0/"]'),
+  });
+  await expect(eventWithoutGallery).toBeVisible();
   await expect(
     eventWithoutGallery.locator("[data-event-thumbnail]"),
   ).toHaveCount(0);
   await expect(eventWithoutGallery).toContainText(
-    "Seminario Técnico de Kendo con Senseis /mo Dan Haruyo y Genki Kubo.",
-  );
-  await expect(eventWithoutGallery).toContainText(
-    "Abierto para practicantes con y sin bogu.",
+    "Información del encuentro y sus actividades.",
   );
 });
