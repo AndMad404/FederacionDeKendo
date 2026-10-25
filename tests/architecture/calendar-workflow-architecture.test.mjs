@@ -50,6 +50,7 @@ test("shared project setup configures Node before enabling pnpm and disables pre
     "Node setup",
   );
   assert.equal(steps[node].with["node-version"], 22);
+  assert.equal(steps[node].with["check-latest"], true);
   assert.equal(steps[node].with["package-manager-cache"], false);
   assert.equal(steps[node].with.cache, undefined);
   const corepack = stepIndex(
