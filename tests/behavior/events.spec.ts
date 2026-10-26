@@ -16,14 +16,14 @@ async function discoverUpcomingEvent(page: Page) {
   await page.waitForLoadState("networkidle");
 
   const eventLink = page.getByRole("link", {
-    name: "Ver detalles del evento Gasshuku Monteverde",
+    name: "Detalles del evento: Gasshuku Monteverde",
   });
   await expect(eventLink).toHaveAttribute("href", GASSHUKU_EVENT_PATH);
   const path = await eventLink.getAttribute("href");
   expect(path).toMatch(/^\/eventos\/[^/]+\/$/);
 
   const accessibleName = await eventLink.getAttribute("aria-label");
-  const title = accessibleName?.replace("Ver detalles del evento ", "");
+  const title = accessibleName?.replace("Detalles del evento: ", "");
   expect(title).toBeTruthy();
 
   return { eventLink, path: path!, title: title! };
@@ -53,7 +53,7 @@ test("shows the next event after the previous event ends", async ({ page }) => {
   await page.goto("/eventos/");
 
   const firstEventLink = page
-    .getByRole("link", { name: /Ver detalles del evento/ })
+    .getByRole("link", { name: /Detalles del evento/ })
     .first();
   await expect(firstEventLink).toHaveAttribute("href", TOURNAMENT_EVENT_PATH);
 
@@ -106,7 +106,7 @@ test("homepage event details link to the canonical event page", async ({
   await page.waitForLoadState("networkidle");
 
   const eventLink = page.getByRole("link", {
-    name: "Consultar detalles del evento Gasshuku Monteverde",
+    name: "Detalles del evento: Gasshuku Monteverde",
   });
   await expect(eventLink).toHaveAttribute("href", GASSHUKU_EVENT_PATH);
   const path = await eventLink.getAttribute("href");

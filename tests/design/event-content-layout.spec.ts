@@ -12,7 +12,7 @@ async function discoverUpcomingEvent(page: Page) {
   await page.clock.setFixedTime(FIXED_UPCOMING_TIME);
   await gotoReady(page, "/eventos/");
   return (await page
-    .getByRole("link", { name: /Ver detalles del evento/ })
+    .getByRole("link", { name: /Detalles del evento/ })
     .first()
     .getAttribute("href"))!;
 }

@@ -286,6 +286,12 @@ function LanguageSelector({
     >
       {(["es", "en"] as const).map((option) => {
         const active = language === option;
+        const visibleLabel =
+          labels === "full"
+            ? option === "es"
+              ? "Español"
+              : "English"
+            : option.toUpperCase();
         return (
           <Link
             key={option}
@@ -293,11 +299,11 @@ function LanguageSelector({
             lang={option}
             hrefLang={option}
             aria-current={active ? "page" : undefined}
-            aria-label={
+            aria-label={`${visibleLabel}: ${
               option === "es"
                 ? copy.nav.switchToSpanish
                 : copy.nav.switchToEnglish
-            }
+            }`}
             onClick={onNavigate}
             className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-md px-2 text-sm font-bold ${navInteractionClass} ${focusRingClass} ${
               active
@@ -305,11 +311,7 @@ function LanguageSelector({
                 : "text-site-on-dark/85 hover:bg-site-on-dark/15 hover:text-site-on-dark"
             }`}
           >
-            {labels === "full"
-              ? option === "es"
-                ? "Español"
-                : "English"
-              : option.toUpperCase()}
+            {visibleLabel}
           </Link>
         );
       })}

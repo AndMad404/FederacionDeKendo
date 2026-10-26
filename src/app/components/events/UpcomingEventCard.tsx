@@ -70,7 +70,7 @@ export function UpcomingEventCard({ event, index }: UpcomingEventCardProps) {
           href={locationUrl}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label={`${copy.calendar.openLocationLabel} ${event.title} ${copy.calendar.mapsPreposition} Google Maps`}
+          aria-label={`${copy.calendar.viewLocation}: ${event.title} ${copy.calendar.mapsPreposition} Google Maps`}
           aria-describedby={locationDescriptionId}
           className={`col-start-1 row-start-2 w-fit justify-self-start ${actionClass} ${focusRingClass}`}
         >
@@ -93,7 +93,7 @@ export function UpcomingEventCard({ event, index }: UpcomingEventCardProps) {
 
       <Link
         to={getEventPath(event, language)}
-        aria-label={`${copy.event.viewDetailsLabel} ${event.title}`}
+        aria-label={`${copy.common.eventDetails}: ${event.title}`}
         className={`col-start-2 row-start-2 w-fit justify-self-center ${eventDetailsClass} ${focusRingClass}`}
       >
         <Info className="mr-1.5 size-4 shrink-0" aria-hidden="true" />

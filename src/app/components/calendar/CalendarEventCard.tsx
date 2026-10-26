@@ -52,7 +52,7 @@ export function CalendarEventCard({ event }: CalendarEventCardProps) {
           href={locationUrl}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label={`${copy.calendar.openLocationLabel} ${event.title} ${copy.calendar.mapsPreposition} Google Maps`}
+          aria-label={`${copy.calendar.viewLocation}: ${event.title} ${copy.calendar.mapsPreposition} Google Maps`}
           aria-describedby={locationDescriptionId}
           className={`inline-flex min-h-11 items-center justify-center rounded-lg px-3 py-1.5 text-sm font-semibold transition hover:border-site-action hover:bg-site-media desktop-fine:min-h-8 lg:px-2.5 lg:py-1 ${actionControlSurfaceClass} ${focusRingClass}`}
         >
@@ -73,7 +73,7 @@ export function CalendarEventCard({ event }: CalendarEventCardProps) {
       <div className="flex items-center justify-center gap-2">
         <Link
           to={getEventPath(event, language)}
-          aria-label={`${copy.calendar.viewDetailsLabel} ${event.title}`}
+          aria-label={`${copy.common.eventDetails}: ${event.title}`}
           className={`inline-flex min-h-11 origin-center cursor-pointer items-center justify-center rounded-full border border-site-action bg-site-action px-3 py-1 text-sm font-semibold text-site-on-dark transition-[background-color,transform,scale] duration-200 hover:scale-[1.04] hover:bg-site-action-hover motion-reduce:transition-none motion-reduce:hover:scale-100 desktop-fine:min-h-8 ${focusRingClass}`}
         >
           {copy.common.eventDetails}

@@ -31,6 +31,19 @@ for (const route of REPRESENTATIVE_ROUTES) {
   });
 }
 
+for (const route of ["/", "/en/"]) {
+  test(`${route} mobile navigation has no detectable WCAG A or AA violations`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.clock.setFixedTime(FIXED_TEST_TIME);
+    await page.goto(route);
+    await page.locator('button[aria-controls="mobile-menu"]').click();
+    await expect(page.locator("#mobile-menu")).toBeVisible();
+    await expectNoAutomatedViolations(page);
+  });
+}
+
 test("the open gallery lightbox has no detectable WCAG A or AA violations", async ({
   page,
 }) => {
