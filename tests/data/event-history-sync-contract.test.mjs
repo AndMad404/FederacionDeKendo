@@ -191,7 +191,7 @@ test("Given a version 2 historical event, When the registry migrates, Then its e
   assert.equal(event.historical, true);
 });
 
-test("a current title change preserves the previous URL as a redirect alias", () => {
+test("a routine title update keeps one event and preserves the previous URL as a redirect alias", () => {
   const previous = {
     version: 4,
     events: [
@@ -216,17 +216,29 @@ test("a current title change preserves the previous URL as a redirect alias", ()
     },
   ];
 
-  const [event] = mergeRegistry(
-    previous,
-    current,
-    new Date("2026-09-24T00:00:00.000Z"),
-  ).events;
+  const now = new Date("2026-09-24T00:00:00.000Z");
+  const result = mergeRegistry(previous, current, now);
 
-  assert.equal(event.slug, "copa-nacional-de-kendo");
-  assert.deepEqual(event.aliases, [
-    "2026-08-22-torneo-de-verano",
-    "torneo-de-verano",
+  // A permitted rename updates the same source identity, not a second event.
+  assert.deepEqual(result.events, [
+    {
+      ...current[0],
+      aliases: ["2026-08-22-torneo-de-verano", "torneo-de-verano"],
+      editorialState: "publicado",
+    },
   ]);
+  assert.equal(result.events[0].sourceId, previous.events[0].sourceId);
+  assert.equal(result.events[0].pendingRevision, undefined);
+
+  const output = serializeCalendarEvents(result.events);
+  assert.equal([...output.matchAll(/^ {4}id: /gm)].length, 1);
+  assert.match(output, /id: "copa-nacional-de-kendo"/);
+  assert.match(output, /title: "Copa Nacional de Kendo"/);
+
+  // Reprocessing the same update must not duplicate events or URL aliases.
+  const repeated = mergeRegistry(result, current, now);
+  assert.deepEqual(repeated, result);
+  assert.equal(serializeCalendarEvents(repeated.events), output);
 });
 
 test("a new title URL cannot reuse an existing alias", () => {
