@@ -97,7 +97,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
     date: "2026-11-20",
     endDate: "2026-11-23",
     location: "Shinsei Budokan Panamá y COS Sport Center, Panamá",
-    summary: "Inscripciones abiertas a la Copa Shogun 2026: tres días de kendo con participación internacional.\n\nPrograma:\n\n- Viernes 20 de noviembre: Godogeiko en Shinsei Budokan Panamá.\n- Sábado 21 de noviembre: torneos en COS Sport Center.\n- Domingo 22 de noviembre: seminario en COS Sport Center.\n\nContaremos con la participación de dos sensei japonesas:\n\n- Akemi Nakano, 7.º dan.\n- Haruyo Kubo, 7.º dan.\n\nForma tu grupo e inscríbete. Contacto: 6613-1539.\n\n[Publicación oficial e información de inscripciones](https://www.instagram.com/p/De-Qt1Mh9AS/)",
+    summary: "Inscripciones abiertas a la Copa Shogun 2026: tres días de kendo con participación internacional.\n\nPrograma:\n\n- Viernes 20 de noviembre: Godogeiko en Shinsei Budokan Panamá.\n- Sábado 21 de noviembre: torneos en COS Sport Center.\n- Domingo 22 de noviembre: seminario en COS Sport Center.\n\nContaremos con la participación de dos sensei japonesas:\n\n- Akemi Nakano, 7.º dan.\n- Haruyo Kubo, 7.º dan.\n\nForma tu grupo e inscríbete.\n\n[Publicación oficial e información de inscripciones](https://www.instagram.com/p/De-Qt1Mh9AS/)",
     external: true,
     eventType: "torneo",
     infoUrl: "https://www.instagram.com/p/De-Qt1Mh9AS/",

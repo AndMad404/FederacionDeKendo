@@ -261,7 +261,7 @@ export function EventPage() {
 
               <aside className="grid gap-3 rounded-xl bg-site-media p-4 land-sm:gap-2">
                 {!isPast ? (
-                  <p className="text-sm leading-relaxed">
+                  <p className="text-center text-sm leading-relaxed">
                     {isExternalEvent(event) ? (
                       <>
                         <strong>
