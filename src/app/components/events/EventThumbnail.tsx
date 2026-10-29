@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { EVENT_GALLERIES } from "../../data/eventGalleries";
 import {
   getEventThumbnail,
   type EventCoverFormat,
@@ -45,7 +46,12 @@ export function EventThumbnail({
     observer.observe(container);
     return () => observer.disconnect();
   }, [canAdapt, eventId]);
-  const thumbnail = selection?.image;
+  // Keep the Shogun crest visible by framing the top of the official flyer.
+  const showShogunCrest =
+    eventId === "panama-5ta-copa-shogun-torneo-por-equipos-y-seminario";
+  const thumbnail = showShogunCrest
+    ? EVENT_GALLERIES[eventId]?.images[0]
+    : selection?.image;
   if (!thumbnail) return null;
   // Enlarged archive cards use the largest existing variant, avoiding browser
   // selection of a small thumbnail left over from the compact layout.
@@ -61,8 +67,11 @@ export function EventThumbnail({
       })[0]
       .trim();
   };
-  const objectFit =
-    selection?.source === "generated" ? "contain" : (fit ?? "contain");
+  const objectFit = showShogunCrest
+    ? "cover"
+    : selection?.source === "generated"
+      ? "contain"
+      : (fit ?? "contain");
   const objectFitClass = {
     contain: "object-contain",
     cover: "object-cover",
@@ -89,9 +98,10 @@ export function EventThumbnail({
         alt={thumbnail.alt ?? ""}
         width={thumbnail.width}
         height={thumbnail.height}
+        style={showShogunCrest ? { aspectRatio: "8 / 5" } : undefined}
         loading="lazy"
         decoding="async"
-        className={`block h-full max-h-full w-full max-w-full rounded-lg object-center ${objectFitClass}`}
+        className={`block h-full max-h-full w-full max-w-full rounded-lg ${showShogunCrest ? "object-top" : "object-center"} ${objectFitClass}`}
       />
     </picture>
   );

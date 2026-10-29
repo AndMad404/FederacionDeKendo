@@ -2,8 +2,8 @@
 
 ## Sources and dependencies
 
-- `v1/template.json` owns source paths, layout, palette, dimensions and
-  `showText`. The current site uses `showText: false`.
+- `v1/template.json` owns source paths, logo and figure layout, background
+  color, dimensions and variants. Covers do not embed event names or tags.
 - `v1/source.svg` is the calendar source (1448x1086, 4:3).
 - `v1/kendoka-vertical.svg` is the archive source (900x1200, 3:4),
   renamed from `source-vertical.svg`. Update the template source path whenever
@@ -13,7 +13,8 @@
   placeholders are excluded. The generator overlays the official logo from
   `public/images/logo/fakcr-logo.png` using the template's logo layout.
 - `scripts/generate-event-covers.ts` consumes those sources, calendar events,
-  existing galleries, the approval configuration, local font and Sharp.
+  existing galleries, the approval configuration and Sharp. Only event IDs
+  associate the shared artwork with events; titles and tags are not renderer inputs.
   `scripts/prepare-event-covers.ts` runs it only after approval.
 - The generated `src/app/data/eventCovers.json` is read by
   `src/app/utils/eventThumbnail.ts` and then `EventThumbnail`, calendar cards
@@ -37,11 +38,11 @@ The generator renders the logo separately, so update both the editable SVG logo
 and template logo layout when changing its size. The source group transform owns
 kendoka placement; the template figure dimensions remain the full canvas.
 
-Fingerprints include template, illustration, logo, font, renderer, approval and
-Sharp versions. Event input is included only when `showText` is enabled.
+Fingerprints include template, illustration, logo, renderer, approval and Sharp
+versions. Event IDs, names and tags do not affect the shared artwork fingerprint.
 Complete unchanged outputs are reused. Missing variants regenerate; obsolete
 files are removed only inside the generator-owned output directory. The renderer
-retains optional title/tag support, but the current site does not rasterize them.
+has no title/tag layers, text-layout settings or font-loading dependency.
 No AVIF cover variants or external AI/font services are used.
 
 ## Generation and verification
@@ -58,7 +59,8 @@ pnpm run verify:site
 ```
 
 The build inside the gate must reuse prepared outputs; generated changes during
-verification invalidate its result. Local font licensing remains in `v1/OFL.txt`.
+verification invalidate its result. Retained font assets and `v1/OFL.txt` are not
+loaded by the generator.
 
 Relevant checks:
 
@@ -71,6 +73,7 @@ Relevant checks:
 - `tests/behavior/event-covers.spec.ts` and
   `tests/behavior/calendar-adaptive-cover.spec.ts`: responsive presentation.
 
-Use `--samples` for isolated PNG/SVG review artifacts, or
+Use `--samples` for one shared sample per approved format as isolated PNG/SVG
+review artifacts, or
 `--review-calendar <event-id>` for one calendar PNG. Neither publishes the
 production manifest. Keep temporary review artifacts under `.cache/`.

@@ -6,7 +6,6 @@ import { EVENT_GALLERIES } from "../../src/app/data/eventGalleries.ts";
 import {
   adaptCoverEvent,
   assertCoverGenerationReady,
-  escapeCoverText,
 } from "../../scripts/event-cover-model.ts";
 import { getEventThumbnail } from "../../src/app/utils/eventThumbnail.ts";
 import coverApproval from "../../src/app/config/eventCoverApproval.json";
@@ -16,21 +15,12 @@ const manifest = JSON.parse(
   await readFile("src/app/data/eventCovers.json", "utf8"),
 );
 
-test("cover adapter preserves accents, normalizes whitespace and escapes markup", () => {
-  assert.deepEqual(
-    adaptCoverEvent({
-      id: "examen",
-      title: "  Exa\u0301men   & <Kendo> ",
-      type: "Examen",
-    }),
-    { id: "examen", title: "Exámen & <Kendo>", tag: "#Examen" },
-  );
-  assert.equal(
-    escapeCoverText('<b>Árbol & "Kendo"</b>'),
-    "&lt;b&gt;Árbol &amp; &quot;Kendo&quot;&lt;/b&gt;",
-  );
-  assert.throws(() => adaptCoverEvent({ id: "../escape", title: "Kendo" }));
-  assert.throws(() => adaptCoverEvent({ id: "empty", title: " " }));
+test("cover adapter only requires safe event identity and ignores editorial text", () => {
+  assert.deepEqual(adaptCoverEvent({ id: "examen" }), { id: "examen" });
+  assert.deepEqual(adaptCoverEvent({ id: "examen", title: "", tag: "#Otro" }), {
+    id: "examen",
+  });
+  assert.throws(() => adaptCoverEvent({ id: "../escape" }));
 });
 
 test(
@@ -109,7 +99,8 @@ test("site covers omit embedded text and retain separate calendar and archive co
   const template = JSON.parse(
     await readFile("templates/event-covers/v1/template.json", "utf8"),
   );
-  assert.equal(template.showText, false);
+  assert.equal("showText" in template, false);
+  assert.equal("font" in template, false);
   for (const [name, ratio] of [
     ["calendar", 4 / 3],
     ["archive", 3 / 4],
@@ -118,14 +109,8 @@ test("site covers omit embedded text and retain separate calendar and archive co
     assert.equal(layout.width / layout.height, ratio);
     for (const width of layout.variants)
       assert.equal(Number.isInteger(width / ratio), true);
-    const [x, y, width, height] = layout.title;
-    assert.ok(x > 0 && x < layout.width / 4);
-    assert.ok(y > layout.height / 2 && y + height < layout.height);
-    assert.ok(x + width <= layout.width);
-    const [tagX, tagY, tagWidth, tagHeight] = layout.tagBox;
-    assert.ok(tagX >= 0 && tagX + tagWidth <= layout.width);
-    assert.ok(tagY >= layout.height * 0.8 && tagY + tagHeight <= layout.height);
-    assert.ok(layout.tagFontSize < tagHeight);
+    for (const key of ["title", "titleFontSize", "tagBox", "tagFontSize"])
+      assert.equal(key in layout, false);
   }
   const component = await readFile(
     "src/app/components/events/EventThumbnail.tsx",

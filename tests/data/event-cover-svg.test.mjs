@@ -32,12 +32,9 @@ test("editable source retains user paths exactly and extracts only background an
   );
   const layout = config.formats.calendar;
   assert.ok(layout.logo[2] >= 220);
-  assert.ok(layout.title[3] <= 80);
-  assert.ok(layout.tagFontSize >= 36);
-  assert.ok(layout.title[0] + layout.title[2] < layout.tagBox[0]);
 });
 
-test("archive uses the approved vertical source with unchanged kendoka paths and bounded title", async () => {
+test("archive uses the approved vertical source with unchanged kendoka paths and text-free layout", async () => {
   const config = JSON.parse(
     await readFile("templates/event-covers/v1/template.json", "utf8"),
   );
@@ -60,11 +57,7 @@ test("archive uses the approved vertical source with unchanged kendoka paths and
     /translate\(23\.5 437\.5\) scale\(0\.57\)/,
   );
   assert.deepEqual(layout.figure, [0, 0, 900, 1200]);
-  assert.equal(layout.titleFontSize, 48);
   assert.ok(layout.logo[2] >= 300);
-  assert.ok(layout.title[0] + layout.title[2] < layout.tagBox[0]);
-  assert.equal(layout.width - layout.tagBox[0] - layout.tagBox[2], 48);
-  assert.equal(layout.height - layout.tagBox[1] - layout.tagBox[3], 48);
 });
 
 test("source extraction rejects missing, unclosed and active layers without rasterization", () => {

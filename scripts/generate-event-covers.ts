@@ -7,7 +7,6 @@ import { EVENT_GALLERIES } from "../src/app/data/eventGalleries";
 import {
   adaptCoverEvent,
   assertCoverGenerationReady,
-  escapeCoverText,
   type CoverEvent,
 } from "./event-cover-model";
 import coverApproval from "../src/app/config/eventCoverApproval.json";
@@ -25,10 +24,6 @@ type Layout = {
   logoInset?: number;
   flagCircle?: number[];
   figure: number[];
-  title: number[];
-  titleFontSize?: number;
-  tagFontSize: number;
-  tagBox: number[];
 };
 type ImageVariant = {
   src: string;
@@ -75,18 +70,14 @@ export async function generateEventCovers({
     );
   // This guard must precede Sharp loading, output writes and sample generation.
   if (!reviewEvent) assertCoverGenerationReady(coverApproval);
-  process.env.FONTCONFIG_FILE = path.join(templateDir, "fonts.conf");
   const { default: sharp } = await import("sharp");
   const templateBytes = await readFile(path.join(templateDir, "template.json"));
   const template = JSON.parse(templateBytes.toString()) as {
     version: string;
-    showText: boolean;
     logo: string;
-    font: string;
-    fontFamily: string;
     source: string;
     flagOpacity: number;
-    colors: { paper: string; ink: string; accent: string; tagText: string };
+    colors: { paper: string };
     formats: Record<Format, Layout>;
   };
   const logo = await readFile(path.resolve(templateDir, template.logo));
@@ -99,16 +90,12 @@ export async function generateEventCovers({
       file ? await readFile(path.resolve(templateDir, file)) : source,
     );
   }
-  const fontPath = path.resolve(templateDir, template.font);
-  const fonts = [await readFile(fontPath)];
   const templateHash = sha(
     Buffer.concat([
       templateBytes,
       logo,
       source,
       ...formatSources.values(),
-      ...fonts,
-      await readFile(path.join(templateDir, "fonts.conf")),
       await readFile(fileURLToPath(import.meta.url)),
       await readFile(new URL("./event-cover-model.ts", import.meta.url)),
       await readFile(new URL("./event-cover-svg.ts", import.meta.url)),
@@ -134,24 +121,7 @@ export async function generateEventCovers({
   const events: CoverEvent[] = reviewEvent
     ? [adaptCoverEvent(reviewEvent)]
     : samples
-      ? [
-          adaptCoverEvent({
-            id: "muestra-torneo",
-            title: "Torneo Nacional de Kendo",
-            eventType: "torneo",
-          }),
-          adaptCoverEvent({
-            id: "muestra-larga",
-            title:
-              "PanamÃ¡: 5.Âª Copa Shogun â€” Torneo por equipos y seminario internacional de formaciÃ³n",
-            eventType: "seminario",
-          }),
-          adaptCoverEvent({
-            id: "muestra-examen",
-            title: "3.er Examen de Kendo 2026",
-            eventType: "examen",
-          }),
-        ]
+      ? [adaptCoverEvent({ id: "muestra" })]
       : CALENDAR_EVENTS.filter(
           (event) =>
             !(
@@ -165,7 +135,6 @@ export async function generateEventCovers({
   for (const event of events) {
     const fingerprint = sha(
       JSON.stringify({
-        ...(template.showText ? { event } : {}),
         templateHash,
         approval: coverApproval.formats,
         sharp: sharp.versions,
@@ -224,50 +193,6 @@ export async function generateEventCovers({
           template.flagOpacity,
         ),
       );
-      let textLayers = "";
-      if (template.showText) {
-        const [tx, ty, tw, th] = layout.title;
-        // Pango fits full text into a bounded box with word/character wrapping.
-        const title = await sharp({
-          text: {
-            text: `<span foreground="${template.colors.ink}">${escapeCoverText(event.title)}</span>`,
-            font: layout.titleFontSize
-              ? `${template.fontFamily} ${layout.titleFontSize}`
-              : template.fontFamily,
-            fontfile: fontPath,
-            width: tw,
-            height: layout.titleFontSize ? undefined : th,
-            rgba: true,
-            align: "left",
-            wrap: "word-char",
-            spacing: 4,
-          },
-        })
-          .resize({
-            width: tw,
-            height: th,
-            fit: "inside",
-            withoutEnlargement: true,
-          })
-          .png()
-          .toBuffer();
-        const titleMeta = await sharp(title).metadata();
-        const tag = await sharp({
-          text: {
-            text: `<span foreground="${template.colors.tagText}">${escapeCoverText(event.tag)}</span>`,
-            font: `${template.fontFamily} ${layout.tagFontSize}`,
-            fontfile: fontPath,
-            rgba: true,
-          },
-        })
-          .png()
-          .toBuffer();
-        const tagMeta = await sharp(tag).metadata();
-        const [bx, by, bw, bh, br] = layout.tagBox;
-        textLayers = `<image href="data:image/png;base64,${title.toString("base64")}" x="${tx}" y="${ty}" width="${layout.titleFontSize ? titleMeta.width : tw}" height="${layout.titleFontSize ? titleMeta.height : th}" preserveAspectRatio="xMinYMin meet"/>
-<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="${br}" fill="${template.colors.accent}"/>
-<image href="data:image/png;base64,${tag.toString("base64")}" x="${bx + (bw - tagMeta.width!) / 2}" y="${by + (bh - tagMeta.height!) / 2}" width="${tagMeta.width}" height="${tagMeta.height}"/>`;
-      }
       const [lx, ly, ls] = layout.logo;
       const inset = layout.logoInset ?? 0.14;
       const circle = layout.flagCircle;
@@ -281,7 +206,6 @@ ${circle ? `<defs><clipPath id="flag-circle"><circle cx="${circle[0]}" cy="${cir
 <circle cx="${lx + ls / 2}" cy="${ly + ls / 2}" r="${ls / 2 + 8}" fill="${template.colors.paper}"/>
 <image href="${dataUri("image/png", logo)}" x="${lx + ls * inset}" y="${ly + ls * inset}" width="${ls * (1 - inset * 2)}" height="${ls * (1 - inset * 2)}" preserveAspectRatio="xMidYMid meet" style="mix-blend-mode:multiply"/>
 <image href="${dataUri("image/svg+xml", figure)}" x="${fx}" y="${fy}" width="${fw}" height="${fh}"/>
-${textLayers}
 </svg>`;
       // Explicit single-review path: one PNG, no variants or production writes.
       if (reviewEvent) {
@@ -301,7 +225,7 @@ ${textLayers}
       const sets: Record<"webp", string[]> = { webp: [] };
       for (const width of layout.variants) {
         for (const extension of ["webp"] as const) {
-          const folder = template.showText ? event.id : "shared";
+          const folder = "shared";
           const filename = `${folder}/kendo-costa-rica-${fingerprint.slice(0, 16)}-${format}-${width}.${extension}`;
           const pipeline = sharp(Buffer.from(svg)).resize(width);
           const bytes = await pipeline.webp({ quality: 86 }).toBuffer();
