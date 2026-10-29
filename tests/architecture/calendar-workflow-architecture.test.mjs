@@ -219,6 +219,30 @@ test("post-publication design review, fallback, delivery and artifacts remain in
   );
 });
 
+test("shared verification prepares approved covers before formatting and the immutable gate", async () => {
+  const steps = actionSteps(
+    await loadYamlDocument(".github/actions/verify-site/action.yml"),
+  );
+  const prepare = stepIndex(
+    steps,
+    (step) => step.run === "pnpm exec tsx scripts/prepare-event-covers.ts",
+    "event cover preparation",
+  );
+  const quality = stepIndex(
+    steps,
+    (step) => step.run === "pnpm run quality:fix",
+    "formatting generated data",
+  );
+  const gate = stepIndex(
+    steps,
+    (step) => step.run?.includes("pnpm run verify:site"),
+    "immutable verification",
+  );
+  assert.ok(prepare < quality && quality < gate);
+  assert.equal(steps[prepare].shell, "bash");
+  assert.equal(steps[prepare]["continue-on-error"], undefined);
+});
+
 test("Phase 6: the shared gate and human CI coverage remain complete", async () => {
   const action = await loadYamlDocument(
     ".github/actions/verify-site/action.yml",

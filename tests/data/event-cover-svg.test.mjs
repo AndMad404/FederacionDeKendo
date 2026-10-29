@@ -57,7 +57,7 @@ test("archive uses the approved vertical source with unchanged kendoka paths and
   );
   assert.match(
     vertical.illustrationGroup,
-    /translate\(23\.5 337\.5\) scale\(0\.57\)/,
+    /translate\(23\.5 437\.5\) scale\(0\.57\)/,
   );
   assert.deepEqual(layout.figure, [0, 0, 900, 1200]);
   assert.equal(layout.titleFontSize, 48);

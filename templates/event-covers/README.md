@@ -14,7 +14,7 @@ The calendar remains the only source of event IDs, titles and event types.
 Unicode and whitespace, rejects unsafe IDs and escapes Pango markup.
 
 `v1/template.json` owns layout, palette, resource paths and output dimensions.
-`v1/source.svg` (calendar) and `v1/source-vertical.svg` (archive) contain the user's separated `fondo-bandera` and `kendoka` groups.
+`v1/source.svg` (calendar) and `v1/kendoka-vertical.svg` (archive) contain the user's separated `fondo-bandera` and `kendoka` groups.
 `scripts/event-cover-svg.ts` extracts those groups without changing their paths.
 The `logo`, `titulo` and `tag` placeholder groups are excluded; the official logo,
 event title and event-type tag are overlaid dynamically using the source's slots.

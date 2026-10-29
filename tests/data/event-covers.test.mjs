@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import test from "node:test";
 import { CALENDAR_EVENTS } from "../../src/app/data/calendarEvents.ts";
 import { EVENT_GALLERIES } from "../../src/app/data/eventGalleries.ts";
@@ -75,7 +75,7 @@ test(
             assert.match(
               src,
               new RegExp(
-                `^/images/event-covers/${event.id}/[a-f0-9]+-${format}-\\d+\\.${extension}$`,
+                `^/images/event-covers/shared/kendo-costa-rica-[a-f0-9]+-${format}-\\d+\\.${extension}$`,
               ),
             );
             const metadata = await sharp(
@@ -93,10 +93,23 @@ test(
   },
 );
 
-test("template separates landscape calendar 4:3 from portrait archive 3:4 with bounded left title slots", async () => {
+test("all events reuse one cover per format without duplicate public images", async () => {
+  for (const format of ["calendar", "archive"]) {
+    const images = Object.values(manifest.events).map((entry) => entry[format]);
+    assert.equal(new Set(images.map((image) => image.src)).size, 1);
+    assert.equal(new Set(images.map((image) => image.srcSet.webp)).size, 1);
+  }
+  const files = await readdir("public/images/event-covers", {
+    recursive: true,
+  });
+  assert.equal(files.filter((file) => file.endsWith(".webp")).length, 6);
+});
+
+test("site covers omit embedded text and retain separate calendar and archive compositions", async () => {
   const template = JSON.parse(
     await readFile("templates/event-covers/v1/template.json", "utf8"),
   );
+  assert.equal(template.showText, false);
   for (const [name, ratio] of [
     ["calendar", 4 / 3],
     ["archive", 3 / 4],
