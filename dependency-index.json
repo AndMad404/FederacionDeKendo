@@ -321,12 +321,38 @@
         "tests/architecture/publication.test.mjs",
         "tests/data/calendar-design-policy.test.mjs"
       ]
+    },
+    {
+      "id": "event-cover-pipeline",
+      "changes": [
+        "templates/event-covers/**",
+        "scripts/generate-event-covers.ts",
+        "scripts/prepare-event-covers.ts",
+        "scripts/event-cover-model.ts",
+        "scripts/event-cover-svg.ts",
+        "scripts/event-cover-build.ts",
+        "src/app/config/eventCoverApproval.json",
+        "src/app/data/eventCovers.json",
+        "src/app/utils/eventThumbnail.ts",
+        "src/app/components/events/EventThumbnail.tsx",
+        "public/images/event-covers/**",
+        "public/images/logo/fakcr-logo.png"
+      ],
+      "area": "Portadas compartidas de eventos, fuentes SVG, generacion y consumo responsive",
+      "tests": [
+        "tests/data/event-cover-svg.test.mjs",
+        "tests/data/event-covers.test.mjs",
+        "tests/architecture/event-cover-build.test.mjs",
+        "tests/architecture/calendar-workflow-architecture.test.mjs",
+        "tests/behavior/event-covers.spec.ts",
+        "tests/behavior/calendar-adaptive-cover.spec.ts"
+      ]
     }
   ],
   "graphSnapshot": {
     "generatorVersion": 1,
-    "relationCount": 359,
+    "relationCount": 394,
     "algorithm": "sha256",
-    "digest": "b7cccbca8bef39f8387fb7537362ad9a37b87f7db13b25c76e76764dde7972c5"
+    "digest": "4e92f4e3c1f932674174963cc1c75724b01bdfe1bcdd38c454fa4f10e7044725"
   }
 }
