@@ -97,7 +97,7 @@ export function CalendarSection() {
   return (
     <section
       aria-labelledby="calendar-title"
-      className="relative my-2 flex w-full flex-col overflow-hidden rounded-xl bg-site-canvas tall-md:h-[calc(100%_-_1rem)] tall-md:min-h-0"
+      className="relative my-2 flex w-full flex-col overflow-hidden rounded-xl bg-site-canvas page-fit:h-[calc(100%_-_1rem)] page-fit:min-h-0"
     >
       <CalendarBanner />
       {currentGroup ? (
@@ -126,7 +126,7 @@ export function CalendarSection() {
               onNextPair={nextPair}
             />
 
-            <div className="grid items-start gap-3 sm:gap-4 md:grid-cols-2 page-fit:flex-1 page-fit:items-stretch">
+            <div className="grid min-h-0 items-start gap-3 sm:gap-4 md:grid-cols-2 page-fit:flex-1 page-fit:items-stretch">
               <CalendarMonth
                 group={currentGroup}
                 monthLabel={formatMonth(currentGroup.monthKey, language)}

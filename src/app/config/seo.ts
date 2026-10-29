@@ -702,7 +702,7 @@ function getRouteImageMetadata() {
     alt: DEFAULT_SOCIAL_IMAGE_ALT,
     width: DEFAULT_SOCIAL_IMAGE_WIDTH,
     height: DEFAULT_SOCIAL_IMAGE_HEIGHT,
-    type: "image/jpeg",
+    type: "image/webp",
   };
 }
 

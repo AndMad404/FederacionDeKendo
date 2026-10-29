@@ -13,6 +13,8 @@ import {
 import { getEventDateLabel } from "../utils/calendarEventPresentation";
 import { getEventPath, getPastEvents } from "../utils/eventRoutes";
 import { EVENT_GALLERIES } from "../data/eventGalleries";
+import { EventThumbnail } from "./events/EventThumbnail";
+import { getEventThumbnail } from "../utils/eventThumbnail";
 import {
   buildArchiveUrl,
   filterAndSortArchiveEvents,
@@ -39,21 +41,6 @@ const subscribeToViewport = (callback: () => void) => {
 };
 const getMobileViewport = () => window.matchMedia(mobileArchiveQuery).matches;
 const getServerViewport = () => true;
-
-function getEventThumbnail(eventId: string) {
-  const gallery = EVENT_GALLERIES[eventId];
-  if (gallery?.thumbnail) return gallery.thumbnail;
-  const images = gallery?.images ?? [];
-  const targetRatio = 16 / 9;
-  const horizontalImages = images.filter(
-    (image) => image.width / image.height >= 1.3,
-  );
-  return [...(horizontalImages.length ? horizontalImages : images)].sort(
-    (a, b) =>
-      Math.abs(a.width / a.height - targetRatio) -
-      Math.abs(b.width / b.height - targetRatio),
-  )[0];
-}
 
 export function PastEventsSection() {
   const { language, copy } = useLanguage();
@@ -142,10 +129,10 @@ export function PastEventsSection() {
         }}
       />
 
-      <div className="relative z-20 -mt-11 flex min-h-0 flex-1 items-start justify-center px-3 pb-0 pt-3 sm:-mt-13 sm:px-4 sm:pb-0 sm:pt-4 tall-md:p-4 page-fit:absolute page-fit:inset-0 page-fit:mt-0 page-fit:items-start page-fit:px-4 page-fit:pb-4 page-fit:pt-20 land-sm:px-2 land-sm:pb-0 land-sm:pt-2 land-compact:-mt-8">
+      <div className="relative z-20 -mt-11 flex min-h-0 flex-1 items-start justify-center px-3 pb-0 pt-3 sm:-mt-13 sm:px-4 sm:pb-0 sm:pt-4 tall-md:p-4 page-fit:absolute page-fit:inset-0 page-fit:mt-0 page-fit:items-start page-fit:px-4 page-fit:pb-0 page-fit:pt-20 land-sm:px-2 land-sm:pb-0 land-sm:pt-2 land-compact:-mt-8">
         <div
           data-page-content-boundary
-          className={`flex w-full touch-pan-y select-none flex-col justify-start gap-3 p-3 sm:gap-4 text-center sm:p-4 md:max-w-5xl land-sm:p-2 ${panelSurfaceClass}`}
+          className={`flex w-full touch-pan-y select-none flex-col justify-start gap-3 p-3 sm:gap-4 text-center sm:p-4 md:max-w-[100rem] page-fit:h-full land-sm:p-2 ${panelSurfaceClass}`}
           {...swipeHandlers}
         >
           <EventSectionNavigation active="past" />
@@ -233,47 +220,38 @@ export function PastEventsSection() {
           </div>
 
           {pageEvents.length ? (
-            <ul className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <ul
+              className={`grid gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-4 page-fit:min-h-0 page-fit:flex-1 page-fit:grid-rows-[auto_auto_minmax(0,1fr)_auto] ${pageEvents.length === 2 ? "xl:[&>li:first-child]:col-start-2" : ""}`}
+            >
               {pageEvents.map((event) => {
-                const thumbnail = getEventThumbnail(event.id);
-                const isPoster = Boolean(
-                  EVENT_GALLERIES[event.id]?.posterSource,
-                );
+                const gallery = EVENT_GALLERIES[event.id];
+                const thumbnail = getEventThumbnail(event.id, "archive");
 
                 return (
                   <li
                     key={event.id}
-                    className="row-span-3 grid grid-rows-subgrid gap-2 rounded-xl border border-site-border bg-site-canvas p-3"
+                    className="row-span-4 grid grid-rows-subgrid gap-3 rounded-xl border border-site-border bg-site-canvas p-3 sm:p-4"
                   >
-                    <div className="flex flex-col items-center justify-between">
-                      <h2 className="font-bold">{event.title}</h2>
-                      <p className="mt-1 inline-block rounded-lg bg-site-media px-2.5 py-2 text-sm font-bold uppercase leading-tight text-site-action lg:px-2 lg:py-1 page-fit:mt-0">
+                    <div className="contents">
+                      <h2 className="order-1 self-center font-bold">
+                        {event.title}
+                      </h2>
+                      <p className="inline-block rounded-lg order-2 justify-self-center bg-site-media px-2.5 py-2 text-sm font-bold uppercase leading-tight text-site-action sm:px-2 sm:py-1">
                         {getEventDateLabel(event, language)}
                       </p>
                     </div>
-                    <div>
+                    <div
+                      className={`flex items-center justify-center order-3 page-fit:min-h-0 [&>picture]:aspect-[3/4] page-fit:[&>picture]:aspect-auto page-fit:[&>picture]:h-full`}
+                    >
                       {thumbnail ? (
-                        <picture
-                          data-event-thumbnail
-                          className="flex aspect-video h-auto w-full max-w-full items-center justify-center overflow-hidden rounded-lg bg-site-surface"
-                        >
-                          <source
-                            srcSet={thumbnail.srcSet.avif}
-                            sizes="(min-width: 1024px) 14rem, (min-width: 768px) 50vw, 100vw"
-                            type="image/avif"
-                          />
-                          <img
-                            src={thumbnail.src}
-                            srcSet={thumbnail.srcSet.webp}
-                            sizes="(min-width: 1024px) 14rem, (min-width: 768px) 50vw, 100vw"
-                            alt=""
-                            width={thumbnail.width}
-                            height={thumbnail.height}
-                            loading="lazy"
-                            decoding="async"
-                            className={`block h-full max-h-full w-full max-w-full rounded-lg object-center ${isPoster ? "object-contain" : "object-cover"}`}
-                          />
-                        </picture>
+                        <EventThumbnail
+                          eventId={event.id}
+                          format={"archive"}
+                          fullResolution
+
+                          sizes="(min-width: 1664px) 24rem, (min-width: 1280px) calc((100vw - 10rem) / 4), (min-width: 768px) 50vw, 100vw"
+                          fit={gallery?.posterSource ? "contain" : "cover"}
+                        />
                       ) : (
                         <EventSummary
                           summary={
@@ -285,7 +263,7 @@ export function PastEventsSection() {
                     </div>
                     <Link
                       to={getEventPath(event, language)}
-                      className={`text-sm ${primaryButtonClass} ${focusRingClass}`}
+                      className={`text-sm order-4 ${primaryButtonClass} ${focusRingClass}`}
                     >
                       {copy.archive.viewEvent}
                     </Link>

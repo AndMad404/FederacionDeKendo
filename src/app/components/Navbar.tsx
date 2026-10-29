@@ -158,9 +158,9 @@ export function Navbar() {
           >
             <picture>
               <source
-                srcSet="/images/logo/fakcr-lockup-112.webp 112w, /images/logo/fakcr-lockup-224.webp 224w"
+                srcSet="/images/logo/fakcr-lockup-112.png 112w, /images/logo/fakcr-lockup-224.png 224w"
                 sizes="56px"
-                type="image/webp"
+                type="image/png"
               />
               <img
                 src="/images/logo/fakcr-lockup-224.png"

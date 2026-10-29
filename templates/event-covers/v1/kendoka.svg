@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400">
+  <!-- Seme / men: extended arms, forward right foot and trailing left leg. -->
+  <g fill="#142738" stroke="#142738" stroke-linejoin="round">
+    <path d="M267 174 316 167 352 220 331 270 252 270 237 224Z"/>
+    <path d="m275 252 61-7 90 108-102-6-36-56-81 62-108 4Z"/>
+    <path d="m253 352-137 12-26-4 6-13 121-21Z"/>
+    <path d="m376 338 79 9 23 15-7 9-90-5Z"/>
+    <path d="m298 187 37-25 65-17 10 22-61 29-31 32Z"/>
+    <path d="m277 192 51 12 66-34-8-20-63 24-32-12Z"/>
+    <path d="m268 171-20-43 5-45 35-25 41 8 25 34-5 51-28 31Z"/>
+    <path d="m259 127-29 40 42 22 13-17Zm83-5 30 36-32 29-23-18Z"/>
+  </g>
+  <g fill="none" stroke="#f4f1e9" stroke-width="4">
+    <path d="m305 76 28 7 13 21-5 38-24 13-23-13-7-32Z"/>
+    <path d="m291 102 53 2m-55 10 55 2m-52 10 50 1m-45 11 41 1m-25-59 3 71m-14-72 3 71" stroke-width="2"/>
+    <path d="m265 217 62 5m-67 10 64 5m-48 33-43 64m64-65 22 61m-9-62 53 66" opacity=".65"/>
+  </g>
+  <path d="m398 149 168-79" fill="none" stroke="#b52a35" stroke-width="9" stroke-linecap="round"/>
+  <path d="m389 155 25-12" fill="none" stroke="#142738" stroke-width="12" stroke-linecap="round"/>
+  <path d="m407 138 8 20" fill="none" stroke="#142738" stroke-width="5"/>
+  <path d="M110 377h378" stroke="#b52a35" stroke-width="3" opacity=".55"/>
+</svg>

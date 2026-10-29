@@ -15,9 +15,14 @@ import {
 const DATA = [
   "src/app/data/calendarEvents.ts",
   "src/app/data/calendarEventRegistry.json",
+  "src/app/data/eventCovers.json",
+  "public/images/event-covers/",
 ];
 const OPERATIONS = {
-  site: { paths: [], message: "chore: apply automatic code quality fixes" },
+  site: {
+    paths: ["src/app/data/eventCovers.json", "public/images/event-covers/"],
+    message: "chore: apply automatic code quality fixes",
+  },
   calendar: {
     paths: [
       ...DATA,
@@ -51,10 +56,19 @@ export function publishChanges({
   ref = process.env.GITHUB_REF,
   captureFingerprint = captureWorkspaceFingerprint,
   summaryPath = process.env.GITHUB_STEP_SUMMARY,
+  readCoverApproval = () =>
+    JSON.parse(
+      readFileSync(
+        path.join(root, "src/app/config/eventCoverApproval.json"),
+        "utf8",
+      ),
+    ),
   git = (args) => execFileSync("git", args, { cwd: root, encoding: "utf8" }),
 } = {}) {
   const operation = OPERATIONS[kind];
   if (!operation) throw new Error(`Unknown publication: ${kind}`);
+  const coverApproval = readCoverApproval();
+  const coversApproved = coverApproval.status === "approved";
   const verification = JSON.parse(
     readFileSync(path.join(directory, "verification.json"), "utf8"),
   );
@@ -79,10 +93,27 @@ export function publishChanges({
   if (ref && ref !== `refs/heads/${branch}`)
     throw new Error("Publication is restricted to the production branch.");
   const allowed = [...operation.paths, ...quality.fixedFiles];
-  const changed = [
+  const candidates = [
     ...git(["diff", "--name-only", "HEAD", "-z"]).split("\0"),
     ...git(["ls-files", "--others", "--exclude-standard", "-z"]).split("\0"),
   ].filter(Boolean);
+  const deferredFiles = coversApproved
+    ? candidates.filter(
+        (file) =>
+          file.startsWith("public/images/event-covers/") &&
+          coverApproval.formats &&
+          !Object.entries(coverApproval.formats).some(
+            ([format, status]) =>
+              status === "approved" &&
+              path.basename(file).includes(`-${format}-`),
+          ),
+      )
+    : candidates.filter(
+        (file) =>
+          file === "src/app/data/eventCovers.json" ||
+          file.startsWith("public/images/event-covers/"),
+      );
+  const changed = candidates.filter((file) => !deferredFiles.includes(file));
   if (
     changed.some(
       (file) =>
@@ -110,7 +141,7 @@ export function publishChanges({
       "user.email",
       "41898282+github-actions[bot]@users.noreply.github.com",
     ]);
-    git(["commit", "-m", operation.message]);
+    git(["commit", "-m", operation.message, "--only", "--", ...changed]);
     git(["push", "origin", `HEAD:refs/heads/${branch}`]);
     sha = git(["rev-parse", "HEAD"]).trim();
   }
@@ -119,6 +150,7 @@ export function publishChanges({
     status: changed.length ? "git-saved" : "unchanged",
     sha,
     files: changed,
+    deferredFiles,
     deployment: "not-confirmed",
   };
   writeFileSync(

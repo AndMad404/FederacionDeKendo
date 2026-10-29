@@ -4,7 +4,8 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "build": "vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr",
+    "generate:event-covers": "tsx scripts/generate-event-covers.ts",
+    "build": "tsx scripts/prepare-event-covers.ts && vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr",
     "postbuild": "node scripts/generate-route-html.mjs",
     "dev": "vite",
     "format": "pnpm run format:line-endings && prettier . --write --ignore-unknown",

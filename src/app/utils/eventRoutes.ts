@@ -3,7 +3,6 @@ import type { CalendarEvent } from "../types";
 import type { Language } from "../config/i18n";
 import { isPastEvent } from "./calendarEvents";
 import { hasDistinctEventTranslation } from "./localizedEvents";
-export { getArchivePagePath } from "./eventArchiveRoutes.ts";
 
 const EVENT_VANITY_SLUGS: Readonly<Record<string, string>> = {
   "2026-05-29-clak-seminario-instructores-chile": "2026-05-30-seminario",

@@ -1,51 +1,45 @@
 import assert from "node:assert/strict";
-import { readFile, stat } from "node:fs/promises";
+import { readFile, stat, readdir } from "node:fs/promises";
 import test from "node:test";
 
-const AVIF_VARIANTS = [
-  [480, "44c635faf6d3"],
-  [960, "72e40d00f3ff"],
-  [1500, "6d56fed2e5fb"],
-];
-
-test("serves a materially smaller AVIF hero with a WebP fallback", async () => {
+test("publishes only WebP content images", async () => {
+  const files = await readdir("public/images", {
+    recursive: true,
+    withFileTypes: true,
+  });
+  for (const file of files)
+    if (
+      file.isFile() &&
+      !file.parentPath.replaceAll("\\", "/").endsWith("/logo")
+    )
+      assert.ok(file.name.endsWith(".webp"), file.name);
   const hero = await readFile("src/app/components/HeroSection.tsx", "utf8");
-
-  assert.match(hero, /type="image\/avif"/);
+  assert.doesNotMatch(hero, /avif/);
   assert.match(hero, /type="image\/webp"/);
-
-  for (const [width, version] of AVIF_VARIANTS) {
-    const avifPath = `public/images/hero/kendo-hero-formacion-${width}.avif`;
-    const webpPath = `public/images/hero/kendo-hero-formacion-${width}.webp`;
-    const [avif, webp] = await Promise.all([stat(avifPath), stat(webpPath)]);
-
+  for (const width of [480, 960, 1500]) {
     assert.ok(
-      avif.size < webp.size * 0.75,
-      `${avifPath} should save at least 25% over its WebP fallback`,
+      (await stat(`public/images/hero/kendo-hero-formacion-${width}.webp`))
+        .size > 0,
     );
-    assert.match(hero, new RegExp(`${width}\\.avif\\?v=${version}`));
   }
 });
 
-test("preloads the AVIF hero consistently in route metadata and headers", async () => {
-  const [seoSource, headers] = await Promise.all([
-    readFile("src/app/config/seo-data.json", "utf8"),
-    readFile("public/_headers", "utf8"),
-  ]);
-  const seo = JSON.parse(seoSource);
-
+test("preloads the WebP hero consistently in route metadata and headers", async () => {
+  const seo = JSON.parse(
+    await readFile("src/app/config/seo-data.json", "utf8"),
+  );
+  const headers = await readFile("public/_headers", "utf8");
   for (const route of ["/", "/en/"]) {
-    assert.equal(seo.routes[route].preloadImage.type, "image/avif");
+    assert.equal(seo.routes[route].preloadImage.type, "image/webp");
     assert.equal(
       seo.routes[route].preloadImage.href,
-      "/images/hero/kendo-hero-formacion-960.avif?v=72e40d00f3ff",
+      "/images/hero/kendo-hero-formacion-960.webp?v=20260704-0120",
     );
   }
-
-  assert.match(headers, /type=image\/avif/);
-  for (const [width, version] of AVIF_VARIANTS) {
-    assert.match(headers, new RegExp(`${width}\\.avif\\?v=${version}`));
-  }
+  assert.doesNotMatch(headers, /avif/);
+  assert.match(headers, /type=image\/webp/);
+  for (const width of [480, 960, 1500])
+    assert.ok(headers.includes(`${width}.webp?v=20260704-0120`));
 });
 
 test("publishes long-lived cache policies for static delivery", async () => {

@@ -5,7 +5,7 @@ interface EventGalleryImage {
   width: number;
   height: number;
   src: string;
-  srcSet: { webp: string; avif: string };
+  srcSet: { webp: string };
   sizes: string;
 }
 
@@ -22,8 +22,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 720,
         "src": "/images/events/2026-08-08-examen/photo-1-1280.webp",
         "srcSet": {
-          "webp": "/images/events/2026-08-08-examen/photo-1-480.webp 480w, /images/events/2026-08-08-examen/photo-1-960.webp 960w, /images/events/2026-08-08-examen/photo-1-1280.webp 1280w",
-          "avif": "/images/events/2026-08-08-examen/photo-1-480.avif 480w, /images/events/2026-08-08-examen/photo-1-960.avif 960w, /images/events/2026-08-08-examen/photo-1-1280.avif 1280w"
+          "webp": "/images/events/2026-08-08-examen/photo-1-480.webp 480w, /images/events/2026-08-08-examen/photo-1-960.webp 960w, /images/events/2026-08-08-examen/photo-1-1280.webp 1280w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -34,8 +33,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 1200,
         "src": "/images/events/2026-08-08-examen/photo-2-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-08-08-examen/photo-2-480.webp 480w, /images/events/2026-08-08-examen/photo-2-960.webp 960w, /images/events/2026-08-08-examen/photo-2-1600.webp 1600w",
-          "avif": "/images/events/2026-08-08-examen/photo-2-480.avif 480w, /images/events/2026-08-08-examen/photo-2-960.avif 960w, /images/events/2026-08-08-examen/photo-2-1600.avif 1600w"
+          "webp": "/images/events/2026-08-08-examen/photo-2-480.webp 480w, /images/events/2026-08-08-examen/photo-2-960.webp 960w, /images/events/2026-08-08-examen/photo-2-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -46,8 +44,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 901,
         "src": "/images/events/2026-08-08-examen/photo-3-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-08-08-examen/photo-3-480.webp 480w, /images/events/2026-08-08-examen/photo-3-960.webp 960w, /images/events/2026-08-08-examen/photo-3-1600.webp 1600w",
-          "avif": "/images/events/2026-08-08-examen/photo-3-480.avif 480w, /images/events/2026-08-08-examen/photo-3-960.avif 960w, /images/events/2026-08-08-examen/photo-3-1600.avif 1600w"
+          "webp": "/images/events/2026-08-08-examen/photo-3-480.webp 480w, /images/events/2026-08-08-examen/photo-3-960.webp 960w, /images/events/2026-08-08-examen/photo-3-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       }
@@ -63,8 +60,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 1560,
         "src": "/images/events/2026-08-22-3er-torneo/photo-1-720.webp",
         "srcSet": {
-          "webp": "/images/events/2026-08-22-3er-torneo/photo-1-480.webp 480w, /images/events/2026-08-22-3er-torneo/photo-1-720.webp 720w",
-          "avif": "/images/events/2026-08-22-3er-torneo/photo-1-480.avif 480w, /images/events/2026-08-22-3er-torneo/photo-1-720.avif 720w"
+          "webp": "/images/events/2026-08-22-3er-torneo/photo-1-480.webp 480w, /images/events/2026-08-22-3er-torneo/photo-1-720.webp 720w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -75,8 +71,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 1600,
         "src": "/images/events/2026-08-22-3er-torneo/photo-2-1445.webp",
         "srcSet": {
-          "webp": "/images/events/2026-08-22-3er-torneo/photo-2-480.webp 480w, /images/events/2026-08-22-3er-torneo/photo-2-960.webp 960w, /images/events/2026-08-22-3er-torneo/photo-2-1445.webp 1445w",
-          "avif": "/images/events/2026-08-22-3er-torneo/photo-2-480.avif 480w, /images/events/2026-08-22-3er-torneo/photo-2-960.avif 960w, /images/events/2026-08-22-3er-torneo/photo-2-1445.avif 1445w"
+          "webp": "/images/events/2026-08-22-3er-torneo/photo-2-480.webp 480w, /images/events/2026-08-22-3er-torneo/photo-2-960.webp 960w, /images/events/2026-08-22-3er-torneo/photo-2-1445.webp 1445w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -87,8 +82,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 1493,
         "src": "/images/events/2026-08-22-3er-torneo/photo-3-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-08-22-3er-torneo/photo-3-480.webp 480w, /images/events/2026-08-22-3er-torneo/photo-3-960.webp 960w, /images/events/2026-08-22-3er-torneo/photo-3-1600.webp 1600w",
-          "avif": "/images/events/2026-08-22-3er-torneo/photo-3-480.avif 480w, /images/events/2026-08-22-3er-torneo/photo-3-960.avif 960w, /images/events/2026-08-22-3er-torneo/photo-3-1600.avif 1600w"
+          "webp": "/images/events/2026-08-22-3er-torneo/photo-3-480.webp 480w, /images/events/2026-08-22-3er-torneo/photo-3-960.webp 960w, /images/events/2026-08-22-3er-torneo/photo-3-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -99,8 +93,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 901,
         "src": "/images/events/2026-08-22-3er-torneo/photo-4-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-08-22-3er-torneo/photo-4-480.webp 480w, /images/events/2026-08-22-3er-torneo/photo-4-960.webp 960w, /images/events/2026-08-22-3er-torneo/photo-4-1600.webp 1600w",
-          "avif": "/images/events/2026-08-22-3er-torneo/photo-4-480.avif 480w, /images/events/2026-08-22-3er-torneo/photo-4-960.avif 960w, /images/events/2026-08-22-3er-torneo/photo-4-1600.avif 1600w"
+          "webp": "/images/events/2026-08-22-3er-torneo/photo-4-480.webp 480w, /images/events/2026-08-22-3er-torneo/photo-4-960.webp 960w, /images/events/2026-08-22-3er-torneo/photo-4-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -111,8 +104,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 900,
         "src": "/images/events/2026-08-22-3er-torneo/photo-5-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-08-22-3er-torneo/photo-5-480.webp 480w, /images/events/2026-08-22-3er-torneo/photo-5-960.webp 960w, /images/events/2026-08-22-3er-torneo/photo-5-1600.webp 1600w",
-          "avif": "/images/events/2026-08-22-3er-torneo/photo-5-480.avif 480w, /images/events/2026-08-22-3er-torneo/photo-5-960.avif 960w, /images/events/2026-08-22-3er-torneo/photo-5-1600.avif 1600w"
+          "webp": "/images/events/2026-08-22-3er-torneo/photo-5-480.webp 480w, /images/events/2026-08-22-3er-torneo/photo-5-960.webp 960w, /images/events/2026-08-22-3er-torneo/photo-5-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       }
@@ -128,8 +120,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 1066,
         "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-1-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-1-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-1-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-1-1600.webp 1600w",
-          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-1-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-1-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-1-1600.avif 1600w"
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-1-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-1-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-1-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -140,8 +131,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 1066,
         "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-2-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-2-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-2-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-2-1600.webp 1600w",
-          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-2-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-2-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-2-1600.avif 1600w"
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-2-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-2-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-2-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -152,8 +142,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 1066,
         "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-3-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-3-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-3-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-3-1600.webp 1600w",
-          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-3-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-3-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-3-1600.avif 1600w"
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-3-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-3-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-3-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -164,8 +153,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 1066,
         "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-4-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-4-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-4-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-4-1600.webp 1600w",
-          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-4-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-4-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-4-1600.avif 1600w"
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-4-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-4-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-4-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -176,8 +164,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 1066,
         "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-5-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-5-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-5-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-5-1600.webp 1600w",
-          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-5-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-5-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-5-1600.avif 1600w"
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-5-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-5-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-5-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -188,8 +175,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 1066,
         "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-6-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-6-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-6-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-6-1600.webp 1600w",
-          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-6-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-6-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-6-1600.avif 1600w"
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-6-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-6-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-6-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -200,8 +186,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 1066,
         "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-7-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-7-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-7-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-7-1600.webp 1600w",
-          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-7-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-7-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-7-1600.avif 1600w"
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-7-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-7-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-7-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -212,8 +197,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 1066,
         "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-8-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-8-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-8-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-8-1600.webp 1600w",
-          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-8-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-8-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-8-1600.avif 1600w"
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-8-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-8-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-8-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -224,8 +208,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 863,
         "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-9-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-9-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-9-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-9-1600.webp 1600w",
-          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-9-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-9-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-9-1600.avif 1600w"
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-9-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-9-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-9-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -236,8 +219,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 1066,
         "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-10-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-10-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-10-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-10-1600.webp 1600w",
-          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-10-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-10-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-10-1600.avif 1600w"
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-10-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-10-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-10-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -248,8 +230,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 1066,
         "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-11-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-11-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-11-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-11-1600.webp 1600w",
-          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-11-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-11-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-11-1600.avif 1600w"
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-11-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-11-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-11-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -260,8 +241,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 1066,
         "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-12-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-12-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-12-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-12-1600.webp 1600w",
-          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-12-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-12-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-12-1600.avif 1600w"
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-12-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-12-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-12-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -272,8 +252,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 1066,
         "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-13-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-13-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-13-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-13-1600.webp 1600w",
-          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-13-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-13-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-13-1600.avif 1600w"
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-13-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-13-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-13-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -284,8 +263,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 1066,
         "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-14-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-14-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-14-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-14-1600.webp 1600w",
-          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-14-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-14-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-14-1600.avif 1600w"
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-14-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-14-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-14-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -296,8 +274,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 1066,
         "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-15-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-15-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-15-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-15-1600.webp 1600w",
-          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-15-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-15-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-15-1600.avif 1600w"
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-15-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-15-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-15-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -308,8 +285,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 1066,
         "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-16-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-16-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-16-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-16-1600.webp 1600w",
-          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-16-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-16-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-16-1600.avif 1600w"
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-16-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-16-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-16-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -320,8 +296,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 1066,
         "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-17-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-17-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-17-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-17-1600.webp 1600w",
-          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-17-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-17-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-17-1600.avif 1600w"
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-17-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-17-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-17-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -332,8 +307,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 1066,
         "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-18-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-18-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-18-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-18-1600.webp 1600w",
-          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-18-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-18-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-18-1600.avif 1600w"
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-18-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-18-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-18-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -344,8 +318,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 1066,
         "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-19-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-19-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-19-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-19-1600.webp 1600w",
-          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-19-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-19-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-19-1600.avif 1600w"
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-19-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-19-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-19-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -356,8 +329,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 1066,
         "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-20-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-20-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-20-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-20-1600.webp 1600w",
-          "avif": "/images/events/2026-09-12-gasshuku-monteverde/photo-20-480.avif 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-20-960.avif 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-20-1600.avif 1600w"
+          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-20-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-20-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-20-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       }
@@ -373,8 +345,7 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "height": 1448,
         "src": "/images/events/clak-1er-panamericano-brasil/photo-1-1086.webp",
         "srcSet": {
-          "webp": "/images/events/clak-1er-panamericano-brasil/photo-1-480.webp 480w, /images/events/clak-1er-panamericano-brasil/photo-1-960.webp 960w, /images/events/clak-1er-panamericano-brasil/photo-1-1086.webp 1086w",
-          "avif": "/images/events/clak-1er-panamericano-brasil/photo-1-480.avif 480w, /images/events/clak-1er-panamericano-brasil/photo-1-960.avif 960w, /images/events/clak-1er-panamericano-brasil/photo-1-1086.avif 1086w"
+          "webp": "/images/events/clak-1er-panamericano-brasil/photo-1-480.webp 480w, /images/events/clak-1er-panamericano-brasil/photo-1-960.webp 960w, /images/events/clak-1er-panamericano-brasil/photo-1-1086.webp 1086w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       }
@@ -390,8 +361,38 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
       "height": 534,
       "src": "/images/events/clak-1er-panamericano-brasil/thumbnail-1600.webp",
       "srcSet": {
-        "webp": "/images/events/clak-1er-panamericano-brasil/thumbnail-480.webp 480w, /images/events/clak-1er-panamericano-brasil/thumbnail-960.webp 960w, /images/events/clak-1er-panamericano-brasil/thumbnail-1600.webp 1600w",
-        "avif": "/images/events/clak-1er-panamericano-brasil/thumbnail-480.avif 480w, /images/events/clak-1er-panamericano-brasil/thumbnail-960.avif 960w, /images/events/clak-1er-panamericano-brasil/thumbnail-1600.avif 1600w"
+        "webp": "/images/events/clak-1er-panamericano-brasil/thumbnail-480.webp 480w, /images/events/clak-1er-panamericano-brasil/thumbnail-960.webp 960w, /images/events/clak-1er-panamericano-brasil/thumbnail-1600.webp 1600w"
+      },
+      "sizes": "(max-width: 640px) 100vw, 960px"
+    }
+  },
+  "panama-5ta-copa-shogun-torneo-por-equipos-y-seminario": {
+    "fingerprint": "d02d1e241f33d6f3b6f6f1848e6c098461ce0119aaddc3ac0f52703397db9eeb",
+    "images": [
+      {
+        "order": 1,
+        "alt": "Flyer oficial de la Copa Shogun 2026 — Panamá",
+        "width": 1440,
+        "height": 1728,
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/copa-shogun-2026-panama-kendo-flyer-1440.webp",
+        "srcSet": {
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/copa-shogun-2026-panama-kendo-flyer-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/copa-shogun-2026-panama-kendo-flyer-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/copa-shogun-2026-panama-kendo-flyer-1440.webp 1440w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      }
+    ],
+    "posterSource": {
+      "label": "Flyer oficial de la Copa Shogun 2026 — Panamá",
+      "url": "https://www.instagram.com/p/De-Qt1Mh9AS/"
+    },
+    "thumbnail": {
+      "order": 1,
+      "alt": "Imagen oficial de la Copa Shogun 2026 — Panamá",
+      "width": 1440,
+      "height": 810,
+      "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/copa-shogun-2026-panama-kendo-thumbnail-1440.webp",
+      "srcSet": {
+        "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/copa-shogun-2026-panama-kendo-thumbnail-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/copa-shogun-2026-panama-kendo-thumbnail-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/copa-shogun-2026-panama-kendo-thumbnail-1440.webp 1440w"
       },
       "sizes": "(max-width: 640px) 100vw, 960px"
     }

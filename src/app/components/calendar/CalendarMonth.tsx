@@ -35,7 +35,9 @@ export function CalendarMonth({
         {monthLabel}
       </h2>
 
-      <ul className="mx-auto grid w-full gap-3 sm:gap-4 page-fit:flex-1 page-fit:grid-rows-2">
+      <ul
+        className={`mx-auto grid min-h-0 w-full gap-3 sm:gap-4 page-fit:flex-1 ${visibleEvents.length === 1 ? "page-fit:grid-rows-1" : "page-fit:grid-rows-2"}`}
+      >
         {visibleEvents.map((event) => (
           <CalendarEventCard key={event.id} event={event} />
         ))}

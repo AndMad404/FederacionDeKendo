@@ -90,11 +90,6 @@ export function HistoricalEventGallery({
     >
       <figure className="group relative aspect-video cursor-pointer overflow-hidden rounded-xl bg-site-media xl:aspect-auto xl:h-[var(--event-featured-height)]">
         <picture>
-          <source
-            srcSet={EVENT_GALLERIES[eventId].images[index].srcSet.avif}
-            sizes={featured.sizes}
-            type="image/avif"
-          />
           <img
             src={featured.src}
             srcSet={featured.srcSet}

@@ -94,7 +94,7 @@ test("imports local official material through the same variants pipeline and fre
     posterSource,
   );
   assert.ok(
-    first.galleries["external-event"].images[0].srcSet.avif.includes(".avif"),
+    first.galleries["external-event"].images[0].srcSet.webp.includes(".webp"),
   );
   first.galleries["external-event"].thumbnail = {
     ...first.galleries["external-event"].images[0],
@@ -190,7 +190,7 @@ test("valid public album freezes all naturally ordered sanitized responsive imag
   );
   const manifest = await readFile(context.options.manifestPath, "utf8");
   assert.match(manifest, /photo-1-480\.webp 480w/);
-  assert.match(manifest, /photo-1-480\.avif 480w/);
+  assert.match(manifest, /photo-1-480\.webp 480w/);
   assert.match(
     manifest,
     /Federaciones de Asociaciones de Kendo - Evento 2026-01-01/,

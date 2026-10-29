@@ -12,6 +12,9 @@
     },
     "clak-1er-panamericano-brasil": {
       "fingerprint": "61f8e8147a0096e0dfb87cb2ae923f51507d62a2ae07a722b4e12396fb4950ea"
+    },
+    "panama-5ta-copa-shogun-torneo-por-equipos-y-seminario": {
+      "fingerprint": "d02d1e241f33d6f3b6f6f1848e6c098461ce0119aaddc3ac0f52703397db9eeb"
     }
   },
   "checks": {
@@ -31,6 +34,9 @@
       "phase": "final"
     },
     "clak-1er-panamericano-brasil": {
+      "phase": "final"
+    },
+    "panama-5ta-copa-shogun-torneo-por-equipos-y-seminario": {
       "phase": "final"
     }
   }

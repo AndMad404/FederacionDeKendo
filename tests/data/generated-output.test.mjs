@@ -156,24 +156,24 @@ test("generates localized, unique, indexable SEO output for every event route", 
   });
 });
 
-test("uses the JPEG social card in generated Open Graph metadata", async () => {
+test("uses the WebP social card in generated Open Graph metadata", async () => {
   const gallery = await readDist("galeria/index.html");
 
   assert.match(gallery, /<html lang="es" prefix="og: https:\/\/ogp\.me\/ns#">/);
   assert.match(
     gallery,
-    /property="og:image" content="https:\/\/fak-kendo\.org\/images\/social\/kendo-social-card-20260921\.jpg"/,
+    /property="og:image" content="https:\/\/fak-kendo\.org\/images\/social\/kendo-social-card-20260921\.webp"/,
   );
-  assert.match(gallery, /property="og:image:type" content="image\/jpeg"/);
+  assert.match(gallery, /property="og:image:type" content="image\/webp"/);
   assert.match(gallery, /name="twitter:card" content="summary_large_image"/);
 
   for (const route of ["index.html", "eventos/index.html"]) {
     const html = await readDist(route);
     assert.match(
       html,
-      /og:image" content="https:\/\/fak-kendo\.org\/images\/social\/kendo-social-card-20260921\.jpg"/,
+      /og:image" content="https:\/\/fak-kendo\.org\/images\/social\/kendo-social-card-20260921\.webp"/,
     );
-    assert.match(html, /og:image:type" content="image\/jpeg"/);
+    assert.match(html, /og:image:type" content="image\/webp"/);
     assert.match(html, /og:image:width" content="1200"/);
     assert.match(html, /og:image:height" content="630"/);
   }

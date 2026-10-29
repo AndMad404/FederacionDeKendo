@@ -93,13 +93,15 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
     aliases: ["2026-11-21-panama-torneo-por-equipos","2026-11-21-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario"],
     archiveEligibleAt: "2026-11-24T06:00:00.000Z",
     sourceUpdatedAt: "2026-09-21T17:02:29.000Z",
-    title: "PANAMÁ 5ta Copa Shogun Torneo por Equipos y Seminario",
+    title: "Copa Shogun 2026 — Panamá",
     date: "2026-11-20",
     endDate: "2026-11-23",
-    location: "Shinsei Budokan Panamá, Plaza Mirage, Panamá, Provincia de Panamá, Panamá",
-    summary: "#EventoExterno: \n\nInvitación del Dojo Shinsei Panamá : 5ta Copa Shogun\n\n- Práctica libre.\n- Torneo por equipos.\n- Seminario.\n\nParticiparemos en todas las actividades , fortaleciendo lazos con la comunidad Kendoka internacional .",
+    location: "Shinsei Budokan Panamá y COS Sport Center, Panamá",
+    summary: "Inscripciones abiertas a la Copa Shogun 2026: tres días de kendo con participación internacional.\n\nPrograma:\n\n- Viernes 20 de noviembre: Godogeiko en Shinsei Budokan Panamá.\n- Sábado 21 de noviembre: torneos en COS Sport Center.\n- Domingo 22 de noviembre: seminario en COS Sport Center.\n\nContaremos con la participación de dos sensei japonesas:\n\n- Akemi Nakano, 7.º dan.\n- Haruyo Kubo, 7.º dan.\n\nForma tu grupo e inscríbete. Contacto: 6613-1539.\n\n[Publicación oficial e información de inscripciones](https://www.instagram.com/p/De-Qt1Mh9AS/)",
+    external: true,
     eventType: "torneo",
-    timeZone: "America/Costa_Rica"
+    infoUrl: "https://www.instagram.com/p/De-Qt1Mh9AS/",
+    timeZone: "America/Panama"
   },
   {
     id: "seminario-noviembre-2026",

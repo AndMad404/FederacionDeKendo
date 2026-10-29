@@ -10,7 +10,7 @@ interface RoutePresentation {
 
 const ROUTE_PRESENTATION = {
   home: { tabletMode: "contained", desktopMode: "contained" },
-  calendar: { tabletMode: "contained", desktopMode: "contained" },
+  calendar: { tabletMode: "flow", desktopMode: "contained" },
   gallery: { tabletMode: "contained", desktopMode: "contained" },
   affiliates: { tabletMode: "flow", desktopMode: "contained" },
   event: { tabletMode: "flow", desktopMode: "flow" },

@@ -35,6 +35,7 @@ async function fixture(
     directory,
     options: {
       directory,
+      readCoverApproval: () => ({ status: "approved" }),
       summaryPath: null,
       expectedSha: "base",
       ref: "refs/heads/main",
@@ -68,6 +69,63 @@ test("publication saves the verified corrections once and distinguishes Git from
       .status,
     result.status,
   );
+});
+
+test("pending illustration defers only provisional cover files and allows verified unrelated publication", async (t) => {
+  const coverFiles = [
+    "src/app/data/eventCovers.json",
+    "public/images/event-covers/provisional.webp",
+  ];
+  const f = await fixture(t, { changed: ["example.js", ...coverFiles] });
+  const result = publishChanges({
+    ...f.options,
+    readCoverApproval: () => ({ status: "awaiting-user-illustration" }),
+  });
+  assert.deepEqual(result.files, ["example.js"]);
+  assert.deepEqual(result.deferredFiles, coverFiles);
+  assert.deepEqual(
+    f.calls.find((call) => call[0] === "add"),
+    ["add", "-A", "--", "example.js"],
+  );
+  assert.deepEqual(f.calls.find((call) => call[0] === "commit").slice(3), [
+    "--only",
+    "--",
+    "example.js",
+  ]);
+});
+
+test("only pending cover files cause no commit or remote request", async (t) => {
+  const f = await fixture(t, {
+    changed: [
+      "src/app/data/eventCovers.json",
+      "public/images/event-covers/provisional.webp",
+    ],
+  });
+  const result = publishChanges({
+    ...f.options,
+    readCoverApproval: () => ({ status: "awaiting-user-illustration" }),
+  });
+  assert.equal(result.status, "unchanged");
+  assert.equal(result.deferredFiles.length, 2);
+  assert.ok(
+    f.calls.every(
+      (call) => !["add", "commit", "push", "ls-remote"].includes(call[0]),
+    ),
+  );
+});
+
+test("calendar-only approval defers archive artwork from publication", async (t) => {
+  const archive = "public/images/event-covers/exam/hash-archive-900.webp";
+  const f = await fixture(t, { changed: ["example.js", archive] });
+  const result = publishChanges({
+    ...f.options,
+    readCoverApproval: () => ({
+      status: "approved",
+      formats: { calendar: "approved", archive: "pending" },
+    }),
+  });
+  assert.deepEqual(result.files, ["example.js"]);
+  assert.deepEqual(result.deferredFiles, [archive]);
 });
 
 test("publication without changes performs no write or remote request", async (t) => {

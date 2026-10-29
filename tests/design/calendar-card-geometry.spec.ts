@@ -22,7 +22,7 @@ for (const viewport of [
     const panel = page.locator("[data-page-content-boundary]");
     await expect(
       panel.getByText("Todos los días", { exact: true }),
-    ).toHaveCount(2);
+    ).toHaveCount(0);
     await expect(
       panel.getByText("1:00p.m. - 3:00p.m.", { exact: true }),
     ).toBeVisible();

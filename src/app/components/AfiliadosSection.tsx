@@ -71,12 +71,6 @@ export function AfiliadosSection() {
           sources: [
             {
               srcSet:
-                "/images/affiliates/kendo-affiliates-768.avif 768w, /images/affiliates/kendo-affiliates-1200.avif 1200w",
-              sizes: "(min-width: 1024px) 1200px, 100vw",
-              type: "image/avif",
-            },
-            {
-              srcSet:
                 "/images/affiliates/kendo-affiliates-768.webp 768w, /images/affiliates/kendo-affiliates-1200.webp 1200w",
               sizes: "(min-width: 1024px) 1200px, 100vw",
               type: "image/webp",

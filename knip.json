@@ -1,5 +1,10 @@
 ﻿{
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "entry": ["src/entry-server.tsx"],
+  "entry": [
+    "src/entry-server.tsx",
+    "tests/fixtures/calendar-layout/entry.tsx",
+    "tests/fixtures/calendar-layout/vite.config.ts",
+    "tests/fixtures/calendar-layout/data.ts"
+  ],
   "ignoreExportsUsedInFile": true
 }

@@ -46,12 +46,7 @@ const PRIVATE_MARKERS = new Set([
 ]);
 
 const MAX_TRACKED_FILE_BYTES = 5 * 1024 * 1024;
-const LARGE_FILE_EXCEPTIONS = new Map([
-  [
-    "public/images/gallery/kendo-gallery-03.jpg",
-    "legacy source asset; removal requires an explicit archival decision",
-  ],
-]);
+const LARGE_FILE_EXCEPTIONS = new Map();
 
 function normalize(relativePath) {
   return relativePath.split(path.sep).join("/");

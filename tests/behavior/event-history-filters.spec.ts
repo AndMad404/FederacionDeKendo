@@ -196,7 +196,7 @@ test("filters apply available values and the empty state remains available", asy
   ).toBeVisible();
 });
 
-test("uses an assigned gallery thumbnail and falls back to the event description", async ({
+test("uses gallery artwork as a thumbnail and falls back to the description without artwork", async ({
   page,
 }) => {
   // Calendar titles, descriptions and galleries can change during a sync.
@@ -209,18 +209,18 @@ test("uses an assigned gallery thumbnail and falls back to the event description
     has: page.locator('a[href="/eventos/pasados/layout-1/"]'),
   });
   await expect(eventWithGallery).toBeVisible();
-  await expect(
-    eventWithGallery.locator("[data-event-thumbnail] img"),
-  ).toHaveCount(1);
-  await expect(
-    eventWithGallery.locator("[data-event-thumbnail] img"),
-  ).toHaveAttribute("src", "/fixture-image/480x320.jpg");
-  await expect(
-    eventWithGallery.locator("[data-event-thumbnail] img"),
-  ).toHaveCSS("object-fit", "cover");
-  await expect(
-    eventWithGallery.getByText(/Información del encuentro y sus actividades/),
-  ).toHaveCount(0);
+  const thumbnail = eventWithGallery.locator("[data-event-thumbnail]");
+  await expect(thumbnail).toHaveCount(1);
+  await expect(thumbnail).toHaveAttribute("data-thumbnail-source", "gallery");
+  await expect(thumbnail.locator("img")).toHaveAttribute(
+    "src",
+    "/fixture-image/480x320.jpg",
+  );
+  await expect(thumbnail.locator("img")).toHaveCSS("object-fit", "cover");
+  await expect(thumbnail.locator("img")).toHaveAttribute(
+    "alt",
+    "Imagen neutra 1",
+  );
 
   const eventWithoutGallery = page.locator("main li").filter({
     has: page.locator('a[href="/eventos/pasados/layout-0/"]'),
