@@ -56,10 +56,20 @@ export async function expectEventGalleryGeometry(page: Page) {
   if (width >= 1280) {
     expect(article.right).toBeLessThan(gallery.left);
     expect(actions.right).toBeLessThan(gallery.left);
-    expect(Math.abs(gallery.top - article.top)).toBeLessThanOrEqual(1);
     if (strip) {
+      expect(
+        Math.abs(gallery.top - article.top),
+        "Multi-image galleries align with the top of the text",
+      ).toBeLessThanOrEqual(1);
       expect(strip.height).toBeLessThanOrEqual(actions.height + 1);
       expect(strip.bottom).toBeGreaterThanOrEqual(article.bottom - 1);
+    } else {
+      const articleCenter = article.top + article.height / 2;
+      const galleryCenter = gallery.top + gallery.height / 2;
+      expect(
+        Math.abs(galleryCenter - articleCenter),
+        "Single-image galleries center vertically against the text",
+      ).toBeLessThanOrEqual(1);
     }
   } else {
     expect(gallery.top).toBeGreaterThanOrEqual(article.bottom);
