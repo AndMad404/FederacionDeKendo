@@ -1,6 +1,14 @@
 import { createHash } from "node:crypto";
-import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync, mkdirSync, writeFileSync } from "node:fs";
+import { execFileSync, spawnSync } from "node:child_process";
+import {
+  existsSync,
+  readFileSync,
+  mkdirSync,
+  writeFileSync,
+  mkdtempSync,
+  rmSync,
+} from "node:fs";
+import os from "node:os";
 import { appendFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -10,6 +18,31 @@ export const reportDirectory = (root = process.cwd()) =>
     root,
     process.env.VERIFY_SITE_REPORT_DIR ?? ".cache/verification",
   );
+
+export function retainCorrections(root, directory = reportDirectory(root)) {
+  const temporary = mkdtempSync(path.join(os.tmpdir(), "site-corrections-"));
+  const git = (args) =>
+    execFileSync("git", args, {
+      cwd: root,
+      env: { ...process.env, GIT_INDEX_FILE: path.join(temporary, "index") },
+    });
+  try {
+    // Snapshot all recoverable changes without changing the working index.
+    // Publication independently enforces approved paths and verification.
+    git(["read-tree", "HEAD"]);
+    git(["add", "--all"]);
+    mkdirSync(directory, { recursive: true });
+    git([
+      "diff",
+      "--cached",
+      "--binary",
+      `--output=${path.resolve(directory, "corrections.patch")}`,
+      "HEAD",
+    ]);
+  } finally {
+    rmSync(temporary, { recursive: true, force: true });
+  }
+}
 
 function phases(mode = "full") {
   if (!["full", "calendar"].includes(mode))
@@ -214,12 +247,15 @@ const isDirectExecution =
 
 if (isDirectExecution) {
   try {
-    runVerification({
-      root: process.cwd(),
-      mode: process.argv.includes("--mode")
-        ? process.argv[process.argv.indexOf("--mode") + 1]
-        : "full",
-    });
+    if (process.argv.includes("--retain-corrections")) {
+      retainCorrections(process.cwd());
+    } else
+      runVerification({
+        root: process.cwd(),
+        mode: process.argv.includes("--mode")
+          ? process.argv[process.argv.indexOf("--mode") + 1]
+          : "full",
+      });
   } catch (error) {
     await writeVerificationFailureSummary(error);
     console.error(error.message);

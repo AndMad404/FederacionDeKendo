@@ -28,9 +28,7 @@ runs:
     - name: Retain recoverable changes
       if: ${{ always() }}
       shell: bash
-      run: |
-        mkdir -p "$VERIFY_SITE_REPORT_DIR"
-        git diff --binary HEAD > "$VERIFY_SITE_REPORT_DIR/corrections.patch"
+      run: node scripts/verify-site.mjs --retain-corrections
       env:
         VERIFY_SITE_REPORT_DIR: ${{ runner.temp }}/site-verification
     - name: Upload site verification evidence

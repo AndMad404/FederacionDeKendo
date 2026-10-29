@@ -1,13 +1,46 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, unlinkSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import test from "node:test";
+import path from "node:path";
 import { temporaryDirectory } from "../helpers/temporary-directory.mjs";
 
 import {
   formatVerificationFailure,
+  captureWorkspaceFingerprint,
+  retainCorrections,
   runVerification,
   verificationSteps,
 } from "../../scripts/verify-site.mjs";
+
+test("CI corrections restore new binary files, modifications and deletions with the verified fingerprint", async (t) => {
+  const root = await temporaryDirectory(t, "verification-patch-");
+  const git = (...args) => execFileSync("git", args, { cwd: root });
+  git("init");
+  git("config", "user.name", "CI test");
+  git("config", "user.email", "ci@example.test");
+  git("config", "core.autocrlf", "false");
+  writeFileSync(path.join(root, "manifest.json"), "old\n");
+  writeFileSync(path.join(root, "obsolete.webp"), Buffer.from([0, 1, 2]));
+  git("add", ".");
+  git("commit", "-m", "fixture");
+  writeFileSync(path.join(root, "manifest.json"), "new\n");
+  unlinkSync(path.join(root, "obsolete.webp"));
+  writeFileSync(path.join(root, "new.webp"), Buffer.from([0, 255, 128, 0]));
+  const verified = captureWorkspaceFingerprint(root);
+  const indexBefore = git("diff", "--cached", "--binary");
+  const action = readFileSync(".github/actions/verify-site/action.yml", "utf8");
+  assert.match(action, /node scripts\/verify-site\.mjs --retain-corrections/);
+  const reports = await temporaryDirectory(t, "corrections-report-");
+  retainCorrections(root, reports);
+  const patch = readFileSync(path.join(reports, "corrections.patch"));
+  assert.deepEqual(git("diff", "--cached", "--binary"), indexBefore);
+  assert.equal(captureWorkspaceFingerprint(root), verified);
+  git("reset", "--hard", "HEAD");
+  unlinkSync(path.join(root, "new.webp"));
+  execFileSync("git", ["apply", "--binary", "-"], { cwd: root, input: patch });
+  assert.equal(captureWorkspaceFingerprint(root), verified);
+});
 
 test("site verification owns checks previously delegated to local Git hooks", async () => {
   const packageJson = JSON.parse(readFileSync("package.json", "utf8"));

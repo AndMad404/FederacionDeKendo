@@ -9,6 +9,7 @@ async function fixture(
   t,
   {
     changed = ["example.js"],
+    untracked = [],
     remote = "base",
     fingerprint = "verified",
     status = "passed",
@@ -43,7 +44,7 @@ async function fixture(
       git: (args) => {
         calls.push(args);
         if (args[0] === "diff") return changed.join("\0");
-        if (args[0] === "ls-files") return "";
+        if (args[0] === "ls-files") return untracked.join("\0");
         if (args[0] === "rev-parse")
           return calls.some((call) => call[0] === "commit") ? "saved" : "base";
         if (args[0] === "ls-remote") return `${remote}\trefs/heads/main`;
@@ -68,6 +69,45 @@ test("publication saves the verified corrections once and distinguishes Git from
     JSON.parse(await readFile(path.join(f.directory, "publication.json")))
       .status,
     result.status,
+  );
+});
+
+test("publication includes new approved calendar and archive covers alongside their manifest", async (t) => {
+  const manifest = "src/app/data/eventCovers.json";
+  const images = [
+    "public/images/event-covers/shared/new-calendar-640.webp",
+    "public/images/event-covers/shared/new-archive-450.webp",
+  ];
+  const f = await fixture(t, { changed: [manifest], untracked: images });
+  const result = publishChanges({
+    ...f.options,
+    readCoverApproval: () => ({
+      status: "approved",
+      formats: { calendar: "approved", archive: "approved" },
+    }),
+  });
+  assert.deepEqual(result.files, [manifest, ...images]);
+  assert.deepEqual(result.deferredFiles, []);
+  assert.deepEqual(
+    f.calls.find((call) => call[0] === "add"),
+    ["add", "-A", "--", manifest, ...images],
+  );
+});
+
+test("a new image outside approved paths blocks publication even alongside desired covers", async (t) => {
+  const f = await fixture(t, {
+    changed: ["src/app/data/eventCovers.json"],
+    untracked: [
+      "public/images/event-covers/shared/new-calendar-640.webp",
+      "public/images/unexpected.webp",
+    ],
+  });
+  assert.throws(() => publishChanges(f.options), /approved publication paths/);
+  assert.ok(
+    f.calls.every(
+      (call) =>
+        !["ls-remote", "add", "config", "commit", "push"].includes(call[0]),
+    ),
   );
 });
 
