@@ -86,9 +86,11 @@ export function HistoricalEventGallery({
   return (
     <section
       aria-label={`${posterSource ? copy.event.officialImage : "Fotografías del evento"} ${eventTitle}`}
-      className={`-mx-3 grid min-w-0 w-[calc(100%_+_1.5rem)] content-start gap-2.5 sm:mx-0 sm:w-full xl:[&_[role=group]]:h-[var(--event-thumbnail-height)] ${images.length === 1 ? "xl:self-center" : ""} ${images.length > 6 ? "sm:[&_[role=group]]:justify-start" : ""}`}
+      className={`-mx-3 grid min-w-0 w-[calc(100%_+_1.5rem)] content-start gap-2.5 sm:mx-0 sm:w-full xl:[&_[role=group]]:h-[var(--event-thumbnail-height)] ${!posterSource && images.length === 1 ? "xl:self-center" : ""} ${images.length > 6 ? "sm:[&_[role=group]]:justify-start" : ""}`}
     >
-      <figure className="group relative aspect-video cursor-pointer overflow-hidden rounded-xl bg-site-media xl:aspect-auto xl:h-[var(--event-featured-height)]">
+      <figure
+        className={`group relative cursor-pointer overflow-hidden rounded-xl bg-site-media ${posterSource ? "h-[min(75svh,48rem)] xl:h-[var(--event-poster-height)]" : "aspect-video xl:aspect-auto xl:h-[var(--event-featured-height)]"}`}
+      >
         <picture>
           <img
             src={featured.src}

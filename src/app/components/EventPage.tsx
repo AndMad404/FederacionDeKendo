@@ -83,6 +83,7 @@ export function EventPage() {
       const articleBox = article.getBoundingClientRect();
       const actionsBox = actions.getBoundingClientRect();
       const galleryHeight = Math.max(articleBox.height, availableHeight);
+      content.style.setProperty("--event-poster-height", `${galleryHeight}px`);
       content.style.setProperty(
         "--event-featured-height",
         `${Math.max(1, galleryHeight - actionsBox.height - 10)}px`,
