@@ -32,6 +32,15 @@ test("calendar selects covers by available space and updates on resize", async (
   await page.setViewportSize({ width: 1280, height: 1500 });
   await expect(exam).toHaveAttribute("data-cover-format", "archive");
   await expect(official.locator("img")).toHaveAttribute("src", posterSrc!);
+  // A tall desktop card can have a nearly square image slot after the
+  // heading and actions take their space. It still needs the portrait cover.
+  await page.setViewportSize({ width: 1936, height: 1480 });
+  await expect(exam).toHaveAttribute("data-cover-format", "archive");
+  await expect(exam.locator("img")).toHaveAttribute("src", /-archive-/);
+  await expect(seminar).toHaveAttribute("data-cover-format", "calendar");
+  await expect(official.locator("img")).toHaveAttribute("src", posterSrc!);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(exam).toHaveAttribute("data-cover-format", "calendar");
   await expect
     .poll(() =>
       page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),

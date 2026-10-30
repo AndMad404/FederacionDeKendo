@@ -22,6 +22,11 @@ export async function expectEventGalleryGeometry(page: Page) {
       article,
       actions,
       gallery,
+      isPoster: Boolean(
+        document.querySelector(
+          'main section:is([aria-label^="Imagen oficial del evento"], [aria-label^="Official image for"])',
+        ),
+      ),
       figure,
       strip,
       thumbnails,
@@ -63,6 +68,11 @@ export async function expectEventGalleryGeometry(page: Page) {
       ).toBeLessThanOrEqual(1);
       expect(strip.height).toBeLessThanOrEqual(actions.height + 1);
       expect(strip.bottom).toBeGreaterThanOrEqual(article.bottom - 1);
+    } else if (geometry.isPoster) {
+      expect(
+        Math.abs(gallery.top - article.top),
+        "Official posters align with the top of the text",
+      ).toBeLessThanOrEqual(1);
     } else {
       const articleCenter = article.top + article.height / 2;
       const galleryCenter = gallery.top + gallery.height / 2;

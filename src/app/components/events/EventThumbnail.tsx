@@ -33,8 +33,20 @@ export function EventThumbnail({
   useEffect(() => {
     const container = containerRef.current;
     if (!canAdapt || !container) return;
+    const card = container.closest("li");
     const measure = () => {
-      const { width, height } = container.getBoundingClientRect();
+      // Desktop cards receive their height from the calendar grid. Use the
+      // whole card so its heading and actions do not disguise a portrait slot.
+      // On mobile the image sets the card height; keep the requested format
+      // rather than letting the selected image determine its own orientation.
+      if (
+        !card ||
+        Number.parseFloat(getComputedStyle(container).flexGrow) <= 0
+      ) {
+        setPortrait(false);
+        return;
+      }
+      const { width, height } = card.getBoundingClientRect();
       if (width <= 0 || height <= 0) return;
       // A small neutral band avoids repeated swaps near a square allocation.
       setPortrait((previous) =>
@@ -44,6 +56,7 @@ export function EventThumbnail({
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(container);
+    if (card) observer.observe(card);
     return () => observer.disconnect();
   }, [canAdapt, eventId]);
   // Keep the Shogun crest visible by framing the top of the official flyer.
