@@ -396,5 +396,65 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
       },
       "sizes": "(max-width: 640px) 100vw, 960px"
     }
+  },
+  "3er-examen-2026": {
+    "fingerprint": "360c7d1e23b1561906843b8a1bc71654a97f3f70ca17ed6dcd0a69c5344d4db6",
+    "images": [
+      {
+        "order": 1,
+        "alt": "Federaciones de Asociaciones de Kendo - 3er Examen 2026 2026-10-31",
+        "width": 464,
+        "height": 832,
+        "src": "/images/events/3er-examen-2026/photo-1-464.webp",
+        "srcSet": {
+          "webp": "/images/events/3er-examen-2026/photo-1-464.webp 464w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 2,
+        "alt": "Federaciones de Asociaciones de Kendo - 3er Examen 2026 2026-10-31",
+        "width": 1200,
+        "height": 1600,
+        "src": "/images/events/3er-examen-2026/photo-2-1200.webp",
+        "srcSet": {
+          "webp": "/images/events/3er-examen-2026/photo-2-480.webp 480w, /images/events/3er-examen-2026/photo-2-960.webp 960w, /images/events/3er-examen-2026/photo-2-1200.webp 1200w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 3,
+        "alt": "Federaciones de Asociaciones de Kendo - 3er Examen 2026 2026-10-31",
+        "width": 1600,
+        "height": 900,
+        "src": "/images/events/3er-examen-2026/photo-3-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/3er-examen-2026/photo-3-480.webp 480w, /images/events/3er-examen-2026/photo-3-960.webp 960w, /images/events/3er-examen-2026/photo-3-1600.webp 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 4,
+        "alt": "Federaciones de Asociaciones de Kendo - 3er Examen 2026 2026-10-31",
+        "width": 1600,
+        "height": 904,
+        "src": "/images/events/3er-examen-2026/photo-4-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/3er-examen-2026/photo-4-480.webp 480w, /images/events/3er-examen-2026/photo-4-960.webp 960w, /images/events/3er-examen-2026/photo-4-1600.webp 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 5,
+        "alt": "Federaciones de Asociaciones de Kendo - 3er Examen 2026 2026-10-31",
+        "width": 1122,
+        "height": 1402,
+        "src": "/images/events/3er-examen-2026/photo-5-1122.webp",
+        "srcSet": {
+          "webp": "/images/events/3er-examen-2026/photo-5-480.webp 480w, /images/events/3er-examen-2026/photo-5-960.webp 960w, /images/events/3er-examen-2026/photo-5-1122.webp 1122w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      }
+    ]
   }
 };

@@ -39,25 +39,6 @@
         }
       }
     },
-    "3er-examen-2026": {
-      "fingerprint": "3928aedfb15b9e29bf4c75b8ce693fd5e8454b744a7f620bdf69e94437f3cfc7",
-      "calendar": {
-        "src": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-1448.webp",
-        "width": 1448,
-        "height": 1086,
-        "srcSet": {
-          "webp": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-640.webp 640w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-960.webp 960w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-1448.webp 1448w"
-        }
-      },
-      "archive": {
-        "src": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-900.webp",
-        "width": 900,
-        "height": 1200,
-        "srcSet": {
-          "webp": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-450.webp 450w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-675.webp 675w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-900.webp 900w"
-        }
-      }
-    },
     "seminario-noviembre-2026": {
       "fingerprint": "3928aedfb15b9e29bf4c75b8ce693fd5e8454b744a7f620bdf69e94437f3cfc7",
       "calendar": {
