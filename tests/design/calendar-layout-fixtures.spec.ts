@@ -41,7 +41,7 @@ for (const viewport of APPROVED_VIEWPORTS) {
         if (count)
           await expect(page.locator("main figure img")).toHaveCSS(
             "object-fit",
-            "cover",
+            "contain",
           );
         const thumbnails = page.locator('main [role="group"] button');
         // Check alignment after changing image orientation.
@@ -60,7 +60,7 @@ for (const viewport of APPROVED_VIEWPORTS) {
           );
           await settleCalendarLayout(page);
           await expectEventGalleryAlignment(page);
-          await expect(image).toHaveCSS("object-fit", "cover");
+          await expect(image).toHaveCSS("object-fit", "contain");
           expect(
             await image.evaluate(
               (element: HTMLImageElement) => element.naturalWidth,
