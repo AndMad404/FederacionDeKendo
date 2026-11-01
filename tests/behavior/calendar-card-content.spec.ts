@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test";
 import { preparePage } from "../helpers/prepare-page";
-import coverApproval from "../../src/app/config/eventCoverApproval.json" with { type: "json" };
 
 for (const viewport of [
   { width: 360, height: 800 },
@@ -19,14 +18,6 @@ for (const viewport of [
         exact: true,
       }),
     });
-    if (coverApproval.status === "approved") {
-      await expect(exam.locator("picture")).toHaveAttribute(
-        "data-thumbnail-source",
-        "generated",
-      );
-    } else {
-      await expect(exam.locator("picture")).toHaveCount(0);
-    }
     await expect(
       exam.getByText("1:00p.m. - 3:00p.m.", { exact: true }),
     ).toBeVisible();

@@ -55,7 +55,8 @@ for (const viewport of [
       const generated = page.locator(
         '[data-thumbnail-source="generated"]:visible',
       );
-      await expect(generated.first()).toBeVisible();
+      // A sync may replace every visible generic cover with Drive artwork.
+      // Generated-cover behavior is exercised with controlled calendar fixtures.
       for (const picture of await generated.all()) {
         const selectedFormat = await picture.getAttribute("data-cover-format");
         expect(["calendar", "archive"]).toContain(selectedFormat);

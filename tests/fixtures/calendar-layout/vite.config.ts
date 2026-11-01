@@ -47,6 +47,14 @@ export default defineConfig({
       resolveId(source, importer) {
         if (
           importer?.replaceAll("\\", "/").includes("/src/") &&
+          /\/data\/eventCovers\.json$/.test(source)
+        )
+          return resolve(
+            process.cwd(),
+            "tests/fixtures/calendar-layout/data.ts",
+          );
+        if (
+          importer?.replaceAll("\\", "/").includes("/src/") &&
           /\/data\/(calendarEvents|eventGalleries|eventTranslations)(\.ts)?$/.test(
             source,
           )

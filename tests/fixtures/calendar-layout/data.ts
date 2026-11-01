@@ -59,7 +59,7 @@ export const IMAGE_SCENARIOS = [
     ],
   },
 ];
-export const CALENDAR_EVENTS: CalendarEvent[] = [
+const LAYOUT_EVENTS: CalendarEvent[] = [
   ...IMAGE_SCENARIOS.map((_, index) => ({
     ...base,
     id: `layout-${index}`,
@@ -95,7 +95,7 @@ export function neutralImages(count: number, dimensions: number[][]) {
     };
   });
 }
-export const EVENT_GALLERIES = Object.fromEntries([
+const LAYOUT_GALLERIES = Object.fromEntries([
   ...IMAGE_SCENARIOS.filter((scenario) => scenario.count > 0).map(
     (scenario) => {
       const index = IMAGE_SCENARIOS.indexOf(scenario);
@@ -120,6 +120,57 @@ export const EVENT_GALLERIES = Object.fromEntries([
     },
   ],
 ]);
+// Neutral scenarios exercise cover behavior without depending on published events.
+export const COVER_EVENTS: CalendarEvent[] = LAYOUT_EVENTS.slice(0, 3).map(
+  (event, index) => ({
+    ...event,
+    id: `cover-${index}`,
+    title: `Cover fixture ${index + 1}`,
+    date: ["2026-10-31", "2026-11-28", "2026-11-20"][index],
+    archiveEligibleAt: undefined,
+    summary: undefined,
+  }),
+);
+export const COVER_DRIVE_IMAGES = neutralImages(2, [
+  [640, 480],
+  [480, 640],
+]);
+const coverFixture =
+  typeof window === "undefined"
+    ? null
+    : new URLSearchParams(window.location.search).get("coverFixture");
+export const CALENDAR_EVENTS = coverFixture ? COVER_EVENTS : LAYOUT_EVENTS;
+export const EVENT_GALLERIES = coverFixture
+  ? {
+      [COVER_EVENTS.at(-1)!.id]: {
+        fingerprint: "poster",
+        images: neutralImages(1, [[480, 640]]),
+        posterSource: {
+          label: "Fuente oficial",
+          url: "https://example.com/poster",
+        },
+      },
+      ...(coverFixture === "gallery"
+        ? {
+            [COVER_EVENTS[0].id]: {
+              fingerprint: "drive",
+              images: COVER_DRIVE_IMAGES,
+            },
+          }
+        : {}),
+    }
+  : LAYOUT_GALLERIES;
+export default {
+  events: Object.fromEntries(
+    COVER_EVENTS.map((event) => [
+      event.id,
+      {
+        calendar: neutralImages(1, [[480, 360]])[0],
+        archive: neutralImages(1, [[360, 480]])[0],
+      },
+    ]),
+  ),
+};
 export const EVENT_TRANSLATIONS = Object.fromEntries(
   CALENDAR_EVENTS.map((event) => [
     event.id,
