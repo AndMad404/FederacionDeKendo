@@ -142,9 +142,11 @@ export function EventPage() {
         allowTitleWrap
         adaptiveHeight
         description={
-          event.eventType
-            ? copy.archive.types[event.eventType]
-            : (event.type ?? copy.event.defaultType)
+          <span className="font-bold">
+            {event.eventType
+              ? copy.archive.types[event.eventType]
+              : (event.type ?? copy.event.defaultType)}
+          </span>
         }
         image={{
           src: "/images/calendar/kendo-calendar-1600.webp",
