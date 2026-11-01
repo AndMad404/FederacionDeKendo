@@ -3,7 +3,7 @@ import calibration from "../fixtures/calendar-layout-calibration.json" with { ty
 import { recordCalendarLayout } from "../helpers/calendar-layout";
 import { measureCalendarBlocks } from "../helpers/calendar-block-measurements";
 import {
-  expectEventGalleryGeometry,
+  expectEventGalleryAlignment,
   expectShortEventFitsViewport,
 } from "../helpers/event-gallery-geometry";
 import { APPROVED_VIEWPORTS } from "./design-contract";
@@ -44,7 +44,7 @@ for (const viewport of APPROVED_VIEWPORTS) {
       );
       expect(measured.blocks[component].height).toBeLessThanOrEqual(range.max);
     }
-    await expectEventGalleryGeometry(page);
+    await expectEventGalleryAlignment(page);
     if (viewport.width === 1366) {
       // Preserve the former desktop spacing coverage around xl and on a wider screen.
       for (const width of [1280, 1920]) {
@@ -57,13 +57,13 @@ for (const viewport of APPROVED_VIEWPORTS) {
             calibration.photoCount,
           ),
         ).toEqual([]);
-        await expectEventGalleryGeometry(page);
+        await expectEventGalleryAlignment(page);
       }
       await page.goto("http://127.0.0.1:4174/eventos/pasados/content-0/");
       expect(
         await recordCalendarLayout(page, info, "short-wide-desktop", 8),
       ).toEqual([]);
-      await expectEventGalleryGeometry(page);
+      await expectEventGalleryAlignment(page);
       await expectShortEventFitsViewport(page);
     }
   });

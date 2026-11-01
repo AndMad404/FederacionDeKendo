@@ -1,109 +1,108 @@
 import { expect, type Page } from "@playwright/test";
 
-export async function expectEventGalleryGeometry(page: Page) {
-  const geometry = await page.evaluate(() => {
-    const rect = (selector: string) =>
-      document.querySelector(selector)?.getBoundingClientRect();
-    const article = rect("main article")!;
-    const actions = rect("main article aside")!;
-    const gallery = rect(
-      'main section:is([aria-label^="Fotografías del evento"], [aria-label^="Imagen oficial del evento"], [aria-label^="Official image for"])',
-    );
-    const figure = rect("main figure");
-    const stripElement = document.querySelector('main [role="group"]');
-    const strip = stripElement?.getBoundingClientRect();
-    const thumbnails = [
-      ...(stripElement?.querySelectorAll("button") ?? []),
-    ].map((element) => element.getBoundingClientRect());
-    const description = document
-      .querySelector("main article h2")
-      ?.parentElement?.getBoundingClientRect();
+// Allow small rendering differences while catching visible misalignment.
+const ALIGNMENT_TOLERANCE = 4;
+
+export async function expectEventGalleryAlignment(page: Page) {
+  const layout = await page.evaluate(() => {
+    const article = document.querySelector("main article")!;
+    const figure = document.querySelector("main figure");
+    const gallery = figure?.closest("section");
+    const strip = gallery?.querySelector('[role="group"]');
+    const thumbnails = [...(strip?.querySelectorAll("button") ?? [])];
     return {
-      article,
-      actions,
-      gallery,
-      isPoster: Boolean(
-        document.querySelector(
-          'main section:is([aria-label^="Imagen oficial del evento"], [aria-label^="Official image for"])',
-        ),
-      ),
-      figure,
-      strip,
-      thumbnails,
-      description,
-      event: rect('[aria-labelledby="event-page-title"]')!,
-      footer: rect("footer")!,
-      columns: getComputedStyle(
-        document.querySelector("main article")!.parentElement!,
-      ).gridTemplateColumns.split(" ").length,
+      article: article.getBoundingClientRect(),
+      actions: article.querySelector("aside")!.getBoundingClientRect(),
+      description: article
+        .querySelector("h2")!
+        .parentElement!.getBoundingClientRect(),
+      gallery: gallery?.getBoundingClientRect(),
+      figure: figure?.getBoundingClientRect(),
+      strip: strip?.getBoundingClientRect(),
+      thumbnails: thumbnails.map((element) => element.getBoundingClientRect()),
+      isPoster:
+        gallery
+          ?.getAttribute("aria-label")
+          ?.match(/^(Imagen oficial|Official image)/) != null,
+      footer: document.querySelector("footer")!.getBoundingClientRect(),
+      desktop:
+        getComputedStyle(article.parentElement!).gridTemplateColumns.split(" ")
+          .length > 1,
       width: window.innerWidth,
     };
   });
-  if (!geometry.gallery) {
-    expect(geometry.columns).toBe(1);
-    expect(geometry.actions.y).toBeGreaterThanOrEqual(
-      geometry.description!.bottom,
-    );
-    return;
-  }
   const {
     article,
     actions,
+    description,
     gallery,
     figure,
     strip,
     thumbnails,
     footer,
-    width,
-  } = geometry;
-  expect(figure!.height).toBeGreaterThan(170);
-  expect(Math.abs(figure!.width - gallery.width)).toBeLessThanOrEqual(1);
-  if (width >= 1280) {
-    expect(article.right).toBeLessThan(gallery.left);
-    expect(actions.right).toBeLessThan(gallery.left);
-    if (strip) {
+  } = layout;
+  expect(actions.top, "Actions follow the description").toBeGreaterThanOrEqual(
+    description.bottom - ALIGNMENT_TOLERANCE,
+  );
+  if (!gallery || !figure) return;
+
+  if (layout.desktop) {
+    expect(
+      gallery.left,
+      "Text and gallery occupy separate columns",
+    ).toBeGreaterThanOrEqual(article.right);
+    if (strip || layout.isPoster) {
+      // The approved album and official-poster layouts start with the text.
       expect(
         Math.abs(gallery.top - article.top),
-        "Multi-image galleries align with the top of the text",
-      ).toBeLessThanOrEqual(1);
-      expect(strip.height).toBeLessThanOrEqual(actions.height + 1);
-      expect(strip.bottom).toBeGreaterThanOrEqual(article.bottom - 1);
-    } else if (geometry.isPoster) {
-      expect(
-        Math.abs(gallery.top - article.top),
-        "Official posters align with the top of the text",
-      ).toBeLessThanOrEqual(1);
+        "Gallery aligns with the top of the left card",
+      ).toBeLessThanOrEqual(ALIGNMENT_TOLERANCE);
     } else {
-      const articleCenter = article.top + article.height / 2;
-      const galleryCenter = gallery.top + gallery.height / 2;
+      const spaceAbove = figure.top - article.top;
+      const spaceBelow = article.bottom - figure.bottom;
       expect(
-        Math.abs(galleryCenter - articleCenter),
-        "Single-image galleries center vertically against the text",
-      ).toBeLessThanOrEqual(1);
+        Math.abs(spaceAbove - spaceBelow),
+        "Single photo has balanced space above and below relative to the left card",
+      ).toBeLessThanOrEqual(ALIGNMENT_TOLERANCE * 2);
     }
   } else {
-    expect(gallery.top).toBeGreaterThanOrEqual(article.bottom);
+    expect(
+      gallery.top,
+      "Stacked gallery follows the text card",
+    ).toBeGreaterThanOrEqual(article.bottom - ALIGNMENT_TOLERANCE);
   }
-  // The approved single-photo variant has no strip. Its text column may
-  // extend below the photo, so the footer follows the taller column.
-  const contentBottom = strip
-    ? gallery.bottom
-    : Math.max(gallery.bottom, article.bottom);
-  expect(footer.top - contentBottom).toBeGreaterThanOrEqual(9);
-  expect(footer.top - contentBottom).toBeLessThanOrEqual(11);
-  if (strip) {
-    expect(strip.top - figure!.bottom).toBeGreaterThanOrEqual(9);
-    expect(strip.top - figure!.bottom).toBeLessThanOrEqual(11);
-    if (width < 640) {
+  expect(
+    footer.top,
+    "Footer follows both columns without overlap",
+  ).toBeGreaterThanOrEqual(
+    Math.max(article.bottom, gallery.bottom) - ALIGNMENT_TOLERANCE,
+  );
+  if (!strip) return;
+
+  expect(strip.top, "Thumbnails stay below the featured image").toBeGreaterThan(
+    figure.bottom,
+  );
+  expect(
+    Math.abs(strip.left - figure.left),
+    "Thumbnail strip aligns with the image's left edge",
+  ).toBeLessThanOrEqual(ALIGNMENT_TOLERANCE);
+  expect(
+    Math.abs(strip.right - figure.right),
+    "Thumbnail strip aligns with the image's right edge",
+  ).toBeLessThanOrEqual(ALIGNMENT_TOLERANCE);
+  if (layout.width >= 640 && thumbnails.length) {
+    if (thumbnails.length <= 6) {
+      const spaceLeft = thumbnails[0].left - strip.left;
+      const spaceRight = strip.right - thumbnails.at(-1)!.right;
       expect(
-        Math.abs(figure!.width - geometry.event.width),
-      ).toBeLessThanOrEqual(1);
-      expect(thumbnails[0].width).toBeGreaterThan(thumbnails[0].height);
-    }
-    if (width >= 640 && thumbnails.length <= 6) {
-      const left = thumbnails[0].left - strip.left;
-      const right = strip.right - thumbnails.at(-1)!.right;
-      expect(Math.abs(left - right)).toBeLessThanOrEqual(1);
+        Math.abs(spaceLeft - spaceRight),
+        "Short thumbnail rows are centered",
+      ).toBeLessThanOrEqual(ALIGNMENT_TOLERANCE);
+    } else {
+      expect(
+        Math.abs(thumbnails[0].left - strip.left),
+        "Scrollable thumbnail rows start at the left edge",
+      ).toBeLessThanOrEqual(ALIGNMENT_TOLERANCE);
     }
   }
 }

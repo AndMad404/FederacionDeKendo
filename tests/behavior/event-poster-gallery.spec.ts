@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { preparePage } from "../helpers/prepare-page";
-import { expectEventGalleryGeometry } from "../helpers/event-gallery-geometry";
+import { expectEventGalleryAlignment } from "../helpers/event-gallery-geometry";
 
 const eventPath = "/eventos/pasados/1er-panamericano-de-kendo/";
 const eventTitle = "1.er Panamericano de Kendo";
@@ -154,7 +154,7 @@ for (const viewport of [
     await expect(gallery).toBeVisible();
     await expect(gallery.locator("img")).toHaveCount(1);
     await expect(gallery.getByRole("group")).toHaveCount(0);
-    await expectEventGalleryGeometry(page);
+    await expectEventGalleryAlignment(page);
     await expect(gallery.locator("figure img")).toHaveAttribute(
       "src",
       /\/photo-1-1086\.webp$/,

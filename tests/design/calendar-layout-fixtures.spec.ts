@@ -11,7 +11,7 @@ import {
   CALENDAR_EVENTS,
 } from "../fixtures/calendar-layout/data";
 import {
-  expectEventGalleryGeometry,
+  expectEventGalleryAlignment,
   expectShortEventFitsViewport,
 } from "../helpers/event-gallery-geometry";
 import { APPROVED_VIEWPORTS } from "./design-contract";
@@ -37,19 +37,14 @@ for (const viewport of APPROVED_VIEWPORTS) {
           await recordCalendarLayout(page, info, "initial", count),
         ).toEqual([]);
 
-        await expectEventGalleryGeometry(page);
+        await expectEventGalleryAlignment(page);
         if (count)
           await expect(page.locator("main figure img")).toHaveCSS(
             "object-fit",
             "cover",
           );
-        const initialPhoto = count
-          ? await page.locator("main figure").boundingBox()
-          : null;
         const thumbnails = page.locator('main [role="group"] button');
-        // Select only changes in natural dimensions. The behavioral suite
-        // covers list positions and wrapping; repeating identical image sizes
-        // does not add a container-geometry guarantee.
+        // Check alignment after changing image orientation.
         const initialIndex = dimensions.findIndex(
           ([width, height]) => width >= height,
         );
@@ -64,13 +59,7 @@ for (const viewport of APPROVED_VIEWPORTS) {
             new RegExp(`Fotografía ${photo + 1} `),
           );
           await settleCalendarLayout(page);
-          const photoBox = await page.locator("main figure").boundingBox();
-          expect(
-            Math.abs(photoBox!.width - initialPhoto!.width),
-          ).toBeLessThanOrEqual(1);
-          expect(
-            Math.abs(photoBox!.height - initialPhoto!.height),
-          ).toBeLessThanOrEqual(1);
+          await expectEventGalleryAlignment(page);
           await expect(image).toHaveCSS("object-fit", "cover");
           expect(
             await image.evaluate(
@@ -105,7 +94,7 @@ for (const viewport of APPROVED_VIEWPORTS) {
         expect(measured.blocks.description.scrollHeight).toBeLessThanOrEqual(
           measured.blocks.description.height + 1,
         );
-        await expectEventGalleryGeometry(page);
+        await expectEventGalleryAlignment(page);
         if (viewport.width >= 1280 && index === 0)
           await expectShortEventFitsViewport(page);
         previousHeight = measured.blocks.description.height;

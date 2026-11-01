@@ -5,42 +5,39 @@ import coverApproval from "../../src/app/config/eventCoverApproval.json" with { 
 const SHOGUN_POSTER_SELECTOR =
   '[data-thumbnail-source="poster"] img[src*="/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/"]';
 
-test.skip(
-  coverApproval.status !== "approved",
-  "Awaiting the user's final illustration; no cover screenshots while paused.",
-);
-
 for (const viewport of [
   { width: 360, height: 800 },
   { width: 390, height: 844 },
   { width: 768, height: 1024 },
   { width: 1366, height: 768 },
 ]) {
-  test(`Shogun thumbnail preserves the crest with a top crop at ${viewport.width}px`, async ({
-    page,
-  }) => {
-    test.skip(
-      coverApproval.formats.calendar !== "approved",
-      "Format composition pending",
-    );
-    await page.setViewportSize(viewport);
-    await preparePage(page, "/eventos/", new Date("2026-11-01T12:00:00-06:00"));
-    const poster = page.locator(SHOGUN_POSTER_SELECTOR);
-    await expect(poster).toHaveCount(1);
-    await poster.scrollIntoViewIfNeeded();
-    await expect(poster).toBeVisible();
-    await expect(poster).toHaveAttribute("src", /-flyer-\d+\.webp$/);
-    await expect(poster).toHaveCSS("object-fit", "cover");
-    await expect(poster).toHaveCSS("object-position", "50% 0%");
-    await expect(poster).toHaveCSS("aspect-ratio", "8 / 5");
-    await expect
-      .poll(() =>
-        poster.evaluate(
-          (image: HTMLImageElement) => image.complete && image.naturalWidth > 0,
-        ),
-      )
-      .toBe(true);
-  });
+  for (const [context, route, referenceTime] of [
+    ["calendar", "/eventos/", "2026-11-01T12:00:00-06:00"],
+    ["archive", "/eventos/pasados/?year=2026", "2026-12-01T12:00:00-06:00"],
+  ] as const) {
+    test(`Shogun ${context} thumbnail preserves the crest with a top crop at ${viewport.width}px`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(viewport);
+      await preparePage(page, route, new Date(referenceTime));
+      const poster = page.locator(SHOGUN_POSTER_SELECTOR);
+      await expect(poster).toHaveCount(1);
+      await poster.scrollIntoViewIfNeeded();
+      await expect(poster).toBeVisible();
+      await expect(poster).toHaveAttribute("src", /-flyer-\d+\.webp$/);
+      await expect(poster).toHaveCSS("object-fit", "cover");
+      await expect(poster).toHaveCSS("object-position", "50% 0%");
+      await expect(poster).toHaveCSS("aspect-ratio", "8 / 5");
+      await expect
+        .poll(() =>
+          poster.evaluate(
+            (image: HTMLImageElement) =>
+              image.complete && image.naturalWidth > 0,
+          ),
+        )
+        .toBe(true);
+    });
+  }
   for (const [format, route] of [
     ["calendar", "/eventos/"],
     ["archive", "/eventos/pasados/?year=2026&type=examen"],
@@ -49,7 +46,8 @@ for (const viewport of [
       page,
     }) => {
       test.skip(
-        coverApproval.formats[format] !== "approved",
+        coverApproval.status !== "approved" ||
+          coverApproval.formats[format] !== "approved",
         "Format composition pending",
       );
       await page.setViewportSize(viewport);
