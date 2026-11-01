@@ -19,6 +19,7 @@ export async function expectEventGalleryAlignment(page: Page) {
       gallery: gallery?.getBoundingClientRect(),
       figure: figure?.getBoundingClientRect(),
       strip: strip?.getBoundingClientRect(),
+      stripOverflows: strip ? strip.scrollWidth > strip.clientWidth + 1 : false,
       thumbnails: thumbnails.map((element) => element.getBoundingClientRect()),
       isPoster:
         gallery
@@ -51,19 +52,15 @@ export async function expectEventGalleryAlignment(page: Page) {
       gallery.left,
       "Text and gallery occupy separate columns",
     ).toBeGreaterThanOrEqual(article.right);
-    if (strip || layout.isPoster) {
-      // The approved album and official-poster layouts start with the text.
+    expect(
+      Math.abs(gallery.top - article.top),
+      "Gallery aligns with the top of the left card",
+    ).toBeLessThanOrEqual(ALIGNMENT_TOLERANCE);
+    if (!strip && !layout.isPoster) {
       expect(
-        Math.abs(gallery.top - article.top),
-        "Gallery aligns with the top of the left card",
+        Math.abs(figure.bottom - article.bottom),
+        "Single photo aligns with the bottom of the left card",
       ).toBeLessThanOrEqual(ALIGNMENT_TOLERANCE);
-    } else {
-      const spaceAbove = figure.top - article.top;
-      const spaceBelow = article.bottom - figure.bottom;
-      expect(
-        Math.abs(spaceAbove - spaceBelow),
-        "Single photo has balanced space above and below relative to the left card",
-      ).toBeLessThanOrEqual(ALIGNMENT_TOLERANCE * 2);
     }
   } else {
     expect(
@@ -90,20 +87,15 @@ export async function expectEventGalleryAlignment(page: Page) {
     Math.abs(strip.right - figure.right),
     "Thumbnail strip aligns with the image's right edge",
   ).toBeLessThanOrEqual(ALIGNMENT_TOLERANCE);
-  if (layout.width >= 640 && thumbnails.length) {
-    if (thumbnails.length <= 6) {
-      const spaceLeft = thumbnails[0].left - strip.left;
-      const spaceRight = strip.right - thumbnails.at(-1)!.right;
-      expect(
-        Math.abs(spaceLeft - spaceRight),
-        "Short thumbnail rows are centered",
-      ).toBeLessThanOrEqual(ALIGNMENT_TOLERANCE);
-    } else {
-      expect(
-        Math.abs(thumbnails[0].left - strip.left),
-        "Scrollable thumbnail rows start at the left edge",
-      ).toBeLessThanOrEqual(ALIGNMENT_TOLERANCE);
-    }
+  // Only contained rows should be centered. An overflowing row moves when
+  // navigating, while its viewport stays aligned with the featured image.
+  if (layout.width >= 640 && thumbnails.length && !layout.stripOverflows) {
+    const spaceLeft = thumbnails[0].left - strip.left;
+    const spaceRight = strip.right - thumbnails.at(-1)!.right;
+    expect(
+      Math.abs(spaceLeft - spaceRight),
+      "Short thumbnail rows are centered",
+    ).toBeLessThanOrEqual(ALIGNMENT_TOLERANCE);
   }
 }
 
