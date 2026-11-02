@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+import { useSequenceTransition } from "../hooks/useContentTransition";
+import { useMemo, useRef } from "react";
 import { CALENDAR_EVENTS } from "../data/calendarEvents";
 import { getUpcomingEventGroups } from "../utils/calendarEvents";
 import { panelSurfaceClass, surfaceClass } from "../styles/shared";
@@ -92,6 +93,8 @@ export function CalendarSection() {
     swipeHandlers,
   } = useCalendarNavigation(eventGroups.length);
 
+  const monthsRef = useRef<HTMLDivElement>(null);
+  useSequenceTransition(monthsRef, groupIndex, language);
   const currentGroup = eventGroups[groupIndex];
   const nextGroup = eventGroups[groupIndex + 1];
   return (
@@ -126,7 +129,10 @@ export function CalendarSection() {
               onNextPair={nextPair}
             />
 
-            <div className="grid min-h-0 items-start gap-3 sm:gap-4 md:grid-cols-2 page-fit:flex-1 page-fit:items-stretch">
+            <div
+              ref={monthsRef}
+              className="grid min-h-0 items-start gap-3 sm:gap-4 md:grid-cols-2 page-fit:flex-1 page-fit:items-stretch"
+            >
               <CalendarMonth
                 group={currentGroup}
                 monthLabel={formatMonth(currentGroup.monthKey, language)}

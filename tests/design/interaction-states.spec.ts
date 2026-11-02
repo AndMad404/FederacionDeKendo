@@ -281,3 +281,157 @@ test("secondary event actions invert background, text and icons on hover", async
   await expect(back).toHaveCSS("background-color", "rgb(22, 58, 99)");
   await expect(back).toHaveCSS("color", "rgb(255, 255, 255)");
 });
+
+type ContentMotionRecord = {
+  id: string;
+  frames: Keyframe[];
+  duration: number;
+  insideMain: boolean;
+};
+
+test.describe("page transitions follow navigation intent", () => {
+  test.use({ viewport: { width: 1366, height: 768 } });
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      const records: ContentMotionRecord[] = [];
+      Object.assign(window, { contentMotionRecords: records });
+      const original = Element.prototype.animate;
+      Element.prototype.animate = function (frames, options) {
+        if (typeof options === "object" && options.id?.startsWith("content-")) {
+          records.push({
+            id: options.id,
+            frames: Array.isArray(frames) ? frames : [],
+            duration: Number(options.duration),
+            insideMain: Boolean(this.closest("main")),
+          });
+        }
+        return original.call(this, frames, options);
+      };
+    });
+  });
+
+  const records = (page: import("@playwright/test").Page) =>
+    page.evaluate(
+      () =>
+        (window as unknown as { contentMotionRecords: ContentMotionRecord[] })
+          .contentMotionRecords,
+    );
+
+  test("sections and event details enter in their intended direction without animating the shell", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+    await expect.poll(() => records(page)).toEqual([]);
+    await page
+      .locator("main")
+      .getByRole("link", {
+        name: "Calendario de Próximos Eventos",
+        exact: true,
+      })
+      .click();
+    await expect
+      .poll(async () => (await records(page)).at(-1)?.id)
+      .toBe("content-section");
+    expect((await records(page)).at(-1)?.frames[0].transform).toBe(
+      "translateY(12px)",
+    );
+    await page.locator("main a[aria-label*='detalles' i]").first().click();
+    await expect
+      .poll(async () => (await records(page)).at(-1)?.id)
+      .toBe("content-event");
+    expect((await records(page)).at(-1)?.frames[0].transform).toBe(
+      "translateX(16px)",
+    );
+    await page
+      .getByRole("link", { name: "Volver al calendario", exact: true })
+      .click();
+    await expect
+      .poll(async () => (await records(page)).at(-1)?.id)
+      .toBe("content-back");
+    expect((await records(page)).at(-1)?.frames[0].transform).toBe(
+      "translateX(-16px)",
+    );
+    expect((await records(page)).every((record) => record.insideMain)).toBe(
+      true,
+    );
+    expect(
+      (await records(page)).every((record) => record.duration === 280),
+    ).toBe(true);
+  });
+
+  test("months, archive pages and filters use directional movement or a fade", async ({
+    page,
+  }) => {
+    await page.goto("/eventos/");
+    await page.waitForLoadState("networkidle");
+    await page
+      .getByRole("button", {
+        name: "Ver los dos meses siguientes",
+        exact: true,
+      })
+      .click();
+    await expect
+      .poll(async () => (await records(page)).at(-1)?.id)
+      .toBe("content-next");
+    expect((await records(page)).at(-1)?.duration).toBe(220);
+    await page
+      .getByRole("button", {
+        name: "Ver los dos meses anteriores",
+        exact: true,
+      })
+      .click();
+    await expect
+      .poll(async () => (await records(page)).at(-1)?.id)
+      .toBe("content-previous");
+    await page.goto("/eventos/pasados/");
+    await page.waitForLoadState("networkidle");
+    await page.getByRole("button", { name: "Siguiente", exact: true }).click();
+    await expect
+      .poll(async () => (await records(page)).at(-1)?.id)
+      .toBe("content-next");
+    await page
+      .getByRole("combobox", { name: "Tipo", exact: true })
+      .selectOption("seminario");
+    await expect
+      .poll(async () => (await records(page)).at(-1)?.id)
+      .toBe("content-fade");
+    expect((await records(page)).at(-1)?.duration).toBe(180);
+    expect((await records(page)).at(-1)?.frames[0].transform).toBe("none");
+  });
+
+  test("language changes fade, and reduced motion suppresses route and month movement", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+    await page.getByRole("link", { name: /^EN:/ }).click();
+    await expect
+      .poll(async () => (await records(page)).at(-1)?.id)
+      .toBe("content-fade");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+    await page
+      .locator("main")
+      .getByRole("link", {
+        name: "Calendario de Próximos Eventos",
+        exact: true,
+      })
+      .click();
+    await expect(page).toHaveURL(/\/eventos\/$/);
+    await page
+      .getByRole("button", {
+        name: "Ver los dos meses siguientes",
+        exact: true,
+      })
+      .click();
+    await expect(
+      page.getByRole("button", {
+        name: "Ver los dos meses anteriores",
+        exact: true,
+      }),
+    ).toBeEnabled();
+    expect(await records(page)).toEqual([]);
+  });
+});

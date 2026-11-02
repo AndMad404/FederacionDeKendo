@@ -1,4 +1,5 @@
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useSequenceTransition } from "../hooks/useContentTransition";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { ChevronDown } from "lucide-react";
 import {
@@ -73,6 +74,8 @@ export function PastEventsSection() {
   const [pagination, setPagination] = useState({ key: paginationKey, page: 1 });
   const requestedPage = pagination.key === paginationKey ? pagination.page : 1;
   const page = Math.min(requestedPage, pageCount);
+  const eventsRef = useRef<HTMLUListElement>(null);
+  useSequenceTransition(eventsRef, page, paginationKey);
   const canonicalPageUrl = buildArchiveUrl(1, language, filters);
   const hasLegacyPageQuery = searchParams.has("page");
   const pageEvents = events.slice((page - 1) * pageSize, page * pageSize);
@@ -224,6 +227,7 @@ export function PastEventsSection() {
 
           {pageEvents.length ? (
             <ul
+              ref={eventsRef}
               className={`grid gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-4 page-fit:min-h-0 page-fit:flex-1 page-fit:grid-rows-[auto_auto_minmax(0,1fr)_auto] ${pageEvents.length === 2 ? "xl:[&>li:first-child]:col-start-2" : ""}`}
             >
               {pageEvents.map((event) => {

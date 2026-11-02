@@ -1,4 +1,11 @@
-import { Suspense, useEffect, useRef, type ComponentType } from "react";
+import { animateContent } from "./hooks/useContentTransition";
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  type ComponentType,
+} from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router";
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
@@ -56,6 +63,30 @@ function AppShell({
   const { pathname, search } = useLocation();
   const routeComponent = getRouteMeta(pathname).component;
   const NotFoundComponent = routeComponents.routes.notFound;
+  const mainRef = useRef<HTMLElement>(null);
+  const previousRoute = useRef<{
+    pathname: string;
+    search: string;
+    component: RouteComponent;
+  } | null>(null);
+  const onRouteReady = useCallback(() => {
+    const last = previousRoute.current;
+    previousRoute.current = { pathname, search, component: routeComponent };
+    if (!last || (last.pathname === pathname && last.search === search)) return;
+    const kind =
+      isLanguageSwitch(last.pathname, pathname) || last.pathname === pathname
+        ? "fade"
+        : routeComponent === "event"
+          ? "event"
+          : last.component === "event" &&
+              (routeComponent === "calendar" || routeComponent === "pastEvents")
+            ? "back"
+            : "section";
+    return animateContent(
+      mainRef.current?.firstElementChild as HTMLElement | null,
+      kind,
+    );
+  }, [pathname, search, routeComponent]);
   const allowsTabletContainment =
     getRoutePresentation(routeComponent).tabletMode === "contained";
   const allowsDesktopContainment =
@@ -84,10 +115,11 @@ function AppShell({
       <Navbar />
 
       <main
+        ref={mainRef}
         id="main-content"
         className={`${
           routeComponent === "event" ? "lg:flex-1" : "tall-md:flex-1"
-        } px-2.5 pt-[calc(4rem_+_10px)] land-sm:pt-[calc(3rem_+_6px)] ${
+        } overflow-x-clip px-2.5 pt-[calc(4rem_+_10px)] land-sm:pt-[calc(3rem_+_6px)] ${
           allowsDesktopContainment
             ? "page-fit:min-h-0 page-fit:overflow-hidden"
             : ""
@@ -132,7 +164,10 @@ function AppShell({
                       </p>
                     }
                   >
-                    <Component />
+                    <RouteContent
+                      component={Component}
+                      onReady={onRouteReady}
+                    />
                   </Suspense>
                 }
               />
@@ -148,7 +183,10 @@ function AppShell({
                   </p>
                 }
               >
-                <NotFoundComponent />
+                <RouteContent
+                  component={NotFoundComponent}
+                  onReady={onRouteReady}
+                />
               </Suspense>
             }
           />
@@ -158,6 +196,17 @@ function AppShell({
       <Footer />
     </div>
   );
+}
+
+function RouteContent({
+  component: Component,
+  onReady,
+}: {
+  component: ComponentType;
+  onReady: () => void | (() => void);
+}) {
+  useEffect(onReady, [onReady]);
+  return <Component />;
 }
 
 function ScrollToTop() {

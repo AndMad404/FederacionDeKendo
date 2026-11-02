@@ -1,3 +1,5 @@
+import { useRef } from "react";
+import { useSequenceTransition } from "../../hooks/useContentTransition";
 import type { UpcomingEventGroup } from "../../utils/calendarEvents";
 import { NavigationArrowButton } from "../ui/ModalControls";
 import { CalendarEventCard } from "./CalendarEventCard";
@@ -19,6 +21,8 @@ export function CalendarMonth({
   onPageChange,
 }: CalendarMonthProps) {
   const { copy } = useLanguage();
+  const eventsRef = useRef<HTMLUListElement>(null);
+  useSequenceTransition(eventsRef, pageIndex, group.monthKey);
   const pageCount = Math.ceil(group.events.length / CALENDAR_EVENTS_PER_PAGE);
   const visibleEvents = group.events.slice(
     pageIndex * CALENDAR_EVENTS_PER_PAGE,
@@ -36,6 +40,7 @@ export function CalendarMonth({
       </h2>
 
       <ul
+        ref={eventsRef}
         className={`mx-auto grid min-h-0 w-full gap-3 sm:gap-4 page-fit:flex-1 ${visibleEvents.length === 1 ? "page-fit:grid-rows-1" : "page-fit:grid-rows-2"}`}
       >
         {visibleEvents.map((event) => (
