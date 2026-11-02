@@ -58,7 +58,7 @@ function HeroBanner() {
           <div className="flex flex-col justify-center gap-3 sm:flex-row land-sm:mt-5 land-sm:justify-start land-tall:justify-start">
             <Link
               to={copy.nav.links[3].path}
-              className={`${secondaryButtonClass} ${focusRingClass}`}
+              className={`${secondaryButtonClass} control-primary ${focusRingClass}`}
             >
               {copy.home.dojos}
             </Link>

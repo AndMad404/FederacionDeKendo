@@ -24,7 +24,7 @@ function Thumbnail({ image, isActive, buttonRef, onClick }: ThumbnailProps) {
       aria-label={`${copy.gallery.viewImage} ${image.title}`}
       aria-current={isActive ? "true" : undefined}
       onClick={onClick}
-      className={`group relative h-full w-full cursor-pointer overflow-hidden rounded-lg border-2 border-transparent bg-site-media transition-colors duration-300 ${
+      className={`control-image-choice group relative h-full w-full cursor-pointer overflow-hidden rounded-lg border-2 border-transparent bg-site-media transition-colors duration-300 ${
         isActive ? galleryThumbnailActiveClass : ""
       } ${focusRingClass}`}
     >

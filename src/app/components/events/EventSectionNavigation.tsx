@@ -1,9 +1,11 @@
 import { Link } from "react-router";
 import { useLanguage } from "../../config/i18n";
-import { focusRingClass } from "../../styles/shared";
+import {
+  textButtonInteractionClass,
+  focusRingClass,
+} from "../../styles/shared";
 
-const eventSectionNavigationButtonClass =
-  "inline-flex min-h-11 items-center justify-center rounded-lg border px-5 py-2 font-bold transition-[box-shadow,transform] duration-200 hover:scale-[1.025] hover:shadow-md active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:scale-100 motion-reduce:active:scale-100";
+const eventSectionNavigationButtonClass = `control-navigation inline-flex min-h-11 items-center justify-center rounded-full border px-5 py-2 font-bold hover:border-site-action hover:bg-site-action hover:text-site-on-dark hover:[&_svg]:text-site-on-dark aria-[current=page]:hover:bg-site-surface aria-[current=page]:hover:text-site-action aria-[current=page]:hover:[&_svg]:text-site-action ${textButtonInteractionClass}`;
 
 interface EventSectionNavigationProps {
   active: "upcoming" | "past";

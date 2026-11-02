@@ -1,6 +1,10 @@
 import { Info, MapPin } from "lucide-react";
 import { Link } from "react-router";
-import { actionControlSurfaceClass, focusRingClass } from "../../styles/shared";
+import {
+  textButtonInteractionClass,
+  actionControlSurfaceClass,
+  focusRingClass,
+} from "../../styles/shared";
 import type { CalendarEvent } from "../../types";
 import {
   getEventDateRangeLabels,
@@ -10,10 +14,9 @@ import {
 import { getEventPath } from "../../utils/eventRoutes";
 import { useLanguage } from "../../config/i18n";
 
-const actionClass = `inline-flex min-h-11 min-w-0 items-center justify-center rounded-lg px-3 py-1.5 text-center text-sm font-semibold leading-tight transition-colors hover:border-site-action hover:bg-site-media desktop-fine:min-h-8 lg:px-2.5 lg:py-1 ${actionControlSurfaceClass}`;
+const actionClass = `inline-flex min-h-11 min-w-0 items-center justify-center rounded-full px-3 py-1.5 text-center text-sm font-semibold leading-tight hover:bg-site-action hover:text-site-on-dark hover:[&_svg]:text-site-on-dark ${textButtonInteractionClass} desktop-fine:min-h-8 lg:px-2.5 lg:py-1 ${actionControlSurfaceClass}`;
 
-const eventDetailsClass =
-  "inline-flex min-h-11 min-w-0 origin-center items-center justify-center rounded-full border border-site-action bg-site-action px-3 py-1 text-center text-sm font-semibold leading-tight text-site-on-dark transition-[background-color,transform] duration-200 hover:scale-[1.015] hover:bg-site-action-hover motion-reduce:transition-none motion-reduce:hover:scale-100 desktop-fine:min-h-8";
+const eventDetailsClass = `inline-flex min-h-11 min-w-0 origin-center items-center justify-center rounded-full control-primary border border-site-action bg-site-action px-3 py-1 text-center text-sm font-semibold leading-tight text-site-on-dark hover:bg-site-surface hover:text-site-action hover:[&_svg]:text-site-action ${textButtonInteractionClass} desktop-fine:min-h-8`;
 
 function getEventVisibilityClass(index: number) {
   if (index === 2) return "land-sm:hidden";
@@ -85,7 +88,7 @@ export function UpcomingEventCard({ event, index }: UpcomingEventCardProps) {
         </a>
       ) : (
         <span
-          className={`inline-flex min-h-11 w-full min-w-0 items-center justify-center rounded-lg border border-site-border bg-site-surface px-3 py-1.5 text-center text-sm font-semibold leading-tight text-site-muted desktop-fine:min-h-8 lg:px-2.5 lg:py-1 ${actionControlSurfaceClass}`}
+          className={`inline-flex min-h-11 w-full min-w-0 items-center justify-center rounded-full border border-site-border bg-site-surface px-3 py-1.5 text-center text-sm font-semibold leading-tight text-site-muted desktop-fine:min-h-8 lg:px-2.5 lg:py-1 ${actionControlSurfaceClass}`}
         >
           {copy.common.toBeConfirmed}
         </span>

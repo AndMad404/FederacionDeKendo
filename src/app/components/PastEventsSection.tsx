@@ -6,6 +6,7 @@ import {
   PAST_EVENTS_PAGE_SIZE,
 } from "../config/events";
 import {
+  textButtonInteractionClass,
   focusRingClass,
   panelSurfaceClass,
   primaryButtonClass,
@@ -157,7 +158,8 @@ export function PastEventsSection() {
             <label className="relative min-w-0 text-xs font-bold text-site-muted sm:w-fit sm:justify-self-end">
               <span
                 aria-hidden="true"
-                className="flex min-h-11 items-center justify-center gap-2 rounded-lg px-2 py-2 text-sm text-site-text"
+                data-selected={Boolean(filters.year)}
+                className={`control-selection flex min-h-11 items-center justify-center gap-2 rounded-full px-2 py-2 text-sm ${filters.year ? "bg-site-action text-site-on-dark" : "bg-site-surface text-site-action"}`}
               >
                 <span>{filters.year ?? copy.archive.year}</span>
                 <ChevronDown className="size-4 shrink-0" />
@@ -167,7 +169,7 @@ export function PastEventsSection() {
                 aria-label={copy.archive.year}
                 value={filters.year ?? ""}
                 onChange={(event) => changeFilter("year", event.target.value)}
-                className={`absolute inset-0 h-full w-full cursor-pointer appearance-none rounded-lg p-0 text-center text-sm text-transparent [text-align-last:center] ${focusRingClass} border border-site-border bg-transparent`}
+                className={`absolute inset-0 h-full w-full cursor-pointer appearance-none rounded-full p-0 text-center text-sm text-transparent [text-align-last:center] ${focusRingClass} ${textButtonInteractionClass} border border-site-action bg-transparent`}
               >
                 <option value="" hidden>
                   {copy.archive.year}
@@ -186,7 +188,8 @@ export function PastEventsSection() {
             <label className="relative min-w-0 text-xs font-bold text-site-muted sm:w-fit sm:justify-self-start">
               <span
                 aria-hidden="true"
-                className="flex min-h-11 items-center justify-center gap-2 rounded-lg px-2 py-2 text-sm text-site-text"
+                data-selected={Boolean(filters.type)}
+                className={`control-selection flex min-h-11 items-center justify-center gap-2 rounded-full px-2 py-2 text-sm ${filters.type ? "bg-site-action text-site-on-dark" : "bg-site-surface text-site-action"}`}
               >
                 <ChevronDown className="size-4 shrink-0" />
                 <span>
@@ -200,7 +203,7 @@ export function PastEventsSection() {
                 aria-label={copy.archive.type}
                 value={filters.type ?? ""}
                 onChange={(event) => changeFilter("type", event.target.value)}
-                className={`absolute inset-0 h-full w-full cursor-pointer appearance-none rounded-lg px-2 py-0 text-left text-sm text-transparent ${focusRingClass} border border-site-border bg-transparent`}
+                className={`absolute inset-0 h-full w-full cursor-pointer appearance-none rounded-full px-2 py-0 text-left text-sm text-transparent ${focusRingClass} ${textButtonInteractionClass} border border-site-action bg-transparent`}
               >
                 <option value="" hidden>
                   {copy.archive.type}

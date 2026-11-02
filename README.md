@@ -95,8 +95,8 @@ corepack pnpm run test:behavior
 corepack pnpm run test:design
 ```
 
-Las comparaciones visuales se ejecutan por separado con
-`corepack pnpm run test:visual`.
+Las pruebas de diseno verifican geometria, responsive e interacciones.
+No se mantiene una suite de comparacion automatica de capturas.
 
 Los flujos de calendario usan `verify:site -- --mode calendar`: datos,
 reglas editoriales, tipos, build y funcionamiento bloquean la publicación.

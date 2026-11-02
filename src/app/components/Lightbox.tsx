@@ -119,7 +119,7 @@ export function Lightbox({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex touch-manipulation items-center justify-center bg-site-navy/90 p-4 land-sm:p-2"
+      className="control-overlay-enter fixed inset-0 z-50 flex touch-manipulation items-center justify-center bg-site-navy/90 p-4 land-sm:p-2"
       onPointerDown={onBackdropInteraction}
     >
       <div
@@ -131,7 +131,7 @@ export function Lightbox({
         aria-describedby={
           showDetails && displayDescription ? "lightbox-description" : undefined
         }
-        className={`relative flex max-h-[calc(100svh-2rem)] w-full max-w-5xl touch-pan-y flex-col items-center text-site-on-dark ${containImage ? "pt-14" : ""} ${showDetails ? "gap-[10px] sm:gap-3 land-sm:h-[calc(100svh-1rem)] land-sm:max-h-none land-sm:max-w-[calc(100vw-2rem)] land-sm:gap-0" : "land-sm:h-[calc(100svh-1rem)] land-sm:max-h-none land-sm:max-w-[calc(100vw-2rem)]"}`}
+        className={`control-dialog-enter relative flex max-h-[calc(100svh-2rem)] w-full max-w-5xl touch-pan-y flex-col items-center text-site-on-dark ${containImage ? "pt-14" : ""} ${showDetails ? "gap-[10px] sm:gap-3 land-sm:h-[calc(100svh-1rem)] land-sm:max-h-none land-sm:max-w-[calc(100vw-2rem)] land-sm:gap-0" : "land-sm:h-[calc(100svh-1rem)] land-sm:max-h-none land-sm:max-w-[calc(100vw-2rem)]"}`}
         onPointerDown={(event) => {
           event.stopPropagation();
           const startedPinch = pinchZoomHandlers.onPointerDown(event);

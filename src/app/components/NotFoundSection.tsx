@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { PageTitle } from "./PageTitle";
-import { focusRingClass, surfaceClass } from "../styles/shared";
+import { focusRingClass, secondaryButtonClass } from "../styles/shared";
 import { useLanguage } from "../config/i18n";
 
 export function NotFoundSection() {
@@ -22,7 +22,7 @@ export function NotFoundSection() {
           <li key={link.path}>
             <Link
               to={link.path}
-              className={`rounded-lg px-4 py-2 text-site-action transition-colors duration-200 hover:border-site-action ${surfaceClass} ${focusRingClass}`}
+              className={`${secondaryButtonClass} ${focusRingClass}`}
             >
               {link.label}
             </Link>

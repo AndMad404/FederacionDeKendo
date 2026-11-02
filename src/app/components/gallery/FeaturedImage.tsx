@@ -136,7 +136,7 @@ export function FeaturedImage({
       <button
         type="button"
         aria-label={`${displayTitle}. ${displayTag}. ${positionLabel}. ${copy.gallery.openDetailsInGallery}`}
-        className={`absolute inset-0 z-10 touch-pan-y cursor-pointer ${focusRingClass}`}
+        className={`control-image-open absolute inset-0 z-10 touch-pan-y cursor-pointer ${focusRingClass}`}
         onClick={(event) => {
           if (consumeSwipe()) {
             event.preventDefault();

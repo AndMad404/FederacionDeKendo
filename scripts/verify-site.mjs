@@ -67,9 +67,7 @@ function phases(mode = "full") {
         "test",
         "tests/data",
         "tests/behavior",
-        ...(mode === "full"
-          ? ["tests/design", "--grep-invert", "@visual"]
-          : []),
+        ...(mode === "full" ? ["tests/design"] : []),
       ],
     ],
   ];

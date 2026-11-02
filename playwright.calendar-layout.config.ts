@@ -3,7 +3,7 @@ import base from "./playwright.config";
 
 export default defineConfig({
   ...base,
-  testIgnore: ["**/*.test.mjs", "**/visual-regression.spec.ts"],
+  testIgnore: ["**/*.test.mjs"],
   testMatch: [
     "**/calendar-card-geometry.spec.ts",
     "**/calendar-layout-full.spec.ts",

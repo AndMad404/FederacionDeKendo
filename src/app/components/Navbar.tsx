@@ -1,16 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router";
 import { ChevronDown, Menu, X } from "lucide-react";
-import { focusRingClass } from "../styles/shared";
+import {
+  textButtonInteractionClass,
+  iconButtonInteractionClass,
+  focusRingClass,
+} from "../styles/shared";
 import { getLocalizedPath, useLanguage } from "../config/i18n";
 import { findEventByPathname } from "../utils/eventRoutes";
 import { hasDistinctEventTranslation } from "../utils/localizedEvents";
 
-const navInteractionClass =
-  "transition-[background-color,border-color,color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-sm focus-visible:-translate-y-0.5 focus-visible:shadow-sm active:translate-y-0 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:focus-visible:translate-y-0 motion-reduce:active:scale-100";
+const navInteractionClass = textButtonInteractionClass;
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `inline-flex items-center text-lg tracking-wide ${navInteractionClass} land-sm:text-base ${focusRingClass} ${
+  `inline-flex min-h-11 items-center text-lg tracking-wide ${navInteractionClass} land-sm:text-base ${focusRingClass} ${
     isActive
       ? "border-b-2 border-site-accent pb-0.5 text-site-on-dark"
       : "text-site-on-dark"
@@ -104,7 +107,7 @@ export function Navbar() {
           onClick={() =>
             setCalendarOpenPath(mobile && calendarOpen ? null : pathname)
           }
-          className={`inline-flex min-h-11 items-center justify-center gap-1 ${navLinkClass({ isActive: calendarActive })}`}
+          className={`control-disclosure inline-flex min-h-11 items-center justify-center gap-1 ${navLinkClass({ isActive: calendarActive })}`}
         >
           {calendarLink.label}
           <ChevronDown
@@ -119,7 +122,7 @@ export function Navbar() {
             aria-label={copy.nav.calendarMenu}
             className={
               mobile
-                ? "mt-2 flex flex-col items-center gap-2 border-y border-site-on-dark/20 py-2"
+                ? "control-panel-enter mt-2 flex flex-col items-center gap-2 border-y border-site-on-dark/20 py-2"
                 : "nav-calendar-menu absolute left-1/2 top-full z-10 mt-2 min-w-52 -translate-x-1/2 rounded-lg border border-site-on-dark/20 bg-site-navy p-2 shadow-lg before:absolute before:-top-2 before:left-0 before:h-2 before:w-full before:content-['']"
             }
           >
@@ -196,7 +199,7 @@ export function Navbar() {
           <button
             ref={menuButtonRef}
             type="button"
-            className={`inline-flex size-11 shrink-0 items-center justify-center rounded-lg border border-white/70 bg-white/10 text-white hover:border-white hover:bg-white/20 hover:text-white ${navInteractionClass} md:hidden ${focusRingClass}`}
+            className={`control-disclosure inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-white/70 bg-white/10 text-white hover:border-white hover:bg-white/20 hover:text-white ${iconButtonInteractionClass} md:hidden ${focusRingClass}`}
             aria-controls="mobile-menu"
             aria-expanded={open}
             aria-label={open ? copy.nav.close : copy.nav.open}
@@ -216,7 +219,7 @@ export function Navbar() {
         {open && (
           <ul
             id="mobile-menu"
-            className="flex flex-col items-center gap-5 bg-site-navy px-6 pb-5 pt-0 text-center md:hidden"
+            className="control-panel-enter flex flex-col items-center gap-5 bg-site-navy px-6 pb-5 pt-0 text-center md:hidden"
           >
             {copy.nav.links.map((link) =>
               link.id === "calendar" ? (
@@ -268,7 +271,7 @@ function LanguageSelector({
     (event && !hasDistinctEventTranslation(event))
   ) {
     return (
-      <div className="inline-flex rounded-lg border border-site-on-dark/40 bg-site-on-dark/10 p-0.5">
+      <div className="inline-flex rounded-full border border-site-on-dark/40 bg-site-on-dark/10 p-0.5">
         <span
           lang="en"
           className="inline-flex min-h-11 items-center justify-center px-2 text-sm text-site-on-dark/85"
@@ -280,7 +283,7 @@ function LanguageSelector({
   }
   return (
     <div
-      className="inline-flex rounded-lg border border-site-on-dark/40 bg-site-on-dark/10 p-0.5"
+      className="inline-flex rounded-full border border-site-on-dark/40 bg-site-on-dark/10 p-0.5"
       role="group"
       aria-label={copy.nav.language}
     >
@@ -305,7 +308,7 @@ function LanguageSelector({
                 : copy.nav.switchToEnglish
             }`}
             onClick={onNavigate}
-            className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-md px-2 text-sm font-bold ${navInteractionClass} ${focusRingClass} ${
+            className={`control-selection inline-flex min-h-11 min-w-11 items-center justify-center rounded-full px-2 text-sm font-bold ${navInteractionClass} ${focusRingClass} ${
               active
                 ? "bg-site-on-dark text-site-navy shadow-sm"
                 : "text-site-on-dark/85 hover:bg-site-on-dark/15 hover:text-site-on-dark"

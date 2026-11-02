@@ -11,6 +11,7 @@ import { Link, useLocation } from "react-router";
 import { useLanguage } from "../config/i18n";
 import { getLocalizedEvent } from "../utils/localizedEvents";
 import {
+  textButtonInteractionClass,
   focusRingClass,
   panelSurfaceClass,
   primaryButtonClass,
@@ -32,8 +33,7 @@ import { EVENT_GALLERIES } from "../data/eventGalleries";
 
 const SOCIAL_PREVIEW_VERSION = "20260825";
 
-const eventNavigationLinkClass =
-  "inline-flex min-h-11 items-center justify-center rounded-lg border px-5 py-2 font-bold transition-[box-shadow,transform] duration-200 hover:scale-[1.025] hover:shadow-md active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:scale-100 motion-reduce:active:scale-100";
+const eventNavigationLinkClass = `control-navigation inline-flex min-h-11 items-center justify-center rounded-full border px-5 py-2 font-bold hover:border-site-action hover:bg-site-action hover:text-site-on-dark hover:[&_svg]:text-site-on-dark aria-[current=page]:hover:bg-site-surface aria-[current=page]:hover:text-site-action aria-[current=page]:hover:[&_svg]:text-site-action ${textButtonInteractionClass}`;
 
 async function shareEvent(title: string, url: string) {
   if (navigator.share) {
@@ -288,7 +288,7 @@ export function EventPage() {
                       </Link>
                       <Link
                         to="/eventos/"
-                        className={`${eventNavigationLinkClass} border-site-action bg-site-action text-site-on-dark shadow-sm ${focusRingClass}`}
+                        className={`${eventNavigationLinkClass} border-site-action bg-site-surface text-site-action ${focusRingClass}`}
                       >
                         {copy.archive.upcomingEvents}
                       </Link>
@@ -311,7 +311,7 @@ export function EventPage() {
                   {!isPast ? (
                     <Link
                       to="/eventos/"
-                      className={`${eventNavigationLinkClass} border-site-action bg-site-action text-site-on-dark shadow-sm ${focusRingClass}`}
+                      className={`${eventNavigationLinkClass} border-site-action bg-site-surface text-site-action ${focusRingClass}`}
                     >
                       {copy.event.backToCalendar}
                     </Link>

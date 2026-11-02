@@ -25,7 +25,7 @@ export const ModalCloseButton = forwardRef<
       className={`${modalCloseButtonClass} ${focusRingClass} ${className}`}
       {...props}
     >
-      <X className="size-5" aria-hidden="true" />
+      <X className="control-dismiss-icon size-5" aria-hidden="true" />
     </button>
   );
 });
@@ -59,6 +59,7 @@ export const NavigationArrowButton = forwardRef<
       type="button"
       aria-label={label}
       data-active={isActive}
+      data-direction={direction}
       className={`${navigationArrowButtonClass} ${focusRingClass} ${className}`}
       {...props}
     >

@@ -108,7 +108,7 @@ export function HistoricalEventGallery({
           type="button"
           aria-label={`${copy.event.openImage} ${featured.alt}`}
           onClick={openFeatured}
-          className={`absolute inset-0 touch-pan-y cursor-pointer ${focusRingClass}`}
+          className={`control-image-open absolute inset-0 touch-pan-y cursor-pointer ${focusRingClass}`}
           {...swipeHandlers}
         >
           <span className="sr-only">

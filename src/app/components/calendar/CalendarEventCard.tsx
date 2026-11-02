@@ -9,7 +9,11 @@ import {
   getEventLocationName,
   getLocationMapUrl,
 } from "../../utils/calendarEventPresentation";
-import { actionControlSurfaceClass, focusRingClass } from "../../styles/shared";
+import {
+  textButtonInteractionClass,
+  actionControlSurfaceClass,
+  focusRingClass,
+} from "../../styles/shared";
 import { getEventPath } from "../../utils/eventRoutes";
 import { useLanguage } from "../../config/i18n";
 
@@ -81,7 +85,7 @@ export function CalendarEventCard({ event }: CalendarEventCardProps) {
             rel="noopener noreferrer"
             aria-label={`${copy.calendar.viewLocation}: ${event.title} ${copy.calendar.mapsPreposition} Google Maps`}
             aria-describedby={locationDescriptionId}
-            className={`inline-flex min-h-11 items-center justify-center rounded-lg px-2 py-2 text-xs font-semibold sm:px-4 sm:text-sm transition hover:border-site-action hover:bg-site-media desktop-fine:min-h-8 desktop-fine:px-3 desktop-fine:py-1 ${actionControlSurfaceClass} ${focusRingClass}`}
+            className={`inline-flex min-h-11 items-center justify-center rounded-full px-2 py-2 text-xs font-semibold sm:px-4 sm:text-sm hover:bg-site-action hover:text-site-on-dark hover:[&_svg]:text-site-on-dark ${textButtonInteractionClass} desktop-fine:min-h-8 desktop-fine:px-3 desktop-fine:py-1 ${actionControlSurfaceClass} ${focusRingClass}`}
           >
             <MapPin
               className="mr-1.5 size-3.5 shrink-0 text-site-accent-soft"
@@ -93,14 +97,14 @@ export function CalendarEventCard({ event }: CalendarEventCardProps) {
             </span>
           </a>
         ) : (
-          <span className="inline-flex min-h-11 items-center justify-center rounded-lg border border-site-border bg-site-surface px-2 py-2 text-xs font-semibold sm:px-3 sm:text-sm text-site-muted desktop-fine:min-h-8 desktop-fine:px-3 desktop-fine:py-1">
+          <span className="inline-flex min-h-11 items-center justify-center rounded-full border border-site-border bg-site-surface px-2 py-2 text-xs font-semibold sm:px-3 sm:text-sm text-site-muted desktop-fine:min-h-8 desktop-fine:px-3 desktop-fine:py-1">
             {copy.common.toBeConfirmed}
           </span>
         )}
         <Link
           to={getEventPath(event, language)}
           aria-label={`${copy.common.eventDetails}: ${event.title}`}
-          className={`ml-auto inline-flex min-h-11 origin-center cursor-pointer items-center justify-center rounded-full border border-site-action bg-site-action px-2 py-2 text-xs font-semibold sm:px-4 sm:text-sm text-site-on-dark desktop-fine:min-h-8 desktop-fine:px-3 desktop-fine:py-1 transition-[background-color,transform,scale] duration-200 hover:scale-[1.04] hover:bg-site-action-hover motion-reduce:transition-none motion-reduce:hover:scale-100 ${focusRingClass}`}
+          className={`ml-auto inline-flex min-h-11 origin-center cursor-pointer items-center justify-center rounded-full control-primary border border-site-action bg-site-action px-2 py-2 text-xs font-semibold sm:px-4 sm:text-sm text-site-on-dark desktop-fine:min-h-8 desktop-fine:px-3 desktop-fine:py-1 hover:bg-site-surface hover:text-site-action hover:[&_svg]:text-site-action ${textButtonInteractionClass} ${focusRingClass}`}
         >
           {copy.common.eventDetails}
         </Link>
