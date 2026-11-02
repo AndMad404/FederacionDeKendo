@@ -101,7 +101,7 @@ export function HistoricalEventGallery({
             height={featured.height}
             loading="lazy"
             decoding="async"
-            className={`h-full w-full ${posterSource ? "object-contain bg-white" : "object-contain transition-transform duration-700 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:transform-none"}`}
+            className={`h-full w-full ${images.length === 1 ? "pt-[var(--event-single-image-padding,0.625rem)]" : ""} ${posterSource ? "object-contain bg-white" : "object-contain transition-transform duration-700 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:transform-none"}`}
           />
         </picture>
         <button

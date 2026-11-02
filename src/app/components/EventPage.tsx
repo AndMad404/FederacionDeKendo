@@ -74,6 +74,10 @@ export function EventPage() {
 
     // Keep short text compact while the gallery fills available space or grows with content.
     const measure = () => {
+      const bottomPadding = content.parentElement
+        ? getComputedStyle(content.parentElement).paddingBottom
+        : "10px";
+      content.style.setProperty("--event-single-image-padding", bottomPadding);
       const contentTop = content.getBoundingClientRect().top + window.scrollY;
       const availableHeight =
         window.innerHeight -
