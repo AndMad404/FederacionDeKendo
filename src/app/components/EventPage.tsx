@@ -141,13 +141,8 @@ export function EventPage() {
         titleCasing="normal"
         allowTitleWrap
         adaptiveHeight
-        description={
-          <span className="font-bold">
-            {event.eventType
-              ? copy.archive.types[event.eventType]
-              : (event.type ?? copy.event.defaultType)}
-          </span>
-        }
+        centerTitle
+        description={null}
         image={{
           src: "/images/calendar/kendo-calendar-1600.webp",
           sources: [
@@ -255,7 +250,7 @@ export function EventPage() {
                 </dl>
 
                 <div className="grid gap-1">
-                  <h2 className="font-bold">{copy.event.description}</h2>
+                  <h2 className="font-bold">{copy.event.description}:</h2>
                   <EventSummary
                     summary={event.summary ?? copy.common.informationPending}
                   />

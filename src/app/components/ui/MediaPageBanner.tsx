@@ -22,6 +22,7 @@ interface MediaPageBannerProps {
   titleCasing?: "uppercase" | "normal";
   allowTitleWrap?: boolean;
   adaptiveHeight?: boolean;
+  centerTitle?: boolean;
   description: ReactNode;
   image: MediaPageBannerImage;
 }
@@ -33,6 +34,7 @@ export function MediaPageBanner({
   titleCasing = "uppercase",
   allowTitleWrap = false,
   adaptiveHeight = false,
+  centerTitle = false,
   description,
   image,
 }: MediaPageBannerProps) {
@@ -63,8 +65,14 @@ export function MediaPageBanner({
         aria-hidden="true"
       />
       <div
-        className={`relative z-10 flex flex-col items-center justify-start px-4 pt-4 text-center text-site-on-dark ${
-          adaptiveHeight ? "min-h-28 pb-8 land-compact:min-h-20" : "h-full"
+        className={`relative z-10 flex flex-col items-center px-4 text-center text-site-on-dark ${
+          centerTitle
+            ? "justify-center pb-8 sm:pb-9 land-compact:pb-5"
+            : "justify-start pt-4"
+        } ${
+          adaptiveHeight
+            ? `min-h-28 land-compact:min-h-20 ${centerTitle ? "" : "pb-8"}`
+            : "h-full"
         }`}
       >
         <PageTitle
@@ -79,9 +87,11 @@ export function MediaPageBanner({
         >
           {title}
         </PageTitle>
-        <p className="mt-1 text-sm text-site-subtle land-compact:hidden">
-          {description}
-        </p>
+        {description != null ? (
+          <p className="mt-1 text-sm text-site-subtle land-compact:hidden">
+            {description}
+          </p>
+        ) : null}
       </div>
     </header>
   );

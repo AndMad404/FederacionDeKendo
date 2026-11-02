@@ -72,7 +72,10 @@ test("scheduled event pages offer an add-to-calendar button", async ({
     name: "Añade a tu calendario",
   });
   await expect(addToCalendar).toBeVisible();
-  await expect(page.locator("#event-page-title + p")).toHaveText("Seminario");
+  await expect(page.locator("#event-page-title + p")).toHaveCount(0);
+  await expect(
+    page.getByRole("heading", { name: "Descripción:", exact: true }),
+  ).toBeVisible();
   await expect(addToCalendar).toHaveAttribute("target", "_blank");
   const href = await addToCalendar.getAttribute("href");
   expect(href).toBeTruthy();
@@ -176,7 +179,7 @@ test("moves an event from upcoming to history after its local date expires", asy
 
   await page.goto(HISTORICAL_EVENT_PATH);
   await expect(page.getByText("Actividad finalizada")).toBeVisible();
-  await expect(page.locator("#event-page-title + p")).toHaveText("Examen");
+  await expect(page.locator("#event-page-title + p")).toHaveCount(0);
   await expect(
     page.getByRole("link", { name: "Añade a tu calendario" }),
   ).toHaveCount(0);
@@ -193,7 +196,7 @@ test("historical tournament details preserve complete information with its galle
   await expect(
     page.getByRole("heading", { name: "3er Torneo", exact: true }),
   ).toBeVisible();
-  await expect(page.locator("#event-page-title + p")).toHaveText("Torneo");
+  await expect(page.locator("#event-page-title + p")).toHaveCount(0);
   await expect(
     page.getByRole("navigation", { name: "Migas de navegación" }),
   ).toHaveCount(0);
