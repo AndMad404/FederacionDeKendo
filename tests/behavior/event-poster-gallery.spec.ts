@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test";
 import { preparePage } from "../helpers/prepare-page";
-import { expectEventGalleryAlignment } from "../helpers/event-gallery-geometry";
 
 const eventPath = "/eventos/pasados/1er-panamericano-de-kendo/";
 const eventTitle = "1.er Panamericano de Kendo";
@@ -13,7 +12,7 @@ for (const viewport of [
   { width: 1366, height: 768 },
   { width: 2048, height: 1014 },
 ]) {
-  test(`archive aligns equal thumbnail frames and preserves poster text at ${viewport.width}px`, async ({
+  test(`archive uses the generic thumbnail and aligns equal frames at ${viewport.width}px`, async ({
     page,
   }, testInfo) => {
     await page.setViewportSize(viewport);
@@ -27,18 +26,12 @@ for (const viewport of [
     await expect(posterCard.locator("img")).toHaveCSS("object-fit", "contain");
     await expect(posterCard.locator("img")).toHaveAttribute(
       "src",
-      /\/thumbnail-\d+\.webp$/,
+      /\/images\/event-covers\/shared\/kendo-external-/,
     );
-    await expect
-      .poll(() =>
-        posterCard
-          .locator("img")
-          .evaluate(
-            (image: HTMLImageElement) =>
-              image.naturalWidth / image.naturalHeight,
-          ),
-      )
-      .toBeGreaterThan(2.9);
+    await expect(posterCard.locator("[data-event-thumbnail]")).toHaveAttribute(
+      "data-thumbnail-source",
+      "generated",
+    );
     await expect
       .poll(() =>
         posterCard
@@ -103,9 +96,8 @@ for (const viewport of [
   { width: 844, height: 390 },
   { width: 1366, height: 768 },
 ]) {
-  test(`one official flyer remains complete at ${viewport.width}px`, async ({
+  test(`event preserves official links without showing artwork at ${viewport.width}px`, async ({
     page,
-    request,
   }, testInfo) => {
     await page.setViewportSize(viewport);
     await preparePage(page, eventPath);
@@ -148,90 +140,26 @@ for (const viewport of [
     await expect(profile).toHaveAttribute("rel", "noopener noreferrer");
     await profile.scrollIntoViewIfNeeded();
     await expect(profile).toBeVisible();
-    const gallery = page.getByRole("region", {
-      name: /^Imagen oficial del evento/,
-    });
-    await expect(gallery).toBeVisible();
-    await expect(gallery.locator("img")).toHaveCount(1);
-    await expect(gallery.getByRole("group")).toHaveCount(0);
-    await expectEventGalleryAlignment(page);
-    await expect(gallery.locator("figure img")).toHaveAttribute(
-      "src",
-      /\/photo-1-1086\.webp$/,
-    );
-    await expect
-      .poll(() =>
-        gallery
-          .locator("figure img")
-          .evaluate(
-            (image: HTMLImageElement) =>
-              image.naturalWidth > 0 &&
-              image.naturalHeight > image.naturalWidth,
-          ),
-      )
-      .toBe(true);
-    await expect(gallery.locator('a[href$=".pdf"]')).toHaveCount(0);
-    await expect(gallery.locator("figure img")).toHaveCSS(
-      "object-fit",
-      "contain",
-    );
-    const source = await gallery.locator("img").getAttribute("src");
-    const imageResponse = await request.get(source!);
-    expect(imageResponse.ok()).toBe(true);
-    expect(imageResponse.headers()["content-type"]).toContain("image/webp");
+    await expect(
+      page.getByRole("region", { name: /^Imagen oficial del evento/ }),
+    ).toHaveCount(0);
+    await expect(
+      page.locator('img[src*="/images/events/clak-1er-panamericano-brasil/"]'),
+    ).toHaveCount(0);
+    await expect(
+      page.getByRole("button", { name: /^Abrir Flyer oficial/ }),
+    ).toHaveCount(0);
     await expect(
       page.getByRole("link", { name: /^Arena Suzano/ }),
     ).toHaveAttribute("href", /maps/);
-    await gallery.scrollIntoViewIfNeeded();
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
       ),
     ).toBe(true);
     await page.screenshot({
-      path: testInfo.outputPath("flyer-page.png"),
+      path: testInfo.outputPath("event-without-artwork.png"),
       fullPage: true,
     });
-    await gallery.getByRole("button", { name: /^Abrir Flyer oficial/ }).click();
-    const dialog = page.getByRole("dialog");
-    await expect(dialog).toBeVisible();
-    await expect(dialog.locator("img")).toHaveCSS("object-fit", "contain");
-    await expect(dialog.locator("img")).toHaveAttribute(
-      "src",
-      /\/photo-1-1086\.webp$/,
-    );
-    await expect(dialog.getByRole("button")).toHaveCount(1);
-    await expect
-      .poll(() =>
-        dialog
-          .locator("img")
-          .evaluate(
-            (image: HTMLImageElement) =>
-              image.complete && image.naturalWidth > 0,
-          ),
-      )
-      .toBe(true);
-    const imageBounds = (await dialog.locator("img").boundingBox())!;
-    const frame = (await dialog
-      .locator("[data-lightbox-image]")
-      .boundingBox())!;
-    expect(imageBounds.x).toBeGreaterThanOrEqual(frame.x - 1);
-    expect(imageBounds.y).toBeGreaterThanOrEqual(frame.y - 1);
-    expect(imageBounds.x + imageBounds.width).toBeLessThanOrEqual(
-      frame.x + frame.width + 1,
-    );
-    expect(imageBounds.y + imageBounds.height).toBeLessThanOrEqual(
-      frame.y + frame.height + 1,
-    );
-    const close = (await dialog
-      .getByRole("button", { name: "Cerrar galería" })
-      .boundingBox())!;
-    expect(close.y + close.height).toBeLessThanOrEqual(imageBounds.y + 1);
-    await page.screenshot({ path: testInfo.outputPath("flyer-lightbox.png") });
-    await page.keyboard.press("Escape");
-    await expect(dialog).toBeHidden();
-    await expect(
-      gallery.getByRole("button", { name: /^Abrir Flyer oficial/ }),
-    ).toBeFocused();
   });
 }

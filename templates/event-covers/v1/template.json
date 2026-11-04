@@ -22,7 +22,9 @@
       "logo": [48, 32, 380],
       "figure": [0, 0, 900, 1200],
       "source": "kendoka-vertical.svg",
-      "logoInset": 0.06
+      "logoInset": 0.06,
+      "externalSource": "external-vertical.svg"
     }
-  }
+  },
+  "externalSource": "external.svg"
 }

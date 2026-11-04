@@ -55,3 +55,27 @@ export function extractCoverSvgLayers(source: string) {
     illustration: wrap(illustrationGroup),
   };
 }
+
+/** Reuse the approved composition while limiting the label to external events. */
+export function selectCoverComposition(source: string, external: boolean) {
+  if (external) return source;
+  const label = /<g\b[^>]*\bid="evento-externo"[^>]*>[\s\S]*?<\/g>/;
+  if (!label.test(source)) throw new Error("Missing external cover label");
+  const canvas = /viewBox="([\d.\s-]+)"/
+    .exec(source)?.[1]
+    .split(/\s+/)
+    .map(Number);
+  const logo =
+    /<g id="external-logo"><image x="([\d.]+)" y="[\d.]+" width="([\d.]+)"/.exec(
+      source,
+    );
+  if (!canvas || !logo) throw new Error("Missing vertical cover logo geometry");
+  const offset =
+    canvas[0] + canvas[2] / 2 - (Number(logo[1]) + Number(logo[2]) / 2);
+  return source
+    .replace(label, "")
+    .replace(
+      '<g id="external-logo">',
+      `<g id="external-logo" transform="translate(${offset} 0)">`,
+    );
+}

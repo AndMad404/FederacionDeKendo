@@ -10,13 +10,18 @@ import {
   type CoverEvent,
 } from "./event-cover-model";
 import coverApproval from "../src/app/config/eventCoverApproval.json";
-import { extractCoverSvgLayers, styleCoverBackground } from "./event-cover-svg";
+import {
+  extractCoverSvgLayers,
+  styleCoverBackground,
+  selectCoverComposition,
+} from "./event-cover-svg";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const templateDir = path.join(root, "templates/event-covers/v1");
 type Format = "calendar" | "archive";
 type Layout = {
   source?: string;
+  externalSource?: string;
   width: number;
   height: number;
   variants: number[];
@@ -76,15 +81,27 @@ export async function generateEventCovers({
     version: string;
     logo: string;
     source: string;
+    externalSource: string;
     flagOpacity: number;
     colors: { paper: string };
     formats: Record<Format, Layout>;
   };
   const logo = await readFile(path.resolve(templateDir, template.logo));
   const source = await readFile(path.resolve(templateDir, template.source));
+  const externalSource = await readFile(
+    path.resolve(templateDir, template.externalSource),
+  );
   const formatSources = new Map<Format, Buffer>();
+  const formatExternalSources = new Map<Format, Buffer>();
   for (const format of ["calendar", "archive"] as Format[]) {
     const file = template.formats[format].source;
+    const externalFile = template.formats[format].externalSource;
+    formatExternalSources.set(
+      format,
+      externalFile
+        ? await readFile(path.resolve(templateDir, externalFile))
+        : externalSource,
+    );
     formatSources.set(
       format,
       file ? await readFile(path.resolve(templateDir, file)) : source,
@@ -95,7 +112,9 @@ export async function generateEventCovers({
       templateBytes,
       logo,
       source,
+      externalSource,
       ...formatSources.values(),
+      ...formatExternalSources.values(),
       await readFile(fileURLToPath(import.meta.url)),
       await readFile(new URL("./event-cover-model.ts", import.meta.url)),
       await readFile(new URL("./event-cover-svg.ts", import.meta.url)),
@@ -136,6 +155,7 @@ export async function generateEventCovers({
     const fingerprint = sha(
       JSON.stringify({
         templateHash,
+        external: Boolean(event.external),
         approval: coverApproval.formats,
         sharp: sharp.versions,
       }),
@@ -199,7 +219,21 @@ export async function generateEventCovers({
       const [fx, fy, fw, fh] = layout.figure;
       const dataUri = (mime: string, bytes: Buffer) =>
         `data:${mime};base64,${bytes.toString("base64")}`;
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${layout.width}" height="${layout.height}" viewBox="0 0 ${layout.width} ${layout.height}">
+      const useSharedComposition = event.external || format === "archive";
+      const sharedComposition = useSharedComposition
+        ? Buffer.from(
+            selectCoverComposition(
+              formatExternalSources.get(format)!.toString("utf8"),
+              Boolean(event.external),
+            ),
+          )
+        : undefined;
+      const svg = sharedComposition
+        ? `<svg xmlns="http://www.w3.org/2000/svg" width="${layout.width}" height="${layout.height}" viewBox="0 0 ${layout.width} ${layout.height}">
+<rect width="100%" height="100%" fill="${template.colors.paper}"/>
+<image href="${dataUri("image/svg+xml", sharedComposition)}" width="${layout.width}" height="${layout.height}" preserveAspectRatio="xMidYMid meet"/>
+</svg>`
+        : `<svg xmlns="http://www.w3.org/2000/svg" width="${layout.width}" height="${layout.height}" viewBox="0 0 ${layout.width} ${layout.height}">
 ${circle ? `<defs><clipPath id="flag-circle"><circle cx="${circle[0]}" cy="${circle[1]}" r="${circle[2]}"/></clipPath></defs>` : ""}
 <rect width="100%" height="100%" fill="${template.colors.paper}"/>
 <image href="${dataUri("image/svg+xml", background)}" width="${layout.width}" height="${layout.height}" preserveAspectRatio="none" ${circle ? 'clip-path="url(#flag-circle)"' : ""}/>
@@ -226,7 +260,7 @@ ${circle ? `<defs><clipPath id="flag-circle"><circle cx="${circle[0]}" cy="${cir
       for (const width of layout.variants) {
         for (const extension of ["webp"] as const) {
           const folder = "shared";
-          const filename = `${folder}/kendo-costa-rica-${fingerprint.slice(0, 16)}-${format}-${width}.${extension}`;
+          const filename = `${folder}/${event.external ? "kendo-external" : "kendo-costa-rica"}-${fingerprint.slice(0, 16)}-${format}-${width}.${extension}`;
           const pipeline = sharp(Buffer.from(svg)).resize(width);
           const bytes = await pipeline.webp({ quality: 86 }).toBuffer();
           await writeChanged(path.join(outputRoot, filename), bytes);

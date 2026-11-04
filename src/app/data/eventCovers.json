@@ -2,211 +2,230 @@
   "templateVersion": "fakcr-cover-v1",
   "events": {
     "1er-examen-2026": {
-      "fingerprint": "3928aedfb15b9e29bf4c75b8ce693fd5e8454b744a7f620bdf69e94437f3cfc7",
+      "fingerprint": "a70c85687a461c829db63f4b6fdffb0437fe5d874f7d883f2dffc44ec6c7bcac",
       "calendar": {
-        "src": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-1448.webp",
+        "src": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-1448.webp",
         "width": 1448,
         "height": 1086,
         "srcSet": {
-          "webp": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-640.webp 640w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-960.webp 960w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-1448.webp 1448w"
+          "webp": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-640.webp 640w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-960.webp 960w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-1448.webp 1448w"
         }
       },
       "archive": {
-        "src": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-900.webp",
+        "src": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-900.webp",
         "width": 900,
         "height": 1200,
         "srcSet": {
-          "webp": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-450.webp 450w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-675.webp 675w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-900.webp 900w"
+          "webp": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-450.webp 450w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-675.webp 675w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-900.webp 900w"
         }
       }
     },
     "clak-seminario-instructores-chile": {
-      "fingerprint": "3928aedfb15b9e29bf4c75b8ce693fd5e8454b744a7f620bdf69e94437f3cfc7",
+      "fingerprint": "a70c85687a461c829db63f4b6fdffb0437fe5d874f7d883f2dffc44ec6c7bcac",
       "calendar": {
-        "src": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-1448.webp",
+        "src": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-1448.webp",
         "width": 1448,
         "height": 1086,
         "srcSet": {
-          "webp": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-640.webp 640w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-960.webp 960w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-1448.webp 1448w"
+          "webp": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-640.webp 640w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-960.webp 960w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-1448.webp 1448w"
         }
       },
       "archive": {
-        "src": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-900.webp",
+        "src": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-900.webp",
         "width": 900,
         "height": 1200,
         "srcSet": {
-          "webp": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-450.webp 450w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-675.webp 675w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-900.webp 900w"
+          "webp": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-450.webp 450w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-675.webp 675w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-900.webp 900w"
+        }
+      }
+    },
+    "clak-1er-panamericano-brasil": {
+      "fingerprint": "6b3d90e07e71a80d85477f4fb55f50bd41d835af7bb78b00ac95ac3b1e101fb2",
+      "calendar": {
+        "src": "/images/event-covers/shared/kendo-external-6b3d90e07e71a80d-calendar-1448.webp",
+        "width": 1448,
+        "height": 1086,
+        "srcSet": {
+          "webp": "/images/event-covers/shared/kendo-external-6b3d90e07e71a80d-calendar-640.webp 640w, /images/event-covers/shared/kendo-external-6b3d90e07e71a80d-calendar-960.webp 960w, /images/event-covers/shared/kendo-external-6b3d90e07e71a80d-calendar-1448.webp 1448w"
+        }
+      },
+      "archive": {
+        "src": "/images/event-covers/shared/kendo-external-6b3d90e07e71a80d-archive-900.webp",
+        "width": 900,
+        "height": 1200,
+        "srcSet": {
+          "webp": "/images/event-covers/shared/kendo-external-6b3d90e07e71a80d-archive-450.webp 450w, /images/event-covers/shared/kendo-external-6b3d90e07e71a80d-archive-675.webp 675w, /images/event-covers/shared/kendo-external-6b3d90e07e71a80d-archive-900.webp 900w"
         }
       }
     },
     "seminario-noviembre-2026": {
-      "fingerprint": "3928aedfb15b9e29bf4c75b8ce693fd5e8454b744a7f620bdf69e94437f3cfc7",
+      "fingerprint": "a70c85687a461c829db63f4b6fdffb0437fe5d874f7d883f2dffc44ec6c7bcac",
       "calendar": {
-        "src": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-1448.webp",
+        "src": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-1448.webp",
         "width": 1448,
         "height": 1086,
         "srcSet": {
-          "webp": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-640.webp 640w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-960.webp 960w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-1448.webp 1448w"
+          "webp": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-640.webp 640w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-960.webp 960w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-1448.webp 1448w"
         }
       },
       "archive": {
-        "src": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-900.webp",
+        "src": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-900.webp",
         "width": 900,
         "height": 1200,
         "srcSet": {
-          "webp": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-450.webp 450w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-675.webp 675w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-900.webp 900w"
+          "webp": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-450.webp 450w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-675.webp 675w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-900.webp 900w"
         }
       }
     },
     "4to-torneo": {
-      "fingerprint": "3928aedfb15b9e29bf4c75b8ce693fd5e8454b744a7f620bdf69e94437f3cfc7",
+      "fingerprint": "a70c85687a461c829db63f4b6fdffb0437fe5d874f7d883f2dffc44ec6c7bcac",
       "calendar": {
-        "src": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-1448.webp",
+        "src": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-1448.webp",
         "width": 1448,
         "height": 1086,
         "srcSet": {
-          "webp": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-640.webp 640w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-960.webp 960w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-1448.webp 1448w"
+          "webp": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-640.webp 640w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-960.webp 960w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-1448.webp 1448w"
         }
       },
       "archive": {
-        "src": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-900.webp",
+        "src": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-900.webp",
         "width": 900,
         "height": 1200,
         "srcSet": {
-          "webp": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-450.webp 450w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-675.webp 675w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-900.webp 900w"
+          "webp": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-450.webp 450w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-675.webp 675w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-900.webp 900w"
         }
       }
     },
     "1er-examen-2027": {
-      "fingerprint": "3928aedfb15b9e29bf4c75b8ce693fd5e8454b744a7f620bdf69e94437f3cfc7",
+      "fingerprint": "a70c85687a461c829db63f4b6fdffb0437fe5d874f7d883f2dffc44ec6c7bcac",
       "calendar": {
-        "src": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-1448.webp",
+        "src": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-1448.webp",
         "width": 1448,
         "height": 1086,
         "srcSet": {
-          "webp": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-640.webp 640w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-960.webp 960w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-1448.webp 1448w"
+          "webp": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-640.webp 640w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-960.webp 960w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-1448.webp 1448w"
         }
       },
       "archive": {
-        "src": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-900.webp",
+        "src": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-900.webp",
         "width": 900,
         "height": 1200,
         "srcSet": {
-          "webp": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-450.webp 450w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-675.webp 675w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-900.webp 900w"
+          "webp": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-450.webp 450w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-675.webp 675w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-900.webp 900w"
         }
       }
     },
     "5to-torneo": {
-      "fingerprint": "3928aedfb15b9e29bf4c75b8ce693fd5e8454b744a7f620bdf69e94437f3cfc7",
+      "fingerprint": "a70c85687a461c829db63f4b6fdffb0437fe5d874f7d883f2dffc44ec6c7bcac",
       "calendar": {
-        "src": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-1448.webp",
+        "src": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-1448.webp",
         "width": 1448,
         "height": 1086,
         "srcSet": {
-          "webp": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-640.webp 640w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-960.webp 960w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-1448.webp 1448w"
+          "webp": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-640.webp 640w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-960.webp 960w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-1448.webp 1448w"
         }
       },
       "archive": {
-        "src": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-900.webp",
+        "src": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-900.webp",
         "width": 900,
         "height": 1200,
         "srcSet": {
-          "webp": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-450.webp 450w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-675.webp 675w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-900.webp 900w"
+          "webp": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-450.webp 450w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-675.webp 675w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-900.webp 900w"
         }
       }
     },
     "2do-examen-2027": {
-      "fingerprint": "3928aedfb15b9e29bf4c75b8ce693fd5e8454b744a7f620bdf69e94437f3cfc7",
+      "fingerprint": "a70c85687a461c829db63f4b6fdffb0437fe5d874f7d883f2dffc44ec6c7bcac",
       "calendar": {
-        "src": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-1448.webp",
+        "src": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-1448.webp",
         "width": 1448,
         "height": 1086,
         "srcSet": {
-          "webp": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-640.webp 640w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-960.webp 960w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-1448.webp 1448w"
+          "webp": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-640.webp 640w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-960.webp 960w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-1448.webp 1448w"
         }
       },
       "archive": {
-        "src": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-900.webp",
+        "src": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-900.webp",
         "width": 900,
         "height": 1200,
         "srcSet": {
-          "webp": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-450.webp 450w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-675.webp 675w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-900.webp 900w"
+          "webp": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-450.webp 450w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-675.webp 675w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-900.webp 900w"
         }
       }
     },
     "3er-examen-2027": {
-      "fingerprint": "3928aedfb15b9e29bf4c75b8ce693fd5e8454b744a7f620bdf69e94437f3cfc7",
+      "fingerprint": "a70c85687a461c829db63f4b6fdffb0437fe5d874f7d883f2dffc44ec6c7bcac",
       "calendar": {
-        "src": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-1448.webp",
+        "src": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-1448.webp",
         "width": 1448,
         "height": 1086,
         "srcSet": {
-          "webp": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-640.webp 640w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-960.webp 960w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-1448.webp 1448w"
+          "webp": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-640.webp 640w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-960.webp 960w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-1448.webp 1448w"
         }
       },
       "archive": {
-        "src": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-900.webp",
+        "src": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-900.webp",
         "width": 900,
         "height": 1200,
         "srcSet": {
-          "webp": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-450.webp 450w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-675.webp 675w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-900.webp 900w"
+          "webp": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-450.webp 450w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-675.webp 675w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-900.webp 900w"
         }
       }
     },
     "6to-torneo": {
-      "fingerprint": "3928aedfb15b9e29bf4c75b8ce693fd5e8454b744a7f620bdf69e94437f3cfc7",
+      "fingerprint": "a70c85687a461c829db63f4b6fdffb0437fe5d874f7d883f2dffc44ec6c7bcac",
       "calendar": {
-        "src": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-1448.webp",
+        "src": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-1448.webp",
         "width": 1448,
         "height": 1086,
         "srcSet": {
-          "webp": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-640.webp 640w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-960.webp 960w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-1448.webp 1448w"
+          "webp": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-640.webp 640w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-960.webp 960w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-1448.webp 1448w"
         }
       },
       "archive": {
-        "src": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-900.webp",
+        "src": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-900.webp",
         "width": 900,
         "height": 1200,
         "srcSet": {
-          "webp": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-450.webp 450w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-675.webp 675w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-900.webp 900w"
+          "webp": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-450.webp 450w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-675.webp 675w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-900.webp 900w"
         }
       }
     },
     "4to-examen-2027": {
-      "fingerprint": "3928aedfb15b9e29bf4c75b8ce693fd5e8454b744a7f620bdf69e94437f3cfc7",
+      "fingerprint": "a70c85687a461c829db63f4b6fdffb0437fe5d874f7d883f2dffc44ec6c7bcac",
       "calendar": {
-        "src": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-1448.webp",
+        "src": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-1448.webp",
         "width": 1448,
         "height": 1086,
         "srcSet": {
-          "webp": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-640.webp 640w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-960.webp 960w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-1448.webp 1448w"
+          "webp": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-640.webp 640w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-960.webp 960w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-1448.webp 1448w"
         }
       },
       "archive": {
-        "src": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-900.webp",
+        "src": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-900.webp",
         "width": 900,
         "height": 1200,
         "srcSet": {
-          "webp": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-450.webp 450w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-675.webp 675w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-900.webp 900w"
+          "webp": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-450.webp 450w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-675.webp 675w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-900.webp 900w"
         }
       }
     },
     "7mo-torneo": {
-      "fingerprint": "3928aedfb15b9e29bf4c75b8ce693fd5e8454b744a7f620bdf69e94437f3cfc7",
+      "fingerprint": "a70c85687a461c829db63f4b6fdffb0437fe5d874f7d883f2dffc44ec6c7bcac",
       "calendar": {
-        "src": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-1448.webp",
+        "src": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-1448.webp",
         "width": 1448,
         "height": 1086,
         "srcSet": {
-          "webp": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-640.webp 640w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-960.webp 960w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-calendar-1448.webp 1448w"
+          "webp": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-640.webp 640w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-960.webp 960w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-calendar-1448.webp 1448w"
         }
       },
       "archive": {
-        "src": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-900.webp",
+        "src": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-900.webp",
         "width": 900,
         "height": 1200,
         "srcSet": {
-          "webp": "/images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-450.webp 450w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-675.webp 675w, /images/event-covers/shared/kendo-costa-rica-3928aedfb15b9e29-archive-900.webp 900w"
+          "webp": "/images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-450.webp 450w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-675.webp 675w, /images/event-covers/shared/kendo-costa-rica-a70c85687a461c82-archive-900.webp 900w"
         }
       }
     }

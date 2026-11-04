@@ -48,7 +48,12 @@ export function getEventThumbnail(
     .replace(/\s+/g, " ")
     .trim();
   return {
-    image: { ...cover, alt: `Afiche de ${seoData.siteName}, ${eventTitle}` },
+    image: {
+      ...cover,
+      alt: event?.external
+        ? `Ilustración genérica para evento externo: ${eventTitle}`
+        : `Afiche de ${seoData.siteName}, ${eventTitle}`,
+    },
     source: "generated" as const,
   };
 }

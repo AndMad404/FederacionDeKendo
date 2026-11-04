@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
   extractCoverSvgLayers,
+  selectCoverComposition,
   styleCoverBackground,
 } from "../../scripts/event-cover-svg.ts";
 import { assertCoverGenerationReady } from "../../scripts/event-cover-model.ts";
@@ -139,4 +140,31 @@ test("single calendar review exits before variants and production manifest write
   assert.ok(reviewReturn < source.indexOf("await writeChanged(manifestPath"));
   assert.match(source, /coverApproval.formats\[format\] === "approved"/);
   assert.match(source, /\.cache\/event-cover-review/);
+});
+
+test("generic vertical covers share the approved layout and reserve the label for external events", async () => {
+  const source = await readFile(
+    "templates/event-covers/v1/external-vertical.svg",
+    "utf8",
+  );
+  assert.equal(selectCoverComposition(source, true), source);
+  const internal = selectCoverComposition(source, false);
+  assert.doesNotMatch(internal, /#EventoExterno|id="evento-externo"/);
+  assert.match(internal, /id="external-logo"/);
+  assert.match(internal, /id="external-kendoka"/);
+  const removed = source.match(
+    /<g\b[^>]*\bid="evento-externo"[^>]*>[\s\S]*?<\/g>/,
+  )[0];
+  const logoOffset = Number(
+    /id="external-logo" transform="translate\(([-\d.]+) 0\)"/.exec(internal)[1],
+  );
+  assert.equal(48 + logoOffset + 420 / 2, 900 / 2);
+  assert.equal(
+    internal.replace(` transform="translate(${logoOffset} 0)"`, ""),
+    source.replace(removed, ""),
+  );
+  assert.throws(
+    () => selectCoverComposition("<svg/>", false),
+    /Missing external cover label/,
+  );
 });

@@ -1,6 +1,6 @@
 import type { CalendarEvent } from "../src/app/types";
 
-export type CoverEvent = Pick<CalendarEvent, "id">;
+export type CoverEvent = Pick<CalendarEvent, "id" | "external">;
 
 export function assertCoverGenerationReady(approval: {
   status: string;
@@ -17,9 +17,9 @@ export function assertCoverGenerationReady(approval: {
   }
 }
 
-/** Only identity is needed to associate shared, text-free artwork with events. */
+/** Identity and external status select shared, text-free artwork. */
 export function adaptCoverEvent(event: CoverEvent): CoverEvent {
   if (!/^[a-z0-9][a-z0-9-]*$/.test(event.id))
     throw new Error(`Unsafe event id: ${event.id}`);
-  return { id: event.id };
+  return { id: event.id, ...(event.external ? { external: true } : {}) };
 }
