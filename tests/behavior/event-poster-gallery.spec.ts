@@ -1,5 +1,15 @@
 import { expect, test } from "@playwright/test";
 import { preparePage } from "../helpers/prepare-page";
+import { EVENT_GALLERIES } from "../../src/app/data/eventGalleries";
+import coverManifest from "../../src/app/data/eventCovers.json" with { type: "json" };
+
+const eventId = "clak-1er-panamericano-brasil";
+const gallery = EVENT_GALLERIES[eventId];
+const assignedImage = gallery?.thumbnail ?? gallery?.images[0];
+const covers: Record<
+  string,
+  Partial<Record<"calendar" | "archive", { src: string }>>
+> = coverManifest.events;
 
 const eventPath = "/eventos/pasados/1er-panamericano-de-kendo/";
 const eventTitle = "1.er Panamericano de Kendo";
@@ -12,7 +22,7 @@ for (const viewport of [
   { width: 1366, height: 768 },
   { width: 2048, height: 1014 },
 ]) {
-  test(`archive uses the generic thumbnail and aligns equal frames at ${viewport.width}px`, async ({
+  test(`archive prioritizes assigned artwork, falls back to generic and aligns frames at ${viewport.width}px`, async ({
     page,
   }, testInfo) => {
     await page.setViewportSize(viewport);
@@ -24,13 +34,22 @@ for (const viewport of [
       }),
     });
     await expect(posterCard.locator("img")).toHaveCSS("object-fit", "contain");
+    const expectedImage = assignedImage ?? covers[eventId]?.archive;
+    expect(
+      expectedImage,
+      "An event without assigned artwork needs a generic cover",
+    ).toBeDefined();
     await expect(posterCard.locator("img")).toHaveAttribute(
       "src",
-      /\/images\/event-covers\/shared\/kendo-external-/,
+      expectedImage!.src,
     );
     await expect(posterCard.locator("[data-event-thumbnail]")).toHaveAttribute(
       "data-thumbnail-source",
-      "generated",
+      assignedImage
+        ? gallery.posterSource
+          ? "poster"
+          : "gallery"
+        : "generated",
     );
     await expect
       .poll(() =>
@@ -96,7 +115,7 @@ for (const viewport of [
   { width: 844, height: 390 },
   { width: 1366, height: 768 },
 ]) {
-  test(`event preserves official links without showing artwork at ${viewport.width}px`, async ({
+  test(`event preserves official links and displays assigned artwork when available at ${viewport.width}px`, async ({
     page,
   }, testInfo) => {
     await page.setViewportSize(viewport);
@@ -140,15 +159,15 @@ for (const viewport of [
     await expect(profile).toHaveAttribute("rel", "noopener noreferrer");
     await profile.scrollIntoViewIfNeeded();
     await expect(profile).toBeVisible();
-    await expect(
-      page.getByRole("region", { name: /^Imagen oficial del evento/ }),
-    ).toHaveCount(0);
-    await expect(
-      page.locator('img[src*="/images/events/clak-1er-panamericano-brasil/"]'),
-    ).toHaveCount(0);
-    await expect(
-      page.getByRole("button", { name: /^Abrir Flyer oficial/ }),
-    ).toHaveCount(0);
+    const featured = page.locator("main figure img");
+    const hasImages = Boolean(gallery?.images.length);
+    await expect(featured).toHaveCount(hasImages ? 1 : 0);
+    if (hasImages) {
+      await expect(featured).toBeVisible();
+      expect(gallery.images.map((image) => image.src)).toContain(
+        await featured.getAttribute("src"),
+      );
+    }
     await expect(
       page.getByRole("link", { name: /^Arena Suzano/ }),
     ).toHaveAttribute("href", /maps/);
@@ -158,7 +177,7 @@ for (const viewport of [
       ),
     ).toBe(true);
     await page.screenshot({
-      path: testInfo.outputPath("event-without-artwork.png"),
+      path: testInfo.outputPath("event-artwork-selection.png"),
       fullPage: true,
     });
   });

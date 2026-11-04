@@ -246,15 +246,19 @@ test("external fallback uses the approved kendo artwork with its diagonal label"
   const panamaId = "panama-5ta-copa-shogun-torneo-por-equipos-y-seminario";
   assert.equal(manifest.events[panamaId], undefined);
   assert.equal(getEventThumbnail(panamaId).source, "poster");
-  const event = CALENDAR_EVENTS.find(
-    (event) => event.id === "clak-1er-panamericano-brasil",
-  );
-  assert.equal(event.external, true);
-  for (const format of ["calendar", "archive"]) {
-    const thumbnail = getEventThumbnail(event.id, format);
-    assert.equal(thumbnail.source, "generated");
-    assert.match(thumbnail.image.src, /\/kendo-external-/);
-    assert.doesNotMatch(thumbnail.image.alt, /afiche de|federaci[oó]n/i);
+  // Check the fallback for external events that currently lack assigned artwork.
+  // Adding a real image later must make the assigned-artwork priority test apply.
+  for (const event of CALENDAR_EVENTS.filter(
+    (candidate) => candidate.external,
+  )) {
+    const gallery = EVENT_GALLERIES[event.id];
+    if (gallery?.thumbnail ?? gallery?.images[0]) continue;
+    for (const format of ["calendar", "archive"]) {
+      const thumbnail = getEventThumbnail(event.id, format);
+      assert.equal(thumbnail.source, "generated");
+      assert.match(thumbnail.image.src, /\/kendo-external-/);
+      assert.doesNotMatch(thumbnail.image.alt, /afiche de|federaci[oó]n/i);
+    }
   }
 });
 

@@ -51,6 +51,22 @@ test("the open gallery lightbox has no detectable WCAG A or AA violations", asyn
   await page.goto("/galeria/");
   await expectInteractiveReady(page, "gallery");
   await page.locator(".gallery-featured-frame > button").click();
-  await expect(page.getByRole("dialog")).toBeVisible();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  // Audit the settled modal, rather than intermediate colors during its fade-in.
+  await dialog.evaluate(async (element) => {
+    const overlay = element.parentElement ?? element;
+    const animations = overlay
+      .getAnimations({ subtree: true })
+      .filter(
+        (animation) =>
+          animation.effect?.getComputedTiming().iterations !== Infinity,
+      );
+    await Promise.all(
+      animations.map((animation) => animation.finished.catch(() => {})),
+    );
+  });
+  await expect(dialog).toHaveCSS("opacity", "1");
+  await expect(dialog.locator("..")).toHaveCSS("opacity", "1");
   await expectNoAutomatedViolations(page);
 });

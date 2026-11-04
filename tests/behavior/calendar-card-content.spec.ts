@@ -1,5 +1,15 @@
 import { expect, test } from "@playwright/test";
 import { preparePage } from "../helpers/prepare-page";
+import { EVENT_GALLERIES } from "../../src/app/data/eventGalleries";
+import coverManifest from "../../src/app/data/eventCovers.json" with { type: "json" };
+
+const eventId = "clak-1er-panamericano-brasil";
+const gallery = EVENT_GALLERIES[eventId];
+const assignedImage = gallery?.thumbnail ?? gallery?.images[0];
+const covers: Record<
+  string,
+  Partial<Record<"calendar" | "archive", { src: string }>>
+> = coverManifest.events;
 
 for (const viewport of [
   { width: 360, height: 800 },
@@ -7,7 +17,7 @@ for (const viewport of [
   { width: 768, height: 1024 },
   { width: 1366, height: 768 },
 ]) {
-  test(`calendar date, optional poster and actions at ${viewport.width}px`, async ({
+  test(`calendar date, assigned image or generic fallback and actions at ${viewport.width}px`, async ({
     page,
   }, testInfo) => {
     await page.setViewportSize(viewport);
@@ -30,6 +40,28 @@ for (const viewport of [
     await expect(poster.locator("picture img")).toHaveCSS(
       "object-fit",
       "contain",
+    );
+    const picture = poster.locator("[data-event-thumbnail]");
+    const format =
+      (await picture.getAttribute("data-cover-format")) === "archive"
+        ? "archive"
+        : "calendar";
+    const expectedImage = assignedImage ?? covers[eventId]?.[format];
+    expect(
+      expectedImage,
+      "An event without assigned artwork needs a generic cover",
+    ).toBeDefined();
+    await expect(picture).toHaveAttribute(
+      "data-thumbnail-source",
+      assignedImage
+        ? gallery.posterSource
+          ? "poster"
+          : "gallery"
+        : "generated",
+    );
+    await expect(picture.locator("img")).toHaveAttribute(
+      "src",
+      expectedImage!.src,
     );
     await expect(
       poster.getByText("Todos los días", { exact: true }),
@@ -71,6 +103,30 @@ for (const viewport of [
       fullPage: true,
     });
     await poster.getByRole("link", { name: /Detalles del evento/ }).click();
-    await expect(page.locator("main figure img").first()).toBeVisible();
+    await expect(page).toHaveURL(/\/eventos\/1er-panamericano-de-kendo\/$/);
+    await expect(
+      page.getByRole("heading", {
+        name: "1.er Panamericano de Kendo",
+        exact: true,
+        level: 1,
+      }),
+    ).toBeVisible();
+    await expect(
+      page.getByText("Evento externo", { exact: true }),
+    ).toBeVisible();
+    // The clock is before the event: official posters may be displayed already,
+    // while ordinary historical photo galleries are shown after the event.
+    const hasPublishedPoster = Boolean(
+      gallery?.posterSource && gallery.images.length,
+    );
+    const featured = page.locator("main figure img");
+    await expect(featured).toHaveCount(hasPublishedPoster ? 1 : 0);
+    if (hasPublishedPoster) await expect(featured).toBeVisible();
+    await expect(
+      page.getByRole("link", {
+        name: "Link de la publicación original",
+        exact: true,
+      }),
+    ).toHaveAttribute("href", "https://www.instagram.com/p/DeLBKMPkdlM/");
   });
 }
