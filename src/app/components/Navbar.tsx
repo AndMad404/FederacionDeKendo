@@ -13,7 +13,7 @@ import { hasDistinctEventTranslation } from "../utils/localizedEvents";
 const navInteractionClass = textButtonInteractionClass;
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `inline-flex min-h-11 items-center text-lg tracking-wide ${navInteractionClass} land-sm:text-base ${focusRingClass} ${
+  `inline-flex min-h-11 items-center text-lg font-bold tracking-wide ${navInteractionClass} land-sm:text-base ${focusRingClass} ${
     isActive
       ? "border-b-2 border-site-accent pb-0.5 text-site-on-dark"
       : "text-site-on-dark"
@@ -132,7 +132,7 @@ export function Navbar() {
                   to={path}
                   end
                   className={({ isActive }) =>
-                    `block min-h-11 rounded-md px-4 py-2.5 text-base ${navInteractionClass} ${focusRingClass} ${
+                    `block min-h-11 rounded-md px-4 py-2.5 text-base font-bold ${navInteractionClass} ${focusRingClass} ${
                       isActive
                         ? "bg-site-on-dark text-site-navy shadow-sm"
                         : "text-site-on-dark/85 hover:bg-site-on-dark/15 hover:text-site-on-dark"
@@ -308,7 +308,7 @@ function LanguageSelector({
                 : copy.nav.switchToEnglish
             }`}
             onClick={onNavigate}
-            className={`control-selection inline-flex min-h-11 min-w-11 items-center justify-center rounded-full px-2 text-sm font-bold ${navInteractionClass} ${focusRingClass} ${
+            className={`control-selection inline-flex min-h-11 min-w-11 items-center justify-center rounded-full px-2 text-sm font-normal ${navInteractionClass} ${focusRingClass} ${
               active
                 ? "bg-site-on-dark text-site-navy shadow-sm"
                 : "text-site-on-dark/85 hover:bg-site-on-dark/15 hover:text-site-on-dark"

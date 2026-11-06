@@ -34,8 +34,6 @@ import { EventSectionNavigation } from "./events/EventSectionNavigation";
 import { NavigationArrowButton } from "./ui/ModalControls";
 
 const mobileArchiveQuery = "(max-width: 767px)";
-// Native option popups can omit CSS right padding; keep a small trailing gutter.
-const nativeOptionTrailingSpace = "\u00a0\u00a0";
 const subscribeToViewport = (callback: () => void) => {
   const query = window.matchMedia(mobileArchiveQuery);
   query.addEventListener("change", callback);
@@ -172,7 +170,7 @@ export function PastEventsSection() {
                 aria-label={copy.archive.year}
                 value={filters.year ?? ""}
                 onChange={(event) => changeFilter("year", event.target.value)}
-                className={`absolute inset-0 h-full w-full cursor-pointer appearance-none rounded-full p-0 text-center text-sm text-transparent [text-align-last:center] ${focusRingClass} ${textButtonInteractionClass} border border-site-action bg-transparent`}
+                className={`archive-filter absolute inset-0 h-full w-full cursor-pointer appearance-none rounded-full p-0 text-center text-sm text-transparent [text-align-last:center] ${focusRingClass} ${textButtonInteractionClass} border border-site-action bg-transparent`}
               >
                 <option value="" hidden>
                   {copy.archive.year}
@@ -206,7 +204,7 @@ export function PastEventsSection() {
                 aria-label={copy.archive.type}
                 value={filters.type ?? ""}
                 onChange={(event) => changeFilter("type", event.target.value)}
-                className={`absolute inset-0 h-full w-full cursor-pointer appearance-none rounded-full px-2 py-0 text-left text-sm text-transparent ${focusRingClass} ${textButtonInteractionClass} border border-site-action bg-transparent`}
+                className={`archive-filter absolute inset-0 h-full w-full cursor-pointer appearance-none rounded-full px-2 py-0 text-left text-sm text-transparent ${focusRingClass} ${textButtonInteractionClass} border border-site-action bg-transparent`}
               >
                 <option value="" hidden>
                   {copy.archive.type}
@@ -218,7 +216,6 @@ export function PastEventsSection() {
                     className="bg-site-surface text-site-text"
                   >
                     {copy.archive.types[type]}
-                    {nativeOptionTrailingSpace}
                   </option>
                 ))}
               </select>
