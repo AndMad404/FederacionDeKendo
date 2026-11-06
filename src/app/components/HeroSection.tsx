@@ -55,7 +55,7 @@ function HeroBanner() {
           <p className="leading-relaxed text-site-subtle land-sm:mt-3">
             {copy.home.description}
           </p>
-          <div className="flex flex-col justify-center gap-3 sm:flex-row land-sm:mt-5 land-sm:justify-start land-tall:justify-start">
+          <div className="flex flex-col flex-wrap justify-center gap-3 sm:flex-row land-sm:mt-5 land-sm:justify-start land-tall:justify-start">
             <Link
               to={copy.nav.links[3].path}
               className={`${secondaryButtonClass} control-primary ${focusRingClass}`}
@@ -67,6 +67,12 @@ function HeroBanner() {
               className={`${primaryButtonClass} ${focusRingClass}`}
             >
               {copy.home.events}
+            </Link>
+            <Link
+              to="/eventos/pasados/"
+              className={`${secondaryButtonClass} ${focusRingClass}`}
+            >
+              {copy.archive.title}
             </Link>
           </div>
         </div>
