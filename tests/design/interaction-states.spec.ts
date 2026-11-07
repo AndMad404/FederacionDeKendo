@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import { FIXED_TEST_TIME } from "./design-contract";
 
-test("hero actions share depth and pressure while preserving inverse colors", async ({
+test("hero actions share depth and pressure with colors suited to the photo", async ({
   page,
 }) => {
   await page.goto("/");
@@ -12,8 +12,12 @@ test("hero actions share depth and pressure while preserving inverse colors", as
   const primary = page
     .locator("main")
     .getByRole("link", { name: "Calendario de Próximos Eventos", exact: true });
-  for (const control of [primary, secondary]) {
-    const isPrimary = control === primary;
+  const archive = page
+    .locator("main > section > header")
+    .getByRole("link", { name: "Eventos pasados", exact: true });
+  await expect(secondary).toHaveCSS("background-color", "rgb(200, 16, 46)");
+  await expect(primary).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  for (const control of [primary, secondary, archive]) {
     const before = await control.boundingBox();
     const normalBackground = await control.evaluate(
       (el) => getComputedStyle(el).backgroundColor,
@@ -26,12 +30,8 @@ test("hero actions share depth and pressure while preserving inverse colors", as
     await control.hover();
     await expect(control).not.toHaveCSS("background-color", normalBackground);
     await expect(control).toHaveCSS(
-      "background-color",
-      isPrimary ? "rgb(255, 255, 255)" : "rgb(22, 58, 99)",
-    );
-    await expect(control).toHaveCSS(
       "color",
-      isPrimary ? "rgb(22, 58, 99)" : "rgb(255, 255, 255)",
+      control === secondary ? "rgb(255, 255, 255)" : "rgb(11, 31, 58)",
     );
     await expect(control).toHaveCSS("scale", "none");
     await expect(control).toHaveCSS("translate", "0px -2px");

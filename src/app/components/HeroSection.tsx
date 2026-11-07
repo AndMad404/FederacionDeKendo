@@ -1,14 +1,11 @@
 import { Link } from "react-router";
 import { UpcomingEventsSection } from "./UpcomingEventsSection";
 import { PageTitle } from "./PageTitle";
-import {
-  focusRingClass,
-  primaryButtonClass,
-  secondaryButtonClass,
-} from "../styles/shared";
+import { textButtonInteractionClass } from "../styles/shared";
 import { useLanguage } from "../config/i18n";
 
 const imageVersion = "v=20260704-0120";
+const heroActionClass = `control-primary inline-flex min-h-11 min-w-0 items-center justify-center rounded-full border px-2 py-2 text-sm font-bold leading-snug text-center sm:shrink-0 sm:whitespace-nowrap sm:px-3 md:px-5 md:text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-site-on-dark ${textButtonInteractionClass}`;
 
 function HeroBanner() {
   const { copy } = useLanguage();
@@ -37,40 +34,40 @@ function HeroBanner() {
       />
 
       <div className="relative z-10 mx-auto flex w-full max-w-6xl items-center px-3 text-center land-sm:text-left land-tall:text-left">
-        <div className="mx-auto flex min-h-[28rem] max-w-xl flex-col justify-between text-site-on-dark md:min-h-[20rem] md:justify-around land-sm:mx-0 land-sm:block land-sm:min-h-0 land-tall:mx-0">
+        <div className="mx-auto flex min-h-[28rem] w-full max-w-3xl flex-col justify-between text-site-on-dark md:min-h-[20rem] md:justify-around land-sm:mx-0 land-sm:block land-sm:min-h-0 land-tall:mx-0">
           <PageTitle
             id="home-title"
             tone="media"
             density="flush"
             decoration="none"
             casing="normal"
-            className="mx-auto text-3xl sm:text-4xl land-sm:mx-0 land-sm:text-left land-tall:mx-0 land-tall:text-left"
+            className="mx-auto max-w-xl text-3xl sm:text-4xl land-sm:mx-0 land-sm:text-left land-tall:mx-0 land-tall:text-left"
             allowWrap
           >
             {copy.home.title}
           </PageTitle>
-          <p className="text-lg font-bold leading-snug sm:text-xl land-sm:mt-5">
+          <p className="mx-auto max-w-xl text-lg font-bold leading-snug sm:text-xl land-sm:mx-0 land-sm:mt-5 land-tall:mx-0">
             {copy.home.lead}
           </p>
-          <p className="leading-relaxed text-site-subtle land-sm:mt-3">
+          <p className="mx-auto max-w-xl leading-relaxed text-site-subtle land-sm:mx-0 land-sm:mt-3 land-tall:mx-0">
             {copy.home.description}
           </p>
-          <div className="flex flex-col flex-wrap justify-center gap-3 sm:flex-row land-sm:mt-5 land-sm:justify-start land-tall:justify-start">
+          <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-nowrap sm:justify-center sm:gap-3 land-sm:mt-5 land-sm:justify-start land-tall:justify-start">
             <Link
               to={copy.nav.links[3].path}
-              className={`${secondaryButtonClass} control-primary ${focusRingClass}`}
+              className={`${heroActionClass} border-site-accent bg-site-accent text-site-on-dark hover:border-site-accent-hover hover:bg-site-accent-hover`}
             >
               {copy.home.dojos}
             </Link>
             <Link
               to={copy.nav.links[1].path}
-              className={`${primaryButtonClass} ${focusRingClass}`}
+              className={`${heroActionClass} border-site-surface bg-site-surface text-site-navy hover:border-site-subtle hover:bg-site-subtle`}
             >
               {copy.home.events}
             </Link>
             <Link
               to="/eventos/pasados/"
-              className={`${secondaryButtonClass} ${focusRingClass}`}
+              className={`${heroActionClass} border-site-on-dark/70 bg-site-navy/80 text-site-on-dark hover:border-site-surface hover:bg-site-surface hover:text-site-navy`}
             >
               {copy.archive.title}
             </Link>
