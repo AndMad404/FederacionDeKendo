@@ -134,8 +134,8 @@ export function Navbar() {
                   className={({ isActive }) =>
                     `block min-h-11 rounded-md px-4 py-2.5 text-base font-bold ${navInteractionClass} ${focusRingClass} ${
                       isActive
-                        ? "bg-site-on-dark text-site-navy shadow-sm"
-                        : "text-site-on-dark/85 hover:bg-site-on-dark/15 hover:text-site-on-dark"
+                        ? "bg-site-on-dark/20 text-site-on-dark shadow-sm"
+                        : "text-site-on-dark hover:bg-site-on-dark/15"
                     }`
                   }
                 >

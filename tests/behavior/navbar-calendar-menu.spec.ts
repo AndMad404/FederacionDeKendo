@@ -33,7 +33,7 @@ test("calendar menu opens on hover and navigates to past events", async ({
 
   await page
     .getByRole("list", { name: "Opciones del calendario" })
-    .getByRole("link", { name: "Ver mas Eventos Pasados", exact: true })
+    .getByRole("link", { name: "Eventos Pasados", exact: true })
     .click();
   await expect(page).toHaveURL(/\/eventos\/pasados\/$/);
   await expect(calendarButton).toHaveAttribute("aria-expanded", "false");
@@ -102,7 +102,7 @@ test("calendar section expands inside the mobile navigation", async ({
   await expect(calendarButton).toHaveAttribute("aria-expanded", "true");
   await page
     .locator("#mobile-calendar-menu")
-    .getByRole("link", { name: "Ver mas Eventos Pasados", exact: true })
+    .getByRole("link", { name: "Eventos Pasados", exact: true })
     .click();
   await expect(page).toHaveURL(/\/eventos\/pasados\/$/);
   await expect(page.locator("#mobile-menu")).toHaveCount(0);

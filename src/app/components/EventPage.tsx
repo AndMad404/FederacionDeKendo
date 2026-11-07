@@ -184,7 +184,7 @@ export function EventPage() {
                     </>
                   ) : null}
                 </p>
-                <dl className="grid gap-2 text-sm land-sm:grid-cols-2 land-tall:grid-cols-2">
+                <dl className="grid gap-x-2 gap-y-3 text-base md:grid-cols-2 land-sm:grid-cols-2 land-sm:gap-y-2 land-tall:grid-cols-2">
                   <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2">
                     <CalendarDays
                       className="row-span-2 size-5 shrink-0 text-site-accent-soft"
@@ -202,7 +202,7 @@ export function EventPage() {
                     <dd>
                       {formatEventTime(event, language)}
                       {event.startTime ? (
-                        <span className="whitespace-nowrap text-xs text-site-muted">
+                        <span className="whitespace-nowrap text-site-muted">
                           {" (UTC−6)"}
                         </span>
                       ) : null}
@@ -235,7 +235,7 @@ export function EventPage() {
                   {!isPast ? (
                     <div>
                       <dt className="sr-only">{copy.event.addToCalendar}</dt>
-                      <dd className="my-2.5 flex items-center justify-center md:my-0 land-sm:my-0 land-sm:justify-start land-tall:justify-start">
+                      <dd className="my-2.5 flex items-center justify-start md:my-0 land-sm:my-0">
                         <a
                           href={getGoogleCalendarUrl(event)}
                           target="_blank"
@@ -254,7 +254,9 @@ export function EventPage() {
                 </dl>
 
                 <div className="grid gap-1">
-                  <h2 className="font-bold">{copy.event.description}:</h2>
+                  <h2 className="text-sm font-bold">
+                    {copy.event.description}:
+                  </h2>
                   <EventSummary
                     summary={event.summary ?? copy.common.informationPending}
                   />
@@ -268,11 +270,19 @@ export function EventPage() {
                       <>
                         <strong>
                           {copy.event.externalAudienceNoticeLabel}
-                        </strong>{" "}
+                        </strong>
+                        <br />
                         {copy.event.externalAudienceNotice}
                       </>
                     ) : (
-                      copy.event.audienceNotice
+                      <>
+                        <strong>{copy.event.publicAccessLabel}</strong>{" "}
+                        {copy.event.publicAccess}
+                        <br />
+                        <strong>{copy.event.participantNoticeLabel}</strong>
+                        <br />
+                        {copy.event.participantNotice}
+                      </>
                     )}
                   </p>
                 ) : null}

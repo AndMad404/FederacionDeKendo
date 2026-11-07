@@ -12,6 +12,8 @@ export function EventThumbnail({
   fullResolution = false,
   format: requestedFormat = "calendar",
   adaptive = false,
+  calendarArtwork = adaptive,
+  portraitOnTablet = false,
   sizes = "(min-width: 1024px) 14rem, (min-width: 768px) 50vw, 100vw",
 }: {
   eventId: string;
@@ -21,6 +23,8 @@ export function EventThumbnail({
   fullResolution?: boolean;
   format?: EventCoverFormat;
   adaptive?: boolean;
+  calendarArtwork?: boolean;
+  portraitOnTablet?: boolean;
 }) {
   const containerRef = useRef<HTMLElement>(null);
   const [portrait, setPortrait] = useState(false);
@@ -34,7 +38,14 @@ export function EventThumbnail({
     const container = containerRef.current;
     if (!canAdapt || !container) return;
     const card = container.closest("li");
+    const tablet = window.matchMedia(
+      "(min-width: 768px) and (max-width: 1279px) and (orientation: portrait)",
+    );
     const measure = () => {
+      if (tablet.matches) {
+        setPortrait(portraitOnTablet);
+        return;
+      }
       // Desktop cards receive their height from the calendar grid. Use the
       // whole card so its heading and actions do not disguise a portrait slot.
       // On mobile the image sets the card height; keep the requested format
@@ -57,11 +68,21 @@ export function EventThumbnail({
     const observer = new ResizeObserver(measure);
     observer.observe(container);
     if (card) observer.observe(card);
-    return () => observer.disconnect();
-  }, [canAdapt, eventId]);
+    tablet.addEventListener("change", measure);
+    return () => {
+      observer.disconnect();
+      tablet.removeEventListener("change", measure);
+    };
+  }, [canAdapt, eventId, portraitOnTablet]);
   // Keep the Shogun crest visible by framing the top of the official flyer.
   const showShogunCrest =
     eventId === "panama-5ta-copa-shogun-torneo-por-equipos-y-seminario";
+  const showShogunTabletCover = showShogunCrest && calendarArtwork;
+  const showSeminarDesktopCover =
+    adaptive &&
+    format === "calendar" &&
+    selection?.source === "generated" &&
+    eventId === "seminario-noviembre-2026";
   const thumbnail = showShogunCrest
     ? EVENT_GALLERIES[eventId]?.images[0]
     : selection?.image;
@@ -104,6 +125,22 @@ export function EventThumbnail({
       data-cover-format={format}
       className={`flex ${aspectClass} h-auto w-full max-w-full items-center justify-center overflow-hidden rounded-lg bg-site-surface ${className}`}
     >
+      {showShogunTabletCover ? (
+        <source
+          media="(min-width: 768px) and (max-width: 1279px) and (orientation: portrait)"
+          srcSet="/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/copa-shogun-2026-panama-kendo-tablet-960.webp"
+          width={960}
+          height={720}
+        />
+      ) : null}
+      {showSeminarDesktopCover ? (
+        <source
+          media="(min-width: 1280px) and (min-height: 768px)"
+          srcSet="/images/calendar/seminario-noviembre-2026-desktop.webp"
+          width={1280}
+          height={800}
+        />
+      ) : null}
       <img
         src={thumbnail.src}
         srcSet={srcSet()}
@@ -111,10 +148,10 @@ export function EventThumbnail({
         alt={thumbnail.alt ?? ""}
         width={thumbnail.width}
         height={thumbnail.height}
-        style={showShogunCrest ? { aspectRatio: "8 / 5" } : undefined}
+
         loading="lazy"
         decoding="async"
-        className={`block h-full max-h-full w-full max-w-full rounded-lg ${showShogunCrest ? "object-top" : "object-center"} ${objectFitClass}`}
+        className={`block h-full max-h-full w-full max-w-full rounded-lg ${showShogunCrest ? "object-top" : "object-center"} ${objectFitClass} ${showShogunCrest ? "aspect-[8/5]" : ""} ${showSeminarDesktopCover ? "page-fit:w-auto page-fit:aspect-[8/5]" : ""} ${showShogunTabletCover ? "md:max-xl:portrait:aspect-auto md:max-xl:portrait:object-contain md:max-xl:portrait:object-center" : ""}`}
       />
     </picture>
   );

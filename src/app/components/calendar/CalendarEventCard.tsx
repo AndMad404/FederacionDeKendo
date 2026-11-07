@@ -19,9 +19,15 @@ import { useLanguage } from "../../config/i18n";
 
 interface CalendarEventCardProps {
   event: CalendarEvent;
+  portraitOnTablet?: boolean;
+  expandedLayout?: boolean;
 }
 
-export function CalendarEventCard({ event }: CalendarEventCardProps) {
+export function CalendarEventCard({
+  event,
+  portraitOnTablet,
+  expandedLayout,
+}: CalendarEventCardProps) {
   const { language, copy } = useLanguage();
   const { startDateLabel, endDateLabel, endDateValue } =
     getEventDateRangeLabels(event, language);
@@ -36,7 +42,9 @@ export function CalendarEventCard({ event }: CalendarEventCardProps) {
     getEventThumbnail(event.id)?.source === "generated";
 
   return (
-    <li className="relative flex min-h-40 flex-col items-center gap-4 rounded-xl border border-site-border bg-site-canvas p-3 text-center transition-colors hover:border-site-action lg:min-h-36 page-fit:min-h-0 page-fit:gap-1 page-fit:p-2">
+    <li
+      className={`relative flex min-h-40 flex-col items-center gap-4 rounded-xl border border-site-border bg-site-canvas p-3 text-center transition-colors hover:border-site-action md:max-xl:portrait:w-full md:max-xl:portrait:min-w-0 ${portraitOnTablet ? "md:max-xl:portrait:self-start" : "md:max-xl:portrait:self-stretch"} lg:min-h-36 page-fit:min-h-0 page-fit:gap-1 page-fit:p-2`}
+    >
       <div className="flex w-full shrink-0 flex-col items-center gap-2 page-fit:gap-1">
         <h3 className="text-base font-bold leading-tight">{event.title}</h3>
         <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
@@ -69,13 +77,21 @@ export function CalendarEventCard({ event }: CalendarEventCardProps) {
       </div>
       <EventThumbnail
         eventId={event.id}
-        adaptive
+        adaptive={!expandedLayout}
+        calendarArtwork
+        portraitOnTablet={portraitOnTablet}
         fit="contain"
-        className={
+        className={`${
           isGeneratedThumbnail
             ? "min-h-0 shrink-0 page-fit:shrink page-fit:basis-0 page-fit:flex-1 page-fit:aspect-auto"
             : "max-h-48 min-h-0 shrink page-fit:max-h-none page-fit:basis-0 page-fit:flex-1 page-fit:aspect-auto [&_img]:w-auto"
-        }
+        } ${
+          expandedLayout
+            ? "md:aspect-[4/3] md:max-h-none md:shrink-0 md:grow-0 md:basis-auto md:bg-[#fafafa] md:[&_img]:w-full page-fit:aspect-[4/3] page-fit:flex-none page-fit:basis-auto page-fit:shrink-0"
+            : portraitOnTablet
+              ? "md:max-xl:portrait:data-[cover-format=archive]:w-[calc(100%+1rem)] md:max-xl:portrait:data-[cover-format=archive]:max-w-none"
+              : "md:max-xl:portrait:aspect-[4/3] md:max-xl:portrait:max-h-none md:max-xl:portrait:shrink-0 md:max-xl:portrait:[&_img]:w-full"
+        }`}
       />
       <div className="mt-auto flex w-full shrink-0 items-stretch justify-between gap-2 pt-2 page-fit:gap-2 page-fit:pt-0">
         {locationUrl ? (

@@ -20,7 +20,8 @@ const eventDetailsClass = `inline-flex min-h-11 min-w-0 origin-center items-cent
 
 function getEventVisibilityClass(index: number) {
   if (index === 2) return "land-sm:hidden";
-  if (index === 3) return "hidden lg:flex land-sm:hidden land-tall:flex";
+  if (index === 3)
+    return "hidden lg:flex land-sm:hidden land-tall:flex tablet-fit:max-lg:grid";
   return "";
 }
 
@@ -48,20 +49,21 @@ export function UpcomingEventCard({ event, index }: UpcomingEventCardProps) {
       <h3 className="col-start-2 row-start-1 min-w-0 text-right text-base font-bold leading-tight land-tall:text-center lg:text-center">
         {event.title}
       </h3>
-      <span className="col-start-1 row-start-1 w-28 shrink-0 rounded-lg bg-site-media px-2.5 py-2 text-center text-sm font-bold uppercase leading-tight text-site-action sm:w-auto sm:max-w-[10rem] land-tall:max-w-none lg:max-w-none lg:px-2 lg:py-1.5">
+      <span className="col-start-1 row-start-1 w-28 shrink-0 rounded-lg bg-site-media px-2.5 py-2 text-center text-sm font-bold leading-tight text-site-action sm:w-auto sm:max-w-[10rem] land-tall:max-w-none lg:max-w-none lg:px-2 lg:py-1.5">
+        {endDateLabel ? (
+          <span className="font-normal">
+            {language === "es" ? "Del " : "From "}
+          </span>
+        ) : null}
         <time dateTime={event.date} className="whitespace-nowrap">
           {startDateLabel}
         </time>
         {endDateLabel && endDateValue ? (
           <>
-            <span className="hidden sm:inline" aria-hidden="true">
-              {" - "}
+            <span className="font-normal">
+              {language === "es" ? " hasta el " : " to "}
             </span>
-            <span className="sr-only"> {copy.common.rangeSeparator} </span>
-            <time
-              dateTime={endDateValue}
-              className="block whitespace-nowrap sm:inline"
-            >
+            <time dateTime={endDateValue} className="whitespace-nowrap">
               {endDateLabel}
             </time>
           </>
@@ -88,7 +90,7 @@ export function UpcomingEventCard({ event, index }: UpcomingEventCardProps) {
         </a>
       ) : (
         <span
-          className={`inline-flex min-h-11 w-full min-w-0 items-center justify-center rounded-full border border-site-border bg-site-surface px-3 py-1.5 text-center text-sm font-semibold leading-tight text-site-muted desktop-fine:min-h-8 lg:px-2.5 lg:py-1 ${actionControlSurfaceClass}`}
+          className={`inline-flex min-h-11 w-full min-w-0 items-center justify-center rounded-full border border-site-border md:max-lg:portrait:w-fit md:max-lg:portrait:justify-self-start bg-site-surface px-3 py-1.5 text-center text-sm font-semibold leading-tight text-site-muted desktop-fine:min-h-8 lg:px-2.5 lg:py-1 ${actionControlSurfaceClass}`}
         >
           {copy.common.toBeConfirmed}
         </span>
@@ -97,7 +99,7 @@ export function UpcomingEventCard({ event, index }: UpcomingEventCardProps) {
       <Link
         to={getEventPath(event, language)}
         aria-label={`${copy.common.eventDetails}: ${event.title}`}
-        className={`col-start-2 row-start-2 w-fit justify-self-center ${eventDetailsClass} ${focusRingClass}`}
+        className={`col-start-2 row-start-2 w-fit justify-self-center md:max-lg:portrait:justify-self-end ${eventDetailsClass} ${focusRingClass}`}
       >
         <Info className="mr-1.5 size-4 shrink-0" aria-hidden="true" />
         {copy.common.eventDetails}

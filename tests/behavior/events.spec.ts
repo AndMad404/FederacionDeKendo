@@ -80,11 +80,16 @@ test("scheduled event pages offer an add-to-calendar button", async ({
   const href = await addToCalendar.getAttribute("href");
   expect(href).toBeTruthy();
   expect(new URL(href!).searchParams.get("text")).toBe(title);
-  await expect(
-    page.getByText(
-      "Acceso del público: gratuito. Para conocer los requisitos, la inscripción y reglamento, comuníquese con la organización.",
-    ),
-  ).toBeVisible();
+  const notice = page
+    .locator("aside p")
+    .filter({ hasText: "Acceso al público:" });
+  await expect(notice.locator("strong")).toHaveText([
+    "Acceso al público:",
+    "Para participantes:",
+  ]);
+  await expect(notice).toContainText("Gratuito.");
+  await expect(notice.locator("br")).toHaveCount(2);
+  await expect(notice).toHaveCSS("text-align", "center");
 });
 
 test("accepts only current canonical event routes", async ({ page }) => {
@@ -183,7 +188,9 @@ test("moves an event from upcoming to history after its local date expires", asy
   await expect(
     page.getByRole("link", { name: "Añade a tu calendario" }),
   ).toHaveCount(0);
-  await expect(page.getByText("Acceso del público: gratuito.")).toHaveCount(0);
+  await expect(
+    page.getByText("Acceso al público:", { exact: true }),
+  ).toHaveCount(0);
 });
 
 test("historical tournament details preserve complete information with its gallery", async ({

@@ -4,7 +4,10 @@ import { CALENDAR_EVENTS } from "../data/calendarEvents";
 import { getUpcomingEventGroups } from "../utils/calendarEvents";
 import { panelSurfaceClass, surfaceClass } from "../styles/shared";
 import { CalendarMonth } from "./calendar/CalendarMonth";
-import { CalendarNavigation } from "./calendar/CalendarNavigation";
+import {
+  CalendarMonthRange,
+  CalendarNavigation,
+} from "./calendar/CalendarNavigation";
 import { MediaPageBanner } from "./ui/MediaPageBanner";
 import { useLanguage, type Language } from "../config/i18n";
 import { getLocalizedEvents } from "../utils/localizedEvents";
@@ -50,18 +53,19 @@ function formatMonth(monthKey: string, language: Language) {
   return label.charAt(0).toUpperCase() + label.slice(1);
 }
 
-function formatMonthRange(
+function formatMonthPair(
   currentMonthKey: string,
-  nextMonthKey: string | undefined,
+  nextMonthKey: string,
   language: Language,
-) {
-  if (!nextMonthKey) return formatMonth(currentMonthKey, language);
-
+): readonly [string, string] {
   const currentDate = new Date(`${currentMonthKey}-01T00:00:00.000Z`);
   const nextDate = new Date(`${nextMonthKey}-01T00:00:00.000Z`);
 
   if (currentDate.getUTCFullYear() !== nextDate.getUTCFullYear()) {
-    return `${formatMonth(currentMonthKey, language)} — ${formatMonth(nextMonthKey, language)}`;
+    return [
+      formatMonth(currentMonthKey, language),
+      formatMonth(nextMonthKey, language),
+    ];
   }
 
   const currentMonth = new Intl.DateTimeFormat(
@@ -73,7 +77,7 @@ function formatMonthRange(
   ).format(currentDate);
   const capitalizedCurrentMonth =
     currentMonth.charAt(0).toUpperCase() + currentMonth.slice(1);
-  return `${capitalizedCurrentMonth} — ${formatMonth(nextMonthKey, language)}`;
+  return [capitalizedCurrentMonth, formatMonth(nextMonthKey, language)];
 }
 
 export function CalendarSection() {
@@ -83,6 +87,9 @@ export function CalendarSection() {
     [language],
   );
   const {
+    additionalPair,
+    canPreviousPair,
+    canNextPair,
     changeMonthPage,
     groupIndex,
     nextMonth,
@@ -91,20 +98,43 @@ export function CalendarSection() {
     previousMonth,
     previousPair,
     swipeHandlers,
-  } = useCalendarNavigation(eventGroups.length);
+  } = useCalendarNavigation(eventGroups);
 
   const monthsRef = useRef<HTMLDivElement>(null);
   useSequenceTransition(monthsRef, groupIndex, language);
   const currentGroup = eventGroups[groupIndex];
   const nextGroup = eventGroups[groupIndex + 1];
+  const monthPair =
+    currentGroup && nextGroup
+      ? formatMonthPair(currentGroup.monthKey, nextGroup.monthKey, language)
+      : undefined;
+  const extraGroups = additionalPair
+    ? eventGroups.slice(groupIndex + 2, groupIndex + 4)
+    : [];
+
+  function renderMonth(group: (typeof eventGroups)[number]) {
+    return (
+      <CalendarMonth
+        key={group.monthKey}
+        group={group}
+        expandedLayout={additionalPair}
+        monthLabel={formatMonth(group.monthKey, language)}
+        pageIndex={pageIndexes[group.monthKey] ?? 0}
+        onPageChange={(nextPage) => changeMonthPage(group.monthKey, nextPage)}
+      />
+    );
+  }
   return (
     <section
       aria-labelledby="calendar-title"
-      className="relative my-2 flex w-full flex-col overflow-hidden rounded-xl bg-site-canvas page-fit:h-[calc(100%_-_1rem)] page-fit:min-h-0"
+      data-expanded-calendar={additionalPair || undefined}
+      className={`relative my-2 flex w-full flex-col overflow-hidden rounded-xl bg-site-canvas ${additionalPair ? "" : "page-fit:h-[calc(100%_-_1rem)] page-fit:min-h-0"}`}
     >
       <CalendarBanner />
       {currentGroup ? (
-        <div className="relative z-20 -mt-11 flex min-h-0 flex-1 items-start justify-center px-3 pb-0 pt-3 sm:-mt-13 sm:px-4 sm:pb-0 sm:pt-4 tall-md:p-4 page-fit:absolute page-fit:inset-0 page-fit:mt-0 page-fit:items-start page-fit:px-4 page-fit:pb-4 page-fit:pt-20 land-sm:px-2 land-sm:pb-0 land-sm:pt-2 land-compact:-mt-8">
+        <div
+          className={`relative z-20 -mt-11 flex min-h-0 flex-1 items-start justify-center px-3 pb-0 pt-3 sm:-mt-13 sm:px-4 sm:pb-0 sm:pt-4 tall-md:items-stretch tall-md:px-4 tall-md:pt-4 land-sm:px-2 land-sm:pb-0 land-sm:pt-2 land-compact:-mt-8 ${additionalPair ? "" : "page-fit:absolute page-fit:inset-0 page-fit:mt-0 page-fit:items-start page-fit:px-4 page-fit:pb-0 page-fit:pt-20"}`}
+        >
           <div
             data-page-content-boundary
             className={`flex w-full touch-pan-y select-none flex-col justify-start gap-3 p-3 sm:gap-4 text-center sm:p-4 md:max-w-5xl page-fit:h-full land-sm:p-2 ${panelSurfaceClass}`}
@@ -114,15 +144,15 @@ export function CalendarSection() {
 
             <CalendarNavigation
               currentMonthLabel={formatMonth(currentGroup.monthKey, language)}
-              monthRangeLabel={formatMonthRange(
-                currentGroup.monthKey,
-                nextGroup?.monthKey,
-                language,
-              )}
+              monthRangeLabel={
+                monthPair?.join(" — ") ??
+                formatMonth(currentGroup.monthKey, language)
+              }
+              centeredMonthLabels={additionalPair ? monthPair : undefined}
               canPreviousMonth={groupIndex > 0}
               canNextMonth={groupIndex < eventGroups.length - 1}
-              canPreviousPair={groupIndex >= 2}
-              canNextPair={groupIndex + 2 < eventGroups.length}
+              canPreviousPair={canPreviousPair}
+              canNextPair={canNextPair}
               onPreviousMonth={previousMonth}
               onNextMonth={nextMonth}
               onPreviousPair={previousPair}
@@ -131,27 +161,28 @@ export function CalendarSection() {
 
             <div
               ref={monthsRef}
-              className="grid min-h-0 items-start gap-3 sm:gap-4 md:grid-cols-2 page-fit:flex-1 page-fit:items-stretch"
+              className="grid min-h-0 items-start gap-3 sm:gap-4 md:grid-cols-2 md:max-xl:portrait:items-stretch page-fit:flex-1 page-fit:items-stretch"
             >
-              <CalendarMonth
-                group={currentGroup}
-                monthLabel={formatMonth(currentGroup.monthKey, language)}
-                pageIndex={pageIndexes[currentGroup.monthKey] ?? 0}
-                onPageChange={(nextPage) =>
-                  changeMonthPage(currentGroup.monthKey, nextPage)
-                }
-              />
+              {renderMonth(currentGroup)}
 
               {nextGroup ? (
-                <div className="hidden md:block page-fit:min-h-0">
-                  <CalendarMonth
-                    group={nextGroup}
-                    monthLabel={formatMonth(nextGroup.monthKey, language)}
-                    pageIndex={pageIndexes[nextGroup.monthKey] ?? 0}
-                    onPageChange={(nextPage) =>
-                      changeMonthPage(nextGroup.monthKey, nextPage)
-                    }
-                  />
+                <div className="hidden md:block md:max-xl:portrait:contents page-fit:min-h-0">
+                  {renderMonth(nextGroup)}
+                </div>
+              ) : null}
+
+              {extraGroups.length === 2 ? (
+                <div className="hidden md:contents">
+                  <p className="col-span-2">
+                    <CalendarMonthRange
+                      labels={formatMonthPair(
+                        extraGroups[0].monthKey,
+                        extraGroups[1].monthKey,
+                        language,
+                      )}
+                    />
+                  </p>
+                  {extraGroups.map(renderMonth)}
                 </div>
               ) : null}
             </div>

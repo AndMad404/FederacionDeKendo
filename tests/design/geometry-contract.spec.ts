@@ -67,15 +67,29 @@ for (const viewport of APPROVED_VIEWPORTS) {
             styles.marginBottom,
             approvedPage.design === "event"
               ? 0
-              : approvedPage.design === "pastEvents" && viewport.width === 768
-                ? SHELL_CONTRACT.pastEventsTabletMarginBottom
-                : SHELL_CONTRACT.routeSurfaceMarginBlock,
+              : SHELL_CONTRACT.routeSurfaceMarginBlock,
             "route surface bottom margin",
           );
           expectCssPixels(
             styles.borderRadius,
             SHELL_CONTRACT.routeSurfaceRadius,
             "route surface radius",
+          );
+        }
+
+        if (
+          viewport.width >= 768 &&
+          (approvedPage.design === "calendar" ||
+            approvedPage.design === "pastEvents")
+        ) {
+          const panel = await getBox(
+            page.locator("[data-page-content-boundary]"),
+          );
+          const footer = await getBox(page.getByRole("contentinfo"));
+          expectCssPixels(
+            footer.y - (panel.y + panel.height),
+            SHELL_CONTRACT.routeSurfaceMarginBlock,
+            "gap between the event panel and footer",
           );
         }
 

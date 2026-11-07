@@ -11,7 +11,7 @@ test("hero actions share depth and pressure with colors suited to the photo", as
     .getByRole("link", { name: "Encuentra un dojo", exact: true });
   const calendar = page
     .locator("main")
-    .getByRole("link", { name: "Calendario de Próximos Eventos", exact: true });
+    .getByRole("link", { name: "Calendario de Eventos", exact: true });
   const archive = page
     .locator("main > section > header")
     .getByRole("link", { name: "Eventos pasados", exact: true });
@@ -62,7 +62,7 @@ test("reduced motion removes non-essential button and gallery motion", async ({
   await page.goto("/");
 
   const primary = page.locator("main").getByRole("link", {
-    name: "Calendario de Próximos Eventos",
+    name: "Calendario de Eventos",
     exact: true,
   });
   await expect(primary).toHaveCSS("transition-duration", "0s");
@@ -197,7 +197,7 @@ test("icon controls grow around their center and filters preserve selection", as
   await page.mouse.up();
   await page.goto("/eventos/pasados/");
   await page.waitForLoadState("networkidle");
-  const filter = page.getByRole("combobox", { name: "Tipo", exact: true });
+  const filter = page.getByRole("combobox", { name: "Categorías", exact: true });
   await filter.selectOption("seminario");
   const label = filter.locator("..").locator("span[aria-hidden=true]");
   await expect(label).toHaveCSS("background-color", "rgb(22, 58, 99)");
@@ -214,7 +214,7 @@ test("selection, disclosure and image controls use finite functional feedback", 
 }) => {
   await page.goto("/eventos/pasados/");
   await page.waitForLoadState("networkidle");
-  const filter = page.getByRole("combobox", { name: "Tipo", exact: true });
+  const filter = page.getByRole("combobox", { name: "Categorías", exact: true });
   await filter.selectOption("seminario");
   const selection = filter.locator("..").locator("[data-selected=true]");
   await expect(selection).toHaveCSS(
@@ -330,7 +330,7 @@ test.describe("page transitions follow navigation intent", () => {
     await page
       .locator("main")
       .getByRole("link", {
-        name: "Calendario de Próximos Eventos",
+        name: "Calendario de Eventos",
         exact: true,
       })
       .click();
@@ -395,7 +395,7 @@ test.describe("page transitions follow navigation intent", () => {
       .poll(async () => (await records(page)).at(-1)?.id)
       .toBe("content-next");
     await page
-      .getByRole("combobox", { name: "Tipo", exact: true })
+      .getByRole("combobox", { name: "Categorías", exact: true })
       .selectOption("seminario");
     await expect
       .poll(async () => (await records(page)).at(-1)?.id)
@@ -419,7 +419,7 @@ test.describe("page transitions follow navigation intent", () => {
     await page
       .locator("main")
       .getByRole("link", {
-        name: "Calendario de Próximos Eventos",
+        name: "Calendario de Eventos",
         exact: true,
       })
       .click();

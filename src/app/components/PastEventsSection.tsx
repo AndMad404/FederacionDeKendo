@@ -108,7 +108,7 @@ export function PastEventsSection() {
     <section
       aria-labelledby="past-events-title"
       data-interactive-ready={isHydrated ? "past-events" : undefined}
-      className="relative my-2 flex w-full flex-col overflow-hidden rounded-xl bg-site-canvas tablet-fit:mb-3 page-fit:h-[calc(100%_-_1rem)] page-fit:min-h-0"
+      className="relative my-2 flex w-full flex-col overflow-hidden rounded-xl bg-site-canvas page-fit:h-[calc(100%_-_1rem)] page-fit:min-h-0"
     >
       <MediaPageBanner
         className="relative z-10 h-28 shrink-0 overflow-hidden land-compact:h-20"
@@ -131,7 +131,7 @@ export function PastEventsSection() {
         }}
       />
 
-      <div className="relative z-20 -mt-11 flex min-h-0 flex-1 items-start justify-center px-3 pb-0 pt-3 sm:-mt-13 sm:px-4 sm:pb-0 sm:pt-4 tall-md:p-4 page-fit:absolute page-fit:inset-0 page-fit:mt-0 page-fit:items-start page-fit:px-4 page-fit:pb-0 page-fit:pt-20 land-sm:px-2 land-sm:pb-0 land-sm:pt-2 land-compact:-mt-8">
+      <div className="relative z-20 -mt-11 flex min-h-0 flex-1 items-start justify-center px-3 pb-0 pt-3 sm:-mt-13 sm:px-4 sm:pb-0 sm:pt-4 tall-md:items-stretch tall-md:px-4 tall-md:pt-4 page-fit:absolute page-fit:inset-0 page-fit:mt-0 page-fit:items-start page-fit:px-4 page-fit:pb-0 page-fit:pt-20 land-sm:px-2 land-sm:pb-0 land-sm:pt-2 land-compact:-mt-8">
         <div
           data-page-content-boundary
           className={`flex w-full touch-pan-y select-none flex-col justify-start gap-3 p-3 sm:gap-4 text-center sm:p-4 md:max-w-[100rem] page-fit:h-full land-sm:p-2 ${panelSurfaceClass}`}
@@ -139,31 +139,15 @@ export function PastEventsSection() {
         >
           <EventSectionNavigation active="past" />
 
-          <div className="my-[-0.1875px] grid w-full grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)_auto] items-end gap-3 sm:mx-auto sm:w-fit sm:grid-cols-[2.75rem_8.5rem_8.5rem_2.75rem] sm:gap-4 md:grid-cols-[3rem_8.5rem_8.5rem_3rem]">
-            <nav aria-label={copy.archive.pagination} className="contents">
-              <NavigationArrowButton
-                direction="previous"
-                label={copy.archive.previous}
-                disabled={page === 1}
-                className="order-[-1] col-start-1"
-                onClick={() => navigateToPage(page - 1)}
-              />
-              <NavigationArrowButton
-                direction="next"
-                label={copy.archive.next}
-                disabled={page === pageCount}
-                className="order-1 col-start-4"
-                onClick={() => navigateToPage(page + 1)}
-              />
-            </nav>
-            <label className="relative min-w-0 text-xs font-bold text-site-muted sm:w-fit sm:justify-self-end">
+          <div className="my-[-0.1875px] grid w-full grid-cols-[auto_max-content_minmax(0,1fr)_auto] items-center gap-1 sm:mx-auto sm:w-fit sm:grid-cols-[2.75rem_8.5rem_8.5rem_2.75rem] sm:items-end sm:gap-4 md:grid-cols-[3rem_9rem_9rem_3rem]">
+            <label className="relative col-start-2 row-start-1 min-w-0 text-xs font-bold text-site-muted sm:w-fit sm:justify-self-end md:w-full">
               <span
                 aria-hidden="true"
                 data-selected={Boolean(filters.year)}
-                className={`control-selection flex min-h-11 items-center justify-center gap-2 rounded-full px-2 py-2 text-sm ${filters.year ? "bg-site-action text-site-on-dark" : "bg-site-surface text-site-action"}`}
+                className={`control-selection flex min-h-11 items-center justify-center gap-1 rounded-full px-1.5 py-2 text-xs sm:gap-2 sm:px-2 sm:text-sm md:px-7 ${filters.year ? "bg-site-action text-site-on-dark" : "bg-site-surface text-site-action"}`}
               >
                 <span>{filters.year ?? copy.archive.year}</span>
-                <ChevronDown className="size-4 shrink-0" />
+                <ChevronDown className="size-3 shrink-0 sm:size-4 md:absolute md:right-2.5" />
               </span>
               <select
                 name="year"
@@ -172,9 +156,7 @@ export function PastEventsSection() {
                 onChange={(event) => changeFilter("year", event.target.value)}
                 className={`archive-filter absolute inset-0 h-full w-full cursor-pointer appearance-none rounded-full p-0 text-center text-sm text-transparent [text-align-last:center] ${focusRingClass} ${textButtonInteractionClass} border border-site-action bg-transparent`}
               >
-                <option value="" hidden>
-                  {copy.archive.year}
-                </option>
+                <option value="">{copy.archive.allYears}</option>
                 {years.map((year) => (
                   <option
                     key={year}
@@ -186,14 +168,14 @@ export function PastEventsSection() {
                 ))}
               </select>
             </label>
-            <label className="relative min-w-0 text-xs font-bold text-site-muted sm:w-fit sm:justify-self-start">
+            <label className="relative col-start-3 row-start-1 min-w-0 text-xs font-bold text-site-muted sm:w-fit sm:justify-self-start md:w-full">
               <span
                 aria-hidden="true"
                 data-selected={Boolean(filters.type)}
-                className={`control-selection flex min-h-11 items-center justify-center gap-2 rounded-full px-2 py-2 text-sm ${filters.type ? "bg-site-action text-site-on-dark" : "bg-site-surface text-site-action"}`}
+                className={`control-selection flex min-h-11 items-center justify-center gap-1 rounded-full px-1.5 py-2 text-xs sm:gap-2 sm:px-2 sm:text-sm md:px-7 ${filters.type ? "bg-site-action text-site-on-dark" : "bg-site-surface text-site-action"}`}
               >
-                <ChevronDown className="size-4 shrink-0" />
-                <span>
+                <ChevronDown className="size-3 shrink-0 sm:size-4 md:absolute md:left-2.5" />
+                <span className="min-w-0 wrap-anywhere">
                   {filters.type
                     ? copy.archive.types[filters.type]
                     : copy.archive.type}
@@ -206,9 +188,7 @@ export function PastEventsSection() {
                 onChange={(event) => changeFilter("type", event.target.value)}
                 className={`archive-filter absolute inset-0 h-full w-full cursor-pointer appearance-none rounded-full px-2 py-0 text-left text-sm text-transparent ${focusRingClass} ${textButtonInteractionClass} border border-site-action bg-transparent`}
               >
-                <option value="" hidden>
-                  {copy.archive.type}
-                </option>
+                <option value="">{copy.archive.allTypes}</option>
                 {eventTypes.map((type) => (
                   <option
                     key={type}
@@ -220,6 +200,22 @@ export function PastEventsSection() {
                 ))}
               </select>
             </label>
+            <nav aria-label={copy.archive.pagination} className="contents">
+              <NavigationArrowButton
+                direction="previous"
+                label={copy.archive.previous}
+                disabled={page === 1}
+                className="col-start-1 row-start-1"
+                onClick={() => navigateToPage(page - 1)}
+              />
+              <NavigationArrowButton
+                direction="next"
+                label={copy.archive.next}
+                disabled={page === pageCount}
+                className="col-start-4 row-start-1"
+                onClick={() => navigateToPage(page + 1)}
+              />
+            </nav>
           </div>
 
           {pageEvents.length ? (
@@ -267,7 +263,7 @@ export function PastEventsSection() {
                     </div>
                     <Link
                       to={getEventPath(event, language)}
-                      className={`text-sm order-4 ${primaryButtonClass} ${focusRingClass}`}
+                      className={`order-4 text-center text-sm ${primaryButtonClass} ${focusRingClass}`}
                     >
                       {copy.archive.viewEvent}
                     </Link>

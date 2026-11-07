@@ -16,7 +16,7 @@ test("persists combined filters on reload and localized routes", async ({
     page.getByRole("combobox", { name: "Año", exact: true }),
   ).toHaveValue("2026");
   await expect(
-    page.getByRole("combobox", { name: "Tipo", exact: true }),
+    page.getByRole("combobox", { name: "Categorías", exact: true }),
   ).toHaveValue("examen");
   await page.reload();
   await expect(page).toHaveURL(/year=2026&type=examen/);
@@ -27,7 +27,7 @@ test("persists combined filters on reload and localized routes", async ({
     page.getByRole("combobox", { name: "Año", exact: true }),
   ).toHaveValue("2026");
   await expect(
-    page.getByRole("combobox", { name: "Tipo", exact: true }),
+    page.getByRole("combobox", { name: "Categorías", exact: true }),
   ).toHaveValue("examen");
 });
 
@@ -185,7 +185,7 @@ test("filters apply available values and the empty state remains available", asy
       timeout: 500,
     });
   }).toPass({ timeout: 5_000 });
-  const typeFilter = page.getByRole("combobox", { name: "Tipo", exact: true });
+  const typeFilter = page.getByRole("combobox", { name: "Categorías", exact: true });
   await typeFilter.selectOption("seminario");
   await expect(page).toHaveURL(
     new RegExp(`year=${selectedYear}&type=seminario`),

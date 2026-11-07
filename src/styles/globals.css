@@ -342,6 +342,27 @@ html {
     cursor: pointer;
   }
 
+  @media (min-width: 768px) {
+    .archive-filter::picker(select) {
+      position-area: block-end span-all;
+      justify-self: anchor-center;
+      width: max(13rem, anchor-size(width));
+      min-width: 0;
+    }
+
+    .archive-filter option {
+      position: relative;
+      justify-content: center;
+      padding-inline: 1.5rem;
+      text-align: center;
+    }
+
+    .archive-filter option::checkmark {
+      position: absolute;
+      inset-inline-start: 0.5rem;
+    }
+  }
+
   .archive-filter option:checked {
     background: var(--color-site-action);
     color: var(--color-site-on-dark);
@@ -352,7 +373,7 @@ html {
     outline: 2px solid var(--color-site-focus);
     outline-offset: -2px;
     background: var(--color-site-action-soft);
-    color: var(--color-site-action);
+    color: var(--color-site-on-dark);
   }
 }
 

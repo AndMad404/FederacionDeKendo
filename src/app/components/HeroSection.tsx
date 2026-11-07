@@ -33,30 +33,32 @@ function HeroBanner() {
       </picture>
 
       <div
-        className="absolute inset-0 bg-gradient-to-r from-site-navy/85 via-site-navy/60 to-site-navy/30"
+        className="absolute inset-0 bg-linear-to-b from-site-navy/30 to-site-navy/38 md:from-site-navy/26 md:to-site-navy/34"
+        aria-hidden="true"
+      />
+      <div
+        className="absolute inset-0 bg-site-navy/53 xl:max-[1600px]:bg-site-navy/76 [mask-image:radial-gradient(ellipse_92%_82%_at_var(--hero-shade-x,50%)_50%,black_0%,#000c_36%,#0005_72%,transparent_100%)] xl:[mask-image:radial-gradient(ellipse_48rem_82%_at_var(--hero-shade-x,50%)_50%,black_0%,#000c_36%,#0005_72%,transparent_100%)] land-sm:[--hero-shade-x:35%] land-tall:[--hero-shade-x:35%] page-fit:[--hero-shade-x:50%]"
         aria-hidden="true"
       />
 
       <div className="relative z-10 mx-auto flex w-full max-w-6xl items-center px-3 text-center land-sm:text-left land-tall:text-left">
-        <div className="mx-auto flex min-h-[28rem] w-full max-w-3xl flex-col justify-between text-site-on-dark md:min-h-[20rem] md:justify-around land-sm:mx-0 land-sm:block land-sm:min-h-0 land-tall:mx-0">
+        <div className="mx-auto flex min-h-[28rem] w-full max-w-3xl flex-col justify-between text-site-on-dark md:min-h-[20rem] md:justify-around page-fit:min-h-0 page-fit:justify-center page-fit:gap-[clamp(6rem,12svh,8rem)] land-sm:mx-0 land-sm:block land-sm:min-h-0 land-tall:mx-0 page-fit:mx-auto">
           <PageTitle
             id="home-title"
             tone="media"
             density="flush"
             decoration="none"
             casing="normal"
-            className="mx-auto max-w-xl text-3xl sm:text-4xl land-sm:mx-0 land-sm:text-left land-tall:mx-0 land-tall:text-left"
+            className="mx-auto max-w-xl text-3xl sm:text-4xl md:max-w-none md:whitespace-nowrap land-sm:mx-0 land-sm:text-left land-tall:mx-0 land-tall:text-left page-fit:mx-auto page-fit:text-center"
             allowWrap
           >
             {copy.home.title}
           </PageTitle>
-          <p className="mx-auto max-w-xl text-lg font-bold leading-snug sm:text-xl land-sm:mx-0 land-sm:mt-5 land-tall:mx-0">
-            {copy.home.lead}
-          </p>
-          <p className="mx-auto max-w-xl leading-relaxed text-site-subtle land-sm:mx-0 land-sm:mt-3 land-tall:mx-0">
-            {copy.home.description}
-          </p>
-          <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-nowrap sm:justify-center sm:gap-3 land-sm:mt-5 land-sm:justify-start land-tall:justify-start">
+          <div className="mx-auto grid w-full max-w-xl gap-3 text-center [&>p]:text-xl [&>p]:font-normal [&>p]:leading-snug land-sm:mx-0 land-sm:mt-5 land-tall:mx-0 page-fit:mx-auto">
+            <p>{copy.home.lead}</p>
+            <p>{copy.home.description}</p>
+          </div>
+          <div className="mx-auto grid w-full max-w-64 gap-2 sm:flex sm:max-w-none sm:flex-nowrap sm:justify-center sm:gap-3 land-sm:mt-5 land-sm:justify-start land-tall:justify-start page-fit:justify-center">
             <Link
               to={copy.nav.links[3].path}
               className={heroSecondaryActionClass}

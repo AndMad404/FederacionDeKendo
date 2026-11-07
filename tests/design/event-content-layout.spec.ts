@@ -45,15 +45,10 @@ test("mobile event actions remain usable and contained with an optional descript
   }
 
   expect(actionBox.height).toBeGreaterThanOrEqual(44);
-  expect(actionBox.x).toBeGreaterThanOrEqual(detailsBox.x);
+  expect(Math.abs(actionBox.x - detailsBox.x)).toBeLessThanOrEqual(1);
   expect(actionBox.x + actionBox.width).toBeLessThanOrEqual(
     detailsBox.x + detailsBox.width,
   );
-  expect(
-    Math.abs(
-      actionBox.x + actionBox.width / 2 - (detailsBox.x + detailsBox.width / 2),
-    ),
-  ).toBeLessThanOrEqual(1);
   expect(actionBox.y + actionBox.height).toBeLessThanOrEqual(descriptionBox.y);
   expect(
     await page.evaluate(
@@ -67,7 +62,7 @@ test("mobile event actions remain usable and contained with an optional descript
 for (const viewport of [
   { name: "mobile 360x800 portrait", width: 360, height: 800, columns: 1 },
   { name: "mobile 390x844 portrait", width: 390, height: 844, columns: 1 },
-  { name: "tablet 768x1024 portrait", width: 768, height: 1024, columns: 1 },
+  { name: "tablet 768x1024 portrait", width: 768, height: 1024, columns: 2 },
   { name: "desktop 1366x768 landscape", width: 1366, height: 768, columns: 2 },
 ]) {
   test(`scheduled event details use a ${viewport.columns}-column ${viewport.name} grid`, async ({
@@ -82,6 +77,16 @@ for (const viewport of [
     const details = addToCalendar.locator("xpath=ancestor::dl");
     await expect(details).toHaveCount(1);
     await expect(details.locator(":scope > div")).toHaveCount(4);
+    await expect
+      .poll(() =>
+        addToCalendar.evaluate((link) =>
+          Math.abs(
+            link.getBoundingClientRect().left -
+              link.parentElement!.getBoundingClientRect().left,
+          ),
+        ),
+      )
+      .toBeLessThanOrEqual(1);
     const time = details.locator("div").filter({
       has: page.locator("dt", { hasText: /^Horario$/ }),
     });

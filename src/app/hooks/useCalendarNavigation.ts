@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import type { UpcomingEventGroup } from "../utils/calendarEvents";
 import { useSwipeNavigation } from "./useSwipeNavigation";
 
 const tabletMediaQuery = "(min-width: 768px)";
@@ -7,7 +8,8 @@ function usesTwoMonthLayout() {
   return window.matchMedia(tabletMediaQuery).matches;
 }
 
-export function useCalendarNavigation(groupCount: number) {
+export function useCalendarNavigation(groups: readonly UpcomingEventGroup[]) {
+  const groupCount = groups.length;
   const [groupIndex, setGroupIndex] = useState(0);
   const [pageIndexes, setPageIndexes] = useState<Record<string, number>>({});
 
@@ -33,15 +35,37 @@ export function useCalendarNavigation(groupCount: number) {
 
   const previousMonth = useCallback(() => changeBy(-1), [changeBy]);
   const nextMonth = useCallback(() => changeBy(1), [changeBy]);
-  const previousPair = useCallback(() => changeBy(-2), [changeBy]);
-  const nextPair = useCallback(() => changeBy(2), [changeBy]);
+  let pairStart = 0;
+  let previousPairIndex: number | undefined;
+  let nextPairIndex: number | undefined;
+  let additionalPair = false;
+  for (let index = 0; index < groupCount;) {
+    if (index < groupIndex) previousPairIndex = index;
+    if (index <= groupIndex) pairStart = index;
+    if (index > groupIndex) {
+      nextPairIndex = index;
+      break;
+    }
+    const fourMonths = groups.slice(index, index + 4);
+    const expanded =
+      fourMonths.length === 4 &&
+      fourMonths.every((group) => group.events.length === 1);
+    if (index === groupIndex) additionalPair = expanded;
+    index += expanded ? 4 : 2;
+  }
+  const previousPair = useCallback(() => {
+    if (previousPairIndex !== undefined) changeMonth(previousPairIndex);
+  }, [changeMonth, previousPairIndex]);
+  const nextPair = useCallback(() => {
+    if (nextPairIndex !== undefined) changeMonth(nextPairIndex);
+  }, [changeMonth, nextPairIndex]);
   const swipePrevious = useCallback(
-    () => changeBy(usesTwoMonthLayout() ? -2 : -1),
-    [changeBy],
+    () => (usesTwoMonthLayout() ? previousPair() : previousMonth()),
+    [previousPair, previousMonth],
   );
   const swipeNext = useCallback(
-    () => changeBy(usesTwoMonthLayout() ? 2 : 1),
-    [changeBy],
+    () => (usesTwoMonthLayout() ? nextPair() : nextMonth()),
+    [nextPair, nextMonth],
   );
   const { swipeHandlers } = useSwipeNavigation({
     onSwipeLeft: swipeNext,
@@ -55,16 +79,17 @@ export function useCalendarNavigation(groupCount: number) {
     const syncGroupStart = () => {
       if (!mediaQuery.matches) return;
 
-      setGroupIndex(
-        (currentGroupIndex) => currentGroupIndex - (currentGroupIndex % 2),
-      );
+      if (groupIndex !== pairStart) changeMonth(pairStart);
     };
 
     mediaQuery.addEventListener("change", syncGroupStart);
     return () => mediaQuery.removeEventListener("change", syncGroupStart);
-  }, []);
+  }, [changeMonth, groupIndex, pairStart]);
 
   return {
+    additionalPair,
+    canPreviousPair: previousPairIndex !== undefined,
+    canNextPair: nextPairIndex !== undefined,
     changeMonthPage,
     groupIndex,
     nextMonth,

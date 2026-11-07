@@ -5,7 +5,7 @@ import {
   focusRingClass,
 } from "../../styles/shared";
 
-const eventSectionNavigationButtonClass = `control-navigation inline-flex min-h-11 items-center justify-center rounded-full border px-5 py-2 font-bold hover:border-site-action hover:bg-site-action hover:text-site-on-dark hover:[&_svg]:text-site-on-dark aria-[current=page]:hover:bg-site-surface aria-[current=page]:hover:text-site-action aria-[current=page]:hover:[&_svg]:text-site-action ${textButtonInteractionClass}`;
+const eventSectionNavigationButtonClass = `control-navigation inline-flex min-h-11 items-center justify-center rounded-full border px-5 py-2 text-center font-bold hover:border-site-action hover:bg-site-action hover:text-site-on-dark hover:[&_svg]:text-site-on-dark aria-[current=page]:hover:bg-site-surface aria-[current=page]:hover:text-site-action aria-[current=page]:hover:[&_svg]:text-site-action ${textButtonInteractionClass}`;
 
 interface EventSectionNavigationProps {
   active: "upcoming" | "past";

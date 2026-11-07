@@ -9,6 +9,7 @@ const CALENDAR_EVENTS_PER_PAGE = 2;
 
 interface CalendarMonthProps {
   group: UpcomingEventGroup;
+  expandedLayout?: boolean;
   monthLabel: string;
   pageIndex: number;
   onPageChange: (page: number) => void;
@@ -16,6 +17,7 @@ interface CalendarMonthProps {
 
 export function CalendarMonth({
   group,
+  expandedLayout,
   monthLabel,
   pageIndex,
   onPageChange,
@@ -41,10 +43,15 @@ export function CalendarMonth({
 
       <ul
         ref={eventsRef}
-        className={`mx-auto grid min-h-0 w-full gap-3 sm:gap-4 page-fit:flex-1 ${visibleEvents.length === 1 ? "page-fit:grid-rows-1" : "page-fit:grid-rows-2"}`}
+        className={`mx-auto grid min-h-0 w-full gap-3 sm:gap-4 md:max-xl:portrait:flex-1 md:max-xl:portrait:auto-rows-fr page-fit:flex-1 ${visibleEvents.length === 1 ? "page-fit:grid-rows-1" : "page-fit:grid-rows-2"}`}
       >
         {visibleEvents.map((event) => (
-          <CalendarEventCard key={event.id} event={event} />
+          <CalendarEventCard
+            key={event.id}
+            event={event}
+            portraitOnTablet={visibleEvents.length === 1 && !expandedLayout}
+            expandedLayout={expandedLayout}
+          />
         ))}
       </ul>
 

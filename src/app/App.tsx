@@ -96,7 +96,7 @@ function AppShell({
     <div
       className={`flex min-h-svh flex-col bg-site-canvas text-site-text ${
         allowsDesktopContainment
-          ? "page-fit:h-dvh page-fit:overflow-hidden"
+          ? "page-fit:h-dvh page-fit:overflow-hidden page-fit:has-[[data-expanded-calendar]]:h-auto page-fit:has-[[data-expanded-calendar]]:overflow-visible"
           : ""
       } ${
         allowsTabletContainment
@@ -118,10 +118,14 @@ function AppShell({
         ref={mainRef}
         id="main-content"
         className={`${
-          routeComponent === "event" ? "lg:flex-1" : "tall-md:flex-1"
+          routeComponent === "event"
+            ? "lg:flex-1"
+            : routeComponent === "calendar" || routeComponent === "pastEvents"
+              ? `tall-md:grid tall-md:flex-1 ${routeComponent === "calendar" ? "md:max-xl:portrait:flex-none" : ""}`
+              : "tall-md:flex-1"
         } overflow-x-clip px-2.5 pt-[calc(4rem_+_10px)] land-sm:pt-[calc(3rem_+_6px)] ${
           allowsDesktopContainment
-            ? "page-fit:min-h-0 page-fit:overflow-hidden"
+            ? "page-fit:min-h-0 page-fit:overflow-hidden page-fit:has-[[data-expanded-calendar]]:overflow-x-clip page-fit:has-[[data-expanded-calendar]]:overflow-y-visible"
             : ""
         } ${
           allowsTabletContainment

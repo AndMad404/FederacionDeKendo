@@ -102,7 +102,7 @@ export const COPY = {
       switchToEnglish: "View site in English",
       calendarMenu: "Opciones del calendario",
       upcomingEvents: "Próximos eventos",
-      pastEvents: "Ver mas Eventos Pasados",
+      pastEvents: "Eventos Pasados",
       links: [
         { id: "home", path: "/", label: "Inicio" },
         { id: "calendar", path: "/eventos/", label: "Calendario" },
@@ -120,7 +120,7 @@ export const COPY = {
       description:
         "Encuentra los contactos de nuestros dojos afiliados, los horarios y consulta los próximos eventos de kendo.",
       dojos: "Encuentra un dojo",
-      events: "Calendario de Próximos Eventos",
+      events: "Calendario de Eventos",
       upcoming: "Calendario de Próximos Eventos",
       heroAlt:
         "Grupo de practicantes de kendo reunidos después de una actividad",
@@ -206,11 +206,14 @@ export const COPY = {
       directions: "Cómo llegar",
       viewDetailsLabel: "Consultar detalles del evento",
       addToCalendar: "Añade a tu calendario",
-      audienceNotice:
-        "Acceso del público: gratuito. Para conocer los requisitos, la inscripción y reglamento, comuníquese con la organización.",
+      publicAccessLabel: "Acceso al público:",
+      publicAccess: "Gratuito.",
+      participantNoticeLabel: "Para participantes:",
+      participantNotice:
+        "Para conocer los requisitos, la inscripción y el reglamento, comuníquese con la organización.",
       externalAudienceNoticeLabel: "Costo y participación:",
       externalAudienceNotice:
-        "consulte la convocatoria oficial o comuníquese con la organización del evento para conocer precios, requisitos e inscripción.",
+        "Consulte la convocatoria oficial o comuníquese con la organización del evento para conocer precios, requisitos e inscripción.",
     },
     archive: {
       title: "Eventos pasados",
@@ -224,7 +227,9 @@ export const COPY = {
       page: "Página",
       of: "de",
       year: "Año",
-      type: "Tipo",
+      allYears: "Todos los años",
+      type: "Categorías",
+      allTypes: "Todas las categorías",
       eventType: "Tipo de evento",
       all: "Todos",
       types: {
@@ -353,11 +358,14 @@ export const COPY = {
       directions: "Directions",
       viewDetailsLabel: "View details for",
       addToCalendar: "Add to calendar",
-      audienceNotice:
-        "Public access: free. Contact the organization for eligibility requirements, registration, and regulations.",
+      publicAccessLabel: "Public access:",
+      publicAccess: "Free.",
+      participantNoticeLabel: "For participants:",
+      participantNotice:
+        "Contact the organization for eligibility requirements, registration, and regulations.",
       externalAudienceNoticeLabel: "Cost and participation:",
       externalAudienceNotice:
-        "consult the official announcement or contact the event organization for pricing, eligibility requirements, and registration.",
+        "Consult the official announcement or contact the event organization for pricing, eligibility requirements, and registration.",
     },
     archive: {
       title: "Past events",
@@ -371,7 +379,9 @@ export const COPY = {
       page: "Page",
       of: "of",
       year: "Year",
-      type: "Type",
+      allYears: "All years",
+      type: "Categories",
+      allTypes: "All categories",
       eventType: "Event type",
       all: "All",
       types: {

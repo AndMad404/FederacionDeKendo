@@ -1,7 +1,22 @@
 import { NavigationArrowButton } from "../ui/ModalControls";
 import { useLanguage } from "../../config/i18n";
 
+export function CalendarMonthRange({
+  labels,
+}: {
+  labels: readonly [string, string];
+}) {
+  return (
+    <span className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 text-lg font-bold">
+      <span className="text-right">{labels[0]}</span>
+      <span>—</span>
+      <span className="text-left">{labels[1]}</span>
+    </span>
+  );
+}
+
 interface CalendarNavigationProps {
+  centeredMonthLabels?: readonly [string, string];
   currentMonthLabel: string;
   monthRangeLabel: string;
   canPreviousMonth: boolean;
@@ -15,6 +30,7 @@ interface CalendarNavigationProps {
 }
 
 export function CalendarNavigation({
+  centeredMonthLabels,
   currentMonthLabel,
   monthRangeLabel,
   canPreviousMonth,
@@ -30,7 +46,7 @@ export function CalendarNavigation({
   return (
     <nav
       aria-label={copy.calendar.navigation}
-      className="flex items-center justify-center gap-3 sm:gap-4"
+      className={`flex items-center justify-center gap-3 sm:gap-4 ${centeredMonthLabels ? "md:grid md:grid-cols-[auto_minmax(0,1fr)_auto]" : ""}`}
     >
       <span className="md:hidden">
         <NavigationArrowButton
@@ -54,7 +70,13 @@ export function CalendarNavigation({
         aria-live="polite"
       >
         <span className="md:hidden">{currentMonthLabel}</span>
-        <span className="hidden md:inline">{monthRangeLabel}</span>
+        <span className="hidden md:block">
+          {centeredMonthLabels ? (
+            <CalendarMonthRange labels={centeredMonthLabels} />
+          ) : (
+            monthRangeLabel
+          )}
+        </span>
       </p>
 
       <span className="md:hidden">
