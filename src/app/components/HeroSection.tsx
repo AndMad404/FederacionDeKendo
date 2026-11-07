@@ -1,11 +1,15 @@
 import { Link } from "react-router";
 import { UpcomingEventsSection } from "./UpcomingEventsSection";
 import { PageTitle } from "./PageTitle";
-import { textButtonInteractionClass } from "../styles/shared";
+import {
+  actionControlSurfaceClass,
+  textButtonInteractionClass,
+} from "../styles/shared";
 import { useLanguage } from "../config/i18n";
 
 const imageVersion = "v=20260704-0120";
 const heroActionClass = `control-primary inline-flex min-h-11 min-w-0 items-center justify-center rounded-full border px-2 py-2 text-sm font-bold leading-snug text-center sm:shrink-0 sm:whitespace-nowrap sm:px-3 md:px-5 md:text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-site-on-dark ${textButtonInteractionClass}`;
+const heroSecondaryActionClass = `${heroActionClass} border-site-on-dark/70 bg-site-navy/80 text-site-on-dark hover:border-site-surface hover:bg-site-surface hover:text-site-navy`;
 
 function HeroBanner() {
   const { copy } = useLanguage();
@@ -55,20 +59,17 @@ function HeroBanner() {
           <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-nowrap sm:justify-center sm:gap-3 land-sm:mt-5 land-sm:justify-start land-tall:justify-start">
             <Link
               to={copy.nav.links[3].path}
-              className={`${heroActionClass} border-site-accent bg-site-accent text-site-on-dark hover:border-site-accent-hover hover:bg-site-accent-hover`}
+              className={heroSecondaryActionClass}
             >
               {copy.home.dojos}
             </Link>
             <Link
               to={copy.nav.links[1].path}
-              className={`${heroActionClass} border-site-surface bg-site-surface text-site-navy hover:border-site-subtle hover:bg-site-subtle`}
+              className={`${heroActionClass} ${actionControlSurfaceClass} hover:border-site-on-dark/70 hover:bg-site-action hover:text-site-on-dark`}
             >
               {copy.home.events}
             </Link>
-            <Link
-              to="/eventos/pasados/"
-              className={`${heroActionClass} border-site-on-dark/70 bg-site-navy/80 text-site-on-dark hover:border-site-surface hover:bg-site-surface hover:text-site-navy`}
-            >
+            <Link to="/eventos/pasados/" className={heroSecondaryActionClass}>
               {copy.archive.title}
             </Link>
           </div>

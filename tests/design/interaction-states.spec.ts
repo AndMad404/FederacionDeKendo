@@ -6,18 +6,25 @@ test("hero actions share depth and pressure with colors suited to the photo", as
   page,
 }) => {
   await page.goto("/");
-  const secondary = page
+  const dojo = page
     .locator("main")
     .getByRole("link", { name: "Encuentra un dojo", exact: true });
-  const primary = page
+  const calendar = page
     .locator("main")
     .getByRole("link", { name: "Calendario de Próximos Eventos", exact: true });
   const archive = page
     .locator("main > section > header")
     .getByRole("link", { name: "Eventos pasados", exact: true });
-  await expect(secondary).toHaveCSS("background-color", "rgb(200, 16, 46)");
-  await expect(primary).toHaveCSS("background-color", "rgb(255, 255, 255)");
-  for (const control of [primary, secondary, archive]) {
+  const secondaryBackground = await archive.evaluate(
+    (el) => getComputedStyle(el).backgroundColor,
+  );
+  await expect(dojo).toHaveCSS("background-color", secondaryBackground);
+  await expect(calendar).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  for (const [control, hoverColor] of [
+    [dojo, "rgb(11, 31, 58)"],
+    [calendar, "rgb(255, 255, 255)"],
+    [archive, "rgb(11, 31, 58)"],
+  ] as const) {
     const before = await control.boundingBox();
     const normalBackground = await control.evaluate(
       (el) => getComputedStyle(el).backgroundColor,
@@ -29,10 +36,7 @@ test("hero actions share depth and pressure with colors suited to the photo", as
     expect(radius).toBeGreaterThanOrEqual(before!.height / 2);
     await control.hover();
     await expect(control).not.toHaveCSS("background-color", normalBackground);
-    await expect(control).toHaveCSS(
-      "color",
-      control === secondary ? "rgb(255, 255, 255)" : "rgb(11, 31, 58)",
-    );
+    await expect(control).toHaveCSS("color", hoverColor);
     await expect(control).toHaveCSS("scale", "none");
     await expect(control).toHaveCSS("translate", "0px -2px");
     const hovered = await control.boundingBox();
@@ -46,9 +50,9 @@ test("hero actions share depth and pressure with colors suited to the photo", as
     await expect(control).toHaveCSS("scale", "none");
   }
   await page.keyboard.press("Tab");
-  await primary.focus();
-  await expect(primary).toHaveCSS("outline-style", "solid");
-  await expect(primary).toHaveCSS("scale", "none");
+  await dojo.focus();
+  await expect(dojo).toHaveCSS("outline-style", "solid");
+  await expect(dojo).toHaveCSS("scale", "none");
 });
 
 test("reduced motion removes non-essential button and gallery motion", async ({
