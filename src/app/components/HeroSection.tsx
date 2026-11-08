@@ -54,7 +54,7 @@ function HeroBanner() {
           >
             {copy.home.title}
           </PageTitle>
-          <div className="relative mx-auto grid w-full max-w-xl gap-3 text-center [&>p]:text-xl [&>p]:font-normal [&>p]:leading-snug page-fit:translate-y-[clamp(0.5rem,calc(22dvh_-_10rem),5rem)] page-fit:[@media(1024px<=height<=1152px)]:-top-12 land-sm:max-md:mx-0 land-sm:max-md:mt-5">
+          <div className="relative mx-auto grid w-full max-w-xl gap-3 text-center [&>p]:text-xl [&>p]:font-normal [&>p]:leading-snug page-fit:translate-y-[clamp(0.5rem,calc(22dvh_-_10rem),5rem)] page-fit:[@media(width<2160px)_and_(1024px<=height<=1152px)]:-top-12 [@media(width>=2160px)_and_(height>=1000px)]:-top-16 land-sm:max-md:mx-0 land-sm:max-md:mt-5">
             <p>{copy.home.lead}</p>
             <p>{copy.home.description}</p>
           </div>
