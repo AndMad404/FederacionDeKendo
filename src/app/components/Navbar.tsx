@@ -159,18 +159,18 @@ export function Navbar() {
             onClick={() => setOpenPath(null)}
             className={`flex min-w-0 items-center ${focusRingClass}`}
           >
-            <picture>
+            <picture className="block size-16 shrink-0 overflow-hidden rounded-full bg-site-on-dark p-1.5 land-sm:size-11 land-sm:p-[5px]">
               <source
                 srcSet="/images/logo/fakcr-lockup-112.png 112w, /images/logo/fakcr-lockup-224.png 224w"
-                sizes="56px"
+                sizes="(orientation: landscape) and (max-height: 640px) 34px, 52px"
                 type="image/png"
               />
               <img
                 src="/images/logo/fakcr-lockup-224.png"
                 alt={copy.nav.homeLabel}
-                className="size-14 shrink-0 rounded-full bg-site-on-dark object-contain land-sm:size-10"
-                width="56"
-                height="56"
+                className="block size-full object-contain"
+                width="52"
+                height="52"
               />
             </picture>
           </Link>
