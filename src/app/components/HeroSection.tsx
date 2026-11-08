@@ -54,11 +54,11 @@ function HeroBanner() {
           >
             {copy.home.title}
           </PageTitle>
-          <div className="mx-auto grid w-full max-w-xl gap-3 text-center [&>p]:text-xl [&>p]:font-normal [&>p]:leading-snug land-sm:max-md:mx-0 land-sm:max-md:mt-5">
+          <div className="mx-auto grid w-full max-w-xl gap-3 text-center [&>p]:text-xl [&>p]:font-normal [&>p]:leading-snug page-fit:translate-y-[clamp(0.5rem,calc(22dvh_-_10rem),5rem)] land-sm:max-md:mx-0 land-sm:max-md:mt-5">
             <p>{copy.home.lead}</p>
             <p>{copy.home.description}</p>
           </div>
-          <div className="mx-auto grid w-full max-w-64 gap-2 sm:flex sm:max-w-none sm:flex-nowrap sm:justify-center sm:gap-3 land-sm:max-md:mt-5 land-sm:max-md:justify-start">
+          <div className="mx-auto grid w-full max-w-64 gap-2 sm:flex sm:max-w-none sm:flex-nowrap sm:justify-center sm:gap-3 page-fit:translate-y-[clamp(0px,calc(15dvh_-_7.125rem),3rem)] land-sm:max-md:mt-5 land-sm:max-md:justify-start">
             <Link
               to={copy.nav.links[3].path}
               className={heroSecondaryActionClass}
