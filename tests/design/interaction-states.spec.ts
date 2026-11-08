@@ -197,7 +197,10 @@ test("icon controls grow around their center and filters preserve selection", as
   await page.mouse.up();
   await page.goto("/eventos/pasados/");
   await page.waitForLoadState("networkidle");
-  const filter = page.getByRole("combobox", { name: "Categorías", exact: true });
+  const filter = page.getByRole("combobox", {
+    name: "Categorías",
+    exact: true,
+  });
   await filter.selectOption("seminario");
   const label = filter.locator("..").locator("span[aria-hidden=true]");
   await expect(label).toHaveCSS("background-color", "rgb(22, 58, 99)");
@@ -214,7 +217,10 @@ test("selection, disclosure and image controls use finite functional feedback", 
 }) => {
   await page.goto("/eventos/pasados/");
   await page.waitForLoadState("networkidle");
-  const filter = page.getByRole("combobox", { name: "Categorías", exact: true });
+  const filter = page.getByRole("combobox", {
+    name: "Categorías",
+    exact: true,
+  });
   await filter.selectOption("seminario");
   const selection = filter.locator("..").locator("[data-selected=true]");
   await expect(selection).toHaveCSS(

@@ -14,7 +14,7 @@ const heroSecondaryActionClass = `${heroActionClass} border-site-on-dark/70 bg-s
 function HeroBanner() {
   const { copy } = useLanguage();
   return (
-    <header className="relative my-2 flex h-[clamp(520px,calc(100svh_-_4rem_-_10px),680px)] items-stretch overflow-hidden rounded-xl land-sm:h-auto land-sm:min-h-[calc(100svh_-_3rem_-_6px)] tall-md:h-auto tall-md:min-h-[230px] tall-md:flex-1 tablet-fit:h-[348px] tablet-fit:min-h-0 tablet-fit:flex-none">
+    <header className="relative my-2 flex h-[clamp(520px,calc(100svh_-_4rem_-_10px),680px)] items-stretch overflow-hidden rounded-xl land-sm:h-auto land-sm:min-h-[calc(100svh_-_3rem_-_6px)] tall-md:h-auto tall-md:min-h-[230px] tall-md:flex-1 tablet-fit:min-h-[348px]">
       <picture className="absolute inset-0">
         <source
           srcSet={`/images/hero/kendo-hero-formacion-480.webp?${imageVersion} 480w, /images/hero/kendo-hero-formacion-960.webp?${imageVersion} 960w, /images/hero/kendo-hero-formacion-1500.webp?${imageVersion} 1500w`}
@@ -37,28 +37,28 @@ function HeroBanner() {
         aria-hidden="true"
       />
       <div
-        className="absolute inset-0 bg-site-navy/53 xl:max-[1600px]:bg-site-navy/76 [mask-image:radial-gradient(ellipse_92%_82%_at_var(--hero-shade-x,50%)_50%,black_0%,#000c_36%,#0005_72%,transparent_100%)] xl:[mask-image:radial-gradient(ellipse_48rem_82%_at_var(--hero-shade-x,50%)_50%,black_0%,#000c_36%,#0005_72%,transparent_100%)] land-sm:[--hero-shade-x:35%] land-tall:[--hero-shade-x:35%] page-fit:[--hero-shade-x:50%]"
+        className="absolute inset-0 bg-site-navy/53 xl:max-[1600px]:bg-site-navy/76 [mask-image:radial-gradient(ellipse_92%_82%_at_var(--hero-shade-x,50%)_50%,black_0%,#000c_36%,#0005_72%,transparent_100%)] xl:[mask-image:radial-gradient(ellipse_48rem_82%_at_var(--hero-shade-x,50%)_50%,black_0%,#000c_36%,#0005_72%,transparent_100%)] land-sm:max-md:[--hero-shade-x:35%]"
         aria-hidden="true"
       />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-6xl items-center px-3 text-center land-sm:text-left land-tall:text-left">
-        <div className="mx-auto flex min-h-[28rem] w-full max-w-3xl flex-col justify-between text-site-on-dark md:min-h-[20rem] md:justify-around page-fit:min-h-0 page-fit:justify-center page-fit:gap-[clamp(6rem,12svh,8rem)] land-sm:mx-0 land-sm:block land-sm:min-h-0 land-tall:mx-0 page-fit:mx-auto">
+      <div className="relative z-10 mx-auto flex w-full max-w-6xl items-center px-3 text-center md:max-xl:items-stretch land-sm:max-md:text-left">
+        <div className="mx-auto flex min-h-[28rem] w-full max-w-3xl flex-col justify-between text-site-on-dark md:min-h-0 md:justify-around md:max-xl:gap-3 md:max-xl:py-5 page-fit:gap-3 land-sm:max-md:mx-0 land-sm:max-md:block land-sm:max-md:min-h-0">
           <PageTitle
             id="home-title"
             tone="media"
             density="flush"
             decoration="none"
             casing="normal"
-            className="mx-auto max-w-xl text-3xl sm:text-4xl md:max-w-none md:whitespace-nowrap land-sm:mx-0 land-sm:text-left land-tall:mx-0 land-tall:text-left page-fit:mx-auto page-fit:text-center"
+            className="mx-auto max-w-xl text-3xl sm:text-4xl md:max-w-none md:-translate-y-3 land-sm:max-md:mx-0 land-sm:max-md:text-left"
             allowWrap
           >
             {copy.home.title}
           </PageTitle>
-          <div className="mx-auto grid w-full max-w-xl gap-3 text-center [&>p]:text-xl [&>p]:font-normal [&>p]:leading-snug land-sm:mx-0 land-sm:mt-5 land-tall:mx-0 page-fit:mx-auto">
+          <div className="mx-auto grid w-full max-w-xl gap-3 text-center [&>p]:text-xl [&>p]:font-normal [&>p]:leading-snug land-sm:max-md:mx-0 land-sm:max-md:mt-5">
             <p>{copy.home.lead}</p>
             <p>{copy.home.description}</p>
           </div>
-          <div className="mx-auto grid w-full max-w-64 gap-2 sm:flex sm:max-w-none sm:flex-nowrap sm:justify-center sm:gap-3 land-sm:mt-5 land-sm:justify-start land-tall:justify-start page-fit:justify-center">
+          <div className="mx-auto grid w-full max-w-64 gap-2 sm:flex sm:max-w-none sm:flex-nowrap sm:justify-center sm:gap-3 land-sm:max-md:mt-5 land-sm:max-md:justify-start">
             <Link
               to={copy.nav.links[3].path}
               className={heroSecondaryActionClass}

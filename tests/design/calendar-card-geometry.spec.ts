@@ -202,6 +202,19 @@ test.describe("responsive calendar display rules", () => {
         name: "Ver los dos meses anteriores",
       });
       await expect(cards).toHaveCount(3);
+      const getArrowSlots = () =>
+        Promise.all([
+          getBox(previous.locator("..")),
+          getBox(next.locator("..")),
+        ]);
+      const initialArrows = await getArrowSlots();
+      const expectAlignedArrows = async () => {
+        const arrows = await getArrowSlots();
+        arrows.forEach((arrow, index) => {
+          expectCssPixels(arrow.x, initialArrows[index].x, "calendar arrow x");
+          expectCssPixels(arrow.y, initialArrows[index].y, "calendar arrow y");
+        });
+      };
       await next.click();
 
       const headings = cards.getByRole("heading");
@@ -212,6 +225,7 @@ test.describe("responsive calendar display rules", () => {
         "3er Examen 2027",
       ];
       await expect(headings).toHaveText(expectedEvents);
+      await expectAlignedArrows();
       const separators = page.getByText("—", { exact: true });
       await expect(separators).toHaveCount(2);
       await expect(separators.first().locator("..")).toHaveText(
@@ -268,6 +282,7 @@ test.describe("responsive calendar display rules", () => {
       await expect(lastAction).toBeInViewport({ ratio: 1 });
       await next.click();
       await expect(headings.first()).toHaveText("6to Torneo");
+      await expectAlignedArrows();
       await previous.click();
       await expect(headings).toHaveText(expectedEvents);
       await previous.click();

@@ -185,7 +185,10 @@ test("filters apply available values and the empty state remains available", asy
       timeout: 500,
     });
   }).toPass({ timeout: 5_000 });
-  const typeFilter = page.getByRole("combobox", { name: "Categorías", exact: true });
+  const typeFilter = page.getByRole("combobox", {
+    name: "Categorías",
+    exact: true,
+  });
   await typeFilter.selectOption("seminario");
   await expect(page).toHaveURL(
     new RegExp(`year=${selectedYear}&type=seminario`),

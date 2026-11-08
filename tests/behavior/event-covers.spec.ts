@@ -5,6 +5,32 @@ import coverApproval from "../../src/app/config/eventCoverApproval.json" with { 
 const SHOGUN_POSTER_SELECTOR =
   '[data-thumbnail-source="poster"] img[src*="/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/"]';
 
+test("generic external archive cover fills the same frame as its neighboring photo", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await preparePage(
+    page,
+    "/eventos/pasados/?year=2026",
+    new Date("2026-11-07T12:00:00-06:00"),
+  );
+  const cover = page.locator("picture").filter({
+    has: page.locator('img[src*="/kendo-external-"][src*="-archive-"]'),
+  });
+  const photo = page
+    .locator('picture[data-thumbnail-source="gallery"]')
+    .first();
+  await expect(cover).toBeVisible();
+  await expect(cover).toHaveCSS("background-color", "rgb(250, 250, 250)");
+  await expect(cover.locator("img")).toHaveCSS("object-fit", "contain");
+  const [coverBox, photoBox] = await Promise.all([
+    cover.boundingBox(),
+    photo.boundingBox(),
+  ]);
+  expect(coverBox!.width).toBeCloseTo(photoBox!.width, 0);
+  expect(coverBox!.height).toBeCloseTo(photoBox!.height, 0);
+});
+
 for (const viewport of [
   { width: 360, height: 800 },
   { width: 390, height: 844 },
@@ -25,9 +51,28 @@ for (const viewport of [
       await poster.scrollIntoViewIfNeeded();
       await expect(poster).toBeVisible();
       await expect(poster).toHaveAttribute("src", /-flyer-\d+\.webp$/);
-      await expect(poster).toHaveCSS("object-fit", "cover");
-      await expect(poster).toHaveCSS("object-position", "50% 0%");
-      await expect(poster).toHaveCSS("aspect-ratio", "8 / 5");
+      // The calendar swaps in a pre-composed 4:3 tablet artwork (see
+      // EventThumbnail `showShogunTabletCover`) on portrait tablets. That
+      // artwork already contains the crest, so it is shown uncropped.
+      const portraitTablet =
+        context === "calendar" &&
+        viewport.width >= 768 &&
+        viewport.width < 1280 &&
+        viewport.height > viewport.width;
+      if (portraitTablet) {
+        await expect(poster).toHaveCSS("object-fit", "contain");
+        await expect(poster).toHaveCSS("object-position", "50% 50%");
+        await expect(poster).toHaveCSS("aspect-ratio", "auto");
+        await expect
+          .poll(() =>
+            poster.evaluate((img: HTMLImageElement) => img.currentSrc),
+          )
+          .toMatch(/-tablet-960\.webp$/);
+      } else {
+        await expect(poster).toHaveCSS("object-fit", "cover");
+        await expect(poster).toHaveCSS("object-position", "50% 0%");
+        await expect(poster).toHaveCSS("aspect-ratio", "8 / 5");
+      }
       await expect
         .poll(() =>
           poster.evaluate(
@@ -64,13 +109,35 @@ for (const viewport of [
         const image = picture.locator("img");
         await image.scrollIntoViewIfNeeded();
         await expect(image).toHaveCSS("object-fit", "contain");
+        // Seminario Noviembre swaps in 8:5 desktop artwork on page-fit
+        // viewports (EventThumbnail `showSeminarDesktopCover`); every other
+        // generated cover keeps its calendar (4:3) or archive (3:4) ratio.
+        const pageFit = viewport.width >= 1280 && viewport.height >= 768;
+        const defaultRatio = selectedFormat === "calendar" ? 4 / 3 : 3 / 4;
         await expect
-          .poll(() =>
-            image.evaluate(
-              (img: HTMLImageElement) => img.naturalWidth / img.naturalHeight,
-            ),
+          .poll(
+            () =>
+              image.evaluate(
+                (
+                  img: HTMLImageElement,
+                  args: { pageFit: boolean; defaultRatio: number },
+                ) => {
+                  const desktopArtwork =
+                    args.pageFit &&
+                    /\/seminario-noviembre-2026-desktop\.webp$/.test(
+                      img.currentSrc,
+                    );
+                  const expected = desktopArtwork ? 8 / 5 : args.defaultRatio;
+                  return (
+                    Math.abs(img.naturalWidth / img.naturalHeight - expected) <
+                    0.01
+                  );
+                },
+                { pageFit, defaultRatio },
+              ),
+            { message: "generated cover natural aspect ratio" },
           )
-          .toBeCloseTo(selectedFormat === "calendar" ? 4 / 3 : 3 / 4, 2);
+          .toBe(true);
         const box = await image.boundingBox();
         expect(box?.width).toBeGreaterThan(0);
         expect(box?.height).toBeGreaterThan(0);

@@ -133,7 +133,7 @@ export function CalendarSection() {
       <CalendarBanner />
       {currentGroup ? (
         <div
-          className={`relative z-20 -mt-11 flex min-h-0 flex-1 items-start justify-center px-3 pb-0 pt-3 sm:-mt-13 sm:px-4 sm:pb-0 sm:pt-4 tall-md:items-stretch tall-md:px-4 tall-md:pt-4 land-sm:px-2 land-sm:pb-0 land-sm:pt-2 land-compact:-mt-8 ${additionalPair ? "" : "page-fit:absolute page-fit:inset-0 page-fit:mt-0 page-fit:items-start page-fit:px-4 page-fit:pb-0 page-fit:pt-20"}`}
+          className={`relative z-20 -mt-11 flex min-h-0 flex-1 items-start justify-center px-3 pb-0 pt-3 sm:-mt-13 sm:px-4 sm:pb-0 sm:pt-4 tall-md:items-stretch tall-md:px-4 tall-md:pt-4 land-sm:px-2 land-sm:pb-0 land-sm:pt-2 land-compact:-mt-8 ${additionalPair ? "page-fit:pt-5" : "page-fit:absolute page-fit:inset-0 page-fit:mt-0 page-fit:items-start page-fit:px-4 page-fit:pb-0 page-fit:pt-20"}`}
         >
           <div
             data-page-content-boundary

@@ -248,7 +248,11 @@ export function PastEventsSection() {
                           eventId={event.id}
                           format={"archive"}
                           fullResolution
-
+                          className={
+                            event.external && thumbnail.source === "generated"
+                              ? "page-fit:bg-[#fafafa]"
+                              : undefined
+                          }
                           sizes="(min-width: 1664px) 24rem, (min-width: 1280px) calc((100vw - 10rem) / 4), (min-width: 768px) 50vw, 100vw"
                           fit={gallery?.posterSource ? "contain" : "cover"}
                         />

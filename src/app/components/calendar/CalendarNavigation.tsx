@@ -46,7 +46,7 @@ export function CalendarNavigation({
   return (
     <nav
       aria-label={copy.calendar.navigation}
-      className={`flex items-center justify-center gap-3 sm:gap-4 ${centeredMonthLabels ? "md:grid md:grid-cols-[auto_minmax(0,1fr)_auto]" : ""}`}
+      className="flex items-center justify-center gap-3 sm:gap-4"
     >
       <span className="md:hidden">
         <NavigationArrowButton
@@ -66,7 +66,7 @@ export function CalendarNavigation({
       </span>
 
       <p
-        className="min-w-0 flex-1 text-center text-lg font-bold sm:flex-none sm:min-w-72"
+        className="min-w-0 flex-1 text-center text-lg font-bold sm:w-72 sm:flex-none"
         aria-live="polite"
       >
         <span className="md:hidden">{currentMonthLabel}</span>

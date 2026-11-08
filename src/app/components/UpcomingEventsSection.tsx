@@ -30,7 +30,7 @@ export function UpcomingEventsSection() {
         </h2>
       </div>
 
-      <ul className="grid gap-3 land-sm:grid-cols-2 land-tall:grid-cols-4 lg:grid-cols-4 lg:gap-2">
+      <ul className="grid gap-3 land-sm:grid-cols-2 land-tall:grid-cols-4 tablet-fit:max-lg:grid-cols-2 lg:grid-cols-4 lg:gap-2">
         {homepageEvents.map((event, index) => (
           <UpcomingEventCard key={event.id} event={event} index={index} />
         ))}

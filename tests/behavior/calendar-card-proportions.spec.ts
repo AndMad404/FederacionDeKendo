@@ -59,11 +59,22 @@ for (const viewport of [
           );
         }
       }
-      expect(
-        await page.evaluate(
-          () => document.documentElement.scrollHeight <= innerHeight,
-        ),
-      ).toBe(true);
+      const expandedCalendar = page.locator("[data-expanded-calendar]");
+      if (month === "12") {
+        await expect(expandedCalendar).toBeVisible();
+        const lastAction = cards.last().getByRole("link", {
+          name: /Detalles del evento/,
+        });
+        await lastAction.scrollIntoViewIfNeeded();
+        await expect(lastAction).toBeInViewport({ ratio: 1 });
+      } else {
+        await expect(expandedCalendar).toHaveCount(0);
+        expect(
+          await page.evaluate(
+            () => document.documentElement.scrollHeight <= innerHeight,
+          ),
+        ).toBe(true);
+      }
     });
   }
 }
