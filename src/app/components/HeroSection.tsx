@@ -26,7 +26,7 @@ function HeroBanner() {
           alt={copy.home.heroAlt}
           width={1500}
           height={750}
-          className="absolute inset-0 h-full w-full object-cover page-fit:object-[center_20%]"
+          className="absolute inset-0 h-full w-full object-cover page-fit:object-[center_40%]"
           loading="eager"
           fetchpriority="high"
         />
