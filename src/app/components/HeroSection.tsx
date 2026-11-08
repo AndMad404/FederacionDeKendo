@@ -26,7 +26,7 @@ function HeroBanner() {
           alt={copy.home.heroAlt}
           width={1500}
           height={750}
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover page-fit:object-[center_20%]"
           loading="eager"
           fetchpriority="high"
         />
@@ -41,15 +41,15 @@ function HeroBanner() {
         aria-hidden="true"
       />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-6xl items-center px-3 text-center md:max-xl:items-stretch land-sm:max-md:text-left">
-        <div className="mx-auto flex min-h-[28rem] w-full max-w-3xl flex-col justify-between text-site-on-dark md:min-h-0 md:justify-around md:max-xl:gap-3 md:max-xl:py-5 page-fit:gap-3 land-sm:max-md:mx-0 land-sm:max-md:block land-sm:max-md:min-h-0">
+      <div className="relative z-10 mx-auto flex w-full max-w-6xl items-center px-3 text-center md:max-xl:items-stretch page-fit:items-stretch land-sm:max-md:text-left">
+        <div className="mx-auto flex min-h-[28rem] w-full max-w-3xl flex-col justify-between text-site-on-dark md:min-h-0 md:justify-around md:max-xl:gap-3 md:max-xl:py-5 page-fit:justify-evenly page-fit:gap-3 land-sm:max-md:mx-0 land-sm:max-md:block land-sm:max-md:min-h-0">
           <PageTitle
             id="home-title"
             tone="media"
             density="flush"
             decoration="none"
             casing="normal"
-            className="mx-auto max-w-xl text-3xl sm:text-4xl md:max-w-none md:-translate-y-3 land-sm:max-md:mx-0 land-sm:max-md:text-left"
+            className="mx-auto max-w-xl text-3xl sm:text-4xl md:max-w-none md:-translate-y-3 page-fit:-translate-y-2 land-sm:max-md:mx-0 land-sm:max-md:text-left"
             allowWrap
           >
             {copy.home.title}
