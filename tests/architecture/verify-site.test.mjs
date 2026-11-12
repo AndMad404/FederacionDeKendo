@@ -132,3 +132,71 @@ test("site verification formats a failed phase for the GitHub job summary", () =
   assert.match(summary, /`pnpm run quality:check`/);
   assert.match(summary, /exit code 1/);
 });
+
+test("Chromium installation recovers after transient failures in both gate modes", async (t) => {
+  for (const mode of ["full", "calendar"]) {
+    const directory = await temporaryDirectory(t, "verification-retry-");
+    const waits = [];
+    let installations = 0;
+    let browserRuns = 0;
+    const report = runVerification({
+      root: process.cwd(),
+      mode,
+      directory,
+      captureFingerprint: () => "stable",
+      wait: (milliseconds) => waits.push(milliseconds),
+      executeStep: (_root, command) => {
+        if (command.includes("install") && ++installations < 3)
+          throw new Error("Temporary failure resolving Ubuntu mirror");
+        if (command.includes("test")) browserRuns++;
+      },
+    });
+    assert.equal(report.status, "passed");
+    assert.equal(installations, 3);
+    assert.equal(browserRuns, 1);
+    assert.deepEqual(waits, [30_000, 30_000]);
+    assert.equal(
+      report.steps.find((step) => step.command.includes("install")).attempts,
+      3,
+    );
+  }
+});
+
+test("exhausted Chromium installation retries fail the gate before browser tests", async (t) => {
+  const directory = await temporaryDirectory(t, "verification-retry-failed-");
+  const waits = [];
+  let installations = 0;
+  let browserRuns = 0;
+  assert.throws(
+    () =>
+      runVerification({
+        root: process.cwd(),
+        directory,
+        captureFingerprint: () => "stable",
+        wait: (milliseconds) => waits.push(milliseconds),
+        executeStep: (_root, command) => {
+          if (command.includes("install")) {
+            installations++;
+            throw Object.assign(new Error("installation failed"), {
+              exitCode: 1,
+            });
+          }
+          if (command.includes("test")) browserRuns++;
+        },
+      }),
+    /installation failed/,
+  );
+  assert.equal(installations, 3);
+  assert.equal(browserRuns, 0);
+  assert.deepEqual(waits, [30_000, 30_000]);
+  const report = JSON.parse(
+    readFileSync(path.join(directory, "verification.json"), "utf8"),
+  );
+  assert.equal(report.status, "failed");
+  const installation = report.steps.find((step) =>
+    step.command.includes("install"),
+  );
+  assert.equal(installation.status, "failed");
+  assert.equal(installation.attempts, 3);
+  assert.equal(installation.exitCode, 1);
+});

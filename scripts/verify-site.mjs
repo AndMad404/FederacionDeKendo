@@ -57,6 +57,7 @@ function phases(mode = "full") {
     [
       "Instalacion de Chromium",
       ["pnpm", "exec", "playwright", "install", "--with-deps", "chromium"],
+      3,
     ],
     [
       "Pruebas de navegador",
@@ -170,6 +171,8 @@ export function runVerification({
   mode = "full",
   captureFingerprint = captureWorkspaceFingerprint,
   executeStep = runStep,
+  wait = (milliseconds) =>
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, milliseconds),
   directory = reportDirectory(),
 }) {
   const initialFingerprint = captureFingerprint(root);
@@ -178,9 +181,11 @@ export function runVerification({
     sha: process.env.GITHUB_SHA ?? null,
     mode,
     status: "passed",
-    steps: phases(mode).map(([label, command]) => ({
+    steps: phases(mode).map(([label, command, maxAttempts = 1]) => ({
       label,
       command,
+      maxAttempts,
+      attempts: 0,
       status: "not-executed",
     })),
   };
@@ -191,7 +196,19 @@ export function runVerification({
     for (const step of report.steps) {
       failedStep = step.command;
       step.status = "running";
-      executeStep(root, step.command);
+      for (let attempt = 1; attempt <= step.maxAttempts; attempt++) {
+        step.attempts = attempt;
+        try {
+          executeStep(root, step.command);
+          break;
+        } catch (error) {
+          if (attempt === step.maxAttempts) throw error;
+          console.warn(
+            `${step.label}: intento ${attempt}/${step.maxAttempts} fallo: ${error.message}. Reintentando en 30 segundos.`,
+          );
+          wait(30_000);
+        }
+      }
       step.status = "passed";
     }
   } catch (error) {
