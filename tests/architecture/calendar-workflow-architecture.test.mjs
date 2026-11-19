@@ -1,389 +1,206 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-
 import {
   actionSteps,
   loadYamlDocument,
-  workflowSteps,
 } from "../helpers/load-yaml-document.mjs";
+import { validateHistoricalRun } from "../../scripts/calendar-workflow-inputs.mjs";
 
-function stepIndex(steps, predicate, description) {
-  const index = steps.findIndex(predicate);
-  assert.notEqual(index, -1, `Missing ${description}`);
-  return index;
-}
+const CALENDAR = [
+  "sync-calendar",
+  "correct-calendar-history-range",
+  "apply-calendar-editorial-decision",
+];
+const workflow = (name) => loadYamlDocument(`.github/workflows/${name}.yml`);
+const action = (name) => loadYamlDocument(`.github/actions/${name}/action.yml`);
+const uses = (steps, name) =>
+  steps.find((step) => step.uses?.startsWith(`${name}@`));
 
-test("workflow expressions use contexts available before and after runner allocation", async () => {
-  for (const file of [
-    ".github/workflows/ci.yml",
-    ".github/workflows/sync-calendar.yml",
-    ".github/workflows/correct-calendar-history-range.yml",
-    ".github/workflows/apply-calendar-editorial-decision.yml",
-  ]) {
-    const workflow = await loadYamlDocument(file);
-    for (const job of Object.values(workflow.jobs)) {
-      assert.doesNotMatch(
-        JSON.stringify(job.env ?? {}),
-        /\$\{\{[^}]*\brunner\./,
-        `${file}: job env cannot use the runner context`,
+test("workflows restrict writes, credentials and executable inputs and pin external actions", async () => {
+  for (const name of ["ci", ...CALENDAR]) {
+    const document = await workflow(name);
+    assert.equal(document.permissions.contents, "read", name);
+    assert.match(document.concurrency.group, /site-writer-/);
+    assert.equal(document.concurrency["cancel-in-progress"], false);
+    for (const [id, job] of Object.entries(document.jobs)) {
+      assert.equal(
+        job.permissions?.contents ?? document.permissions.contents,
+        ["publish", "publish-fixes"].includes(id) ? "write" : "read",
+      );
+      assert.equal(
+        job["timeout-minutes"],
+        id.startsWith("publish") ? 10 : id === "finalize" ? 30 : 60,
+      );
+      assert.doesNotMatch(JSON.stringify(job.env ?? {}), /secrets\.|runner\./);
+      assert.equal(
+        uses(job.steps, "actions/checkout").with["persist-credentials"],
+        false,
       );
       for (const step of job.steps) {
+        if (step.uses && !step.uses.startsWith("./"))
+          assert.match(step.uses, /^[\w/-]+@[a-f0-9]{40}$/);
+        if (step.run) assert.doesNotMatch(step.run, /\$\{\{\s*inputs\./);
+      }
+      if (id.startsWith("publish")) {
+        assert.match(job.if, /refs\/heads\/main/);
         assert.doesNotMatch(
-          JSON.stringify(step.with ?? {}),
-          /\$\{\{[^}]*\b(?:failure|success|always|cancelled)\s*\(/,
-          `${file}: status functions belong in step conditions, not action inputs`,
+          JSON.stringify(job.steps),
+          /pnpm|npm |setup-project/,
         );
       }
     }
   }
+  for (const name of ["setup-project", "verify-site", "calendar-design-review"])
+    for (const step of actionSteps(await action(name)))
+      if (step.uses) assert.match(step.uses, /^[\w/-]+@[a-f0-9]{40}$/);
+  const bot = await loadYamlDocument(".github/dependabot.yml");
+  assert.equal(bot.updates[0]["package-ecosystem"], "github-actions");
+  assert.equal(bot.updates[0].schedule.interval, "weekly");
 });
 
-test("shared project setup configures Node before enabling pnpm and disables premature caching", async () => {
-  const action = await loadYamlDocument(
-    ".github/actions/setup-project/action.yml",
-  );
-  assert.equal(action.runs.using, "composite");
-  const steps = actionSteps(action);
-  const node = stepIndex(
-    steps,
-    (step) => step.uses === "actions/setup-node@v5",
-    "Node setup",
-  );
-  assert.equal(steps[node].with["node-version"], 22);
-  assert.equal(steps[node].with["check-latest"], true);
-  assert.equal(steps[node].with["package-manager-cache"], false);
-  assert.equal(steps[node].with.cache, undefined);
-  const corepack = stepIndex(
-    steps,
-    (step) => step.run === "corepack enable",
-    "Corepack",
-  );
-  const install = stepIndex(
-    steps,
-    (step) => step.run === "pnpm install --frozen-lockfile",
-    "dependency installation",
-  );
-  assert.ok(node < corepack && corepack < install);
-  for (const step of steps.filter((step) => step.run)) {
-    assert.equal(step.shell, "bash");
-  }
-});
-
-test("all workflows use shared project setup after checkout and before project commands", async () => {
-  for (const file of [
-    ".github/workflows/ci.yml",
-    ".github/workflows/sync-calendar.yml",
-    ".github/workflows/correct-calendar-history-range.yml",
-    ".github/workflows/apply-calendar-editorial-decision.yml",
-  ]) {
-    const document = await loadYamlDocument(file);
-    const steps = document.jobs.verify?.steps ?? workflowSteps(document);
-    const setup = stepIndex(
-      steps,
-      (step) => step.uses === "./.github/actions/setup-project",
-      `${file}: project setup`,
-    );
-    const checkout = stepIndex(
-      steps,
-      (step) => step.uses === "actions/checkout@v5",
-      `${file}: checkout`,
-    );
-    assert.ok(checkout < setup, file);
+test("calendar publication requires verified evidence from this attempt and preserves Presidency approval", async () => {
+  for (const name of CALENDAR) {
+    const { prepare, publish, finalize } = (await workflow(name)).jobs;
+    assert.equal(publish.needs, "prepare");
+    assert.match(publish.if, /needs.prepare.result == 'success'/);
     assert.equal(
-      steps.filter((step) => step.uses === "./.github/actions/setup-project")
-        .length,
-      1,
-      file,
-    );
-    assert.equal(
-      steps.some((step) => step.uses?.startsWith("actions/setup-node@")),
-      false,
-      file,
-    );
-    for (const [index, step] of steps.entries()) {
-      if (step.run) {
-        assert.doesNotMatch(step.run, /corepack enable|pnpm install/, file);
-        assert.ok(setup < index, `${file}: setup must precede commands`);
-      }
-    }
-  }
-});
-
-test("writer workflows verify once before guarded publication and finalize afterwards", async () => {
-  const cases = [
-    [".github/workflows/sync-calendar.yml", "Commit calendar changes"],
-    [
-      ".github/workflows/apply-calendar-editorial-decision.yml",
-      "Commit recorded decision",
-    ],
-    [
-      ".github/workflows/correct-calendar-history-range.yml",
-      "Commit approved historical range",
-    ],
-  ];
-
-  for (const [file, commitName] of cases) {
-    const steps = workflowSteps(await loadYamlDocument(file));
-    const gate = stepIndex(
-      steps,
-      (step) => step.uses === "./.github/actions/verify-site",
-      `${file}: shared gate`,
-    );
-    const commit = stepIndex(
-      steps,
-      (step) => step.name === commitName,
-      `${file}: commit`,
-    );
-    assert.ok(gate < commit, `${file}: gate must precede commit`);
-    assert.match(steps[commit].run, /node scripts\/publish-changes\.mjs/);
-    const workflow = await loadYamlDocument(file);
-    assert.equal(workflow.concurrency.group, "site-writer-${{ github.ref }}");
-    assert.equal(workflow.concurrency["cancel-in-progress"], false);
-    assert.equal(workflow.concurrency.queue, "max");
-    assert.equal(
-      steps.some((step) => step.run?.includes("test:sync-directed")),
-      false,
-    );
-    assert.equal(steps[gate].with.mode, "calendar");
-    assert.equal(steps[gate].id, "verification");
-    assert.equal(steps[commit].id, "publication");
-    assert.equal(
-      steps[commit].if,
-      undefined,
-      "design cannot condition publication",
-    );
-    const review = stepIndex(
-      steps,
-      (step) => step.uses === "./.github/actions/calendar-design-review",
-      `${file}: post-publication review`,
-    );
-    assert.ok(
-      commit < review,
-      `${file}: review and notification must follow push`,
-    );
-    assert.equal(steps[review].if, "${{ always() }}");
-    assert.equal(
-      steps[review].with["publication-failed"],
-      "${{ steps.verification.outcome == 'failure' || steps.publication.outcome == 'failure' }}",
-    );
-    assert.equal(
-      steps[review].with["failed-step"],
-      "${{ steps.verification.outcome == 'failure' && 'site verification' || 'Git publication' }}",
-    );
-    assert.equal(
-      steps[review].with["git-saved"],
-      "${{ steps.publication.outcome == 'success' }}",
+      prepare.steps.find((step) => step.id === "verification").with.mode,
+      "calendar",
     );
     assert.match(
-      steps[review].with.recipient,
-      /secrets.CALENDAR_ALERT_RECIPIENT/,
+      prepare.steps.find((step) => step.id === "handoff").env.CALENDAR_PREPARED,
+      /steps.verification.outcome == 'success'/,
     );
-  }
-});
-
-test("post-publication design review, fallback, delivery and artifacts remain independent of Git publication", async () => {
-  const steps = actionSteps(
-    await loadYamlDocument(".github/actions/calendar-design-review/action.yml"),
-  );
-  const review = steps.find((step) => step.id === "review");
-  assert.equal(review.continueOnError ?? review["continue-on-error"], true);
-  assert.match(review.if, /inputs.git-saved == 'true'/);
-  const fallback = steps.find(
-    (step) => step.name === "Report incomplete design review",
-  );
-  assert.equal(fallback.env.CALENDAR_LAYOUT_FORCE_INCOMPLETE, "true");
-  assert.match(fallback.if, /steps.review.outcome == 'failure'/);
-  const send = steps.find((step) => step.id === "delivery");
-  assert.equal(send.run, "node scripts/send-calendar-notification-email.mjs");
-  assert.equal(send.env.CALENDAR_GIT_SAVED, "${{ inputs.git-saved }}");
-  assert.match(send.if, /always\(\)/);
-  assert.ok(
-    steps
-      .filter((step) => step.uses === "actions/upload-artifact@v6")
-      .every((step) => step.if.includes("always()")),
-  );
-  const designUpload = steps.find(
-    (step) => step.with?.name === "calendar-design-review",
-  );
-  assert.match(designUpload.if, /steps.evidence.outputs.available == 'true'/);
-  const evidence = steps.find((step) => step.id === "evidence");
-  assert.match(evidence.run, /-d .*calendar-design-review/);
-  assert.match(evidence.run, /-f .*publication.json/);
-  const failure = steps.find(
-    (step) => step.name === "Emit verification failure notification",
-  );
-  assert.equal(failure.env.CALENDAR_FAILED_STEP, "${{ inputs.failed-step }}");
-  assert.doesNotMatch(
-    steps.map((step) => step.run ?? "").join("\n"),
-    /git (?:reset|revert|checkout|push|commit)/,
-  );
-});
-
-test("shared verification prepares approved covers before formatting and the immutable gate", async () => {
-  const steps = actionSteps(
-    await loadYamlDocument(".github/actions/verify-site/action.yml"),
-  );
-  const prepare = stepIndex(
-    steps,
-    (step) => step.run === "pnpm exec tsx scripts/prepare-event-covers.ts",
-    "event cover preparation",
-  );
-  const quality = stepIndex(
-    steps,
-    (step) => step.run === "pnpm run quality:fix",
-    "formatting generated data",
-  );
-  const gate = stepIndex(
-    steps,
-    (step) => step.run?.includes("pnpm run verify:site"),
-    "immutable verification",
-  );
-  assert.ok(prepare < quality && quality < gate);
-  assert.equal(steps[prepare].shell, "bash");
-  assert.equal(steps[prepare]["continue-on-error"], undefined);
-});
-
-test("Phase 6: the shared gate and human CI coverage remain complete", async () => {
-  const action = await loadYamlDocument(
-    ".github/actions/verify-site/action.yml",
-  );
-  const commands = actionSteps(action)
-    .map((step) => step.run)
-    .filter(Boolean);
-  assert.ok(
-    commands.some((command) => command.includes("pnpm run quality:fix")),
-  );
-  assert.ok(
-    commands.some((command) => command.includes("pnpm run verify:site")),
-  );
-  assert.ok(
-    actionSteps(action).some(
-      (step) =>
-        step.uses === "actions/upload-artifact@v6" &&
-        step.if === "${{ always() }}",
-    ),
-  );
-
-  const { verificationSteps } = await import("../../scripts/verify-site.mjs");
-  for (const mode of ["full", "calendar"]) {
-    assert.equal(
-      verificationSteps(mode).filter((step) => step.includes("test:unit"))
-        .length,
-      1,
+    const download = uses(publish.steps, "actions/download-artifact");
+    const upload = uses(prepare.steps, "actions/upload-artifact");
+    assert.equal(download.with.name, upload.with.name);
+    assert.match(download.with.name, /github.run_attempt/);
+    assert.match(download.with.path, /runner.temp/);
+    assert.equal(download.with["run-id"], undefined);
+    assert.match(
+      uses(publish.steps, "actions/checkout").with.ref,
+      /github.sha/,
     );
     assert.equal(
-      verificationSteps(mode).filter(
-        (step) => step.includes("test") && step.includes("playwright"),
-      ).length,
-      1,
+      publish.steps.find((step) => step.id === "publication").run,
+      "node scripts/calendar-handoff.mjs publish",
     );
-  }
-  assert.throws(
-    () => verificationSteps("arbitrary-command"),
-    /Unsupported verification mode/,
-  );
-
-  const ci = await loadYamlDocument(".github/workflows/ci.yml");
-  assert.ok(Object.hasOwn(ci.on ?? {}, "push"));
-  assert.ok(Object.hasOwn(ci.on ?? {}, "pull_request"));
-  const jobs = Object.values(ci.jobs ?? {});
-  assert.equal(ci.permissions.contents, "read");
-  assert.equal(ci.concurrency.queue, "max");
-  assert.equal(ci.concurrency["cancel-in-progress"], false);
-  assert.equal(ci.jobs["publish-fixes"].permissions.contents, "write");
-  assert.match(ci.jobs["publish-fixes"].if, /event_name == 'push'/);
-  assert.equal(ci.jobs["publish-fixes"].needs, "verify");
-  const publisher = ci.jobs["publish-fixes"];
-  const download = publisher.steps.find(
-    (step) => step.uses === "actions/download-artifact@v5",
-  );
-  const upload = publisher.steps.find(
-    (step) => step.uses === "actions/upload-artifact@v6",
-  );
-  assert.equal(download.with.path, "${{ env.VERIFY_SITE_REPORT_DIR }}");
-  assert.equal(
-    upload.with.path,
-    "${{ env.VERIFY_SITE_REPORT_DIR }}/publication.json",
-  );
-  assert.ok(
-    jobs.some((job) =>
-      job.steps?.some((step) => step.uses === "./.github/actions/verify-site"),
-    ),
-  );
-});
-
-test("Phase 6: historical correction downloads the artifact produced by synchronization", async () => {
-  const syncWorkflow = await loadYamlDocument(
-    ".github/workflows/sync-calendar.yml",
-  );
-  const syncSteps = workflowSteps(syncWorkflow);
-  const correctionSteps = workflowSteps(
-    await loadYamlDocument(
-      ".github/workflows/correct-calendar-history-range.yml",
-    ),
-  );
-  const artifactName = "calendar-notification-reports";
-  assert.ok(
-    syncSteps.some(
+    assert.deepEqual(finalize.needs, ["prepare", "publish"]);
+    assert.match(finalize.if, /always\(\)/);
+    assert.equal(
+      finalize.steps.find((step) => step.id === "restore").run,
+      "node scripts/calendar-handoff.mjs restore",
+    );
+    const review = finalize.steps.find(
       (step) => step.uses === "./.github/actions/calendar-design-review",
-    ),
-  );
-  const reviewAction = await loadYamlDocument(
-    ".github/actions/calendar-design-review/action.yml",
-  );
-  const upload = actionSteps(reviewAction).find(
-    (step) => step.uses === "actions/upload-artifact@v6",
-    // Evidence has a separate artifact from the historical correction report.
-  );
-  const download = correctionSteps.find(
-    (step) => step.uses === "actions/download-artifact@v5",
-  );
-  const reportUpload = actionSteps(reviewAction).find(
-    (step) => step.with?.name === artifactName,
-  );
-  assert.ok(upload);
-  assert.equal(reportUpload?.with?.name, artifactName);
-  assert.equal(download?.with?.name, artifactName);
-  assert.match(
-    reportUpload?.with?.path ?? "",
-    /calendar-historical-changes\.json/,
-  );
-  assert.equal(syncWorkflow.permissions?.issues, undefined);
-  assert.equal(
-    syncSteps.some((step) => step.run?.match(/exit\s+1/)),
-    false,
+    );
+    assert.match(
+      review.with["git-saved"],
+      /needs.publish.outputs.git-saved == 'true'/,
+    );
+    assert.match(
+      review.with["publication-failed"],
+      /needs.prepare.result.*needs.publish.result/,
+    );
+    if (name === "apply-calendar-editorial-decision")
+      assert.deepEqual(
+        [prepare.environment, publish.environment],
+        ["presidencia", "presidencia"],
+      );
+  }
+});
+
+test("CI verifies pull requests but publishes corrections only after verification on main pushes", async () => {
+  const ci = await workflow("ci");
+  assert.ok(
+    Object.hasOwn(ci.on, "push") && Object.hasOwn(ci.on, "pull_request"),
   );
   assert.ok(
-    correctionSteps.some((step) =>
-      step.run?.includes("--report calendar-historical-changes.json"),
+    ci.jobs.verify.steps.some(
+      (step) => step.uses === "./.github/actions/verify-site",
+    ),
+  );
+  const publish = ci.jobs["publish-fixes"];
+  assert.equal(publish.needs, "verify");
+  assert.match(publish.if, /event_name == 'push'/);
+  assert.ok(
+    publish.steps.some(
+      (step) => step.run === "node scripts/calendar-handoff.mjs site",
     ),
   );
 });
 
-test("range workflow requires an approved report run and an inclusive date range", async () => {
-  const workflow = await loadYamlDocument(
-    ".github/workflows/correct-calendar-history-range.yml",
+test("design failures cannot undo publication and SMTP credentials are scoped to delivery", async () => {
+  const steps = actionSteps(await action("calendar-design-review"));
+  assert.equal(
+    steps.find((step) => step.id === "review")["continue-on-error"],
+    true,
   );
-  const inputs = workflow.on?.workflow_dispatch?.inputs;
-  assert.ok(inputs?.report_run_id);
-  assert.ok(inputs?.from);
-  assert.ok(inputs?.to);
-  const steps = workflowSteps(workflow);
-  const commands = steps
-    .map((step) => step.run)
-    .filter(Boolean)
-    .join("\n");
-  assert.match(commands, /correct:calendar-history-range/);
-  assert.match(commands, /sync:approved-historical-galleries/);
-  assert.match(
-    commands,
-    /rm -f calendar-historical-changes\.json calendar-notifications\.json/,
-  );
+  const delivery = steps.find((step) => step.id === "delivery");
+  assert.match(delivery.if, /always\(\)/);
+  assert.match(delivery.env.CALENDAR_GIT_SAVED, /inputs.git-saved/);
+  for (const step of steps) {
+    if (step.env?.CALENDAR_ALERT_SMTP_APP_PASSWORD)
+      assert.equal(step.id, "delivery");
+    assert.doesNotMatch(
+      step.run ?? "",
+      /git (?:reset|revert|checkout|push|commit)/,
+    );
+  }
   assert.ok(
-    Object.values(workflow.jobs ?? {}).some((job) => job.env?.CALENDAR_ICS_URL),
-    "workflow must provide CALENDAR_ICS_URL",
+    steps.some(
+      (step) =>
+        step.with?.name === "calendar-notification-reports" &&
+        step.if.includes("always()"),
+    ),
   );
-  assert.match(commands, /publish-changes\.mjs history/);
-  assert.doesNotMatch(commands, /correct:calendar-history-range -- --report/);
-  assert.equal(workflow.permissions?.issues, undefined);
+});
+
+test("historical corrections validate dates and report origin before consuming a downloaded report", async () => {
+  const prepare = (await workflow("correct-calendar-history-range")).jobs
+    .prepare.steps;
+  const validate = prepare.findIndex(
+    (step) => step.run === "node scripts/calendar-workflow-inputs.mjs",
+  );
+  const download = prepare.findIndex((step) => step.with?.["run-id"]);
+  assert.ok(validate >= 0 && validate < download);
+  assert.match(prepare[download].with.path, /runner.temp/);
+  for (const step of prepare.filter((step) => step.run?.includes("--from"))) {
+    assert.ok(step.run.includes('--from "$CALENDAR_FROM" --to "$CALENDAR_TO"'));
+    assert.match(step.env.CALENDAR_FROM, /inputs.from/);
+    assert.match(step.env.CALENDAR_TO, /inputs.to/);
+    assert.match(step.env.CALENDAR_APPROVED_REPORT_PATH, /runner.temp/);
+  }
+  const env = {
+    CALENDAR_FROM: "2026-01-01",
+    CALENDAR_TO: "2026-03-01",
+    CALENDAR_REPORT_RUN_ID: "123",
+    GITHUB_REPOSITORY: "owner/site",
+  };
+  const run = {
+    id: 123,
+    repository: { full_name: "owner/site" },
+    head_repository: { full_name: "owner/site" },
+    head_branch: "main",
+    path: ".github/workflows/sync-calendar.yml",
+    conclusion: "success",
+    event: "schedule",
+  };
+  const request = (value) => async () => ({
+    ok: true,
+    json: async () => value,
+  });
+  await validateHistoricalRun(env, request(run));
+  for (const change of [
+    { id: 999 },
+    { path: ".github/workflows/ci.yml" },
+    { head_branch: "feature" },
+    { conclusion: "failure" },
+    { head_repository: { full_name: "fork/site" } },
+    { event: "pull_request" },
+  ])
+    await assert.rejects(
+      validateHistoricalRun(env, request({ ...run, ...change })),
+      /Historical reports/,
+    );
 });

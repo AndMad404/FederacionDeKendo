@@ -36,6 +36,7 @@ export function retainCorrections(root, directory = reportDirectory(root)) {
       "diff",
       "--cached",
       "--binary",
+      "--no-renames",
       `--output=${path.resolve(directory, "corrections.patch")}`,
       "HEAD",
     ]);
@@ -179,6 +180,8 @@ export function runVerification({
   const report = {
     schemaVersion: 1,
     sha: process.env.GITHUB_SHA ?? null,
+    runId: process.env.GITHUB_RUN_ID ?? null,
+    attempt: process.env.GITHUB_RUN_ATTEMPT ?? null,
     mode,
     status: "passed",
     steps: phases(mode).map(([label, command, maxAttempts = 1]) => ({

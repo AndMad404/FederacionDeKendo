@@ -33,15 +33,15 @@ runs:
         VERIFY_SITE_REPORT_DIR: ${{ runner.temp }}/site-verification
     - name: Upload site verification evidence
       if: ${{ always() }}
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
       with:
-        name: site-verification
+        name: site-verification-${{ github.run_attempt }}
         path: ${{ runner.temp }}/site-verification
         if-no-files-found: warn
         retention-days: 30
     - name: Upload browser failure evidence
       if: ${{ failure() }}
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
       with:
         name: browser-failure-evidence
         path: test-results

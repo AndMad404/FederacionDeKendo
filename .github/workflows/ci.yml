@@ -16,10 +16,11 @@ jobs:
   verify:
     name: Unit, typecheck, build and browser tests
     runs-on: ubuntu-latest
+    timeout-minutes: 60
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           persist-credentials: false
 
@@ -38,32 +39,32 @@ jobs:
     needs: verify
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: write
     env:
       VERIFY_SITE_REPORT_DIR: .cache/verification
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
         with:
           node-version: 22
           check-latest: true
           package-manager-cache: false
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
         with:
-          name: site-verification
+          name: site-verification-${{ github.run_attempt }}
           path: ${{ env.VERIFY_SITE_REPORT_DIR }}
-      - name: Restore verified corrections
-        shell: bash
-        run: |
-          if [[ -s "$VERIFY_SITE_REPORT_DIR/corrections.patch" ]]; then
-            git apply --binary "$VERIFY_SITE_REPORT_DIR/corrections.patch"
-          fi
       - name: Commit and push verified corrections
-        run: node scripts/publish-changes.mjs site
+        run: node scripts/calendar-handoff.mjs site
+        env:
+          CALENDAR_PUBLICATION_TOKEN: ${{ github.token }}
       - name: Retain Git publication result
         if: ${{ always() }}
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: site-publication
           path: ${{ env.VERIFY_SITE_REPORT_DIR }}/publication.json

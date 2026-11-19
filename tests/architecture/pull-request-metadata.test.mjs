@@ -37,3 +37,28 @@ test("rejects non-pull-request events", () => {
     "El evento no contiene datos de un pull request.",
   ]);
 });
+
+test("accepts generated metadata only for authentic same-repository Dependabot Actions PRs", () => {
+  const pr = {
+    title: "Bump actions/checkout",
+    body: "Generated dependency update",
+    user: { login: "dependabot[bot]", type: "Bot" },
+    head: {
+      ref: "dependabot/github_actions/actions/checkout-update",
+      repo: { full_name: "owner/site" },
+    },
+    base: { repo: { full_name: "owner/site" } },
+  };
+  assert.deepEqual(validatePullRequestEvent({ pull_request: pr }), []);
+  for (const change of [
+    { user: { login: "human", type: "User" } },
+    { user: { login: "dependabot[bot]", type: "User" } },
+    { head: { ...pr.head, repo: { full_name: "fork/site" } } },
+    { head: { ...pr.head, ref: "feature" } },
+    { base: { repo: {} } },
+  ])
+    assert.ok(
+      validatePullRequestEvent({ pull_request: { ...pr, ...change } }).length >
+        0,
+    );
+});

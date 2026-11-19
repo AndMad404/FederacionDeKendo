@@ -15,6 +15,7 @@ import {
   parseCliArguments,
 } from "../../scripts/correct-calendar-history-range.mjs";
 import { synchronizeApprovedHistoricalGalleries } from "../../scripts/sync-approved-historical-galleries.mjs";
+import { assertDateRange } from "../../scripts/calendar-workflow-inputs.mjs";
 import {
   detectHistoricalChanges,
   serializeCalendarEvents,
@@ -212,31 +213,25 @@ test("range correction accepts every reported field for historical events inside
   assert.deepEqual(registry.events[1], files.other);
 });
 
-test("range correction rejects an empty or reversed range without changing published files", async (t) => {
+test("range correction rejects empty, impossible and unsafe dates without changing published files", async (t) => {
   const files = await fixture(t);
 
   const before = await Promise.all([
     readFile(files.registryPath),
     readFile(files.outputPath),
   ]);
-  await assert.rejects(
-    applyHistoricalCorrectionsByDateRange({
-      registryPath: files.registryPath,
-      outputPath: files.outputPath,
-      reportPath: files.reportPath,
-      from: "2026-01-11",
-      to: "2026-01-10",
-    }),
-  );
-  await assert.rejects(
-    applyHistoricalCorrectionsByDateRange({
-      registryPath: files.registryPath,
-      outputPath: files.outputPath,
-      reportPath: files.reportPath,
-      from: "2026-02-01",
-      to: "2026-02-02",
-    }),
-  );
+  assertDateRange("2024-02-29", "2024-02-29");
+  for (const [from, to] of [
+    ["2026-01-11", "2026-01-10"],
+    ["2026-02-01", "2026-02-02"],
+    ["2026-02-30", "2026-03-01"],
+    ["2025-02-29", "2025-03-01"],
+    ['2026-01-01"; echo injected', "2026-03-01"],
+    ["$(echo injected)", "2026-03-01"],
+  ])
+    await assert.rejects(
+      applyHistoricalCorrectionsByDateRange({ ...files, from, to }),
+    );
   const after = await Promise.all([
     readFile(files.registryPath),
     readFile(files.outputPath),

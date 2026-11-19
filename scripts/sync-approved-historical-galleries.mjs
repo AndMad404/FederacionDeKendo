@@ -4,6 +4,10 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { synchronizeEventGalleries } from "./sync-event-galleries.ts";
 import {
+  assertDateRange,
+  approvedReportPath,
+} from "./calendar-workflow-inputs.mjs";
+import {
   getPrivateAlbumUrl,
   parseCalendarEvent,
   parseVEvents,
@@ -18,19 +22,6 @@ const defaultReportPath = path.join(
   repoRoot,
   "calendar-historical-changes.json",
 );
-const datePattern = /^\d{4}-\d{2}-\d{2}$/;
-
-function assertDateRange(from, to) {
-  if (
-    !datePattern.test(from ?? "") ||
-    !datePattern.test(to ?? "") ||
-    from > to
-  ) {
-    throw new Error(
-      "Use an inclusive ISO date range with --from no later than --to.",
-    );
-  }
-}
 
 export async function synchronizeApprovedHistoricalGalleries({
   source,
@@ -116,6 +107,7 @@ function parseCliArguments(args) {
 async function main() {
   const result = await synchronizeApprovedHistoricalGalleries({
     source: process.env.CALENDAR_ICS_URL,
+    reportPath: approvedReportPath(),
     ...parseCliArguments(process.argv.slice(2)),
   });
   console.log(

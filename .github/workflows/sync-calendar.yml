@@ -4,27 +4,32 @@ on:
     - cron: 0 9 * * *
   workflow_dispatch: null
 permissions:
-  contents: write
+  contents: read
 concurrency:
   group: site-writer-${{ github.ref }}
   cancel-in-progress: false
   queue: max
 jobs:
-  sync-calendar:
-    name: Sync Google Calendar into site data
+  prepare:
+    name: Prepare and verify calendar changes
     runs-on: ubuntu-latest
-    env:
-      CALENDAR_ICS_URL: ${{ secrets.CALENDAR_ICS_URL }}
-      CALENDAR_TIME_ZONE: America/Costa_Rica
+    timeout-minutes: 60
+    permissions:
+      contents: read
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
+      - name: Checkout exact workflow revision
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
       - name: Set up project
         uses: ./.github/actions/setup-project
       - name: Sync calendar events
         id: sync
         run: pnpm run sync:calendar
         env:
+          CALENDAR_ICS_URL: ${{ secrets.CALENDAR_ICS_URL }}
+          CALENDAR_TIME_ZONE: America/Costa_Rica
           HISTORICAL_CHANGES_REPORT_PATH: ${{ runner.temp }}/calendar-historical-changes.json
           CALENDAR_NOTIFICATIONS_REPORT_PATH: ${{ runner.temp }}/calendar-notifications.json
       - name: Verify generated site
@@ -32,18 +37,110 @@ jobs:
         uses: ./.github/actions/verify-site
         with:
           mode: calendar
-      - name: Commit calendar changes
-        run: node scripts/publish-changes.mjs calendar
+      - name: Package verified source, build and reports
+        id: handoff
+        if: ${{ always() }}
+        run: node scripts/calendar-handoff.mjs pack
+        env:
+          CALENDAR_PREPARED: ${{ steps.verification.outcome == 'success' }}
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: calendar-handoff-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/calendar-handoff
+          if-no-files-found: error
+          retention-days: 30
+        name: Retain calendar handoff
+        if: ${{ always() && steps.handoff.outcome == 'success' }}
+  publish:
+    name: Publish verified calendar changes
+    outputs:
+      git-saved: ${{ steps.publication.outputs.git-saved }}
+    needs: prepare
+    if: ${{ needs.prepare.result == 'success' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout exact workflow revision
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Set up Node without dependencies
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: 22
+          check-latest: true
+          package-manager-cache: false
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
+        with:
+          name: calendar-handoff-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/calendar-handoff
+      - name: Publish guarded handoff
+        id: publication
+        run: node scripts/calendar-handoff.mjs publish
         env:
           VERIFY_SITE_REPORT_DIR: ${{ runner.temp }}/site-verification
-        id: publication
+          CALENDAR_PUBLICATION_TOKEN: ${{ github.token }}
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: calendar-publication-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/calendar-publication
+          if-no-files-found: error
+          retention-days: 30
+        name: Retain publication result
+        if: ${{ always() }}
+  finalize:
+    name: Review verified build and notify
+    needs:
+      - prepare
+      - publish
+    if: ${{ always() && !cancelled() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout exact workflow revision
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Set up project
+        uses: ./.github/actions/setup-project
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
+        with:
+          name: calendar-handoff-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/calendar-handoff
+        name: Download calendar handoff
+        id: download
+        continue-on-error: true
+      - name: Restore verified build and notification reports
+        id: restore
+        if: ${{ steps.download.outcome == 'success' }}
+        continue-on-error: true
+        run: node scripts/calendar-handoff.mjs restore
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
+        with:
+          name: calendar-publication-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/site-verification
+        name: Download publication result
+        if: ${{ needs.publish.result == 'success' }}
+        continue-on-error: true
+      - name: Install Chromium for design review
+        if: ${{ needs.publish.result == 'success' && steps.restore.outcome == 'success' }}
+        continue-on-error: true
+        run: pnpm exec playwright install --with-deps chromium
       - name: Review calendar design and notify
         if: ${{ always() }}
         uses: ./.github/actions/calendar-design-review
         with:
-          publication-failed: ${{ steps.verification.outcome == 'failure' || steps.publication.outcome == 'failure' }}
-          failed-step: ${{ steps.verification.outcome == 'failure' && 'site verification' || 'Git publication' }}
-          git-saved: ${{ steps.publication.outcome == 'success' }}
+          publication-failed: ${{ needs.prepare.result != 'success' || needs.publish.result != 'success' || steps.restore.outcome != 'success' }}
+          failed-step: ${{ needs.prepare.result != 'success' && 'preparation or site verification' || needs.publish.result != 'success' && 'Git publication' || 'handoff restoration' }}
+          git-saved: ${{ needs.publish.outputs.git-saved == 'true' }}
           smtp-username: ${{ secrets.CALENDAR_ALERT_SMTP_USERNAME }}
           smtp-password: ${{ secrets.CALENDAR_ALERT_SMTP_APP_PASSWORD }}
           recipient: ${{ secrets.CALENDAR_ALERT_RECIPIENT }}
+env:
+  CALENDAR_OPERATION: calendar

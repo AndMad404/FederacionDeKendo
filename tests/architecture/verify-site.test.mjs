@@ -1,9 +1,20 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync, writeFileSync, unlinkSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+  unlinkSync,
+} from "node:fs";
 import { execFileSync } from "node:child_process";
 import test from "node:test";
 import path from "node:path";
 import { temporaryDirectory } from "../helpers/temporary-directory.mjs";
+import {
+  createHandoff,
+  validateHandoff,
+  restoreHandoff,
+} from "../../scripts/calendar-handoff.mjs";
 
 import {
   formatVerificationFailure,
@@ -13,33 +24,104 @@ import {
   verificationSteps,
 } from "../../scripts/verify-site.mjs";
 
-test("CI corrections restore new binary files, modifications and deletions with the verified fingerprint", async (t) => {
-  const root = await temporaryDirectory(t, "verification-patch-");
-  const git = (...args) => execFileSync("git", args, { cwd: root });
+test("verified handoffs preserve source, binaries, build and notifications across jobs", async (t) => {
+  const root = await temporaryDirectory(t, "verified-source-");
+  const temporary = await temporaryDirectory(t, "verified-handoff-");
+  const git = (...args) =>
+    execFileSync("git", args, { cwd: root, encoding: "utf8" }).trim();
+  const put = (file, contents) => {
+    mkdirSync(path.dirname(file), { recursive: true });
+    writeFileSync(file, contents);
+  };
   git("init");
   git("config", "user.name", "CI test");
   git("config", "user.email", "ci@example.test");
   git("config", "core.autocrlf", "false");
-  writeFileSync(path.join(root, "manifest.json"), "old\n");
-  writeFileSync(path.join(root, "obsolete.webp"), Buffer.from([0, 1, 2]));
+  for (const [file, contents] of Object.entries({
+    ".gitignore": "dist/\n",
+    "manifest.json": "old\n",
+    "obsolete.webp": Buffer.from([0, 1, 255]),
+  }))
+    put(path.join(root, file), contents);
   git("add", ".");
   git("commit", "-m", "fixture");
-  writeFileSync(path.join(root, "manifest.json"), "new\n");
+  put(path.join(root, "manifest.json"), "new\n");
   unlinkSync(path.join(root, "obsolete.webp"));
-  writeFileSync(path.join(root, "new.webp"), Buffer.from([0, 255, 128, 0]));
+  put(path.join(root, "new.webp"), Buffer.from([0, 255, 128, 0]));
+  put(path.join(root, "dist/index.html"), "verified HTML");
+  const env = {
+    GITHUB_SHA: git("rev-parse", "HEAD"),
+    GITHUB_REPOSITORY: "owner/site",
+    GITHUB_RUN_ID: "123",
+    GITHUB_RUN_ATTEMPT: "1",
+  };
+  const options = {
+    root,
+    temporary,
+    env,
+    kind: "calendar",
+    directory: path.join(temporary, "bundle"),
+    reports: path.join(temporary, "evidence"),
+  };
   const verified = captureWorkspaceFingerprint(root);
   const indexBefore = git("diff", "--cached", "--binary");
-  const action = readFileSync(".github/actions/verify-site/action.yml", "utf8");
-  assert.match(action, /node scripts\/verify-site\.mjs --retain-corrections/);
-  const reports = await temporaryDirectory(t, "corrections-report-");
-  retainCorrections(root, reports);
-  const patch = readFileSync(path.join(reports, "corrections.patch"));
-  assert.deepEqual(git("diff", "--cached", "--binary"), indexBefore);
-  assert.equal(captureWorkspaceFingerprint(root), verified);
+  retainCorrections(root, options.reports);
+  assert.equal(git("diff", "--cached", "--binary"), indexBefore);
+  put(
+    path.join(options.reports, "verification.json"),
+    JSON.stringify({
+      schemaVersion: 1,
+      sha: env.GITHUB_SHA,
+      status: "passed",
+      fingerprint: verified,
+    }),
+  );
+  put(
+    path.join(options.reports, "quality-fix.json"),
+    JSON.stringify({
+      schemaVersion: 1,
+      sha: env.GITHUB_SHA,
+      mode: "fix",
+      status: "clean",
+      fixedFiles: [],
+    }),
+  );
+  const notifications = path.join(temporary, "calendar-notifications.json");
+  put(notifications, '{"version":1,"notifications":[]}');
+  createHandoff({ ...options, ready: true });
+  for (const [key, value] of [
+    ["GITHUB_SHA", "a".repeat(40)],
+    ["GITHUB_RUN_ID", "999"],
+    ["GITHUB_RUN_ATTEMPT", "2"],
+    ["GITHUB_REPOSITORY", "other/site"],
+  ])
+    assert.throws(
+      () => validateHandoff({ ...options, env: { ...env, [key]: value } }),
+      /origin/,
+    );
+  const html = path.join(options.directory, "build/index.html");
+  writeFileSync(html, "tampered");
+  assert.throws(() => validateHandoff(options), /checksum/);
+  unlinkSync(html);
+  assert.throws(() => validateHandoff(options), /missing/);
+  writeFileSync(html, "verified HTML");
+  const failed = { ...options, directory: path.join(temporary, "failed") };
+  createHandoff({ ...failed, ready: false });
+  assert.throws(
+    () => validateHandoff({ ...failed, requireReady: true }),
+    /not ready/,
+  );
   git("reset", "--hard", "HEAD");
   unlinkSync(path.join(root, "new.webp"));
-  execFileSync("git", ["apply", "--binary", "-"], { cwd: root, input: patch });
+  unlinkSync(path.join(root, "dist/index.html"));
+  unlinkSync(notifications);
+  restoreHandoff(options);
   assert.equal(captureWorkspaceFingerprint(root), verified);
+  assert.equal(
+    readFileSync(path.join(root, "dist/index.html"), "utf8"),
+    "verified HTML",
+  );
+  assert.ok(existsSync(notifications));
 });
 
 test("site verification owns checks previously delegated to local Git hooks", async () => {
@@ -51,6 +133,10 @@ test("site verification owns checks previously delegated to local Git hooks", as
 });
 
 test("both gate modes build before one complete Node suite and one browser invocation", () => {
+  assert.throws(
+    () => verificationSteps("arbitrary-command"),
+    /Unsupported verification mode/,
+  );
   for (const mode of ["full", "calendar"]) {
     const commands = verificationSteps(mode).map((step) => step.join(" "));
     assert.equal(
@@ -133,70 +219,48 @@ test("site verification formats a failed phase for the GitHub job summary", () =
   assert.match(summary, /exit code 1/);
 });
 
-test("Chromium installation recovers after transient failures in both gate modes", async (t) => {
-  for (const mode of ["full", "calendar"]) {
-    const directory = await temporaryDirectory(t, "verification-retry-");
-    const waits = [];
-    let installations = 0;
-    let browserRuns = 0;
-    const report = runVerification({
-      root: process.cwd(),
-      mode,
-      directory,
-      captureFingerprint: () => "stable",
-      wait: (milliseconds) => waits.push(milliseconds),
-      executeStep: (_root, command) => {
-        if (command.includes("install") && ++installations < 3)
-          throw new Error("Temporary failure resolving Ubuntu mirror");
-        if (command.includes("test")) browserRuns++;
-      },
-    });
-    assert.equal(report.status, "passed");
-    assert.equal(installations, 3);
-    assert.equal(browserRuns, 1);
-    assert.deepEqual(waits, [30_000, 30_000]);
-    assert.equal(
-      report.steps.find((step) => step.command.includes("install")).attempts,
-      3,
-    );
-  }
-});
-
-test("exhausted Chromium installation retries fail the gate before browser tests", async (t) => {
-  const directory = await temporaryDirectory(t, "verification-retry-failed-");
-  const waits = [];
-  let installations = 0;
-  let browserRuns = 0;
-  assert.throws(
-    () =>
-      runVerification({
-        root: process.cwd(),
-        directory,
-        captureFingerprint: () => "stable",
-        wait: (milliseconds) => waits.push(milliseconds),
-        executeStep: (_root, command) => {
-          if (command.includes("install")) {
-            installations++;
-            throw Object.assign(new Error("installation failed"), {
-              exitCode: 1,
-            });
-          }
-          if (command.includes("test")) browserRuns++;
-        },
-      }),
-    /installation failed/,
+for (const failures of [2, 3]) {
+  test(
+    "Chromium installation " +
+      (failures === 2
+        ? "recovers after retries"
+        : "stops before browser tests when retries are exhausted"),
+    async (t) => {
+      for (const mode of ["full", "calendar"]) {
+        const directory = await temporaryDirectory(t, "verification-retry-");
+        const waits = [];
+        let installations = 0;
+        let browserRuns = 0;
+        const verify = () =>
+          runVerification({
+            root: process.cwd(),
+            mode,
+            directory,
+            captureFingerprint: () => "stable",
+            wait: (milliseconds) => waits.push(milliseconds),
+            executeStep: (_root, command) => {
+              if (command.includes("install") && ++installations <= failures)
+                throw Object.assign(new Error("installation failed"), {
+                  exitCode: 1,
+                });
+              if (command.includes("test")) browserRuns++;
+            },
+          });
+        if (failures === 2) verify();
+        else assert.throws(verify, /installation failed/);
+        const report = JSON.parse(
+          readFileSync(path.join(directory, "verification.json"), "utf8"),
+        );
+        assert.equal(report.status, failures === 2 ? "passed" : "failed");
+        assert.equal(installations, 3);
+        assert.equal(browserRuns, failures === 2 ? 1 : 0);
+        assert.deepEqual(waits, [30_000, 30_000]);
+        const installation = report.steps.find((step) =>
+          step.command.includes("install"),
+        );
+        assert.equal(installation.attempts, 3);
+        if (failures === 3) assert.equal(installation.exitCode, 1);
+      }
+    },
   );
-  assert.equal(installations, 3);
-  assert.equal(browserRuns, 0);
-  assert.deepEqual(waits, [30_000, 30_000]);
-  const report = JSON.parse(
-    readFileSync(path.join(directory, "verification.json"), "utf8"),
-  );
-  assert.equal(report.status, "failed");
-  const installation = report.steps.find((step) =>
-    step.command.includes("install"),
-  );
-  assert.equal(installation.status, "failed");
-  assert.equal(installation.attempts, 3);
-  assert.equal(installation.exitCode, 1);
-});
+}

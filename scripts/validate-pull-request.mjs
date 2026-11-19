@@ -54,6 +54,18 @@ export function validatePullRequestEvent(event) {
   if (!event?.pull_request) {
     return ["El evento no contiene datos de un pull request."];
   }
+  const pr = event.pull_request;
+  // Dependabot owns its generated title/body; it still runs the complete gate.
+  // Restrict this exception to the actual bot and its same-repository Actions branches.
+  if (
+    pr.user?.login === "dependabot[bot]" &&
+    pr.user?.type === "Bot" &&
+    pr.head?.ref?.startsWith("dependabot/github_actions/") &&
+    typeof pr.base?.repo?.full_name === "string" &&
+    pr.base.repo.full_name.length > 0 &&
+    pr.head?.repo?.full_name === pr.base.repo.full_name
+  )
+    return [];
   return validatePullRequest({
     title: event.pull_request.title,
     body: event.pull_request.body ?? "",

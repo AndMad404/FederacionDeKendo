@@ -2,6 +2,10 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { applyHistoricalCorrections } from "./correct-calendar-history.ts";
+import {
+  assertDateRange,
+  approvedReportPath,
+} from "./calendar-workflow-inputs.mjs";
 
 const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -25,19 +29,6 @@ const defaultReportPath = path.join(
   repoRoot,
   "calendar-historical-changes.json",
 );
-const datePattern = /^\d{4}-\d{2}-\d{2}$/;
-
-function assertDateRange(from, to) {
-  if (
-    !datePattern.test(from ?? "") ||
-    !datePattern.test(to ?? "") ||
-    from > to
-  ) {
-    throw new Error(
-      "Use an inclusive ISO date range with --from no later than --to.",
-    );
-  }
-}
 
 export async function applyHistoricalCorrectionsByDateRange({
   registryPath = defaultRegistryPath,
@@ -88,9 +79,10 @@ export function parseCliArguments(args) {
 }
 
 async function main() {
-  const results = await applyHistoricalCorrectionsByDateRange(
-    parseCliArguments(process.argv.slice(2)),
-  );
+  const results = await applyHistoricalCorrectionsByDateRange({
+    ...parseCliArguments(process.argv.slice(2)),
+    reportPath: approvedReportPath(),
+  });
   console.log(
     `Historical range correction applied: ${results.length} event(s).`,
   );

@@ -86,6 +86,20 @@ Cloudflare mantiene el despliegue directo; los reportes distinguen guardar en
 Git de confirmar un despliegue. El token de Actions no dispara otro CI con su
 push: la evidencia del árbol verificado y del commit final queda en el run original.
 
+Los flujos de calendario separan preparación y verificación (solo lectura),
+publicación (escritura, sin instalar dependencias) y revisión con notificaciones
+(solo lectura). Un paquete por intento transporta el parche binario, el build y
+los reportes; su identidad de repositorio, commit, ejecución e intento y sus hashes
+se comprueban antes de restaurarlo. La publicación carga sus scripts del checkout
+original antes de aplicar el parche. Las decisiones mantienen el entorno
+`presidencia` tanto al prepararlas como al publicarlas. Para reintentar estos flujos,
+usar **Re-run all jobs**: un intento nuevo no reutiliza paquetes anteriores.
+Las acciones externas están fijadas a SHA y Dependabot propone actualizaciones
+semanales. Las correcciones históricas validan las fechas y el origen del run
+seleccionado antes de descargar el reporte en un directorio temporal.
+Las PR de GitHub Actions del bot auténtico de Dependabot, creadas en este mismo
+repositorio, conservan sus metadatos generados y ejecutan el gate completo.
+
 Para ejecutar una suite dirigida:
 
 ```bash

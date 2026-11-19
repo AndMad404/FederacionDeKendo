@@ -3,6 +3,11 @@ import { writeFile, readFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { publishChanges } from "../../scripts/publish-changes.mjs";
+import {
+  applyVerifiedPatch,
+  safeRelativePath,
+  publishSiteCorrections,
+} from "../../scripts/calendar-handoff.mjs";
 import { temporaryDirectory } from "../helpers/temporary-directory.mjs";
 
 async function fixture(
@@ -19,12 +24,20 @@ async function fixture(
   const directory = await temporaryDirectory(t, "site-publication-");
   await writeFile(
     path.join(directory, "verification.json"),
-    JSON.stringify({ schemaVersion: 1, status, fingerprint: "verified" }),
+    JSON.stringify({
+      schemaVersion: 1,
+      status,
+      fingerprint: "verified",
+      sha: "base",
+      runId: "123",
+      attempt: "1",
+    }),
   );
   await writeFile(
     path.join(directory, "quality-fix.json"),
     JSON.stringify({
       schemaVersion: 1,
+      sha: "base",
       mode: "fix",
       status: qualityStatus,
       fixedFiles: ["example.js"],
@@ -197,4 +210,43 @@ test("publication rejects stale branches, unverified changes, failed checks and 
       ),
     );
   }
+  const f = await fixture(t);
+  for (const unsafe of [
+    "../file",
+    "/absolute",
+    "C:/file",
+    "x\\file",
+    ".git/config",
+    "x/.GIT/config",
+    "x//file",
+    "x\0file",
+  ])
+    assert.throws(() => safeRelativePath(unsafe), /Unsafe/);
+  const patch = path.join(f.directory, "unsafe.patch");
+  for (const mode of ["120000", "160000"]) {
+    await writeFile(patch, `diff --git a/link b/link\nnew file mode ${mode}\n`);
+    assert.throws(() => applyVerifiedPatch(f.directory, patch), /forbidden/);
+  }
+  const identity = {
+    GITHUB_SHA: "base",
+    GITHUB_REF: "refs/heads/main",
+    GITHUB_RUN_ID: "123",
+    GITHUB_RUN_ATTEMPT: "1",
+    GITHUB_EVENT_NAME: "push",
+  };
+  for (const change of [
+    { GITHUB_REF: "refs/pull/1/merge" },
+    { GITHUB_RUN_ID: "other" },
+    { GITHUB_RUN_ATTEMPT: "other" },
+    { GITHUB_EVENT_NAME: "pull_request" },
+  ])
+    assert.throws(
+      () =>
+        publishSiteCorrections({
+          root: f.directory,
+          reports: f.directory,
+          env: { ...identity, ...change },
+        }),
+      /main push execution/,
+    );
 });
