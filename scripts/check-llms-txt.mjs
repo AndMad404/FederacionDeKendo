@@ -1,7 +1,8 @@
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
+import seoData from "../src/app/config/seo-data.json" with { type: "json" };
 
-const SITE_ORIGIN = "https://fak-kendo.org";
+const SITE_ORIGIN = new URL(seoData.siteUrl).origin;
 const LEGACY_PATHS = new Set(["/calendario/"]);
 const LINK_PATTERN = /^- \[([^\]]+)\]\((https:\/\/[^)]+)\)(?:: (.+))?$/;
 

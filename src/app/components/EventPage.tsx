@@ -60,37 +60,40 @@ export function EventPage() {
 
   useEffect(() => {
     const content = contentRef.current;
+    const contentWrapper = content?.parentElement;
     const article = content?.querySelector("article");
     const actions = article?.querySelector("aside");
+    const gallery = content?.querySelector("figure")?.parentElement;
     const footer = document.querySelector("footer");
     if (
       !content ||
+      !contentWrapper ||
       !article ||
       !actions ||
-      !footer ||
-      !content.querySelector("figure")
+      !gallery ||
+      !footer
     )
       return;
 
     // Keep short text compact while the gallery fills available space or grows with content.
     const measure = () => {
-      const bottomPadding = content.parentElement
-        ? getComputedStyle(content.parentElement).paddingBottom
-        : "10px";
-      content.style.setProperty("--event-single-image-padding", bottomPadding);
+      const bottomPadding = parseFloat(
+        getComputedStyle(contentWrapper).paddingBottom,
+      );
+      const galleryRowGap = parseFloat(getComputedStyle(gallery).rowGap);
       const contentTop = content.getBoundingClientRect().top + window.scrollY;
       const availableHeight =
         window.innerHeight -
         footer.getBoundingClientRect().height -
         contentTop -
-        10;
+        bottomPadding;
       const articleBox = article.getBoundingClientRect();
       const actionsBox = actions.getBoundingClientRect();
       const galleryHeight = Math.max(articleBox.height, availableHeight);
       content.style.setProperty("--event-poster-height", `${galleryHeight}px`);
       content.style.setProperty(
         "--event-featured-height",
-        `${Math.max(1, galleryHeight - actionsBox.height - 10)}px`,
+        `${Math.max(1, galleryHeight - actionsBox.height - galleryRowGap)}px`,
       );
       content.style.setProperty(
         "--event-thumbnail-height",
@@ -164,7 +167,7 @@ export function EventPage() {
       />
 
       <div
-        className={`relative z-20 -mt-11 grid w-full justify-items-stretch gap-3 px-3 pb-2.5 pt-3 sm:-mt-13 sm:px-4 sm:pb-2.5 sm:pt-4 tall-md:py-4 tall-md:pb-2.5 ${hasGallery ? "lg:px-4" : "lg:px-0"} land-sm:gap-2 land-sm:px-3 land-sm:pb-2.5 land-sm:pt-3 land-compact:-mt-8`}
+        className={`relative z-20 -mt-11 grid w-full justify-items-stretch gap-3 px-3 pb-(--event-page-bottom-padding) pt-3 [--event-page-bottom-padding:calc(var(--spacing)*2.5)] sm:-mt-13 sm:px-4 sm:pt-4 tall-md:pt-4 ${hasGallery ? "lg:px-4" : "lg:px-0"} land-sm:gap-2 land-sm:px-3 land-sm:pt-3 land-compact:-mt-8`}
       >
         <div
           ref={contentRef}

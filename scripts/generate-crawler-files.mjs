@@ -1,4 +1,4 @@
-const SITE_ORIGIN = "https://fak-kendo.org";
+import seoData from "../src/app/config/seo-data.json" with { type: "json" };
 
 function normalizeText(value) {
   return String(value).replace(/\s+/g, " ").trim();
@@ -87,7 +87,7 @@ export function generateRobotsTxt(routes, getRouteSeoPayload) {
     "# Event routes generated automatically from the published calendar.",
     ...eventPaths.map((path) => `Allow: ${path}`),
     "",
-    `Sitemap: ${SITE_ORIGIN}/sitemap.xml`,
+    `Sitemap: ${new URL("/sitemap.xml", seoData.siteUrl).href}`,
     "",
   ].join("\n");
 }

@@ -74,8 +74,12 @@ const embeddedGoogleDriveFolderUrl =
 const embeddedGoogleDriveFolderAnchor =
   /<a\b[^>]*\bhref=["'](https:\/\/drive\.google\.com\/drive\/folders\/[A-Za-z0-9_-]+(?:[/?#][^\s"']*)?)["'][^>]*>[\s\S]*?<\/a>/gi;
 const albumUrlSymbol = Symbol("privateAlbumUrl");
-export const MASS_DISAPPEARANCE_MINIMUM = 2;
-export const MASS_DISAPPEARANCE_RATIO = 0.5;
+// Block a run when at least half of the published Calendar events disappear,
+// with a minimum of two missing events to allow individual absences.
+const massDisappearancePolicy = {
+  minimumMissingEvents: 2,
+  missingEventRatio: 0.5,
+} as const;
 
 export function getTranslationPublicationCounts(
   events: (Pick<CalendarEvent, "title" | "summary"> & { id?: string })[],
@@ -650,8 +654,10 @@ export function assertSafeCalendarInput(
     (event) => !currentSourceIds.has(event.sourceId),
   ).length;
   const threshold = Math.max(
-    MASS_DISAPPEARANCE_MINIMUM,
-    Math.ceil(publishedEvents.length * MASS_DISAPPEARANCE_RATIO),
+    massDisappearancePolicy.minimumMissingEvents,
+    Math.ceil(
+      publishedEvents.length * massDisappearancePolicy.missingEventRatio,
+    ),
   );
   if (disappeared >= threshold) {
     throw new Error(

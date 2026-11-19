@@ -3,8 +3,6 @@ import test from "node:test";
 
 import {
   assertSafeCalendarInput,
-  MASS_DISAPPEARANCE_MINIMUM,
-  MASS_DISAPPEARANCE_RATIO,
   mergeRegistry,
   serializeCalendarEvents,
 } from "../../scripts/sync-calendar-events.ts";
@@ -288,10 +286,10 @@ test("a new title URL cannot reuse an existing alias", () => {
   );
 });
 
-test("the measured mass-disappearance threshold blocks publication while one absence remains pending", () => {
-  const previous = {
+test("the mass-disappearance policy permits one absence and rounds half of an odd total up", () => {
+  const registry = {
     version: 4,
-    events: Array.from({ length: 4 }, (_, index) => ({
+    events: Array.from({ length: 5 }, (_, index) => ({
       sourceId: `source-${index}`,
       slug: `2026-08-0${index + 1}-event`,
       title: `Event ${index}`,
@@ -299,15 +297,26 @@ test("the measured mass-disappearance threshold blocks publication while one abs
       editorialState: "publicado",
     })),
   };
-  const current = previous.events.slice(0, 2);
 
-  assert.throws(
-    () => assertSafeCalendarInput(previous, current),
-    new RegExp(`2 of 4.*threshold 2`, "i"),
+  assert.doesNotThrow(() =>
+    assertSafeCalendarInput(
+      { ...registry, events: registry.events.slice(0, 2) },
+      registry.events.slice(0, 1),
+    ),
   );
   assert.doesNotThrow(() =>
-    assertSafeCalendarInput(previous, previous.events.slice(0, 3)),
+    assertSafeCalendarInput(registry, registry.events.slice(0, 3)),
   );
-  assert.equal(MASS_DISAPPEARANCE_MINIMUM, 2);
-  assert.equal(MASS_DISAPPEARANCE_RATIO, 0.5);
+  assert.throws(
+    () =>
+      assertSafeCalendarInput(
+        { ...registry, events: registry.events.slice(0, 4) },
+        registry.events.slice(0, 2),
+      ),
+    /2 of 4.*threshold 2/i,
+  );
+  assert.throws(
+    () => assertSafeCalendarInput(registry, registry.events.slice(0, 2)),
+    /3 of 5.*threshold 3/i,
+  );
 });
