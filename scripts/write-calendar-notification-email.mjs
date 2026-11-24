@@ -8,7 +8,45 @@ function singleLine(value) {
     .trim();
 }
 
+function formatBlockedCalendarInput(notification) {
+  const details = notification.after;
+  if (!Array.isArray(details?.missingEvents)) return null;
+  return [
+    "Publicación detenida. El sitio conserva la última versión válida.",
+    ...(notification.before?.publishedEventCount != null
+      ? [
+          `Eventos publicados de Google Calendar: ${notification.before.publishedEventCount}.`,
+        ]
+      : []),
+    ...(details.threshold != null
+      ? [`Umbral de bloqueo: ${details.threshold} eventos ausentes.`]
+      : []),
+    ...(details.validEventCount != null
+      ? [`Eventos válidos recibidos: ${details.validEventCount}.`]
+      : []),
+    ...(notification.before?.historicalEventCount
+      ? ["La fuente dejó de devolver todos los eventos históricos."]
+      : []),
+    ...(details.missingEvents.length
+      ? [
+          `Eventos publicados ausentes de los datos válidos (${details.missingEvents.length}):`,
+          ...details.missingEvents.map(
+            ({ title, date, slug }) =>
+              `- ${singleLine(title)} — ${singleLine(date)} (${singleLine(slug)})`,
+          ),
+        ]
+      : []),
+    ...(details.omittedEvents?.length
+      ? [
+          "Datos recibidos que impidieron procesar eventos:",
+          ...details.omittedEvents.map((reason) => `- ${singleLine(reason)}`),
+        ]
+      : []),
+  ];
+}
+
 function formatNotification(notification) {
+  const blockedInput = formatBlockedCalendarInput(notification);
   return [
     `Tipo: ${singleLine(notification.kind)}`,
     `Identidad: ${singleLine(notification.identity?.slug ?? "no aplica")}`,
@@ -16,8 +54,10 @@ function formatNotification(notification) {
     `Causa: ${singleLine(notification.cause)}`,
     `Accion requerida: ${singleLine(notification.actionRequired)}`,
     `Ejecucion: ${singleLine(notification.execution?.origin ?? "desconocida")} / ${singleLine(notification.execution?.runId ?? "sin identificador")}`,
-    `Antes (redactado): ${JSON.stringify(notification.before ?? null)}`,
-    `Despues (redactado): ${JSON.stringify(notification.after ?? null)}`,
+    ...(blockedInput ?? [
+      `Antes (redactado): ${JSON.stringify(notification.before ?? null)}`,
+      `Despues (redactado): ${JSON.stringify(notification.after ?? null)}`,
+    ]),
     `Huella de alerta: ${singleLine(notification.id)}`,
     ...(notification.after?.executionUrl
       ? [
@@ -47,10 +87,15 @@ export function formatCalendarNotificationEmail(
       "Calendar notification sender and recipient must be valid email addresses.",
     );
   }
+  const subject = notifications.some((notification) =>
+    Array.isArray(notification.after?.missingEvents),
+  )
+    ? "Publicacion detenida por datos faltantes del calendario"
+    : `${notifications.length} alerta(s) operativa(s) del calendario`;
   const plain = [
     `From: ${sender}`,
     `To: ${recipientAddress}`,
-    `Subject: [Federacion de Kendo] ${notifications.length} alerta(s) operativa(s) del calendario`,
+    `Subject: [Federacion de Kendo] ${subject}`,
     "Content-Type: text/plain; charset=UTF-8",
     "",
     "Alertas operativas del calendario. El contenido sensible fue redactado antes de generar este mensaje.",

@@ -321,10 +321,11 @@ function parseIcsDate(
   | { date: string; time?: string; isDateOnly: boolean; timeZone: string }
   | undefined {
   if (!property) return undefined;
-  const isDateOnly =
-    property.params.VALUE === "DATE" || /^\d{8}$/.test(property.rawValue);
+  const hasDateFormat = /^\d{8}$/.test(property.rawValue);
+  const isDateOnly = property.params.VALUE === "DATE" || hasDateFormat;
 
   if (isDateOnly) {
+    if (!hasDateFormat) return undefined;
     return {
       date: formatDate(parseBasicDate(property.rawValue)),
       isDateOnly: true,
@@ -475,6 +476,7 @@ function getOrganizer(property: IcsProperty | undefined) {
 export function parseCalendarEvent(
   properties: Map<string, IcsProperty>,
   warnings: string[] = [],
+  publishedDatesBySourceId?: ReadonlyMap<string, string>,
 ): RegistryEvent | undefined {
   const rawTitle = properties.get("SUMMARY")?.value;
   if (rawTitle?.toUpperCase().startsWith(draftPrefix)) {
@@ -495,15 +497,27 @@ export function parseCalendarEvent(
   }
 
   const uid = properties.get("UID")?.value;
-  const start = parseIcsDate(properties.get("DTSTART"));
+  const startProperty = properties.get("DTSTART");
+  const start = parseIcsDate(startProperty);
   const missingRequired = [
-    !rawTitle?.trim() && "title",
-    !start && "date",
-  ].filter((value): value is NonNullable<typeof value> => Boolean(value));
-  if (!uid || !rawTitle?.trim() || !start || missingRequired.length) {
-    const reason = !uid ? "UID" : missingRequired.join(" and ");
+    !uid && "UID (identificador ausente)",
+    !rawTitle?.trim() && "SUMMARY (titulo ausente)",
+    !start &&
+      (startProperty?.value
+        ? "DTSTART (fecha de inicio invalida)"
+        : "DTSTART (fecha de inicio ausente)"),
+  ].filter(Boolean);
+  if (!uid || !rawTitle?.trim() || !start) {
+    const publishedDate = uid
+      ? publishedDatesBySourceId?.get(hash(uid))
+      : undefined;
+    const date = start
+      ? start.date
+      : publishedDate
+        ? `${publishedDate} (última fecha publicada)`
+        : "fecha no disponible";
     warnings.push(
-      `Event omitted because required ${reason} is missing: ${rawTitle || "(untitled)"}`,
+      `Evento omitido: ${rawTitle?.trim() || "(sin titulo)"} - ${date} - ${missingRequired.join(", ")}`,
     );
     return undefined;
   }
@@ -578,7 +592,7 @@ function getEventIdentity(event: RegistryEvent, matchedAs?: string) {
   };
 }
 
-function createCalendarIdentityConflict({
+function createStructuredCalendarError({
   kind,
   message,
   identity,
@@ -600,7 +614,7 @@ function assertUniqueCurrentSlugs(events: RegistryEvent[]) {
           slug === event.slug
             ? "Duplicate calendar canonical slug"
             : "Duplicate calendar canonical slug or alias";
-        throw createCalendarIdentityConflict({
+        throw createStructuredCalendarError({
           kind: "url_evento_duplicada",
           message: `${label}: ${slug} (${previousOwner.sourceId} and ${event.sourceId}).`,
           identity: { slug },
@@ -622,18 +636,13 @@ function assertUniqueCurrentSlugs(events: RegistryEvent[]) {
 export function assertSafeCalendarInput(
   previousRegistry: Registry,
   parsedEvents: RegistryEvent[],
+  warnings: string[] = [],
 ) {
-  if (parsedEvents.length === 0) {
-    throw new Error(
-      "Calendar feed contains no valid events; no files were changed.",
-    );
-  }
-
   const currentSourceIds = new Map();
   for (const event of parsedEvents) {
     const previousOwner = currentSourceIds.get(event.sourceId);
     if (previousOwner) {
-      throw createCalendarIdentityConflict({
+      throw createStructuredCalendarError({
         kind: "id_fuente_duplicado",
         message: `Duplicate calendar source identity: ${event.sourceId}.`,
         identity: { sourceId: event.sourceId },
@@ -652,17 +661,33 @@ export function assertSafeCalendarInput(
   );
   const disappeared = publishedEvents.filter(
     (event) => !currentSourceIds.has(event.sourceId),
-  ).length;
+  );
   const threshold = Math.max(
     massDisappearancePolicy.minimumMissingEvents,
     Math.ceil(
       publishedEvents.length * massDisappearancePolicy.missingEventRatio,
     ),
   );
-  if (disappeared >= threshold) {
-    throw new Error(
-      `Mass calendar disappearance detected: ${disappeared} of ${publishedEvents.length} published events are absent (threshold ${threshold}); no files were changed.`,
-    );
+  const emptyFeed = parsedEvents.length === 0;
+  if (emptyFeed || disappeared.length >= threshold) {
+    throw createStructuredCalendarError({
+      kind: emptyFeed ? "parser_o_fuente_invalida" : "desaparicion_masiva",
+      message: emptyFeed
+        ? "Calendar feed contains no valid events; no files were changed."
+        : `Mass calendar disappearance detected: ${disappeared.length} of ${publishedEvents.length} published events are absent (threshold ${threshold}); no files were changed.`,
+      identity: {},
+      before: { publishedEventCount: publishedEvents.length },
+      after: {
+        validEventCount: parsedEvents.length,
+        threshold: emptyFeed ? null : threshold,
+        missingEvents: disappeared.map(({ title, date, slug }) => ({
+          title,
+          date,
+          slug,
+        })),
+        omittedEvents: warnings,
+      },
+    });
   }
 }
 
@@ -670,6 +695,7 @@ export function mergeRegistry(
   previousRegistry: Registry,
   currentEvents: RegistryEvent[],
   now: Date = new Date(),
+  warnings: string[] = [],
 ): Registry {
   const registryVersion = 4;
   assertUniqueCurrentSlugs(currentEvents);
@@ -685,9 +711,21 @@ export function mergeRegistry(
     historicalEvents.length > 0 &&
     historicalEvents.every((event) => !currentSourceIds.has(event.sourceId))
   ) {
-    throw new Error(
-      "All historical events disappeared from the Calendar feed; no files were changed.",
-    );
+    throw createStructuredCalendarError({
+      kind: "desaparicion_masiva",
+      message:
+        "All historical events disappeared from the Calendar feed; no files were changed.",
+      identity: {},
+      before: { historicalEventCount: historicalEvents.length },
+      after: {
+        missingEvents: historicalEvents.map(({ title, date, slug }) => ({
+          title,
+          date,
+          slug,
+        })),
+        omittedEvents: warnings,
+      },
+    });
   }
   const previousBySourceId = new Map(
     (previousRegistry.events ?? []).map((event) => [event.sourceId, event]),
@@ -1790,11 +1828,17 @@ export async function synchronizeCalendar({
 
   const icsText = await readCalendarSource(source);
   const warnings: string[] = [];
-  const parsed = parseVEvents(icsText)
-    .map((properties) => parseCalendarEvent(properties, warnings))
-    .filter((value): value is NonNullable<typeof value> => Boolean(value));
+  const icsEvents = parseVEvents(icsText);
   const previousRegistry = await readRegistry(registryPath);
-  assertSafeCalendarInput(previousRegistry, parsed);
+  const publishedDatesBySourceId = new Map(
+    previousRegistry.events.map(({ sourceId, date }) => [sourceId, date]),
+  );
+  const parsed = icsEvents
+    .map((properties) =>
+      parseCalendarEvent(properties, warnings, publishedDatesBySourceId),
+    )
+    .filter((value): value is NonNullable<typeof value> => Boolean(value));
+  assertSafeCalendarInput(previousRegistry, parsed, warnings);
   const currentBySourceId = new Map(
     parsed.map((event) => [event.sourceId, event]),
   );
@@ -1803,7 +1847,7 @@ export async function synchronizeCalendar({
     [source, process.env.CALENDAR_ICS_URL],
   );
   historicalReport.galleryChanges = [];
-  let registry = mergeRegistry(previousRegistry, parsed, now);
+  let registry = mergeRegistry(previousRegistry, parsed, now, warnings);
 
   const galleryEvents = registry.events
     .filter((event) => event.syncPolicy !== "manual")

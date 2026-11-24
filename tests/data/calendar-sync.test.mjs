@@ -13,7 +13,11 @@ import sharp from "sharp";
 
 import { createIcs } from "../helpers/calendar-fixtures.mjs";
 
-import { synchronizeCalendar } from "../../scripts/sync-calendar-events.ts";
+import {
+  createCalendarFailureNotification,
+  synchronizeCalendar,
+} from "../../scripts/sync-calendar-events.ts";
+import { formatCalendarNotificationEmail } from "../../scripts/write-calendar-notification-email.mjs";
 
 const phase2FixturePath = new URL(
   "../fixtures/calendar-events-phase-2.ics",
@@ -133,6 +137,59 @@ for (const scenario of REJECTED_FEEDS) {
     await expectFilesUnchanged(before);
   });
 }
+
+test("a blocked publication email identifies absent events and rejected Calendar fields", async (t) => {
+  const tempDirectory = await temporaryDirectory(t, "fak-calendar-");
+  const events = [
+    { uid: "exam@example.test", title: "Examen", date: "20260808" },
+    { uid: "seminar@example.test", title: "Seminario", date: "20260809" },
+    { uid: "practice@example.test", title: "Practica", date: "20260810" },
+    { uid: "tournament@example.test", title: "Torneo", date: "20260811" },
+  ];
+  const { outputPath, registryPath } = await runSynchronization({
+    tempDirectory,
+    name: "published",
+    events,
+  });
+  const source = path.join(tempDirectory, "incomplete.ics");
+  const feed = createIcs([
+    ...events.slice(0, 3),
+    { uid: "", title: "https://example.test/private-feed", date: "invalid" },
+    { uid: "", title: "Entrenamiento", date: "20260812" },
+  ]).replace("DTSTART;VALUE=DATE:20260810\n", "");
+  await writeFile(source, feed);
+  const before = await snapshotFiles([outputPath, registryPath]);
+  await assert.rejects(
+    synchronizeCalendar({ source, outputPath, registryPath }),
+    (error) => {
+      const report = createCalendarFailureNotification(error);
+      assert.equal(report.notifications[0].kind, "desaparicion_masiva");
+      const email = formatCalendarNotificationEmail(
+        report,
+        "alerts@example.test",
+        "owner@example.test",
+      );
+      assert.match(
+        email,
+        /Subject: .*Publicacion detenida por datos faltantes/,
+      );
+      assert.match(email, /Practica — 2026-08-10 \(practica\)/);
+      assert.match(email, /Torneo — 2026-08-11 \(torneo\)/);
+      assert.match(
+        email,
+        /Practica - 2026-08-10 \(última fecha publicada\) - DTSTART \(fecha de inicio ausente\)/,
+      );
+      assert.match(email, /Entrenamiento - 2026-08-12 - UID/);
+      assert.match(
+        email,
+        /fecha no disponible - UID \(identificador ausente\), DTSTART \(fecha de inicio invalida\)/,
+      );
+      assert.doesNotMatch(email, /private-feed|practice@example\.test/);
+      return true;
+    },
+  );
+  await expectFilesUnchanged(before);
+});
 
 test("phase 2 normalizes public descriptions and event types without publishing album URLs", async (t) => {
   const tempDirectory = await temporaryDirectory(t, "fak-calendar-");

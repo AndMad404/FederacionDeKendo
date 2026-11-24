@@ -118,11 +118,13 @@ test("omits an event and warns when title or date is missing", () => {
 
   assert.deepEqual(events, []);
   assert.equal(
-    warnings.some((warning) => warning.includes("title")),
+    warnings.some((warning) => warning.includes("SUMMARY (titulo ausente)")),
     true,
   );
   assert.equal(
-    warnings.some((warning) => warning.includes("date")),
+    warnings.some((warning) =>
+      warning.includes("DTSTART (fecha de inicio ausente)"),
+    ),
     true,
   );
 });
