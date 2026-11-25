@@ -9,7 +9,15 @@ import type {
 
 import type { EventGallery } from "../src/app/data/eventGalleries";
 import { createHash } from "node:crypto";
-import { cp, mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
+import {
+  cp,
+  mkdir,
+  mkdtemp,
+  readFile,
+  rename,
+  rm,
+  writeFile,
+} from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
@@ -99,7 +107,7 @@ async function listPublicDriveFolder(
   return extractDriveFiles(await response.text());
 }
 
-async function downloadDriveFile(
+export async function downloadDriveFile(
   file: DriveFile,
   fetchImpl: typeof fetch = fetch,
 ) {
@@ -107,7 +115,31 @@ async function downloadDriveFile(
     `https://drive.usercontent.google.com/download?id=${encodeURIComponent(file.id)}&export=download&confirm=t`,
   );
   if (!response.ok) throw new Error(`Download failed for ${file.name}.`);
-  return Buffer.from(await response.arrayBuffer());
+  const oversized = () => new Error(`${file.name}: file exceeds 20 MB.`);
+  const length = Number(response.headers.get("content-length"));
+  if (length > MAX_BYTES) {
+    await response.body?.cancel();
+    throw oversized();
+  }
+  if (!response.body) throw new Error(`Download failed for ${file.name}.`);
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > MAX_BYTES) throw oversized();
+      chunks.push(value);
+    }
+    return Buffer.concat(chunks, total);
+  } catch (error) {
+    await reader.cancel().catch(() => {});
+    throw error;
+  } finally {
+    reader.releaseLock();
+  }
 }
 
 async function inspectImage(buffer: Buffer, name: string) {
@@ -242,241 +274,269 @@ export async function synchronizeEventGalleries({
   let hasStateChange = false;
   let importedCount = 0;
   const stage = `${imagesRoot}.${process.pid}.stage`;
-  await rm(stage, { recursive: true, force: true });
-  await mkdir(path.dirname(stage), { recursive: true });
+  const stateStage = `${statePath}.${process.pid}.stage`;
+  const manifestStage = `${manifestPath}.${process.pid}.stage`;
+  let inputStage: string | undefined;
+  let handedOff = false;
   try {
-    await cp(imagesRoot, stage, { recursive: true });
-  } catch (caught) {
-    const error = caught as CalendarError;
-
-    if (error?.code === "ENOENT") await mkdir(stage, { recursive: true });
-    else throw error;
-  }
-
-  for (const event of events ?? []) {
-    const stateFrozen = previousState.galleries?.[event.slug];
-    const manifestFrozen = previousGalleries[event.slug];
-    if (
-      stateFrozen &&
-      manifestFrozen &&
-      stateFrozen.fingerprint !== manifestFrozen.fingerprint
-    ) {
-      warnings.push(
-        `${event.slug}: gallery state is inconsistent; published gallery preserved.`,
-      );
-      alarms.push({
-        slug: event.slug,
-        status: "galeria_congelada_cambio_detectado",
-        reason: "estado_incompatible",
-      });
-      continue;
-    }
-    const frozen = stateFrozen ?? manifestFrozen;
-    if (frozen) continue;
-    const galleryCheckPhase = event.galleryCheckPhase ?? "final";
-    const previousCheckPhase = previousState.checks?.[event.slug]?.phase;
-    const phaseRank: Record<string, number> = { first: 1, final: 2 };
-    if (
-      (phaseRank[previousCheckPhase ?? ""] ?? 0) >=
-        (phaseRank[galleryCheckPhase] ?? 0) &&
-      !event.albumUrl &&
-      !event.localFiles?.length
-    ) {
-      continue;
-    }
-    nextState.checks[event.slug] = { phase: galleryCheckPhase };
-    hasStateChange = true;
-    if (!event.albumUrl && !event.localFiles?.length) {
-      alarms.push({
-        slug: event.slug,
-        status: frozen
-          ? "galeria_congelada_cambio_detectado"
-          : "album_aun_no_publicado",
-        reason: frozen ? "album_retirado" : "album_ausente",
-      });
-      continue;
-    }
-    if (!event.localFiles?.length && !getDriveFolderId(event.albumUrl)) {
-      warnings.push(`${event.slug}: invalid Google Drive folder URL.`);
-      alarms.push({
-        slug: event.slug,
-        status: frozen
-          ? "galeria_congelada_cambio_detectado"
-          : "album_aun_no_publicado",
-        reason: "album_invalido",
-      });
-      continue;
-    }
+    await rm(stage, { recursive: true, force: true });
+    await mkdir(path.dirname(stage), { recursive: true });
+    inputStage = await mkdtemp(
+      path.join(path.dirname(stage), ".gallery-inputs-"),
+    );
     try {
-      if (event.posterSource) {
-        const original = new URL(event.posterSource.url);
-        if (original.protocol !== "https:") {
-          throw new Error("Invalid poster source.");
-        }
-      }
-      const files = (
-        event.localFiles?.length
-          ? event.localFiles.map((file) => ({ id: file.path, name: file.name }))
-          : await listFolder(event.albumUrl!)
-      ).sort((a, b) => collator.compare(a.name, b.name));
-      const valid = [];
-      let invalidFile = false;
-      const seen = new Set();
-      for (const file of files) {
-        try {
-          const buffer = event.localFiles?.length
-            ? await readFile(file.id)
-            : await downloadFile(file);
-          const inspected = await inspectImage(buffer, file.name);
-          if (seen.has(inspected.pixelHash)) {
-            warnings.push(`${event.slug}: duplicate ignored.`);
-            continue;
-          }
-          seen.add(inspected.pixelHash);
-          valid.push({ file, buffer, ...inspected });
-        } catch (caught) {
-          const error = caught as CalendarError;
+      await cp(imagesRoot, stage, { recursive: true });
+    } catch (caught) {
+      const error = caught as CalendarError;
 
-          invalidFile = true;
-          warnings.push(`${event.slug}: ${error.message}`);
-        }
-      }
-      if (valid.length === 0 || (invalidFile && valid.length < 5)) {
+      if (error?.code === "ENOENT") await mkdir(stage, { recursive: true });
+      else throw error;
+    }
+
+    for (const event of events ?? []) {
+      const stateFrozen = previousState.galleries?.[event.slug];
+      const manifestFrozen = previousGalleries[event.slug];
+      if (
+        stateFrozen &&
+        manifestFrozen &&
+        stateFrozen.fingerprint !== manifestFrozen.fingerprint
+      ) {
         warnings.push(
-          `${event.slug}: partial or invalid import; previous gallery preserved.`,
+          `${event.slug}: gallery state is inconsistent; published gallery preserved.`,
+        );
+        alarms.push({
+          slug: event.slug,
+          status: "galeria_congelada_cambio_detectado",
+          reason: "estado_incompatible",
+        });
+        continue;
+      }
+      const frozen = stateFrozen ?? manifestFrozen;
+      if (frozen) continue;
+      const galleryCheckPhase = event.galleryCheckPhase ?? "final";
+      const previousCheckPhase = previousState.checks?.[event.slug]?.phase;
+      const phaseRank: Record<string, number> = { first: 1, final: 2 };
+      if (
+        (phaseRank[previousCheckPhase ?? ""] ?? 0) >=
+          (phaseRank[galleryCheckPhase] ?? 0) &&
+        !event.albumUrl &&
+        !event.localFiles?.length
+      ) {
+        continue;
+      }
+      nextState.checks[event.slug] = { phase: galleryCheckPhase };
+      hasStateChange = true;
+      if (!event.albumUrl && !event.localFiles?.length) {
+        alarms.push({
+          slug: event.slug,
+          status: frozen
+            ? "galeria_congelada_cambio_detectado"
+            : "album_aun_no_publicado",
+          reason: frozen ? "album_retirado" : "album_ausente",
+        });
+        continue;
+      }
+      if (!event.localFiles?.length && !getDriveFolderId(event.albumUrl)) {
+        warnings.push(`${event.slug}: invalid Google Drive folder URL.`);
+        alarms.push({
+          slug: event.slug,
+          status: frozen
+            ? "galeria_congelada_cambio_detectado"
+            : "album_aun_no_publicado",
+          reason: "album_invalido",
+        });
+        continue;
+      }
+      try {
+        if (event.posterSource) {
+          const original = new URL(event.posterSource.url);
+          if (original.protocol !== "https:") {
+            throw new Error("Invalid poster source.");
+          }
+        }
+        const files = (
+          event.localFiles?.length
+            ? event.localFiles.map((file) => ({
+                id: file.path,
+                name: file.name,
+              }))
+            : await listFolder(event.albumUrl!)
+        ).sort((a, b) => collator.compare(a.name, b.name));
+        const valid = [];
+        let invalidFile = false;
+        const seen = new Set();
+        for (const file of files) {
+          try {
+            const buffer = event.localFiles?.length
+              ? await readFile(file.id)
+              : await downloadFile(file);
+            const inspected = await inspectImage(buffer, file.name);
+            if (seen.has(inspected.pixelHash)) {
+              warnings.push(`${event.slug}: duplicate ignored.`);
+              continue;
+            }
+            seen.add(inspected.pixelHash);
+            const inputPath = path.join(inputStage, String(valid.length));
+            await writeFile(inputPath, buffer);
+            valid.push({ file, inputPath, ...inspected });
+          } catch (caught) {
+            const error = caught as CalendarError;
+
+            invalidFile = true;
+            warnings.push(`${event.slug}: ${error.message}`);
+          }
+        }
+        if (valid.length === 0 || (invalidFile && valid.length < 5)) {
+          warnings.push(
+            `${event.slug}: partial or invalid import; previous gallery preserved.`,
+          );
+          alarms.push({
+            slug: event.slug,
+            status: frozen
+              ? "galeria_congelada_cambio_detectado"
+              : "album_aun_no_publicado",
+            reason: "importacion_invalida",
+          });
+          continue;
+        }
+        const selected = valid;
+        const fingerprint = digest(
+          selected
+            .map((item) => `${item.file.name}:${item.pixelHash}`)
+            .join("\n"),
+        );
+        if (frozen) {
+          if (!stateFrozen) {
+            nextState.galleries[event.slug] = {
+              fingerprint: frozen.fingerprint,
+            };
+            hasGalleryChange = true;
+            hasStateChange = true;
+          }
+          if (frozen.fingerprint !== fingerprint) {
+            warnings.push(
+              `${event.slug}: Drive changed; frozen gallery preserved.`,
+            );
+            alarms.push({
+              slug: event.slug,
+              status: "galeria_congelada_cambio_detectado",
+              reason: "album_modificado",
+            });
+          }
+          continue;
+        }
+        const eventDirectory = path.join(stage, event.slug);
+        await rm(eventDirectory, { recursive: true, force: true });
+        await mkdir(eventDirectory, { recursive: true });
+        const images = [];
+        for (const [index, item] of selected.entries()) {
+          const buffer = await readFile(item.inputPath);
+          const baseName = `photo-${index + 1}`;
+          const widths = WIDTHS.filter((width) => width <= item.width);
+          if (!widths.includes(item.width) && item.width < WIDTHS.at(-1)!)
+            widths.push(item.width);
+          const variants = [];
+          for (const width of widths)
+            variants.push(
+              ...(await createVariants(
+                buffer,
+                eventDirectory,
+                baseName,
+                width,
+              )),
+            );
+          const byFormat = Object.groupBy(
+            variants,
+            (variant) => variant.format,
+          );
+          const largest = variants.toSorted((a, b) => b.width - a.width)[0];
+          const publicBase = `/images/events/${event.slug}/`;
+          images.push({
+            order: index + 1,
+            alt: event.posterSource
+              ? event.posterSource.label
+              : `Federaciones de Asociaciones de Kendo - ${event.title} ${event.date}`,
+            width: largest.width,
+            height: largest.height,
+            src: `${publicBase}${baseName}-${largest.width}.webp`,
+            srcSet: Object.fromEntries(
+              Object.entries(byFormat).map(([format, values]) => [
+                format,
+                values!
+                  .map(
+                    (value) => `${publicBase}${value.fileName} ${value.width}w`,
+                  )
+                  .join(", "),
+              ]),
+            ) as { webp: string },
+            sizes: SIZES,
+          });
+        }
+        nextGalleries[event.slug] = {
+          fingerprint,
+          images,
+          ...(event.posterSource ? { posterSource: event.posterSource } : {}),
+        };
+        nextState.galleries[event.slug] = { fingerprint };
+        hasGalleryChange = true;
+        hasStateChange = true;
+        importedCount += 1;
+      } catch {
+        warnings.push(
+          `${event.slug}: gallery access or download failed; previous gallery preserved.`,
         );
         alarms.push({
           slug: event.slug,
           status: frozen
             ? "galeria_congelada_cambio_detectado"
             : "album_aun_no_publicado",
-          reason: "importacion_invalida",
-        });
-        continue;
-      }
-      const selected = valid;
-      const fingerprint = digest(
-        selected
-          .map((item) => `${item.file.name}:${item.pixelHash}`)
-          .join("\n"),
-      );
-      if (frozen) {
-        if (!stateFrozen) {
-          nextState.galleries[event.slug] = { fingerprint: frozen.fingerprint };
-          hasGalleryChange = true;
-          hasStateChange = true;
-        }
-        if (frozen.fingerprint !== fingerprint) {
-          warnings.push(
-            `${event.slug}: Drive changed; frozen gallery preserved.`,
-          );
-          alarms.push({
-            slug: event.slug,
-            status: "galeria_congelada_cambio_detectado",
-            reason: "album_modificado",
-          });
-        }
-        continue;
-      }
-      const eventDirectory = path.join(stage, event.slug);
-      await rm(eventDirectory, { recursive: true, force: true });
-      await mkdir(eventDirectory, { recursive: true });
-      const images = [];
-      for (const [index, item] of selected.entries()) {
-        const baseName = `photo-${index + 1}`;
-        const widths = WIDTHS.filter((width) => width <= item.width);
-        if (!widths.includes(item.width) && item.width < WIDTHS.at(-1)!)
-          widths.push(item.width);
-        const variants = [];
-        for (const width of widths)
-          variants.push(
-            ...(await createVariants(
-              item.buffer,
-              eventDirectory,
-              baseName,
-              width,
-            )),
-          );
-        const byFormat = Object.groupBy(variants, (variant) => variant.format);
-        const largest = variants.toSorted((a, b) => b.width - a.width)[0];
-        const publicBase = `/images/events/${event.slug}/`;
-        images.push({
-          order: index + 1,
-          alt: event.posterSource
-            ? event.posterSource.label
-            : `Federaciones de Asociaciones de Kendo - ${event.title} ${event.date}`,
-          width: largest.width,
-          height: largest.height,
-          src: `${publicBase}${baseName}-${largest.width}.webp`,
-          srcSet: Object.fromEntries(
-            Object.entries(byFormat).map(([format, values]) => [
-              format,
-              values!
-                .map(
-                  (value) => `${publicBase}${value.fileName} ${value.width}w`,
-                )
-                .join(", "),
-            ]),
-          ) as { webp: string },
-          sizes: SIZES,
+          reason: "acceso_o_descarga_fallida",
         });
       }
-      nextGalleries[event.slug] = {
-        fingerprint,
-        images,
-        ...(event.posterSource ? { posterSource: event.posterSource } : {}),
-      };
-      nextState.galleries[event.slug] = { fingerprint };
-      hasGalleryChange = true;
-      hasStateChange = true;
-      importedCount += 1;
-    } catch {
-      warnings.push(
-        `${event.slug}: gallery access or download failed; previous gallery preserved.`,
-      );
-      alarms.push({
-        slug: event.slug,
-        status: frozen
-          ? "galeria_congelada_cambio_detectado"
-          : "album_aun_no_publicado",
-        reason: "acceso_o_descarga_fallida",
-      });
     }
-  }
 
-  if (!hasGalleryChange && !hasStateChange) {
-    await rm(stage, { recursive: true, force: true });
+    if (!hasGalleryChange && !hasStateChange) {
+      await rm(stage, { recursive: true, force: true });
+      return {
+        galleries: nextGalleries,
+        state: nextState,
+        warnings,
+        alarms,
+        importedCount,
+      };
+    }
+
+    await mkdir(path.dirname(stateStage), { recursive: true });
+    await writeFile(stateStage, `${JSON.stringify(nextState, null, 2)}\n`);
+    const publication = [{ target: statePath, staged: stateStage }];
+    if (hasGalleryChange) {
+      await mkdir(path.dirname(manifestStage), { recursive: true });
+      await writeFile(manifestStage, serializeManifest(nextGalleries));
+      publication.unshift(
+        { target: imagesRoot, staged: stage },
+        { target: manifestPath, staged: manifestStage },
+      );
+    } else {
+      await rm(stage, { recursive: true, force: true });
+    }
+    await rm(inputStage, { recursive: true, force: true });
+    inputStage = undefined;
+    if (!deferPublish) await replaceTransaction(publication);
+    handedOff = deferPublish;
     return {
       galleries: nextGalleries,
       state: nextState,
       warnings,
       alarms,
+      publication,
       importedCount,
     };
-  }
-
-  const stateStage = `${statePath}.${process.pid}.stage`;
-  await mkdir(path.dirname(stateStage), { recursive: true });
-  await writeFile(stateStage, `${JSON.stringify(nextState, null, 2)}\n`);
-  const publication = [{ target: statePath, staged: stateStage }];
-  if (hasGalleryChange) {
-    const manifestStage = `${manifestPath}.${process.pid}.stage`;
-    await mkdir(path.dirname(manifestStage), { recursive: true });
-    await writeFile(manifestStage, serializeManifest(nextGalleries));
-    publication.unshift(
-      { target: imagesRoot, staged: stage },
-      { target: manifestPath, staged: manifestStage },
+  } finally {
+    await Promise.all(
+      [
+        ...(inputStage ? [inputStage] : []),
+        ...(!handedOff ? [stage, stateStage, manifestStage] : []),
+      ].map((staged) => rm(staged, { recursive: true, force: true })),
     );
-  } else {
-    await rm(stage, { recursive: true, force: true });
   }
-  if (!deferPublish) await replaceTransaction(publication);
-  return {
-    galleries: nextGalleries,
-    state: nextState,
-    warnings,
-    alarms,
-    publication,
-    importedCount,
-  };
 }

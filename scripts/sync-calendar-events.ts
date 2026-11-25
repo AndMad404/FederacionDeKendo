@@ -1876,57 +1876,59 @@ export async function synchronizeCalendar({
     })
     .filter((value): value is NonNullable<typeof value> => Boolean(value));
   let galleryResult;
-  if (galleryEvents.length || galleryOptions?.force) {
-    galleryResult = await synchronizeEventGalleries({
-      events: galleryEvents,
-      ...galleryOptions,
-      deferPublish: true,
-    });
-    warnings.push(...galleryResult.warnings);
-    historicalReport.galleryChanges = galleryResult.alarms;
-  }
-
-  const notificationReport = createCalendarNotifications(registry);
-  const notificationReportPath = process.env.CALENDAR_NOTIFICATIONS_REPORT_PATH;
-  if (notificationReportPath) {
-    await writeCalendarNotificationsReport(
-      notificationReport,
-      notificationReportPath,
-    );
-    registry = recordCalendarNotifications(registry, notificationReport);
-  }
-
-  let calendarPublication;
   try {
-    calendarPublication = await Promise.all([
-      stageTextFile(registryPath, `${JSON.stringify(registry, null, 2)}\n`),
-      stageTextFile(outputPath, serializeCalendarEvents(registry.events)),
-    ]);
-  } catch (caught) {
-    const error = caught as CalendarError;
+    if (galleryEvents.length || galleryOptions?.force) {
+      galleryResult = await synchronizeEventGalleries({
+        events: galleryEvents,
+        ...galleryOptions,
+        deferPublish: true,
+      });
+      warnings.push(...galleryResult.warnings);
+      historicalReport.galleryChanges = galleryResult.alarms;
+    }
 
-    await Promise.all(
-      (galleryResult?.publication ?? []).map(({ staged }) =>
-        rm(staged, { recursive: true, force: true }),
+    const notificationReport = createCalendarNotifications(registry);
+    const notificationReportPath =
+      process.env.CALENDAR_NOTIFICATIONS_REPORT_PATH;
+    if (notificationReportPath) {
+      await writeCalendarNotificationsReport(
+        notificationReport,
+        notificationReportPath,
+      );
+      registry = recordCalendarNotifications(registry, notificationReport);
+    }
+
+    const calendarPublication = [
+      await stageTextFile(
+        registryPath,
+        `${JSON.stringify(registry, null, 2)}\n`,
       ),
+      await stageTextFile(outputPath, serializeCalendarEvents(registry.events)),
+    ];
+    await replaceTransaction([
+      ...(galleryResult?.publication ?? []),
+      ...calendarPublication,
+    ]);
+    await writeHistoricalChangesReport(
+      historicalReport,
+      process.env.HISTORICAL_CHANGES_REPORT_PATH,
     );
-    throw error;
+    return {
+      registry,
+      galleryResult,
+      warnings,
+      historicalReport,
+      notificationReport,
+    };
+  } finally {
+    await Promise.all(
+      [
+        ...(galleryResult?.publication ?? []).map(({ staged }) => staged),
+        `${registryPath}.${process.pid}.stage`,
+        `${outputPath}.${process.pid}.stage`,
+      ].map((staged) => rm(staged, { recursive: true, force: true })),
+    );
   }
-  await replaceTransaction([
-    ...(galleryResult?.publication ?? []),
-    ...calendarPublication,
-  ]);
-  await writeHistoricalChangesReport(
-    historicalReport,
-    process.env.HISTORICAL_CHANGES_REPORT_PATH,
-  );
-  return {
-    registry,
-    galleryResult,
-    warnings,
-    historicalReport,
-    notificationReport,
-  };
 }
 
 async function main() {

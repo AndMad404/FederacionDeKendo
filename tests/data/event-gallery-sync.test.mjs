@@ -5,13 +5,15 @@ import {
   expectFilesUnchanged,
 } from "../helpers/temporary-directory.mjs";
 import assert from "node:assert/strict";
-import { readFile, stat, writeFile } from "node:fs/promises";
+import { readdir, readFile, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import sharp from "sharp";
 
 import {
   EVENT_GALLERY_LIMITS,
+  downloadDriveFile,
+  replaceTransaction,
   extractDriveFiles,
   getDriveFolderId,
   serializeManifest,
@@ -372,4 +374,149 @@ test("imports an album added after the final absent-gallery check", async (t) =>
 
   assert.equal(imported.importedCount, 1);
   assert.equal(imported.galleries[event.slug].images.length, 1);
+});
+
+test("rejects oversized Content-Length without reading the download", async () => {
+  let cancelled = false;
+  let reads = 0;
+  const body = new ReadableStream(
+    {
+      pull() {
+        reads += 1;
+      },
+      cancel() {
+        cancelled = true;
+      },
+    },
+    { highWaterMark: 0 },
+  );
+  await assert.rejects(
+    downloadDriveFile(
+      { id: "x", name: "large.jpg" },
+      async () =>
+        new Response(body, {
+          headers: {
+            "content-length": String(EVENT_GALLERY_LIMITS.maxBytes + 1),
+          },
+        }),
+    ),
+    /exceeds 20 MB/,
+  );
+  assert.equal(reads, 0);
+  assert.equal(cancelled, true);
+});
+
+for (const declaredLength of [undefined, "1"]) {
+  test(`cancels an oversized stream with Content-Length ${declaredLength ?? "absent"}`, async () => {
+    let reads = 0;
+    let cancelled = false;
+    const body = new ReadableStream(
+      {
+        pull(controller) {
+          reads += 1;
+          controller.enqueue(new Uint8Array(1024 * 1024));
+        },
+        cancel() {
+          cancelled = true;
+        },
+      },
+      { highWaterMark: 0 },
+    );
+    const headers = declaredLength ? { "content-length": declaredLength } : {};
+    await assert.rejects(
+      downloadDriveFile(
+        { id: "x", name: "large.jpg" },
+        async () => new Response(body, { headers }),
+      ),
+      /exceeds 20 MB/,
+    );
+    assert.equal(reads, 21);
+    assert.equal(cancelled, true);
+  });
+}
+
+test("accepts a stream at exactly the download limit", async () => {
+  let remaining = 20;
+  const body = new ReadableStream(
+    {
+      pull(controller) {
+        if (remaining-- > 0) controller.enqueue(new Uint8Array(1024 * 1024));
+        else controller.close();
+      },
+    },
+    { highWaterMark: 0 },
+  );
+  const result = await downloadDriveFile(
+    { id: "x", name: "limit.jpg" },
+    async () => new Response(body),
+  );
+  assert.equal(result.length, EVENT_GALLERY_LIMITS.maxBytes);
+});
+
+test("cleans staged galleries and originals when manifest staging fails", async (t) => {
+  const context = await fixture(t, [
+    { id: "one", name: "one.jpg", buffer: await image("red") },
+  ]);
+  const blocker = path.join(context.directory, "not-a-directory");
+  await writeFile(blocker, "block");
+  await assert.rejects(
+    run({
+      ...context.options,
+      manifestPath: path.join(blocker, "manifest.ts"),
+    }),
+  );
+  assert.deepEqual((await readdir(context.directory)).sort(), [
+    "not-a-directory",
+  ]);
+});
+
+test("cleans an unused image stage without changing its source", async (t) => {
+  const context = await fixture(t, []);
+  await writeFile(context.options.imagesRoot, "original");
+  await synchronizeEventGalleries({ ...context.options, events: [] });
+  assert.deepEqual(await readdir(context.directory), ["images"]);
+  assert.equal(await readFile(context.options.imagesRoot, "utf8"), "original");
+});
+
+test("spools originals separately and hands off only publishable stages", async (t) => {
+  const context = await fixture(t, [
+    { id: "one", name: "1.jpg", buffer: await image("red") },
+    { id: "two", name: "2.jpg", buffer: await image("blue") },
+  ]);
+  let checkedSpool = false;
+  const result = await run({
+    ...context.options,
+    deferPublish: true,
+    downloadFile: async (file) => {
+      if (file.id === "two") {
+        const spool = (await readdir(context.directory)).find((name) =>
+          name.startsWith(".gallery-inputs-"),
+        );
+        assert.ok(spool);
+        assert.deepEqual(await readdir(path.join(context.directory, spool)), [
+          "0",
+        ]);
+        checkedSpool = true;
+      }
+      return file.buffer;
+    },
+  });
+  assert.equal(checkedSpool, true);
+  assert.equal(
+    (await readdir(context.directory)).some((name) =>
+      name.startsWith(".gallery-inputs-"),
+    ),
+    false,
+  );
+  assert.equal(result.publication.length, 3);
+  for (const { staged } of result.publication) await stat(staged);
+  await replaceTransaction(result.publication);
+  assert.deepEqual((await readdir(context.directory)).sort(), [
+    "eventGalleries.ts",
+    "eventGalleryState.json",
+    "images",
+  ]);
+  assert.deepEqual(await readdir(context.options.imagesRoot), [
+    "2026-01-01-evento",
+  ]);
 });

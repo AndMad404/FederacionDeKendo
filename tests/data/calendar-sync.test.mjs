@@ -5,7 +5,7 @@ import {
   expectFilesUnchanged,
 } from "../helpers/temporary-directory.mjs";
 import assert from "node:assert/strict";
-import { readFile, writeFile } from "node:fs/promises";
+import { readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
@@ -257,4 +257,55 @@ test("phase 2 normalizes public descriptions and event types without publishing 
     /drive\.google|phase2ValidAlbum|private-file-id/.test(galleryManifest),
     false,
   );
+});
+
+test("cleans deferred gallery stages and a successful registry stage when calendar staging fails", async (t) => {
+  const directory = await temporaryDirectory(t, "fak-calendar-stage-");
+  const source = path.join(directory, "input.ics");
+  const registryPath = path.join(directory, "registry.json");
+  const blocker = path.join(directory, "not-a-directory");
+  await writeFile(
+    source,
+    createIcs([{ uid: "stage@example.test", title: "Examen" }]),
+  );
+  await writeFile(blocker, "block");
+  await writeFile(
+    path.join(directory, "photo.jpg"),
+    await sharp({
+      create: { width: 640, height: 480, channels: 3, background: "red" },
+    })
+      .jpeg()
+      .toBuffer(),
+  );
+  await assert.rejects(
+    synchronizeCalendar({
+      source,
+      registryPath,
+      outputPath: path.join(blocker, "events.ts"),
+      now: new Date("2026-07-01"),
+      galleryOptions: {
+        force: true,
+        events: [
+          {
+            slug: "gallery",
+            title: "Gallery",
+            localFiles: [
+              { name: "1.jpg", path: path.join(directory, "photo.jpg") },
+            ],
+          },
+        ],
+        manifestPath: path.join(directory, "gallery.ts"),
+        statePath: path.join(directory, "gallery-state.json"),
+        imagesRoot: path.join(directory, "images"),
+        downloadFile: async () => {
+          throw new Error("Unexpected download");
+        },
+      },
+    }),
+  );
+  assert.deepEqual((await readdir(directory)).sort(), [
+    "input.ics",
+    "not-a-directory",
+    "photo.jpg",
+  ]);
 });

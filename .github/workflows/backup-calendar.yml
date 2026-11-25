@@ -1,0 +1,30 @@
+name: Back up private calendar
+on:
+  schedule:
+    - cron: "15 9 * * *"
+  workflow_dispatch: null
+permissions:
+  contents: read
+concurrency:
+  group: private-calendar-backup
+  cancel-in-progress: false
+jobs:
+  backup:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact workflow revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Set up project
+        uses: ./.github/actions/setup-project
+      - name: Back up ICS and verify restoration
+        run: node --import tsx scripts/calendar-backup.mjs backup
+        env:
+          CALENDAR_ICS_URL: ${{ secrets.CALENDAR_ICS_URL }}
+          CALENDAR_BACKUP_CF_API_TOKEN: ${{ secrets.CALENDAR_BACKUP_CF_API_TOKEN }}
+          CALENDAR_BACKUP_CF_ACCOUNT_ID: ${{ vars.CALENDAR_BACKUP_CF_ACCOUNT_ID }}
+          CALENDAR_BACKUP_R2_BUCKET: ${{ vars.CALENDAR_BACKUP_R2_BUCKET }}

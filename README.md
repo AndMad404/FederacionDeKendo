@@ -140,6 +140,50 @@ revisiones incompletas generan alertas. Informes y capturas quedan en
 La sincronización y las utilidades de fechas y archivo se ejecutan mediante
 `tsx` y se comprueban estrictamente con `typecheck`, incluidos los scripts.
 
+## Respaldo privado del calendario
+
+El workflow `.github/workflows/backup-calendar.yml` programa una copia diaria
+a las 09:15 UTC (03:15 de Costa Rica), independiente de la sincronizacion del
+sitio. Requiere activacion de R2, configuracion y publicacion del workflow en
+la rama principal; tener el codigo local no activa el respaldo.
+
+Configuracion inicial:
+
+1. En Cloudflare: **Storage & databases > R2 > Overview**, completar la
+   suscripcion de R2 y crear un bucket dedicado, por ejemplo
+   `fak-calendar-backups`. Mantener deshabilitados `r2.dev` y todos los
+   dominios personalizados.
+2. En **Settings > Object Lifecycle Rules**, agregar una regla habilitada
+   para el prefijo `calendar/` que elimine objetos a los **30 dias**
+   (2592000 segundos). No agregar reglas que los eliminen antes.
+3. En GitHub, **Settings > Secrets and variables > Actions**, configurar:
+   - secreto existente `CALENDAR_ICS_URL`;
+   - secreto `CALENDAR_BACKUP_CF_API_TOKEN`, con acceso de lectura y escritura
+     al almacenamiento R2 de la cuenta;
+   - variable `CALENDAR_BACKUP_CF_ACCOUNT_ID`, con el ID de la cuenta;
+   - variable `CALENDAR_BACKUP_R2_BUCKET`, con el nombre del bucket.
+4. Despues de incorporar el workflow a `main`, ejecutarlo manualmente en
+   Actions: **Back up private calendar > Run workflow**. Comprobar el resultado
+   `restorationVerified: true` y la presencia del objeto en R2.
+
+`scripts/calendar-backup.mjs` comprueba privacidad y retencion antes de leer
+Calendar; guarda los bytes originales, valida el formato ICS y descarga la
+copia para comprobar SHA-256 e igualdad exacta. No guarda el ICS en Git ni en
+artefactos de Actions, ni imprime su contenido, URL o credenciales. El horario
+programado depende de la disponibilidad de GitHub Actions.
+
+Con esas variables en el entorno de una terminal autorizada, restaurar a un
+archivo **nuevo** dentro de `.cache/` (no modifica Google Calendar):
+
+```bash
+node --import tsx scripts/calendar-backup.mjs restore '<clave calendar/.../....ics del respaldo>' .cache/calendar-restored.ics
+```
+
+El comando valida el checksum incluido en la clave y el ICS antes de escribir;
+rechaza destinos existentes. La prueba local con datos ficticios esta en
+`tests/data/calendar-backup.test.mjs`. La prueba real de R2 y la recuperacion
+del calendario operativo requieren el primer respaldo remoto exitoso.
+
 ## Estructura
 
 | Ruta                 | Responsabilidad                                           |
