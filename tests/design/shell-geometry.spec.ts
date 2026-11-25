@@ -39,6 +39,10 @@ test.describe("representative layouts preserve the desktop shell contract", () =
       }
       await preparePage(page, approvedPage.path);
       expect((await getReachability(page)).clippedContent).toEqual([]);
+      const allowsDocumentScroll =
+        approvedPage.design === "calendar" &&
+        (await page.locator('main [data-expanded-calendar="true"]').count()) ===
+          1;
 
       const geometry = await page.evaluate(() => {
         const root = document.documentElement;
@@ -81,21 +85,29 @@ test.describe("representative layouts preserve the desktop shell contract", () =
       expect(geometry.document.scrollWidth).toBeLessThanOrEqual(
         geometry.document.clientWidth + 1,
       );
-      expect(geometry.document.scrollHeight).toBeLessThanOrEqual(
-        geometry.document.clientHeight + 1,
-      );
+      if (!allowsDocumentScroll) {
+        expect(geometry.document.scrollHeight).toBeLessThanOrEqual(
+          geometry.document.clientHeight + 1,
+        );
+      }
       expect(geometry.navTop).toBeGreaterThanOrEqual(0);
       expect(geometry.headingTop).toBeGreaterThanOrEqual(0);
       expect(geometry.headingBottom).toBeLessThanOrEqual(
         SHELL_CONTRACT.desktopViewport.height,
       );
       expect(geometry.footerBottom).toBeLessThanOrEqual(
-        SHELL_CONTRACT.desktopViewport.height + 1,
+        (allowsDocumentScroll
+          ? geometry.document.scrollHeight
+          : SHELL_CONTRACT.desktopViewport.height) + 1,
       );
       expectCssPixels(
         geometry.footerBottom,
-        geometry.document.clientHeight,
-        "footer bottom without document scroll",
+        allowsDocumentScroll
+          ? geometry.document.scrollHeight
+          : geometry.document.clientHeight,
+        allowsDocumentScroll
+          ? "footer bottom at the end of document flow"
+          : "footer bottom without document scroll",
       );
       expect(geometry.primaryScrollHeight).toBeLessThanOrEqual(
         geometry.primaryClientHeight + 2,
@@ -111,6 +123,19 @@ test.describe("representative layouts preserve the desktop shell contract", () =
         SHELL_CONTRACT.mainPaddingInline,
         "main right padding",
       );
+      if (allowsDocumentScroll) {
+        const lastAction = page
+          .locator("main li:visible")
+          .last()
+          .getByRole("link", {
+            name: /Detalles del evento/,
+          });
+        await lastAction.scrollIntoViewIfNeeded();
+        await expect(lastAction).toBeInViewport({ ratio: 1 });
+        const footer = page.getByRole("contentinfo");
+        await footer.scrollIntoViewIfNeeded();
+        await expect(footer).toBeInViewport({ ratio: 1 });
+      }
     });
   }
 });
