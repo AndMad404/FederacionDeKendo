@@ -302,6 +302,12 @@ test("cleans deferred gallery stages and a successful registry stage when calend
         },
       },
     }),
+    (error) => {
+      // Cleanup must preserve the original staging error, not replace it with rm.
+      assert.equal(error.syscall, "mkdir");
+      assert.equal(error.path, blocker);
+      return true;
+    },
   );
   assert.deepEqual((await readdir(directory)).sort(), [
     "input.ics",

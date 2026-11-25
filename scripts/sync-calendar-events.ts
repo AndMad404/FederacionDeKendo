@@ -1603,6 +1603,33 @@ export async function writeAtomically(files: [string, string][]) {
   }
 }
 
+async function cleanupCalendarStages(
+  stagedPaths: string[],
+  synchronizationError: unknown,
+) {
+  // Wait for every removal, even when an invalid parent rejects early on Linux.
+  const cleanupResults = await Promise.allSettled(
+    stagedPaths.map((staged) => rm(staged, { recursive: true, force: true })),
+  );
+  const cleanupErrors = cleanupResults.flatMap((result) => {
+    if (result.status === "fulfilled") return [];
+    const error = result.reason as NodeJS.ErrnoException;
+    // An absent file or a non-directory parent means no stage exists here.
+    return error.code === "ENOENT" || error.code === "ENOTDIR"
+      ? []
+      : [result.reason];
+  });
+  if (cleanupErrors.length) {
+    throw new AggregateError(
+      synchronizationError === undefined
+        ? cleanupErrors
+        : [synchronizationError, ...cleanupErrors],
+      "Failed to clean up calendar synchronization stages",
+      { cause: synchronizationError },
+    );
+  }
+}
+
 async function stageTextFile(filePath: string, contents: string) {
   await mkdir(path.dirname(filePath), { recursive: true });
   const staged = `${filePath}.${process.pid}.stage`;
@@ -1876,6 +1903,7 @@ export async function synchronizeCalendar({
     })
     .filter((value): value is NonNullable<typeof value> => Boolean(value));
   let galleryResult;
+  let synchronizationError: unknown;
   try {
     if (galleryEvents.length || galleryOptions?.force) {
       galleryResult = await synchronizeEventGalleries({
@@ -1920,13 +1948,17 @@ export async function synchronizeCalendar({
       historicalReport,
       notificationReport,
     };
+  } catch (error) {
+    synchronizationError = error;
+    throw error;
   } finally {
-    await Promise.all(
+    await cleanupCalendarStages(
       [
         ...(galleryResult?.publication ?? []).map(({ staged }) => staged),
         `${registryPath}.${process.pid}.stage`,
         `${outputPath}.${process.pid}.stage`,
-      ].map((staged) => rm(staged, { recursive: true, force: true })),
+      ],
+      synchronizationError,
     );
   }
 }
