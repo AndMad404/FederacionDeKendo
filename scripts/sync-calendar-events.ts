@@ -13,6 +13,7 @@ import type {
   NotificationReport,
   CalendarError,
   SyncOptions,
+  GalleryEvent,
 } from "./calendar-sync-types.ts";
 import type { CalendarEvent } from "../src/app/types";
 
@@ -40,9 +41,17 @@ import {
   getCalendarDateTimeSortKey,
 } from "../src/app/utils/calendarDate.ts";
 import {
+  downloadDriveFile,
+  getDriveFolderId,
   replaceTransaction,
   synchronizeEventGalleries,
 } from "./sync-event-galleries.ts";
+import {
+  createCalendarDrive,
+  DriveQuotaError,
+  getEventFolderDetails,
+} from "./calendar-drive.ts";
+import { isPastEvent } from "../src/app/utils/calendarEvents.ts";
 import eventTranslations from "../src/app/data/eventTranslations.json" with { type: "json" };
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -790,6 +799,9 @@ export function mergeRegistry(
 
     return {
       ...currentEvent,
+      ...(previousEvent?.driveGallery
+        ? { driveGallery: previousEvent.driveGallery }
+        : {}),
       ...(sourceUpdatedAt ? { sourceUpdatedAt } : {}),
       editorialState: "publicado",
       ...(becomesHistorical ? { historical: true } : {}),
@@ -1380,15 +1392,17 @@ export function createCalendarFailureNotification(
           ? "parser_o_fuente_invalida"
           : "verificacion_fallida");
   const actionRequired =
-    kind === "id_fuente_duplicado"
-      ? "Corregir los IDs duplicados en Calendar y reejecutar; la publicacion fue interrumpida y conserva el ultimo conjunto valido."
-      : kind === "url_evento_duplicada"
-        ? "Corregir los titulos para que produzcan URLs unicas y reejecutar; la publicacion fue interrumpida y conserva el ultimo conjunto valido."
-        : kind === "desaparicion_masiva"
-          ? "Revisar la fuente antes de reintentar; el umbral bloqueo la publicacion y conserva el ultimo conjunto valido."
-          : kind === "verificacion_fallida"
-            ? "Corregir la verificacion fallida y reejecutar; no publicar ni aprobar cambios a partir de esta ejecucion."
-            : "Corregir la fuente o el formato y reejecutar; el ultimo conjunto valido permanece sin cambios.";
+    kind === "cuota_drive_bloqueada"
+      ? "Revisar las cuotas de Google Cloud y reintentar cuando haya capacidad. La ejecución no publicó cambios."
+      : kind === "id_fuente_duplicado"
+        ? "Corregir los IDs duplicados en Calendar y reejecutar; la publicacion fue interrumpida y conserva el ultimo conjunto valido."
+        : kind === "url_evento_duplicada"
+          ? "Corregir los titulos para que produzcan URLs unicas y reejecutar; la publicacion fue interrumpida y conserva el ultimo conjunto valido."
+          : kind === "desaparicion_masiva"
+            ? "Revisar la fuente antes de reintentar; el umbral bloqueo la publicacion y conserva el ultimo conjunto valido."
+            : kind === "verificacion_fallida"
+              ? "Corregir la verificacion fallida y reejecutar; no publicar ni aprobar cambios a partir de esta ejecucion."
+              : "Corregir la fuente o el formato y reejecutar; el ultimo conjunto valido permanece sin cambios.";
   const identity = redactNotificationValue(structuredFailure?.identity ?? null);
   const id = fingerprintOrderedFields({ kind, message, identity }, [
     "kind",
@@ -1432,6 +1446,10 @@ const notificationTitles: Record<string, string> = {
   parser_o_fuente_invalida:
     "La fuente del calendario tiene un formato invalido",
   desaparicion_masiva: "Desaparicion inusual de eventos del calendario",
+  cuota_drive_bloqueada: "Ejecución bloqueada por cuota de Drive",
+  carpeta_drive_fallida: "Fallo al preparar carpeta de Drive",
+  carpeta_drive_vinculada: "Carpeta de Drive vinculada",
+  galeria_drive_conservada: "Galería de Drive conservada",
   verificacion_fallida: "Fallo una verificacion de la publicacion",
 };
 
@@ -1445,7 +1463,9 @@ function notificationIdentity(notification: Notification) {
 }
 
 function formatWorkflowWarning(notification: Notification) {
-  return `${notificationTitle(notification.kind)}. Afectado: ${notificationIdentity(notification)}. ${notification.cause} ${notification.actionRequired}`;
+  const folderName = (notification.after as { folderName?: string } | null)
+    ?.folderName;
+  return `${notificationTitle(notification.kind)}. Afectado: ${notificationIdentity(notification)}. ${folderName ? `Carpeta: ${folderName}. ` : ""}${notification.cause} ${notification.actionRequired}`;
 }
 
 export function getCalendarNotificationWarnings(
@@ -1453,7 +1473,7 @@ export function getCalendarNotificationWarnings(
 ) {
   return (notificationReport?.notifications ?? []).map(
     (notification) =>
-      `::warning title=${escapeWorkflowCommandMessage(`Calendario: ${notificationTitle(notification.kind)}`)}::${escapeWorkflowCommandMessage(formatWorkflowWarning(notification))}`,
+      `::${["carpeta_drive_fallida", "cuota_drive_bloqueada"].includes(notification.kind) ? "error" : notification.kind === "carpeta_drive_vinculada" ? "notice" : "warning"} title=${escapeWorkflowCommandMessage(`Calendario: ${notificationTitle(notification.kind)}`)}::${escapeWorkflowCommandMessage(formatWorkflowWarning(notification))}`,
   );
 }
 
@@ -1846,6 +1866,7 @@ export async function synchronizeCalendar({
   registryPath = defaultRegistryPath,
   now = new Date(),
   galleryOptions,
+  drive,
 }: SyncOptions = {}) {
   if (!source) {
     throw new Error(
@@ -1857,6 +1878,9 @@ export async function synchronizeCalendar({
   const warnings: string[] = [];
   const icsEvents = parseVEvents(icsText);
   const previousRegistry = await readRegistry(registryPath);
+  const previousBySourceId = new Map(
+    previousRegistry.events.map((event) => [event.sourceId, event]),
+  );
   const publishedDatesBySourceId = new Map(
     previousRegistry.events.map(({ sourceId, date }) => [sourceId, date]),
   );
@@ -1876,32 +1900,110 @@ export async function synchronizeCalendar({
   historicalReport.galleryChanges = [];
   let registry = mergeRegistry(previousRegistry, parsed, now, warnings);
 
-  const galleryEvents = registry.events
-    .filter((event) => event.syncPolicy !== "manual")
-    .map((event) => {
-      const lastEventDate =
-        event.endDate && !event.startTime && !event.endTime
-          ? addCalendarDays(event.endDate, -1)
-          : (event.endDate ?? event.date);
-      const firstCheckAt = calculateGalleryCheckAt(
-        lastEventDate,
-        event.timeZone,
-      );
-      if (firstCheckAt.getTime() > now.getTime()) return undefined;
-      const deadlineAt = calculateGalleryDeadlineAt(
-        lastEventDate,
-        event.timeZone,
-      );
-      return {
-        slug: event.slug,
-        title: event.title,
-        date: event.date,
-        albumUrl: getPrivateAlbumUrl(currentBySourceId.get(event.sourceId)),
-        galleryCheckPhase:
-          deadlineAt.getTime() <= now.getTime() ? "final" : "first",
-      };
-    })
-    .filter((value): value is NonNullable<typeof value> => Boolean(value));
+  const legacyGalleryEvents = () =>
+    registry.events
+      .filter((event) => event.syncPolicy !== "manual")
+      .map((event) => {
+        const lastEventDate =
+          event.endDate && !event.startTime && !event.endTime
+            ? addCalendarDays(event.endDate, -1)
+            : (event.endDate ?? event.date);
+        const firstCheckAt = calculateGalleryCheckAt(
+          lastEventDate,
+          event.timeZone,
+        );
+        if (firstCheckAt.getTime() > now.getTime()) return undefined;
+        const deadlineAt = calculateGalleryDeadlineAt(
+          lastEventDate,
+          event.timeZone,
+        );
+        return {
+          slug: event.slug,
+          title: event.title,
+          date: event.date,
+          albumUrl: getPrivateAlbumUrl(currentBySourceId.get(event.sourceId)),
+          galleryCheckPhase:
+            deadlineAt.getTime() <= now.getTime() ? "final" : "first",
+        };
+      })
+      .filter((value): value is NonNullable<typeof value> => Boolean(value));
+  const driveNotices: Notification[] = [];
+  function notifyDrive(
+    event: RegistryEvent,
+    kind: string,
+    name: string,
+    cause: string,
+    actionRequired: string,
+  ) {
+    const category = getEventFolderDetails(event).category;
+    driveNotices.push({
+      id: hash(JSON.stringify([event.sourceId, kind, name, cause])),
+      kind,
+      identity: getEventIdentity(event),
+      temporality: isArchiveEligible(event, now) ? "pasado" : "futuro",
+      cause: redactNotificationValue(cause),
+      actionRequired,
+      before: null,
+      after: { folderName: name, category },
+      execution: getNotificationExecution(),
+      fingerprints: {},
+    });
+  }
+
+  const managedEvents: GalleryEvent[] = [];
+  if (drive) {
+    for (const event of registry.events) {
+      if (event.inactive || event.editorialState === "eliminado") continue;
+      const previous = previousBySourceId.get(event.sourceId);
+      const past = isPastEvent({ ...event, id: event.slug }, now);
+      const existingId =
+        drive.existingFolders?.[event.sourceId] ??
+        getDriveFolderId(
+          getPrivateAlbumUrl(currentBySourceId.get(event.sourceId)),
+        );
+      if (previous && past && !event.driveGallery && !existingId) continue;
+      event.driveGallery ??= "pending";
+      const { category, name } = getEventFolderDetails(event);
+      try {
+        const { folder, linked } = await drive.prepareFolder(
+          event.sourceId,
+          category,
+          name,
+          existingId,
+        );
+        if (linked || event.driveGallery === "pending")
+          notifyDrive(
+            event,
+            "carpeta_drive_vinculada",
+            folder.name,
+            "Carpeta disponible para el material del evento.",
+            "Cargar el material en la carpeta indicada.",
+          );
+        event.driveGallery = "linked";
+        managedEvents.push({
+          slug: event.slug,
+          title: event.title,
+          date: event.date,
+          albumUrl: `https://drive.google.com/drive/folders/${folder.id}`,
+          drive: {
+            past,
+            folderName: folder.name,
+            previousSlug: previous?.slug,
+          },
+        });
+      } catch (error) {
+        if (error instanceof DriveQuotaError) throw error;
+        notifyDrive(
+          event,
+          "carpeta_drive_fallida",
+          name,
+          (error as Error).message,
+          "La publicación del evento continúa. Revisar el acceso y reintentar en la siguiente sincronización.",
+        );
+      }
+    }
+  }
+  const galleryEvents = drive ? managedEvents : legacyGalleryEvents();
   let galleryResult;
   let synchronizationError: unknown;
   try {
@@ -1909,13 +2011,38 @@ export async function synchronizeCalendar({
       galleryResult = await synchronizeEventGalleries({
         events: galleryEvents,
         ...galleryOptions,
+        ...(drive
+          ? {
+              listFolder: (url: string) =>
+                drive.listImages(getDriveFolderId(url)!),
+              downloadFile: (file) =>
+                downloadDriveFile(file, drive.fetchMedia, true),
+            }
+          : {}),
         deferPublish: true,
       });
       warnings.push(...galleryResult.warnings);
       historicalReport.galleryChanges = galleryResult.alarms;
+      const eventsBySlug = new Map(
+        registry.events.map((event) => [event.slug, event]),
+      );
+      for (const alarm of galleryResult.alarms) {
+        if (!alarm.folderName) continue;
+        const event = eventsBySlug.get(alarm.slug)!;
+        notifyDrive(
+          event,
+          "galeria_drive_conservada",
+          alarm.folderName,
+          alarm.reason === "carpeta_vacia"
+            ? "La carpeta quedó vacía. Se conservó la galería publicada."
+            : alarm.reason,
+          "Revisar el material disponible en Drive.",
+        );
+      }
     }
 
     const notificationReport = createCalendarNotifications(registry);
+    notificationReport.notifications.push(...driveNotices);
     const notificationReportPath =
       process.env.CALENDAR_NOTIFICATIONS_REPORT_PATH;
     if (notificationReportPath) {
@@ -1965,8 +2092,25 @@ export async function synchronizeCalendar({
 
 async function main() {
   const source = process.env.CALENDAR_ICS_URL ?? process.argv[2];
+  const driveConfig = process.env.CALENDAR_DRIVE_CONFIG;
+  let drive;
+  if (driveConfig) {
+    let config;
+    try {
+      config = JSON.parse(driveConfig);
+    } catch {
+      throw new DriveQuotaError(
+        "CALENDAR_DRIVE_CONFIG no contiene un JSON válido.",
+        {
+          configuracion: "CALENDAR_DRIVE_CONFIG",
+        },
+      );
+    }
+    drive = createCalendarDrive(config);
+  }
   const result = await synchronizeCalendar({
     source,
+    drive,
     outputPath: process.env.CALENDAR_OUTPUT_PATH ?? defaultOutputPath,
     registryPath: process.env.CALENDAR_REGISTRY_PATH ?? defaultRegistryPath,
   });
@@ -1982,6 +2126,14 @@ async function main() {
       `::warning title=Historical calendar changes::${result.historicalReport.historicalChanges.length} historical event(s) require confirmation.`,
     );
   }
+  for (const message of getCalendarNotificationWarnings({
+    ...result.notificationReport,
+    notifications: result.notificationReport.notifications.filter(
+      ({ after }) =>
+        typeof after === "object" && after !== null && "folderName" in after,
+    ),
+  }))
+    console.log(message);
   await writeCalendarNotificationsSummary(result.notificationReport);
   await writeActionSummary(
     actionWarnings,

@@ -59,6 +59,61 @@ async function run(
   });
 }
 
+test("keeps the flyer through archival and reflects only complete Drive inventories", async (t) => {
+  const files = [];
+  const { options } = await fixture(t, files);
+  const slug = "evento-drive";
+  const folderName = "2026-08-08 - Evento Drive";
+  const event = {
+    slug,
+    title: "Evento Drive",
+    date: "2026-08-08",
+    albumUrl: "https://drive.google.com/drive/folders/album",
+    drive: { past: false, folderName },
+  };
+  const sync = () => synchronizeEventGalleries({ ...options, events: [event] });
+  assert.deepEqual((await sync()).alarms, []);
+  files.push({
+    name: "Afiche externo.jpg",
+    id: "flyer",
+    buffer: await image("white"),
+  });
+  const flyer = (await sync()).galleries[slug].images[0];
+  assert.equal(flyer.kind, "flyer");
+  assert.equal(flyer.originalName, "Afiche externo.jpg");
+  assert.equal((await sync()).publication, undefined);
+
+  event.drive.past = true;
+  files.push(
+    { name: "Zulu.jpg", id: "first", buffer: await image("red", 500, 650) },
+    { name: "Alpha.jpg", id: "second", buffer: await image("blue") },
+  );
+  const album = (await sync()).galleries[slug];
+  assert.deepEqual(
+    album.images.map(({ kind }) => kind),
+    [undefined, undefined, "flyer"],
+  );
+  assert.ok(album.images[0].height > album.images[0].width);
+  assert.equal(album.images[2].src, flyer.src);
+  files.splice(2, 1);
+  assert.equal((await sync()).galleries[slug].images.length, 2);
+
+  const published = (await sync()).galleries[slug];
+  files[1].buffer = undefined;
+  assert.deepEqual((await sync()).galleries[slug], published);
+  files.length = 0;
+  const empty = await sync();
+  assert.deepEqual(empty.galleries[slug], published);
+  assert.equal(empty.alarms[0].folderName, folderName);
+  files.push({
+    name: "Recuperada.jpg",
+    id: "recovered",
+    buffer: await image("green"),
+  });
+  assert.equal((await sync()).galleries[slug].images[1].src, flyer.src);
+  assert.equal((await sync()).publication, undefined);
+});
+
 test("uses approved input and 4K limits", () => {
   assert.deepEqual(EVENT_GALLERY_LIMITS.inputFormats, [
     "jpeg",
@@ -191,7 +246,6 @@ test("valid public album freezes all naturally ordered sanitized responsive imag
     false,
   );
   const manifest = await readFile(context.options.manifestPath, "utf8");
-  assert.match(manifest, /photo-1-480\.webp 480w/);
   assert.match(manifest, /photo-1-480\.webp 480w/);
   assert.match(
     manifest,

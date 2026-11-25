@@ -29,6 +29,7 @@ jobs:
         run: pnpm run sync:calendar
         env:
           CALENDAR_ICS_URL: ${{ secrets.CALENDAR_ICS_URL }}
+          CALENDAR_DRIVE_CONFIG: ${{ github.ref == 'refs/heads/main' && secrets.CALENDAR_DRIVE_CONFIG || '' }}
           CALENDAR_TIME_ZONE: America/Costa_Rica
           HISTORICAL_CHANGES_REPORT_PATH: ${{ runner.temp }}/calendar-historical-changes.json
           CALENDAR_NOTIFICATIONS_REPORT_PATH: ${{ runner.temp }}/calendar-notifications.json
@@ -142,5 +143,6 @@ jobs:
           smtp-username: ${{ secrets.CALENDAR_ALERT_SMTP_USERNAME }}
           smtp-password: ${{ secrets.CALENDAR_ALERT_SMTP_APP_PASSWORD }}
           recipient: ${{ secrets.CALENDAR_ALERT_RECIPIENT }}
+          drive-config: ${{ github.ref == 'refs/heads/main' && secrets.CALENDAR_DRIVE_CONFIG || '' }}
 env:
   CALENDAR_OPERATION: calendar

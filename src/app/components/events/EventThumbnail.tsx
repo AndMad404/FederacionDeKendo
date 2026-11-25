@@ -76,7 +76,8 @@ export function EventThumbnail({
   }, [canAdapt, eventId, portraitOnTablet]);
   // Keep the Shogun crest visible by framing the top of the official flyer.
   const showShogunCrest =
-    eventId === "panama-5ta-copa-shogun-torneo-por-equipos-y-seminario";
+    eventId === "panama-5ta-copa-shogun-torneo-por-equipos-y-seminario" &&
+    selection?.source === "poster";
   const showShogunTabletCover = showShogunCrest && calendarArtwork;
   const showSeminarDesktopCover =
     adaptive &&

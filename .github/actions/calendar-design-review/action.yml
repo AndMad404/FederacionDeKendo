@@ -17,6 +17,9 @@ inputs:
   smtp-password:
     required: true
     description: Existing calendar alert SMTP app password.
+  drive-config:
+    required: false
+    description: Optional Drive credentials for resolving folder links in the email only.
   recipient:
     required: true
     description: Existing calendar alert recipient.
@@ -53,10 +56,11 @@ runs:
       id: email
       if: ${{ always() }}
       shell: bash
-      run: node scripts/write-calendar-notification-email.mjs
+      run: node --import tsx scripts/write-calendar-notification-email.mjs
       env:
         CALENDAR_NOTIFICATIONS_REPORT_PATH: ${{ runner.temp }}/calendar-notifications.json
         CALENDAR_NOTIFICATION_EMAIL_PATH: ${{ runner.temp }}/calendar-notification-email.txt
+        CALENDAR_DRIVE_CONFIG: ${{ inputs.drive-config }}
         CALENDAR_ALERT_SMTP_USERNAME: ${{ inputs.smtp-username }}
         CALENDAR_ALERT_RECIPIENT: ${{ inputs.recipient }}
         CALENDAR_LAYOUT_REPORT_DIR: ${{ runner.temp }}/calendar-design-review

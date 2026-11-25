@@ -45,11 +45,20 @@ function formatBlockedCalendarInput(notification) {
   ];
 }
 
-function formatNotification(notification) {
+function formatNotification(notification, folderLinks) {
   const blockedInput = formatBlockedCalendarInput(notification);
   return [
     `Tipo: ${singleLine(notification.kind)}`,
     `Identidad: ${singleLine(notification.identity?.slug ?? "no aplica")}`,
+    ...(notification.after?.folderName
+      ? [
+          `Carpeta de Drive: ${singleLine(notification.after.folderName)}`,
+          `Categoría: ${singleLine(notification.after.category)}`,
+          ...(folderLinks.get(notification.id)
+            ? [`Enlace de Drive: ${folderLinks.get(notification.id)}`]
+            : []),
+        ]
+      : []),
     `Temporalidad: ${singleLine(notification.temporality)}`,
     `Causa: ${singleLine(notification.cause)}`,
     `Accion requerida: ${singleLine(notification.actionRequired)}`,
@@ -76,6 +85,7 @@ export function formatCalendarNotificationEmail(
   from,
   recipient,
   attachments = [],
+  folderLinks = new Map(),
 ) {
   const notifications = report?.notifications ?? [];
   if (!notifications.length) return null;
@@ -102,7 +112,7 @@ export function formatCalendarNotificationEmail(
     "",
     ...notifications.flatMap((notification, index) => [
       `--- Alerta ${index + 1} ---`,
-      formatNotification(notification),
+      formatNotification(notification, folderLinks),
       "",
     ]),
   ].join("\n");
@@ -182,6 +192,33 @@ async function main() {
   if (report.version !== 1 || !Array.isArray(report.notifications)) {
     throw new Error("Calendar notification report has an invalid schema.");
   }
+  const folderLinks = new Map();
+  const driveConfig = process.env.CALENDAR_DRIVE_CONFIG;
+  const folderNotices = report.notifications.filter(
+    (notification) =>
+      notification.kind === "carpeta_drive_vinculada" &&
+      notification.identity?.sourceId,
+  );
+  if (driveConfig && folderNotices.length) {
+    try {
+      const { createCalendarDrive } = await import("./calendar-drive.ts");
+      const drive = createCalendarDrive(JSON.parse(driveConfig));
+      for (const notification of folderNotices) {
+        const folder = await drive
+          .findFolder(notification.identity.sourceId)
+          .catch(() => undefined);
+        if (folder)
+          folderLinks.set(
+            notification.id,
+            `https://drive.google.com/drive/folders/${encodeURIComponent(folder.id)}`,
+          );
+      }
+    } catch {
+      console.warn(
+        "No se pudieron recuperar los enlaces privados de las carpetas de Drive.",
+      );
+    }
+  }
   const email = formatCalendarNotificationEmail(
     report,
     process.env.CALENDAR_ALERT_SMTP_USERNAME,
@@ -190,6 +227,7 @@ async function main() {
       report,
       process.env.CALENDAR_LAYOUT_REPORT_DIR,
     ),
+    folderLinks,
   );
   if (!email) {
     await writeFile(process.env.GITHUB_OUTPUT, "send=false\n", "utf8");

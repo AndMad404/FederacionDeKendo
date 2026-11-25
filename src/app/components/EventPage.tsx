@@ -118,7 +118,9 @@ export function EventPage() {
 
   const isPast = now ? isPastEvent(event, now) : false;
   const hasGallery =
-    (isPast || Boolean(EVENT_GALLERIES[event.id]?.posterSource)) &&
+    (isPast ||
+      Boolean(EVENT_GALLERIES[event.id]?.posterSource) ||
+      EVENT_GALLERIES[event.id]?.images[0]?.kind === "flyer") &&
     Boolean(EVENT_GALLERIES[event.id]?.images.length);
   const locationUrl = event.location
     ? getLocationMapUrl(event.location)

@@ -27,37 +27,53 @@ export function HistoricalEventGallery({
   eventTitle,
 }: HistoricalEventGalleryProps) {
   const { language, copy } = useLanguage();
-  const posterSource = EVENT_GALLERIES[eventId]?.posterSource;
-  const translatedPosterAlt =
-    language === "en" ? `${copy.event.officialFlyer} ${eventTitle}` : undefined;
+  const gallery = EVENT_GALLERIES[eventId];
+  const isFlyer = (order: number) =>
+    gallery?.images.some(
+      (image) => image.order === order && image.kind === "flyer",
+    ) || Boolean(gallery?.posterSource && !gallery.driveOrdered);
+  const flyerOnly =
+    gallery?.images.length === 1 && isFlyer(gallery.images[0].order);
+  const labels = copy.event;
   const images = useMemo<GalleryImage[]>(() => {
-    const gallery = EVENT_GALLERIES[eventId];
-    return (gallery?.images ?? []).map((image) => ({
-      id: image.order,
-      src: image.src,
-      srcSet: image.srcSet.webp,
-      sizes: FEATURED_IMAGE_SIZES,
-      width: image.width,
-      height: image.height,
-      thumbnailSrc: image.src,
-      thumbnailSrcSet: image.srcSet.webp,
-      thumbnailWidth: image.width,
-      thumbnailHeight: image.height,
-      title: gallery.posterSource
-        ? (translatedPosterAlt ?? image.alt)
-        : `Fotografía ${image.order}`,
-      tag: eventTitle,
-      alt: gallery.posterSource
-        ? (translatedPosterAlt ?? image.alt)
-        : `Fotografía ${image.order} del evento ${eventTitle}`,
-    }));
-  }, [eventId, eventTitle, translatedPosterAlt]);
+    return (gallery?.images ?? []).map((image) => {
+      const flyer =
+        image.kind === "flyer" ||
+        Boolean(gallery.posterSource && !gallery.driveOrdered);
+      const title = flyer
+        ? language === "es" && gallery.posterSource
+          ? image.alt
+          : `${labels.officialFlyer} ${eventTitle}`
+        : `${labels.photograph} ${image.order}`;
+      return {
+        id: image.order,
+        src: image.src,
+        srcSet: image.srcSet.webp,
+        sizes: FEATURED_IMAGE_SIZES,
+        width: image.width,
+        height: image.height,
+        thumbnailSrc: image.src,
+        thumbnailSrcSet: image.srcSet.webp,
+        thumbnailWidth: image.width,
+        thumbnailHeight: image.height,
+        title,
+        tag: eventTitle,
+        alt: flyer
+          ? title
+          : language === "es"
+            ? `${title} del evento ${eventTitle}`
+            : `${title} of the event ${eventTitle}`,
+      };
+    });
+  }, [gallery, eventTitle, labels, language]);
   const firstLandscapeIndex = images.findIndex(
     (image) => image.width >= image.height,
   );
   const { index, prev, next, goTo } = useCarousel(
     images.length,
-    firstLandscapeIndex >= 0 ? firstLandscapeIndex : 0,
+    !gallery?.driveOrdered && firstLandscapeIndex >= 0
+      ? firstLandscapeIndex
+      : 0,
   );
   const {
     closeLightbox,
@@ -75,6 +91,7 @@ export function HistoricalEventGallery({
   });
   if (!images.length) return null;
   const featured = images[index];
+  const featuredFlyer = isFlyer(featured.id);
   const openFeatured = (event: MouseEvent<HTMLButtonElement>) => {
     if (consumeSwipe()) {
       event.preventDefault();
@@ -85,11 +102,11 @@ export function HistoricalEventGallery({
 
   return (
     <section
-      aria-label={`${posterSource ? copy.event.officialImage : "Fotografías del evento"} ${eventTitle}`}
-      className={`-mx-3 grid min-w-0 w-[calc(100%_+_1.5rem)] content-start gap-2.5 sm:mx-0 sm:w-full xl:[&_[role=group]]:h-[var(--event-thumbnail-height)] ${!posterSource && images.length === 1 ? "xl:self-stretch xl:content-stretch" : ""} ${images.length > 6 ? "sm:[&_[role=group]]:justify-start" : ""}`}
+      aria-label={`${flyerOnly ? labels.officialImage : labels.eventPhotos} ${eventTitle}`}
+      className={`-mx-3 grid min-w-0 w-[calc(100%_+_1.5rem)] content-start gap-2.5 sm:mx-0 sm:w-full xl:[&_[role=group]]:h-[var(--event-thumbnail-height)] ${!flyerOnly && images.length === 1 ? "xl:self-stretch xl:content-stretch" : ""} ${images.length > 6 ? "sm:[&_[role=group]]:justify-start" : ""}`}
     >
       <figure
-        className={`group relative cursor-pointer overflow-hidden rounded-xl bg-site-media ${posterSource ? "h-[min(75svh,48rem)] xl:h-[var(--event-poster-height)]" : images.length === 1 ? "aspect-video xl:aspect-auto xl:h-full" : "aspect-video xl:aspect-auto xl:h-[var(--event-featured-height)]"}`}
+        className={`group relative cursor-pointer overflow-hidden rounded-xl bg-site-media ${flyerOnly ? "h-[min(75svh,48rem)] xl:h-[var(--event-poster-height)]" : images.length === 1 ? "aspect-video xl:aspect-auto xl:h-full" : "aspect-video xl:aspect-auto xl:h-[var(--event-featured-height)]"}`}
       >
         <picture>
           <img
@@ -101,7 +118,7 @@ export function HistoricalEventGallery({
             height={featured.height}
             loading="lazy"
             decoding="async"
-            className={`h-full w-full ${images.length === 1 ? "pt-(--event-page-bottom-padding)" : ""} ${posterSource ? "object-contain bg-white" : "object-contain transition-transform duration-700 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:transform-none"}`}
+            className={`h-full w-full ${images.length === 1 ? "pt-(--event-page-bottom-padding)" : ""} ${featuredFlyer ? "object-contain bg-white" : "object-contain transition-transform duration-700 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:transform-none"}`}
           />
         </picture>
         <button
@@ -112,14 +129,14 @@ export function HistoricalEventGallery({
           {...swipeHandlers}
         >
           <span className="sr-only">
-            {posterSource ? copy.event.enlargeFlyer : "Abrir fotografía"}
+            {featuredFlyer ? labels.enlargeFlyer : labels.openPhoto}
           </span>
         </button>
         {images.length > 1 ? (
           <div className="pointer-events-none absolute inset-y-0 left-5 right-5 flex items-center justify-between">
             <NavigationArrowButton
               direction="previous"
-              label="Fotografía anterior"
+              label={labels.previousImage}
               onClick={(event) => {
                 event.stopPropagation();
                 prev();
@@ -128,7 +145,7 @@ export function HistoricalEventGallery({
             />
             <NavigationArrowButton
               direction="next"
-              label="Fotografía siguiente"
+              label={labels.nextImage}
               onClick={(event) => {
                 event.stopPropagation();
                 next();
@@ -142,7 +159,7 @@ export function HistoricalEventGallery({
         <GalleryThumbnails
           images={images}
           activeIndex={index}
-          ariaLabel="Seleccionar fotografía"
+          ariaLabel={labels.selectImage}
           centerWhenContained
           onSelect={goTo}
         />
@@ -152,7 +169,7 @@ export function HistoricalEventGallery({
           <Lightbox
             image={lightboxImage}
             total={images.length}
-            containImage={Boolean(posterSource)}
+            containImage={isFlyer(lightboxImage.id)}
             triggerRef={triggerRef}
             onClose={closeLightbox}
             onPrev={showPrev}

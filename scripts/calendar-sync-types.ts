@@ -1,6 +1,8 @@
 import type { CalendarEvent } from "../src/app/types";
 import type { EventGallery } from "../src/app/data/eventGalleries";
 
+import type { CalendarDrive } from "./calendar-drive.ts";
+
 export type PublicFields = Omit<CalendarEvent, "id"> & {
   slug: string;
   sourceId: string;
@@ -37,6 +39,7 @@ export interface RegistryEvent extends PublicFields {
   /** Locally maintained exception: Calendar cannot revise or retire this event. */
   syncPolicy?: "manual";
   historical?: boolean;
+  driveGallery?: "pending" | "linked";
   inactive?: boolean;
   editorialState?: string;
   pendingRevision?: PendingRevision;
@@ -71,6 +74,7 @@ export interface GalleryAlarm {
   slug: string;
   status: string;
   reason: string;
+  folderName?: string;
 }
 export interface HistoricalReport {
   version: number;
@@ -122,12 +126,16 @@ export interface GalleryEvent {
   date: string;
   albumUrl?: string;
   galleryCheckPhase?: string;
+  drive?: { past: boolean; folderName: string; previousSlug?: string };
   localFiles?: { name: string; path: string }[];
   posterSource?: { label: string; url: string };
 }
 export interface GalleryState {
   version: number;
-  galleries: Record<string, { fingerprint: string }>;
+  galleries: Record<
+    string,
+    { fingerprint: string; flyerKey?: string; hadDriveImages?: boolean }
+  >;
   checks: Record<string, { phase: string }>;
 }
 export interface GalleryOptions {
@@ -154,6 +162,7 @@ export interface SyncOptions {
   registryPath?: string;
   now?: Date;
   galleryOptions?: GalleryOptions;
+  drive?: CalendarDrive;
 }
 export interface Correction {
   sourceId: string;

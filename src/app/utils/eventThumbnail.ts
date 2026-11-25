@@ -31,9 +31,11 @@ export function getEventThumbnail(
   if (existing) {
     return {
       image: existing,
-      source: gallery?.posterSource
-        ? ("poster" as const)
-        : ("gallery" as const),
+      source:
+        gallery?.images[0]?.kind === "flyer" ||
+        (gallery?.posterSource && !gallery.driveOrdered)
+          ? ("poster" as const)
+          : ("gallery" as const),
     };
   }
   const cover =
