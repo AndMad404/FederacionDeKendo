@@ -65,7 +65,8 @@
     {
       "sourceId": "72f0b1f2f02e0f5d73ae28ec",
       "slug": "3er-torneo",
-      "title": "3er Torneo",
+      "title": "3er Torneo 2026",
+      "syncPolicy": "manual",
       "date": "2026-08-22",
       "timeZone": "America/Costa_Rica",
       "startTime": "13:00",

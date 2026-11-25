@@ -124,7 +124,7 @@ test("generates localized, unique, indexable SEO output for every event route", 
         "gasshuku-monteverde:es",
         "Gasshuku Monteverde — 12 sept 2026 | Costa Rica",
       ],
-      ["3er-torneo:es", "3er Torneo de Kendo — 22 ago 2026"],
+      ["3er-torneo:es", "3er Torneo 2026 — 22 ago 2026"],
       [
         "clak-seminario-instructores-chile:es",
         "CLAK Seminario Instructores CHILE — 29 may 2026",

@@ -39,7 +39,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
     id: "3er-torneo",
     aliases: ["2026-08-22-3er-torneo"],
     archiveEligibleAt: "2026-08-24T06:00:00.000Z",
-    title: "3er Torneo",
+    title: "3er Torneo 2026",
     date: "2026-08-22",
     startTime: "13:00",
     endTime: "17:00",

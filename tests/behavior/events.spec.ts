@@ -201,7 +201,7 @@ test("historical tournament details preserve complete information with its galle
 
   await expect(page.getByText("Actividad finalizada")).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "3er Torneo", exact: true }),
+    page.getByRole("heading", { name: "3er Torneo 2026", exact: true }),
   ).toBeVisible();
   await expect(page.locator("#event-page-title + p")).toHaveCount(0);
   await expect(
@@ -214,7 +214,9 @@ test("historical tournament details preserve complete information with its galle
     page.getByText("Categoría con Bogu y sin Bogu", { exact: false }),
   ).toBeVisible();
   await expect(
-    page.getByRole("region", { name: "Fotografías del evento 3er Torneo" }),
+    page.getByRole("region", {
+      name: "Fotografías del evento 3er Torneo 2026",
+    }),
   ).toBeVisible();
   await expect(
     page.getByRole("button", { name: /Abrir Fotografía/ }),
