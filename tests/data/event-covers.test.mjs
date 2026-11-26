@@ -155,11 +155,19 @@ test("existing event artwork takes priority over generated covers in both format
       const gallery = EVENT_GALLERIES[event.id];
       assert.ok(selection);
       if (gallery?.thumbnail ?? gallery?.images[0]) {
-        assert.equal(
-          selection.source,
-          gallery.posterSource ? "poster" : "gallery",
-        );
-        assert.equal(selection.image, gallery.thumbnail ?? gallery.images[0]);
+        const firstImage = gallery.images[0];
+        if (gallery.driveOrdered && firstImage?.kind !== "flyer") {
+          assert.equal(selection.source, "gallery");
+          assert.equal(selection.image, firstImage);
+        } else {
+          assert.equal(
+            selection.source,
+            firstImage?.kind === "flyer" || gallery.posterSource
+              ? "poster"
+              : "gallery",
+          );
+          assert.equal(selection.image, gallery.thumbnail ?? firstImage);
+        }
       } else {
         assert.equal(selection.source, "generated");
         assert.equal(
@@ -186,26 +194,42 @@ test("generated thumbnails describe organization and event in their alternative 
   }
 });
 
-test("pending illustration disables generated covers while preserving official Shogun artwork", () => {
+test("pending illustration preserves the Shogun Drive cover and official flyer", () => {
   assert.throws(
     () => assertCoverGenerationReady({ status: "awaiting-user-illustration" }),
     /No images were generated/,
   );
   assert.doesNotThrow(() => assertCoverGenerationReady({ status: "approved" }));
-  const shogun = getEventThumbnail(
-    "panama-5ta-copa-shogun-torneo-por-equipos-y-seminario",
-  );
-  assert.equal(shogun?.source, "poster");
-  assert.match(shogun.image.src, /copa-shogun-2026-panama-kendo-thumbnail/);
+  const shogunId = "panama-5ta-copa-shogun-torneo-por-equipos-y-seminario";
+  const gallery = EVENT_GALLERIES[shogunId];
+  const firstImage = gallery.images[0];
+  const pendingApproval = { status: "awaiting-user-illustration" };
+  for (const format of ["calendar", "archive"]) {
+    const shogun = getEventThumbnail(shogunId, format, pendingApproval);
+    if (gallery.driveOrdered && gallery.images.length > 1) {
+      assert.equal(shogun.source, "gallery");
+      assert.equal(shogun.image, firstImage);
+      assert.notEqual(firstImage.kind, "flyer");
+      assert.equal(gallery.images.at(-1).kind, "flyer");
+      assert.match(
+        gallery.images.at(-1).src,
+        /copa-shogun-2026-panama-kendo-flyer/,
+      );
+    } else {
+      assert.equal(shogun.source, "poster");
+      assert.match(
+        shogun.image.src,
+        /copa-shogun-2026-panama-kendo-(?:thumbnail|flyer)/,
+      );
+    }
+  }
   for (const event of CALENDAR_EVENTS) {
     if (!(
       EVENT_GALLERIES[event.id]?.thumbnail ??
       EVENT_GALLERIES[event.id]?.images[0]
     ))
       assert.equal(
-        getEventThumbnail(event.id, "archive", {
-          status: "awaiting-user-illustration",
-        }),
+        getEventThumbnail(event.id, "archive", pendingApproval),
         undefined,
       );
   }
@@ -245,7 +269,6 @@ test("external fallback uses the approved kendo artwork with its diagonal label"
   assert.doesNotMatch(source, /href="https?:/);
   const panamaId = "panama-5ta-copa-shogun-torneo-por-equipos-y-seminario";
   assert.equal(manifest.events[panamaId], undefined);
-  assert.equal(getEventThumbnail(panamaId).source, "poster");
   // Check the fallback for external events that currently lack assigned artwork.
   // Adding a real image later must make the assigned-artwork priority test apply.
   for (const event of CALENDAR_EVENTS.filter(
