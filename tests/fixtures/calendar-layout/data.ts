@@ -135,31 +135,78 @@ export const COVER_DRIVE_IMAGES = neutralImages(2, [
   [640, 480],
   [480, 640],
 ]);
+export const SHOGUN_ID =
+  "panama-5ta-copa-shogun-torneo-por-equipos-y-seminario";
+const shogunEvent: CalendarEvent = {
+  ...base,
+  id: SHOGUN_ID,
+  title: "5ta Copa Shogun",
+  date: "2026-11-21",
+  archiveEligibleAt: undefined,
+  external: true,
+  eventType: "torneo",
+};
+const shogunFlyerSrc = `/images/events/${SHOGUN_ID}/copa-shogun-2026-panama-kendo-flyer-1440.webp`;
+const shogunFlyer = {
+  order: 1,
+  alt: "Flyer oficial de la Copa Shogun 2026 — Panamá",
+  width: 1440,
+  height: 1728,
+  src: shogunFlyerSrc,
+  srcSet: { webp: `${shogunFlyerSrc} 1440w` },
+  sizes: "100vw",
+};
+export const SHOGUN_DRIVE_PHOTO = COVER_DRIVE_IMAGES[0];
 const coverFixture =
   typeof window === "undefined"
     ? null
     : new URLSearchParams(window.location.search).get("coverFixture");
-export const CALENDAR_EVENTS = coverFixture ? COVER_EVENTS : LAYOUT_EVENTS;
-export const EVENT_GALLERIES = coverFixture
+const shogunWithDrive = coverFixture === "shogun-drive";
+const shogunFixture = shogunWithDrive || coverFixture === "shogun-poster";
+export const CALENDAR_EVENTS = shogunFixture
+  ? [shogunEvent]
+  : coverFixture
+    ? COVER_EVENTS
+    : LAYOUT_EVENTS;
+export const EVENT_GALLERIES = shogunFixture
   ? {
-      [COVER_EVENTS.at(-1)!.id]: {
-        fingerprint: "poster",
-        images: neutralImages(1, [[480, 640]]),
+      [SHOGUN_ID]: {
+        fingerprint: coverFixture,
         posterSource: {
-          label: "Fuente oficial",
+          label: shogunFlyer.alt,
           url: "https://example.com/poster",
         },
+        ...(shogunWithDrive
+          ? {
+              driveOrdered: true,
+              images: [
+                SHOGUN_DRIVE_PHOTO,
+                { ...shogunFlyer, order: 2, kind: "flyer" },
+              ],
+            }
+          : { images: [shogunFlyer] }),
       },
-      ...(coverFixture === "gallery"
-        ? {
-            [COVER_EVENTS[0].id]: {
-              fingerprint: "drive",
-              images: COVER_DRIVE_IMAGES,
-            },
-          }
-        : {}),
     }
-  : LAYOUT_GALLERIES;
+  : coverFixture
+    ? {
+        [COVER_EVENTS.at(-1)!.id]: {
+          fingerprint: "poster",
+          images: neutralImages(1, [[480, 640]]),
+          posterSource: {
+            label: "Fuente oficial",
+            url: "https://example.com/poster",
+          },
+        },
+        ...(coverFixture === "gallery"
+          ? {
+              [COVER_EVENTS[0].id]: {
+                fingerprint: "drive",
+                images: COVER_DRIVE_IMAGES,
+              },
+            }
+          : {}),
+      }
+    : LAYOUT_GALLERIES;
 export default {
   events: Object.fromEntries(
     COVER_EVENTS.map((event) => [

@@ -1,9 +1,22 @@
 import { expect, test } from "@playwright/test";
 import { preparePage } from "../helpers/prepare-page";
+import {
+  SHOGUN_DRIVE_PHOTO,
+  SHOGUN_ID,
+} from "../fixtures/calendar-layout/data";
 import coverApproval from "../../src/app/config/eventCoverApproval.json" with { type: "json" };
 
-const SHOGUN_POSTER_SELECTOR =
-  '[data-thumbnail-source="poster"] img[src*="/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/"]';
+const SHOGUN_POSTER_SELECTOR = `[data-thumbnail-source="poster"] img[src*="/${SHOGUN_ID}/"]`;
+const SHOGUN_ROUTES = [
+  ["calendar", "/eventos/", "2026-11-01T12:00:00-06:00"],
+  ["archive", "/eventos/pasados/?year=2026", "2026-12-01T12:00:00-06:00"],
+] as const;
+
+function shogunFixtureUrl(route: string, gallery: "poster" | "drive") {
+  const url = new URL(route, "http://127.0.0.1:4174");
+  url.searchParams.set("coverFixture", `shogun-${gallery}`);
+  return url.href;
+}
 
 test("generic external archive cover fills the same frame as its neighboring photo", async ({
   page,
@@ -31,21 +44,45 @@ test("generic external archive cover fills the same frame as its neighboring pho
   expect(coverBox!.height).toBeCloseTo(photoBox!.height, 0);
 });
 
+for (const [context, route, referenceTime] of SHOGUN_ROUTES) {
+  test(`Shogun ${context} thumbnail uses the first photo after a Drive import`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 768, height: 1024 });
+    await preparePage(
+      page,
+      shogunFixtureUrl(route, "drive"),
+      new Date(referenceTime),
+    );
+    const thumbnail = page.locator("main [data-event-thumbnail]");
+    await expect(thumbnail).toHaveAttribute("data-thumbnail-source", "gallery");
+    const photo = thumbnail.locator("img");
+    await photo.scrollIntoViewIfNeeded();
+    await expect(photo).toBeVisible();
+    await expect(photo).toHaveAttribute("src", SHOGUN_DRIVE_PHOTO.src);
+    await expect(photo).toHaveJSProperty(
+      "naturalWidth",
+      SHOGUN_DRIVE_PHOTO.width,
+    );
+  });
+}
+
 for (const viewport of [
   { width: 360, height: 800 },
   { width: 390, height: 844 },
   { width: 768, height: 1024 },
   { width: 1366, height: 768 },
 ]) {
-  for (const [context, route, referenceTime] of [
-    ["calendar", "/eventos/", "2026-11-01T12:00:00-06:00"],
-    ["archive", "/eventos/pasados/?year=2026", "2026-12-01T12:00:00-06:00"],
-  ] as const) {
+  for (const [context, route, referenceTime] of SHOGUN_ROUTES) {
     test(`Shogun ${context} thumbnail preserves the crest with a top crop at ${viewport.width}px`, async ({
       page,
     }) => {
       await page.setViewportSize(viewport);
-      await preparePage(page, route, new Date(referenceTime));
+      await preparePage(
+        page,
+        shogunFixtureUrl(route, "poster"),
+        new Date(referenceTime),
+      );
       const poster = page.locator(SHOGUN_POSTER_SELECTOR);
       await expect(poster).toHaveCount(1);
       await poster.scrollIntoViewIfNeeded();
