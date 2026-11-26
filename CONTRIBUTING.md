@@ -30,9 +30,11 @@ la raíz las categorías `Examenes`, `Torneos` y `Seminarios`.
 En `existingFolders`, asigna la carpeta existente de la Copa Shogun de Panamá al
 evento `2d5bad84832b0a2be6193e52`. Valida con la identidad de Actions que puede
 listar la carpeta, crear una carpeta de prueba en una categoría y recuperarla.
-Comprueba el orden con dos cargas y un archivo movido. Revisa el álbum de Panamá
-si Drive Activity no devuelve evidencia suficiente. Los IDs de las carpetas
-se resuelven desde Drive y los enlaces se añaden al correo operativo.
+Comprueba que la primera incorporación se conserve como afiche y que las fotos
+del evento pasado aparezcan por nombre en orden natural (`2.jpg` antes de
+`10.jpg`). El afiche queda al final del álbum. Revisa el álbum de Panamá si
+Drive Activity no devuelve evidencia suficiente. Los IDs de las carpetas se
+resuelven desde Drive y los enlaces se añaden al correo operativo.
 
 Configura `quota.userUnitsPerMinute`, `quota.projectUnitsPerMinute`,
 `quota.projectBytesPerDay` y `quota.timeZone` según el proyecto. Configura también

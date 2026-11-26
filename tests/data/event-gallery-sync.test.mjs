@@ -5,6 +5,7 @@ import {
   expectFilesUnchanged,
 } from "../helpers/temporary-directory.mjs";
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readdir, readFile, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
@@ -93,7 +94,7 @@ test("keeps the flyer through archival and reflects only complete Drive inventor
     album.images.map(({ kind }) => kind),
     [undefined, undefined, "flyer"],
   );
-  assert.ok(album.images[0].height > album.images[0].width);
+  assert.ok(album.images[0].width > album.images[0].height);
   assert.equal(album.images[2].src, flyer.src);
   files.splice(2, 1);
   assert.equal((await sync()).galleries[slug].images.length, 2);
@@ -112,6 +113,81 @@ test("keeps the flyer through archival and reflects only complete Drive inventor
   });
   assert.equal((await sync()).galleries[slug].images[1].src, flyer.src);
   assert.equal((await sync()).publication, undefined);
+});
+
+test("reorders a published Drive album by natural filename without dropping photos", async (t) => {
+  const ten = {
+    name: "10.jpeg",
+    id: "ten",
+    buffer: await image("red", 500, 650),
+  };
+  const two = { name: "2.jpeg", id: "two", buffer: await image("blue") };
+  const files = [ten, two];
+  const { options } = await fixture(t, files);
+  const event = {
+    slug: "album-numerado",
+    title: "Álbum numerado",
+    date: "2026-08-08",
+    albumUrl: "https://drive.google.com/drive/folders/album",
+    drive: { past: true, folderName: "Álbum numerado" },
+  };
+  const sync = () => synchronizeEventGalleries({ ...options, events: [event] });
+  const { galleries, state } = await sync();
+  const album = galleries[event.slug];
+  const photoShapes = (gallery) =>
+    gallery.images.map(({ width, height }) => [width, height]);
+  assert.deepEqual(photoShapes(album), [
+    [640, 480],
+    [500, 650],
+  ]);
+
+  // Seed the previously published result in Drive incorporation order.
+  const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
+  const legacyPhotos = await Promise.all(
+    files.map(async ({ name, buffer }) => {
+      const pixels = await sharp(buffer)
+        .rotate()
+        .removeAlpha()
+        .raw()
+        .toBuffer();
+      return `${name}:${hash(pixels)}`;
+    }),
+  );
+  const legacyFingerprint = hash(
+    [...legacyPhotos, "", event.title, event.date, event.slug].join("\n"),
+  );
+  const legacyAlbum = {
+    ...album,
+    fingerprint: legacyFingerprint,
+    images: album.images.toReversed().map((entry, index) => ({
+      ...entry,
+      order: index + 1,
+    })),
+  };
+  state.galleries[event.slug].fingerprint = legacyFingerprint;
+  await writeFile(
+    options.manifestPath,
+    serializeManifest({ [event.slug]: legacyAlbum }),
+  );
+  await writeFile(options.statePath, JSON.stringify(state));
+
+  files.push({ name: "3.jpeg", id: "invalid", buffer: Buffer.from("invalid") });
+  const migrated = await sync();
+  assert.equal(migrated.importedCount, 1);
+  assert.deepEqual(
+    photoShapes(migrated.galleries[event.slug]),
+    photoShapes(album),
+  );
+  assert.match(migrated.warnings.join("\n"), /3\.jpeg: invalid image/);
+  assert.equal((await sync()).importedCount, 0);
+
+  files.splice(0, 1);
+  const incomplete = await sync();
+  assert.deepEqual(
+    incomplete.galleries[event.slug],
+    migrated.galleries[event.slug],
+  );
+  assert.equal(incomplete.alarms[0]?.reason, "importacion_invalida");
 });
 
 test("uses approved input and 4K limits", () => {

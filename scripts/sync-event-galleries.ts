@@ -426,11 +426,43 @@ export async function synchronizeEventGalleries({
             warnings.push(`${event.slug}: ${error.message}`);
           }
         }
+        const photos = valid.filter((item) => !item.flyer);
+        const orderedPhotos = drive?.past
+          ? photos.toSorted((a, b) =>
+              collator.compare(a.file.name, b.file.name),
+            )
+          : photos;
+        const galleryFingerprint = (images: typeof photos) =>
+          digest(
+            images
+              .map((item) => `${item.file.name}:${item.pixelHash}`)
+              .concat(
+                drive
+                  ? [
+                      flyerKey ?? retainedFlyer?.src ?? "",
+                      event.title,
+                      event.date,
+                      event.slug,
+                    ]
+                  : [],
+              )
+              .join("\n"),
+          );
+        const fingerprint = galleryFingerprint(orderedPhotos);
+        // A matching inventory in either order lets an existing album migrate
+        // even if Drive still contains files rejected by the original import.
+        const matchesPublishedPhotos =
+          drive?.past &&
+          invalidFile &&
+          (manifestFrozen?.fingerprint === fingerprint ||
+            manifestFrozen?.fingerprint === galleryFingerprint(photos));
         if (
           (!drive &&
             (valid.length === 0 || (invalidFile && valid.length < 5))) ||
           (drive &&
-            ((invalidFile && Boolean(manifestFrozen?.driveOrdered)) ||
+            ((invalidFile &&
+              manifestFrozen?.driveOrdered &&
+              !matchesPublishedPhotos) ||
               (valid.length === 0 && (invalidFile || !retainedFlyer))))
         ) {
           warnings.push(
@@ -447,27 +479,8 @@ export async function synchronizeEventGalleries({
           continue;
         }
         const selected = drive
-          ? [
-              ...valid.filter((item) => !item.flyer),
-              ...valid.filter((item) => item.flyer),
-            ]
+          ? [...orderedPhotos, ...valid.filter((item) => item.flyer)]
           : valid;
-        const fingerprint = digest(
-          selected
-            .filter((item) => !item.flyer)
-            .map((item) => `${item.file.name}:${item.pixelHash}`)
-            .concat(
-              drive
-                ? [
-                    flyerKey ?? retainedFlyer?.src ?? "",
-                    event.title,
-                    event.date,
-                    event.slug,
-                  ]
-                : [],
-            )
-            .join("\n"),
-        );
         if (
           drive &&
           manifestFrozen?.fingerprint === fingerprint &&
