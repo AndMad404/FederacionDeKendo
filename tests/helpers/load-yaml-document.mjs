@@ -10,10 +10,6 @@ export async function loadYamlDocument(path) {
   return document;
 }
 
-export function workflowSteps(document) {
-  return Object.values(document.jobs ?? {}).flatMap((job) => job.steps ?? []);
-}
-
 export function actionSteps(document) {
   return document.runs?.steps ?? [];
 }
