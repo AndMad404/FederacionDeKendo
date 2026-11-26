@@ -156,18 +156,54 @@ const shogunFlyer = {
   srcSet: { webp: `${shogunFlyerSrc} 1440w` },
   sizes: "100vw",
 };
+// Keep the three-card composition independent of later calendar and Drive syncs.
+const geometryEvents: CalendarEvent[] = [
+  {
+    ...shogunEvent,
+    title: "Copa Shogun 2026 — Panamá",
+    date: "2026-11-20",
+    endDate: "2026-11-23",
+    location: "Shinsei Budokan Panamá y COS Sport Center, Panamá",
+    timeZone: "America/Panama",
+  },
+  {
+    ...base,
+    id: "seminario-noviembre-2026",
+    title: "Seminario Noviembre 2026",
+    date: "2026-11-28",
+    archiveEligibleAt: undefined,
+    startTime: "11:00",
+    endTime: "14:00",
+    location: "Colegio Europeo, Heredia, Costa Rica",
+  },
+  {
+    ...base,
+    id: "4to-torneo",
+    title: "4to Torneo",
+    date: "2026-12-05",
+    archiveEligibleAt: undefined,
+    startTime: "13:00",
+    endTime: "17:00",
+    location: undefined,
+    eventType: "torneo",
+  },
+];
 export const SHOGUN_DRIVE_PHOTO = COVER_DRIVE_IMAGES[0];
 const coverFixture =
   typeof window === "undefined"
     ? null
     : new URLSearchParams(window.location.search).get("coverFixture");
 const shogunWithDrive = coverFixture === "shogun-drive";
-const shogunFixture = shogunWithDrive || coverFixture === "shogun-poster";
-export const CALENDAR_EVENTS = shogunFixture
-  ? [shogunEvent]
-  : coverFixture
-    ? COVER_EVENTS
-    : LAYOUT_EVENTS;
+const geometryFixture = coverFixture === "shogun-geometry";
+const shogunFixture =
+  geometryFixture || shogunWithDrive || coverFixture === "shogun-poster";
+export const CALENDAR_EVENTS = geometryFixture
+  ? geometryEvents
+  : shogunFixture
+    ? [shogunEvent]
+    : coverFixture
+      ? COVER_EVENTS
+      : LAYOUT_EVENTS;
 export const EVENT_GALLERIES = shogunFixture
   ? {
       [SHOGUN_ID]: {
@@ -209,7 +245,10 @@ export const EVENT_GALLERIES = shogunFixture
     : LAYOUT_GALLERIES;
 export default {
   events: Object.fromEntries(
-    COVER_EVENTS.map((event) => [
+    [
+      ...COVER_EVENTS,
+      ...geometryEvents.filter(({ id }) => id !== SHOGUN_ID),
+    ].map((event) => [
       event.id,
       {
         calendar: neutralImages(1, [[480, 360]])[0],

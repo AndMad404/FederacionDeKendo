@@ -82,6 +82,14 @@ for (const viewport of [
 
 const FIXED_TABLET_TIME = new Date("2026-11-07T12:00:00-06:00");
 
+async function openShogunCoverCalendar(page: Page) {
+  await preparePage(
+    page,
+    "http://127.0.0.1:4174/eventos/?coverFixture=shogun-geometry",
+    FIXED_TABLET_TIME,
+  );
+}
+
 function visibleCalendarCards(page: Page) {
   return page.locator('section[aria-labelledby^="calendar-month-"] li:visible');
 }
@@ -107,7 +115,7 @@ test.describe("responsive calendar display rules", () => {
       page,
     }) => {
       await page.setViewportSize(viewport);
-      await openCalendar(page, FIXED_TABLET_TIME);
+      await openShogunCoverCalendar(page);
       const cards = visibleCalendarCards(page);
       await expect(cards).toHaveCount(3);
 
@@ -294,7 +302,7 @@ test.describe("responsive calendar display rules", () => {
     page,
   }) => {
     await page.setViewportSize({ width: 1920, height: 1080 });
-    await openCalendar(page, FIXED_TABLET_TIME);
+    await openShogunCoverCalendar(page);
     const cards = visibleCalendarCards(page);
     const shogun = cards
       .filter({
