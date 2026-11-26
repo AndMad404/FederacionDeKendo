@@ -2,19 +2,24 @@
   "version": 2,
   "galleries": {
     "2do-examen-2026": {
-      "fingerprint": "2164e8b1aa9e2137057d27be603d707fb25d0c2b8c31e5ed1be3912763284fe8"
+      "fingerprint": "f25ff36996d36e56cb4daa08f0652f986507224b4f785abbd2564dd1829fa520",
+      "hadDriveImages": true
     },
     "3er-torneo": {
-      "fingerprint": "5cbd7351da72eb1e6102d6c0ca7ff00c14d4ce7be66701295d787af74361734d"
+      "fingerprint": "fb4c6e029e609707239db9f6c3431d604682d03c4326553d4dd5c23fea5d1a18",
+      "hadDriveImages": true
     },
     "gasshuku-monteverde": {
-      "fingerprint": "82896ffb0c046080c5083b1f67d8e456ef145b7809ccbffe146c1591891971ef"
+      "fingerprint": "886730a76b2156b22c462ab43ff9aee916d0ae34125700b4ed209cce9286744e",
+      "hadDriveImages": true
     },
     "panama-5ta-copa-shogun-torneo-por-equipos-y-seminario": {
-      "fingerprint": "d02d1e241f33d6f3b6f6f1848e6c098461ce0119aaddc3ac0f52703397db9eeb"
+      "fingerprint": "32c1aba31859e80736cd2f3906ae70d448a563ef6e5df9020c6bd3a179bf6333",
+      "hadDriveImages": true
     },
     "3er-examen-2026": {
-      "fingerprint": "360c7d1e23b1561906843b8a1bc71654a97f3f70ca17ed6dcd0a69c5344d4db6"
+      "fingerprint": "4108ce8ce33370f07dd8401c31405d4ff7e39d6e284d9f091d6a67123a7bfdcf",
+      "hadDriveImages": true
     }
   },
   "checks": {
