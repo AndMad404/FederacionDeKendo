@@ -61,7 +61,7 @@
       "aliases": [
         "2026-08-08-examen"
       ],
-      "driveGallery": "pending"
+      "driveGallery": "linked"
     },
     {
       "sourceId": "72f0b1f2f02e0f5d73ae28ec",
@@ -81,7 +81,7 @@
       "aliases": [
         "2026-08-22-3er-torneo"
       ],
-      "driveGallery": "pending"
+      "driveGallery": "linked"
     },
     {
       "sourceId": "45c4376b5e5e0fcf347835d0",
@@ -99,7 +99,7 @@
       "aliases": [
         "2026-09-12-gasshuku-monteverde"
       ],
-      "driveGallery": "pending"
+      "driveGallery": "linked"
     },
     {
       "sourceId": "e25ca7168de483e195f1aaf1",
@@ -139,7 +139,7 @@
         "2026-10-31-examen"
       ],
       "historical": true,
-      "driveGallery": "pending"
+      "driveGallery": "linked"
     },
     {
       "sourceId": "2d5bad84832b0a2be6193e52",
@@ -161,7 +161,7 @@
       "syncPolicy": "manual",
       "external": true,
       "infoUrl": "https://www.instagram.com/p/De-Qt1Mh9AS/",
-      "driveGallery": "pending"
+      "driveGallery": "linked"
     },
     {
       "sourceId": "c3909f6184a7323412928ae0",
@@ -176,11 +176,11 @@
       "location": "Colegio Europeo, San Pablo del cementerio 125 oeste 100 norte Heredia, Heredia, San Pablo, Puebla, 40901, Costa Rica",
       "summary": "Seminario Técnico de Kendo con Senseis 7mo Dan:  Haruyo y Genki Kubo.\nAbierto para practicantes con y sin bogu.",
       "eventType": "seminario",
+      "driveGallery": "linked",
       "editorialState": "publicado",
       "aliases": [
         "seminario-noviembre"
-      ],
-      "driveGallery": "pending"
+      ]
     },
     {
       "sourceId": "d5e995f4e75da854e455e4a5",
@@ -194,11 +194,11 @@
       "archiveEligibleAt": "2026-12-07T06:00:00.000Z",
       "summary": "Torneo de la Federación de Asociaciones de Kendo. FAK\nCategoría con Bogu, sin Bogu y por Equipos",
       "eventType": "torneo",
+      "driveGallery": "linked",
       "editorialState": "publicado",
       "aliases": [
         "2026-12-12-4to-torneo"
-      ],
-      "driveGallery": "pending"
+      ]
     },
     {
       "sourceId": "8f7f631510e2e2523d7345c1",
@@ -213,11 +213,11 @@
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
       "summary": "Exámenes de grado para Kende de 8vo a 2do kyu",
       "eventType": "examen",
+      "driveGallery": "linked",
       "editorialState": "publicado",
       "aliases": [
         "2027-01-30-examen"
-      ],
-      "driveGallery": "pending"
+      ]
     },
     {
       "sourceId": "325fa23572d746c098463cfc",
@@ -232,11 +232,11 @@
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
       "summary": "Torneo de la Federación de Asociaciones de Kendo. FAK\nCategoría con Bogu, sin Bogu y por Equipos",
       "eventType": "torneo",
+      "driveGallery": "linked",
       "editorialState": "publicado",
       "aliases": [
         "2027-04-03-5to-torneo"
-      ],
-      "driveGallery": "pending"
+      ]
     },
     {
       "sourceId": "2c34e1accb679991a55100bb",
@@ -251,11 +251,11 @@
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
       "summary": "Exámenes de grado para Kende de 8vo a 2do kyu",
       "eventType": "examen",
+      "driveGallery": "linked",
       "editorialState": "publicado",
       "aliases": [
         "2027-05-01-examen"
-      ],
-      "driveGallery": "pending"
+      ]
     },
     {
       "sourceId": "1361a31e6ed86361f014c7c1",
@@ -270,11 +270,11 @@
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
       "summary": "Exámenes de grado para Kende de 8vo a 2do kyu",
       "eventType": "examen",
+      "driveGallery": "linked",
       "editorialState": "publicado",
       "aliases": [
         "2027-07-31-examen"
-      ],
-      "driveGallery": "pending"
+      ]
     },
     {
       "sourceId": "af94c6be4ebe10e334a37951",
@@ -289,11 +289,11 @@
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
       "summary": "Torneo de la Federación de Asociaciones de Kendo. FAK\nCategoría con Bogu, sin Bogu y por Equipos",
       "eventType": "torneo",
+      "driveGallery": "linked",
       "editorialState": "publicado",
       "aliases": [
         "2027-08-14-6to-torneo"
-      ],
-      "driveGallery": "pending"
+      ]
     },
     {
       "sourceId": "2d0ecad0919db5dc75e39dd5",
@@ -308,11 +308,11 @@
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
       "summary": "Exámenes de grado para Kende de 8vo a 2do kyu",
       "eventType": "examen",
+      "driveGallery": "linked",
       "editorialState": "publicado",
       "aliases": [
         "2027-10-30-examen"
-      ],
-      "driveGallery": "pending"
+      ]
     },
     {
       "sourceId": "26e2ecffe893577fa8a242ec",
@@ -327,11 +327,11 @@
       "location": "Tamashii Martial Arts Pinares, San José, Curridabat, Granadilla, De Walmart, Complejo FRC, doscientos metros este y doscientos metros norte, local 2, San José, Curridabat, Ayarco Norte, 11803, Costa Rica",
       "summary": "Torneo de la Federación de Asociaciones de Kendo. FAK\nCategoría con Bogu, sin Bogu y por Equipos",
       "eventType": "torneo",
+      "driveGallery": "linked",
       "editorialState": "publicado",
       "aliases": [
         "2027-12-11-7mo-torneo"
-      ],
-      "driveGallery": "pending"
+      ]
     }
   ]
 }

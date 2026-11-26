@@ -15,114 +15,127 @@ export interface EventGallery { fingerprint: string; driveOrdered?: boolean; ima
 
 export const EVENT_GALLERIES: Record<string, EventGallery> = {
   "2do-examen-2026": {
-    "fingerprint": "2164e8b1aa9e2137057d27be603d707fb25d0c2b8c31e5ed1be3912763284fe8",
+    "fingerprint": "f25ff36996d36e56cb4daa08f0652f986507224b4f785abbd2564dd1829fa520",
     "images": [
       {
         "order": 1,
-        "alt": "Federaciones de Asociaciones de Kendo - Examen 2026-08-08",
-        "width": 1280,
-        "height": 720,
-        "src": "/images/events/2026-08-08-examen/photo-1-1280.webp",
-        "srcSet": {
-          "webp": "/images/events/2026-08-08-examen/photo-1-480.webp 480w, /images/events/2026-08-08-examen/photo-1-960.webp 960w, /images/events/2026-08-08-examen/photo-1-1280.webp 1280w"
-        },
-        "sizes": "(max-width: 640px) 100vw, 960px"
-      },
-      {
-        "order": 2,
-        "alt": "Federaciones de Asociaciones de Kendo - Examen 2026-08-08",
+        "alt": "Federaciones de Asociaciones de Kendo - 2do Examen 2026 2026-08-08",
         "width": 1600,
         "height": 1200,
-        "src": "/images/events/2026-08-08-examen/photo-2-1600.webp",
+        "src": "/images/events/2do-examen-2026/drive-f25ff36996d3-1-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-08-08-examen/photo-2-480.webp 480w, /images/events/2026-08-08-examen/photo-2-960.webp 960w, /images/events/2026-08-08-examen/photo-2-1600.webp 1600w"
+          "webp": "/images/events/2do-examen-2026/drive-f25ff36996d3-1-480.webp 480w, /images/events/2do-examen-2026/drive-f25ff36996d3-1-960.webp 960w, /images/events/2do-examen-2026/drive-f25ff36996d3-1-1600.webp 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 2,
+        "alt": "Federaciones de Asociaciones de Kendo - 2do Examen 2026 2026-08-08",
+        "width": 1280,
+        "height": 720,
+        "src": "/images/events/2do-examen-2026/drive-f25ff36996d3-2-1280.webp",
+        "srcSet": {
+          "webp": "/images/events/2do-examen-2026/drive-f25ff36996d3-2-480.webp 480w, /images/events/2do-examen-2026/drive-f25ff36996d3-2-960.webp 960w, /images/events/2do-examen-2026/drive-f25ff36996d3-2-1280.webp 1280w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
       {
         "order": 3,
-        "alt": "Federaciones de Asociaciones de Kendo - Examen 2026-08-08",
+        "alt": "Federaciones de Asociaciones de Kendo - 2do Examen 2026 2026-08-08",
         "width": 1600,
         "height": 901,
-        "src": "/images/events/2026-08-08-examen/photo-3-1600.webp",
+        "src": "/images/events/2do-examen-2026/drive-f25ff36996d3-3-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-08-08-examen/photo-3-480.webp 480w, /images/events/2026-08-08-examen/photo-3-960.webp 960w, /images/events/2026-08-08-examen/photo-3-1600.webp 1600w"
+          "webp": "/images/events/2do-examen-2026/drive-f25ff36996d3-3-480.webp 480w, /images/events/2do-examen-2026/drive-f25ff36996d3-3-960.webp 960w, /images/events/2do-examen-2026/drive-f25ff36996d3-3-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       }
-    ]
+    ],
+    "driveOrdered": true
   },
   "3er-torneo": {
-    "fingerprint": "5cbd7351da72eb1e6102d6c0ca7ff00c14d4ce7be66701295d787af74361734d",
+    "fingerprint": "fb4c6e029e609707239db9f6c3431d604682d03c4326553d4dd5c23fea5d1a18",
     "images": [
       {
         "order": 1,
-        "alt": "Federaciones de Asociaciones de Kendo - 3er Torneo 2026-08-22",
-        "width": 720,
-        "height": 1560,
-        "src": "/images/events/2026-08-22-3er-torneo/photo-1-720.webp",
+        "alt": "Federaciones de Asociaciones de Kendo - 3er Torneo 2026 2026-08-22",
+        "width": 1600,
+        "height": 900,
+        "src": "/images/events/3er-torneo/drive-fb4c6e029e60-1-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-08-22-3er-torneo/photo-1-480.webp 480w, /images/events/2026-08-22-3er-torneo/photo-1-720.webp 720w"
+          "webp": "/images/events/3er-torneo/drive-fb4c6e029e60-1-480.webp 480w, /images/events/3er-torneo/drive-fb4c6e029e60-1-960.webp 960w, /images/events/3er-torneo/drive-fb4c6e029e60-1-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
       {
         "order": 2,
-        "alt": "Federaciones de Asociaciones de Kendo - 3er Torneo 2026-08-22",
-        "width": 1445,
-        "height": 1600,
-        "src": "/images/events/2026-08-22-3er-torneo/photo-2-1445.webp",
+        "alt": "Federaciones de Asociaciones de Kendo - 3er Torneo 2026 2026-08-22",
+        "width": 1600,
+        "height": 1493,
+        "src": "/images/events/3er-torneo/drive-fb4c6e029e60-2-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-08-22-3er-torneo/photo-2-480.webp 480w, /images/events/2026-08-22-3er-torneo/photo-2-960.webp 960w, /images/events/2026-08-22-3er-torneo/photo-2-1445.webp 1445w"
+          "webp": "/images/events/3er-torneo/drive-fb4c6e029e60-2-480.webp 480w, /images/events/3er-torneo/drive-fb4c6e029e60-2-960.webp 960w, /images/events/3er-torneo/drive-fb4c6e029e60-2-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
       {
         "order": 3,
-        "alt": "Federaciones de Asociaciones de Kendo - 3er Torneo 2026-08-22",
+        "alt": "Federaciones de Asociaciones de Kendo - 3er Torneo 2026 2026-08-22",
         "width": 1600,
-        "height": 1493,
-        "src": "/images/events/2026-08-22-3er-torneo/photo-3-1600.webp",
+        "height": 901,
+        "src": "/images/events/3er-torneo/drive-fb4c6e029e60-3-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-08-22-3er-torneo/photo-3-480.webp 480w, /images/events/2026-08-22-3er-torneo/photo-3-960.webp 960w, /images/events/2026-08-22-3er-torneo/photo-3-1600.webp 1600w"
+          "webp": "/images/events/3er-torneo/drive-fb4c6e029e60-3-480.webp 480w, /images/events/3er-torneo/drive-fb4c6e029e60-3-960.webp 960w, /images/events/3er-torneo/drive-fb4c6e029e60-3-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
       {
         "order": 4,
-        "alt": "Federaciones de Asociaciones de Kendo - 3er Torneo 2026-08-22",
-        "width": 1600,
-        "height": 901,
-        "src": "/images/events/2026-08-22-3er-torneo/photo-4-1600.webp",
+        "alt": "Federaciones de Asociaciones de Kendo - 3er Torneo 2026 2026-08-22",
+        "width": 1445,
+        "height": 1600,
+        "src": "/images/events/3er-torneo/drive-fb4c6e029e60-4-1445.webp",
         "srcSet": {
-          "webp": "/images/events/2026-08-22-3er-torneo/photo-4-480.webp 480w, /images/events/2026-08-22-3er-torneo/photo-4-960.webp 960w, /images/events/2026-08-22-3er-torneo/photo-4-1600.webp 1600w"
+          "webp": "/images/events/3er-torneo/drive-fb4c6e029e60-4-480.webp 480w, /images/events/3er-torneo/drive-fb4c6e029e60-4-960.webp 960w, /images/events/3er-torneo/drive-fb4c6e029e60-4-1445.webp 1445w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
       {
         "order": 5,
-        "alt": "Federaciones de Asociaciones de Kendo - 3er Torneo 2026-08-22",
-        "width": 1600,
-        "height": 900,
-        "src": "/images/events/2026-08-22-3er-torneo/photo-5-1600.webp",
+        "alt": "Federaciones de Asociaciones de Kendo - 3er Torneo 2026 2026-08-22",
+        "width": 900,
+        "height": 1600,
+        "src": "/images/events/3er-torneo/drive-fb4c6e029e60-5-900.webp",
         "srcSet": {
-          "webp": "/images/events/2026-08-22-3er-torneo/photo-5-480.webp 480w, /images/events/2026-08-22-3er-torneo/photo-5-960.webp 960w, /images/events/2026-08-22-3er-torneo/photo-5-1600.webp 1600w"
+          "webp": "/images/events/3er-torneo/drive-fb4c6e029e60-5-480.webp 480w, /images/events/3er-torneo/drive-fb4c6e029e60-5-900.webp 900w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 6,
+        "alt": "Federaciones de Asociaciones de Kendo - 3er Torneo 2026 2026-08-22",
+        "width": 720,
+        "height": 1560,
+        "src": "/images/events/3er-torneo/drive-fb4c6e029e60-6-720.webp",
+        "srcSet": {
+          "webp": "/images/events/3er-torneo/drive-fb4c6e029e60-6-480.webp 480w, /images/events/3er-torneo/drive-fb4c6e029e60-6-720.webp 720w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       }
-    ]
+    ],
+    "driveOrdered": true
   },
   "gasshuku-monteverde": {
-    "fingerprint": "82896ffb0c046080c5083b1f67d8e456ef145b7809ccbffe146c1591891971ef",
+    "fingerprint": "886730a76b2156b22c462ab43ff9aee916d0ae34125700b4ed209cce9286744e",
     "images": [
       {
         "order": 1,
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-1-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/drive-886730a76b21-1-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-1-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-1-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-1-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/drive-886730a76b21-1-480.webp 480w, /images/events/gasshuku-monteverde/drive-886730a76b21-1-960.webp 960w, /images/events/gasshuku-monteverde/drive-886730a76b21-1-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -131,9 +144,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-2-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/drive-886730a76b21-2-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-2-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-2-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-2-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/drive-886730a76b21-2-480.webp 480w, /images/events/gasshuku-monteverde/drive-886730a76b21-2-960.webp 960w, /images/events/gasshuku-monteverde/drive-886730a76b21-2-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -142,9 +155,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-3-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/drive-886730a76b21-3-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-3-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-3-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-3-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/drive-886730a76b21-3-480.webp 480w, /images/events/gasshuku-monteverde/drive-886730a76b21-3-960.webp 960w, /images/events/gasshuku-monteverde/drive-886730a76b21-3-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -153,9 +166,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-4-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/drive-886730a76b21-4-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-4-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-4-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-4-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/drive-886730a76b21-4-480.webp 480w, /images/events/gasshuku-monteverde/drive-886730a76b21-4-960.webp 960w, /images/events/gasshuku-monteverde/drive-886730a76b21-4-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -164,9 +177,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-5-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/drive-886730a76b21-5-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-5-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-5-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-5-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/drive-886730a76b21-5-480.webp 480w, /images/events/gasshuku-monteverde/drive-886730a76b21-5-960.webp 960w, /images/events/gasshuku-monteverde/drive-886730a76b21-5-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -174,10 +187,10 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "order": 6,
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
-        "height": 1066,
-        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-6-1600.webp",
+        "height": 863,
+        "src": "/images/events/gasshuku-monteverde/drive-886730a76b21-6-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-6-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-6-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-6-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/drive-886730a76b21-6-480.webp 480w, /images/events/gasshuku-monteverde/drive-886730a76b21-6-960.webp 960w, /images/events/gasshuku-monteverde/drive-886730a76b21-6-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -186,9 +199,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-7-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/drive-886730a76b21-7-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-7-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-7-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-7-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/drive-886730a76b21-7-480.webp 480w, /images/events/gasshuku-monteverde/drive-886730a76b21-7-960.webp 960w, /images/events/gasshuku-monteverde/drive-886730a76b21-7-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -197,9 +210,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-8-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/drive-886730a76b21-8-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-8-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-8-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-8-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/drive-886730a76b21-8-480.webp 480w, /images/events/gasshuku-monteverde/drive-886730a76b21-8-960.webp 960w, /images/events/gasshuku-monteverde/drive-886730a76b21-8-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -207,10 +220,10 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "order": 9,
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
-        "height": 863,
-        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-9-1600.webp",
+        "height": 1066,
+        "src": "/images/events/gasshuku-monteverde/drive-886730a76b21-9-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-9-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-9-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-9-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/drive-886730a76b21-9-480.webp 480w, /images/events/gasshuku-monteverde/drive-886730a76b21-9-960.webp 960w, /images/events/gasshuku-monteverde/drive-886730a76b21-9-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -219,9 +232,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-10-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/drive-886730a76b21-10-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-10-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-10-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-10-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/drive-886730a76b21-10-480.webp 480w, /images/events/gasshuku-monteverde/drive-886730a76b21-10-960.webp 960w, /images/events/gasshuku-monteverde/drive-886730a76b21-10-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -230,9 +243,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-11-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/drive-886730a76b21-11-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-11-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-11-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-11-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/drive-886730a76b21-11-480.webp 480w, /images/events/gasshuku-monteverde/drive-886730a76b21-11-960.webp 960w, /images/events/gasshuku-monteverde/drive-886730a76b21-11-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -241,9 +254,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-12-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/drive-886730a76b21-12-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-12-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-12-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-12-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/drive-886730a76b21-12-480.webp 480w, /images/events/gasshuku-monteverde/drive-886730a76b21-12-960.webp 960w, /images/events/gasshuku-monteverde/drive-886730a76b21-12-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -252,9 +265,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-13-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/drive-886730a76b21-13-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-13-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-13-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-13-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/drive-886730a76b21-13-480.webp 480w, /images/events/gasshuku-monteverde/drive-886730a76b21-13-960.webp 960w, /images/events/gasshuku-monteverde/drive-886730a76b21-13-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -263,9 +276,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-14-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/drive-886730a76b21-14-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-14-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-14-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-14-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/drive-886730a76b21-14-480.webp 480w, /images/events/gasshuku-monteverde/drive-886730a76b21-14-960.webp 960w, /images/events/gasshuku-monteverde/drive-886730a76b21-14-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -274,9 +287,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-15-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/drive-886730a76b21-15-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-15-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-15-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-15-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/drive-886730a76b21-15-480.webp 480w, /images/events/gasshuku-monteverde/drive-886730a76b21-15-960.webp 960w, /images/events/gasshuku-monteverde/drive-886730a76b21-15-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -285,9 +298,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-16-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/drive-886730a76b21-16-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-16-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-16-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-16-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/drive-886730a76b21-16-480.webp 480w, /images/events/gasshuku-monteverde/drive-886730a76b21-16-960.webp 960w, /images/events/gasshuku-monteverde/drive-886730a76b21-16-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -296,9 +309,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-17-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/drive-886730a76b21-17-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-17-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-17-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-17-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/drive-886730a76b21-17-480.webp 480w, /images/events/gasshuku-monteverde/drive-886730a76b21-17-960.webp 960w, /images/events/gasshuku-monteverde/drive-886730a76b21-17-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -307,9 +320,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-18-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/drive-886730a76b21-18-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-18-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-18-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-18-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/drive-886730a76b21-18-480.webp 480w, /images/events/gasshuku-monteverde/drive-886730a76b21-18-960.webp 960w, /images/events/gasshuku-monteverde/drive-886730a76b21-18-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -318,9 +331,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-19-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/drive-886730a76b21-19-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-19-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-19-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-19-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/drive-886730a76b21-19-480.webp 480w, /images/events/gasshuku-monteverde/drive-886730a76b21-19-960.webp 960w, /images/events/gasshuku-monteverde/drive-886730a76b21-19-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -329,19 +342,141 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/2026-09-12-gasshuku-monteverde/photo-20-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/drive-886730a76b21-20-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2026-09-12-gasshuku-monteverde/photo-20-480.webp 480w, /images/events/2026-09-12-gasshuku-monteverde/photo-20-960.webp 960w, /images/events/2026-09-12-gasshuku-monteverde/photo-20-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/drive-886730a76b21-20-480.webp 480w, /images/events/gasshuku-monteverde/drive-886730a76b21-20-960.webp 960w, /images/events/gasshuku-monteverde/drive-886730a76b21-20-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       }
-    ]
+    ],
+    "driveOrdered": true
   },
   "panama-5ta-copa-shogun-torneo-por-equipos-y-seminario": {
-    "fingerprint": "d02d1e241f33d6f3b6f6f1848e6c098461ce0119aaddc3ac0f52703397db9eeb",
+    "fingerprint": "32c1aba31859e80736cd2f3906ae70d448a563ef6e5df9020c6bd3a179bf6333",
     "images": [
       {
         "order": 1,
+        "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
+        "width": 1200,
+        "height": 1600,
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-1-1200.webp",
+        "srcSet": {
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-1-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-1-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-1-1200.webp 1200w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 2,
+        "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
+        "width": 1280,
+        "height": 960,
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-2-1280.webp",
+        "srcSet": {
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-2-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-2-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-2-1280.webp 1280w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 3,
+        "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
+        "width": 1200,
+        "height": 1600,
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-3-1200.webp",
+        "srcSet": {
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-3-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-3-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-3-1200.webp 1200w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 4,
+        "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
+        "width": 1188,
+        "height": 967,
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-4-1188.webp",
+        "srcSet": {
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-4-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-4-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-4-1188.webp 1188w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 5,
+        "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
+        "width": 1200,
+        "height": 1600,
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-5-1200.webp",
+        "srcSet": {
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-5-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-5-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-5-1200.webp 1200w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 6,
+        "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
+        "width": 1200,
+        "height": 1600,
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-6-1200.webp",
+        "srcSet": {
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-6-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-6-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-6-1200.webp 1200w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 7,
+        "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
+        "width": 1200,
+        "height": 1600,
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-7-1200.webp",
+        "srcSet": {
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-7-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-7-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-7-1200.webp 1200w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 8,
+        "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
+        "width": 1600,
+        "height": 1200,
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-8-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-8-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-8-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-8-1600.webp 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 9,
+        "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
+        "width": 1280,
+        "height": 960,
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-9-1280.webp",
+        "srcSet": {
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-9-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-9-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-9-1280.webp 1280w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 10,
+        "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
+        "width": 1600,
+        "height": 1200,
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-10-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-10-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-10-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-10-1600.webp 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 11,
+        "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
+        "width": 1600,
+        "height": 1200,
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-11-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-11-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-11-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-32c1aba31859-11-1600.webp 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 12,
         "alt": "Flyer oficial de la Copa Shogun 2026 — Panamá",
         "width": 1440,
         "height": 1728,
@@ -349,36 +484,27 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "srcSet": {
           "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/copa-shogun-2026-panama-kendo-flyer-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/copa-shogun-2026-panama-kendo-flyer-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/copa-shogun-2026-panama-kendo-flyer-1440.webp 1440w"
         },
-        "sizes": "(max-width: 640px) 100vw, 960px"
+        "sizes": "(max-width: 640px) 100vw, 960px",
+        "kind": "flyer"
       }
     ],
+    "driveOrdered": true,
     "posterSource": {
       "label": "Flyer oficial de la Copa Shogun 2026 — Panamá",
       "url": "https://www.instagram.com/p/De-Qt1Mh9AS/"
-    },
-    "thumbnail": {
-      "order": 1,
-      "alt": "Imagen oficial de la Copa Shogun 2026 — Panamá",
-      "width": 1440,
-      "height": 810,
-      "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/copa-shogun-2026-panama-kendo-thumbnail-1440.webp",
-      "srcSet": {
-        "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/copa-shogun-2026-panama-kendo-thumbnail-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/copa-shogun-2026-panama-kendo-thumbnail-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/copa-shogun-2026-panama-kendo-thumbnail-1440.webp 1440w"
-      },
-      "sizes": "(max-width: 640px) 100vw, 960px"
     }
   },
   "3er-examen-2026": {
-    "fingerprint": "360c7d1e23b1561906843b8a1bc71654a97f3f70ca17ed6dcd0a69c5344d4db6",
+    "fingerprint": "4108ce8ce33370f07dd8401c31405d4ff7e39d6e284d9f091d6a67123a7bfdcf",
     "images": [
       {
         "order": 1,
         "alt": "Federaciones de Asociaciones de Kendo - 3er Examen 2026 2026-10-31",
-        "width": 464,
-        "height": 832,
-        "src": "/images/events/3er-examen-2026/photo-1-464.webp",
+        "width": 1600,
+        "height": 904,
+        "src": "/images/events/3er-examen-2026/drive-4108ce8ce333-1-1600.webp",
         "srcSet": {
-          "webp": "/images/events/3er-examen-2026/photo-1-464.webp 464w"
+          "webp": "/images/events/3er-examen-2026/drive-4108ce8ce333-1-480.webp 480w, /images/events/3er-examen-2026/drive-4108ce8ce333-1-960.webp 960w, /images/events/3er-examen-2026/drive-4108ce8ce333-1-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -387,9 +513,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - 3er Examen 2026 2026-10-31",
         "width": 1200,
         "height": 1600,
-        "src": "/images/events/3er-examen-2026/photo-2-1200.webp",
+        "src": "/images/events/3er-examen-2026/drive-4108ce8ce333-2-1200.webp",
         "srcSet": {
-          "webp": "/images/events/3er-examen-2026/photo-2-480.webp 480w, /images/events/3er-examen-2026/photo-2-960.webp 960w, /images/events/3er-examen-2026/photo-2-1200.webp 1200w"
+          "webp": "/images/events/3er-examen-2026/drive-4108ce8ce333-2-480.webp 480w, /images/events/3er-examen-2026/drive-4108ce8ce333-2-960.webp 960w, /images/events/3er-examen-2026/drive-4108ce8ce333-2-1200.webp 1200w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -398,34 +524,35 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - 3er Examen 2026 2026-10-31",
         "width": 1600,
         "height": 900,
-        "src": "/images/events/3er-examen-2026/photo-3-1600.webp",
+        "src": "/images/events/3er-examen-2026/drive-4108ce8ce333-3-1600.webp",
         "srcSet": {
-          "webp": "/images/events/3er-examen-2026/photo-3-480.webp 480w, /images/events/3er-examen-2026/photo-3-960.webp 960w, /images/events/3er-examen-2026/photo-3-1600.webp 1600w"
+          "webp": "/images/events/3er-examen-2026/drive-4108ce8ce333-3-480.webp 480w, /images/events/3er-examen-2026/drive-4108ce8ce333-3-960.webp 960w, /images/events/3er-examen-2026/drive-4108ce8ce333-3-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
       {
         "order": 4,
         "alt": "Federaciones de Asociaciones de Kendo - 3er Examen 2026 2026-10-31",
-        "width": 1600,
-        "height": 904,
-        "src": "/images/events/3er-examen-2026/photo-4-1600.webp",
+        "width": 1122,
+        "height": 1402,
+        "src": "/images/events/3er-examen-2026/drive-4108ce8ce333-4-1122.webp",
         "srcSet": {
-          "webp": "/images/events/3er-examen-2026/photo-4-480.webp 480w, /images/events/3er-examen-2026/photo-4-960.webp 960w, /images/events/3er-examen-2026/photo-4-1600.webp 1600w"
+          "webp": "/images/events/3er-examen-2026/drive-4108ce8ce333-4-480.webp 480w, /images/events/3er-examen-2026/drive-4108ce8ce333-4-960.webp 960w, /images/events/3er-examen-2026/drive-4108ce8ce333-4-1122.webp 1122w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
       {
         "order": 5,
         "alt": "Federaciones de Asociaciones de Kendo - 3er Examen 2026 2026-10-31",
-        "width": 1122,
-        "height": 1402,
-        "src": "/images/events/3er-examen-2026/photo-5-1122.webp",
+        "width": 464,
+        "height": 832,
+        "src": "/images/events/3er-examen-2026/drive-4108ce8ce333-5-464.webp",
         "srcSet": {
-          "webp": "/images/events/3er-examen-2026/photo-5-480.webp 480w, /images/events/3er-examen-2026/photo-5-960.webp 960w, /images/events/3er-examen-2026/photo-5-1122.webp 1122w"
+          "webp": "/images/events/3er-examen-2026/drive-4108ce8ce333-5-464.webp 464w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       }
-    ]
+    ],
+    "driveOrdered": true
   }
 };
