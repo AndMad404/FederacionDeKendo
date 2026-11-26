@@ -60,7 +60,8 @@
       "editorialState": "publicado",
       "aliases": [
         "2026-08-08-examen"
-      ]
+      ],
+      "driveGallery": "pending"
     },
     {
       "sourceId": "72f0b1f2f02e0f5d73ae28ec",
@@ -79,7 +80,8 @@
       "historical": true,
       "aliases": [
         "2026-08-22-3er-torneo"
-      ]
+      ],
+      "driveGallery": "pending"
     },
     {
       "sourceId": "45c4376b5e5e0fcf347835d0",
@@ -96,7 +98,8 @@
       "historical": true,
       "aliases": [
         "2026-09-12-gasshuku-monteverde"
-      ]
+      ],
+      "driveGallery": "pending"
     },
     {
       "sourceId": "e25ca7168de483e195f1aaf1",
@@ -135,7 +138,8 @@
       "aliases": [
         "2026-10-31-examen"
       ],
-      "historical": true
+      "historical": true,
+      "driveGallery": "pending"
     },
     {
       "sourceId": "2d5bad84832b0a2be6193e52",
@@ -156,7 +160,8 @@
       ],
       "syncPolicy": "manual",
       "external": true,
-      "infoUrl": "https://www.instagram.com/p/De-Qt1Mh9AS/"
+      "infoUrl": "https://www.instagram.com/p/De-Qt1Mh9AS/",
+      "driveGallery": "pending"
     },
     {
       "sourceId": "c3909f6184a7323412928ae0",
@@ -174,7 +179,8 @@
       "editorialState": "publicado",
       "aliases": [
         "seminario-noviembre"
-      ]
+      ],
+      "driveGallery": "pending"
     },
     {
       "sourceId": "d5e995f4e75da854e455e4a5",
@@ -191,7 +197,8 @@
       "editorialState": "publicado",
       "aliases": [
         "2026-12-12-4to-torneo"
-      ]
+      ],
+      "driveGallery": "pending"
     },
     {
       "sourceId": "8f7f631510e2e2523d7345c1",
@@ -209,7 +216,8 @@
       "editorialState": "publicado",
       "aliases": [
         "2027-01-30-examen"
-      ]
+      ],
+      "driveGallery": "pending"
     },
     {
       "sourceId": "325fa23572d746c098463cfc",
@@ -227,7 +235,8 @@
       "editorialState": "publicado",
       "aliases": [
         "2027-04-03-5to-torneo"
-      ]
+      ],
+      "driveGallery": "pending"
     },
     {
       "sourceId": "2c34e1accb679991a55100bb",
@@ -245,7 +254,8 @@
       "editorialState": "publicado",
       "aliases": [
         "2027-05-01-examen"
-      ]
+      ],
+      "driveGallery": "pending"
     },
     {
       "sourceId": "1361a31e6ed86361f014c7c1",
@@ -263,7 +273,8 @@
       "editorialState": "publicado",
       "aliases": [
         "2027-07-31-examen"
-      ]
+      ],
+      "driveGallery": "pending"
     },
     {
       "sourceId": "af94c6be4ebe10e334a37951",
@@ -281,7 +292,8 @@
       "editorialState": "publicado",
       "aliases": [
         "2027-08-14-6to-torneo"
-      ]
+      ],
+      "driveGallery": "pending"
     },
     {
       "sourceId": "2d0ecad0919db5dc75e39dd5",
@@ -299,7 +311,8 @@
       "editorialState": "publicado",
       "aliases": [
         "2027-10-30-examen"
-      ]
+      ],
+      "driveGallery": "pending"
     },
     {
       "sourceId": "26e2ecffe893577fa8a242ec",
@@ -317,7 +330,8 @@
       "editorialState": "publicado",
       "aliases": [
         "2027-12-11-7mo-torneo"
-      ]
+      ],
+      "driveGallery": "pending"
     }
   ]
 }
