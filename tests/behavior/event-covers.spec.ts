@@ -68,6 +68,40 @@ for (const [context, route, referenceTime] of SHOGUN_ROUTES) {
   });
 }
 
+test("archive shows the imported Shogun photo edge to edge from tablet up", async ({
+  page,
+}) => {
+  await preparePage(
+    page,
+    shogunFixtureUrl("/eventos/pasados/?year=2026", "drive"),
+    new Date("2026-12-01T12:00:00-06:00"),
+  );
+  const frame = page.locator('main picture[data-thumbnail-source="gallery"]');
+  const photo = frame.locator("img");
+
+  for (const [width, height, fit] of [
+    [390, 844, "contain"],
+    [768, 1024, "cover"],
+    [1440, 900, "cover"],
+  ] as const) {
+    await page.setViewportSize({ width, height });
+    await photo.scrollIntoViewIfNeeded();
+    await expect(photo).toHaveCSS("object-fit", fit);
+    await expect(frame).toHaveCSS("overflow", "hidden");
+    expect(
+      await frame.evaluate((element) =>
+        Number.parseFloat(getComputedStyle(element).borderTopLeftRadius),
+      ),
+    ).toBeGreaterThan(0);
+    const [frameBox, photoBox] = await Promise.all([
+      frame.boundingBox(),
+      photo.boundingBox(),
+    ]);
+    expect(photoBox!.width).toBeCloseTo(frameBox!.width, 0);
+    expect(photoBox!.height).toBeCloseTo(frameBox!.height, 0);
+  }
+});
+
 for (const viewport of [
   { width: 360, height: 800 },
   { width: 390, height: 844 },

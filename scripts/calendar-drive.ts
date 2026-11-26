@@ -8,7 +8,7 @@ const filesUrl = "https://www.googleapis.com/drive/v3/files";
 const activityUrl = "https://driveactivity.googleapis.com/v2/activity:query";
 const folderMime = "application/vnd.google-apps.folder";
 const budgetKey = "calendarDownloadBudget";
-export const MAX_DRIVE_IMAGE_BYTES = 20 * 1024 * 1024;
+export const MAX_DRIVE_IMAGE_BYTES = 10 * 1024 * 1024;
 
 // OAuth error codes from RFC 6749 section 5.2 plus Google-specific ones. Only
 // these values may reach logs and notifications; error_description never does.

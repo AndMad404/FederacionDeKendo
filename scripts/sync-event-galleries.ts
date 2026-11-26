@@ -29,10 +29,8 @@ const DRIVE_FOLDER =
   /^https:\/\/drive\.google\.com\/drive\/folders\/([A-Za-z0-9_-]+)(?:[/?#].*)?$/;
 const INPUT_FORMATS = new Set(["jpeg", "png", "webp", "avif"]);
 const MAX_BYTES = MAX_DRIVE_IMAGE_BYTES;
-const MIN_WIDTH = 480;
-const MIN_HEIGHT = 320;
-const MAX_LONG_EDGE = 3840;
-const MAX_PIXELS = 3840 * 2160;
+const MAX_SIZE_MIB = MAX_BYTES / (1024 * 1024);
+const MAX_FULL_SIZE_FINGERPRINT_PIXELS = 3840 * 2160;
 const WIDTHS = [480, 960, 1600];
 const SIZES = "(max-width: 640px) 100vw, 960px";
 const collator = new Intl.Collator("en", {
@@ -42,10 +40,6 @@ const collator = new Intl.Collator("en", {
 
 export const EVENT_GALLERY_LIMITS = Object.freeze({
   maxBytes: MAX_BYTES,
-  minWidth: MIN_WIDTH,
-  minHeight: MIN_HEIGHT,
-  maxLongEdge: MAX_LONG_EDGE,
-  maxPixels: MAX_PIXELS,
   inputFormats: [...INPUT_FORMATS],
   outputFormats: ["webp"],
 });
@@ -120,7 +114,8 @@ export async function downloadDriveFile(
       : `https://drive.usercontent.google.com/download?id=${encodeURIComponent(file.id)}&export=download&confirm=t`,
   );
   if (!response.ok) throw new Error(`Download failed for ${file.name}.`);
-  const oversized = () => new Error(`${file.name}: file exceeds 20 MB.`);
+  const oversized = () =>
+    new Error(`${file.name}: file exceeds ${MAX_SIZE_MIB} MiB.`);
   const length = Number(response.headers.get("content-length"));
   if (length > MAX_BYTES) {
     await response.body?.cancel();
@@ -149,12 +144,11 @@ export async function downloadDriveFile(
 
 async function inspectImage(buffer: Buffer, name: string) {
   if (buffer.length > MAX_BYTES)
-    throw new Error(`${name}: file exceeds 20 MB.`);
+    throw new Error(`${name}: file exceeds ${MAX_SIZE_MIB} MiB.`);
   let metadata;
   try {
     metadata = await sharp(buffer, {
       failOn: "error",
-      limitInputPixels: MAX_PIXELS,
     }).metadata();
   } catch {
     throw new Error(`${name}: invalid image content or dimensions.`);
@@ -164,19 +158,26 @@ async function inspectImage(buffer: Buffer, name: string) {
   const rotated = [5, 6, 7, 8].includes(metadata.orientation ?? 0);
   const width = rotated ? metadata.height : metadata.width;
   const height = rotated ? metadata.width : metadata.height;
-  if (
-    !width ||
-    !height ||
-    Math.max(width, height) < MIN_WIDTH ||
-    Math.min(width, height) < MIN_HEIGHT
-  ) {
-    throw new Error(`${name}: image is smaller than 480 x 320.`);
+  if (!width || !height)
+    throw new Error(`${name}: invalid image content or dimensions.`);
+
+  const image = sharp(buffer).rotate().removeAlpha();
+  if (width * height <= MAX_FULL_SIZE_FINGERPRINT_PIXELS) {
+    const pixels = await image.raw().toBuffer();
+    return { width, height, pixelHash: digest(pixels) };
   }
-  if (Math.max(width, height) > MAX_LONG_EDGE || width * height > MAX_PIXELS) {
-    throw new Error(`${name}: image exceeds orientation-independent 4K.`);
-  }
-  const pixels = await sharp(buffer).rotate().removeAlpha().raw().toBuffer();
-  return { width, height, pixelHash: digest(pixels) };
+
+  // Keep existing fingerprints and bound the raw buffer for larger originals.
+  const edge = WIDTHS.at(-1)!;
+  const pixels = await image
+    .resize({ width: edge, height: edge, fit: "inside" })
+    .raw()
+    .toBuffer();
+  const pixelHash = createHash("sha256")
+    .update(`${width}x${height}:`)
+    .update(pixels)
+    .digest("hex");
+  return { width, height, pixelHash };
 }
 
 async function createVariants(

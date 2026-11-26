@@ -190,17 +190,35 @@ test("reorders a published Drive album by natural filename without dropping phot
   assert.equal(incomplete.alarms[0]?.reason, "importacion_invalida");
 });
 
-test("uses approved input and 4K limits", () => {
+test("uses approved input formats and a 10 MiB download limit", () => {
   assert.deepEqual(EVENT_GALLERY_LIMITS.inputFormats, [
     "jpeg",
     "png",
     "webp",
     "avif",
   ]);
-  assert.equal(EVENT_GALLERY_LIMITS.maxBytes, 20 * 1024 * 1024);
-  assert.equal(EVENT_GALLERY_LIMITS.maxLongEdge, 3840);
-  assert.equal(EVENT_GALLERY_LIMITS.maxPixels, 3840 * 2160);
+  assert.equal(EVENT_GALLERY_LIMITS.maxBytes, 10 * 1024 * 1024);
   assert.equal(getDriveFolderId("https://example.test/folder"), undefined);
+});
+
+test("resizes a 12 megapixel original and keeps small images at their original size", async (t) => {
+  const large = await image("red", 4032, 3024);
+  assert.ok(large.length < EVENT_GALLERY_LIMITS.maxBytes);
+  const { options } = await fixture(t, [
+    { name: "large.jpg", id: "large", buffer: large },
+    { name: "small.jpg", id: "small", buffer: await image("blue", 320, 240) },
+  ]);
+
+  const result = await run(options);
+  assert.deepEqual(result.warnings, []);
+  const { images } = result.galleries["2026-01-01-evento"];
+  assert.deepEqual(
+    images.map(({ width, height }) => [width, height]),
+    [
+      [1600, 1200],
+      [320, 240],
+    ],
+  );
 });
 
 test("imports local official material through the same variants pipeline and freezes it", async (t) => {
@@ -530,7 +548,7 @@ test("rejects oversized Content-Length without reading the download", async () =
           },
         }),
     ),
-    /exceeds 20 MB/,
+    /exceeds 10 MiB/,
   );
   assert.equal(reads, 0);
   assert.equal(cancelled, true);
@@ -558,15 +576,15 @@ for (const declaredLength of [undefined, "1"]) {
         { id: "x", name: "large.jpg" },
         async () => new Response(body, { headers }),
       ),
-      /exceeds 20 MB/,
+      /exceeds 10 MiB/,
     );
-    assert.equal(reads, 21);
+    assert.equal(reads, 11);
     assert.equal(cancelled, true);
   });
 }
 
 test("accepts a stream at exactly the download limit", async () => {
-  let remaining = 20;
+  let remaining = 10;
   const body = new ReadableStream(
     {
       pull(controller) {
