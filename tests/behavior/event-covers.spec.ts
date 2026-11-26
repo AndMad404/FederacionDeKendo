@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import { preparePage } from "../helpers/prepare-page";
 import {
   SHOGUN_DRIVE_PHOTO,
+  SHOGUN_FLYER_SRC,
   SHOGUN_ID,
 } from "../fixtures/calendar-layout/data";
 import coverApproval from "../../src/app/config/eventCoverApproval.json" with { type: "json" };
@@ -122,7 +123,7 @@ for (const viewport of [
       await expect(poster).toHaveCount(1);
       await poster.scrollIntoViewIfNeeded();
       await expect(poster).toBeVisible();
-      await expect(poster).toHaveAttribute("src", /-flyer-\d+\.webp$/);
+      await expect(poster).toHaveAttribute("src", SHOGUN_FLYER_SRC);
       // The calendar swaps in a pre-composed 4:3 tablet artwork (see
       // EventThumbnail `showShogunTabletCover`) on portrait tablets. That
       // artwork already contains the crest, so it is shown uncropped.

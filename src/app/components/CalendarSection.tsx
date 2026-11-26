@@ -9,6 +9,7 @@ import {
   CalendarNavigation,
 } from "./calendar/CalendarNavigation";
 import { MediaPageBanner } from "./ui/MediaPageBanner";
+import { calendarBannerImage } from "../config/calendarBanner";
 import { useLanguage, type Language } from "../config/i18n";
 import { getLocalizedEvents } from "../utils/localizedEvents";
 import { useCalendarNavigation } from "../hooks/useCalendarNavigation";
@@ -24,20 +25,7 @@ function CalendarBanner() {
       allowTitleWrap
       adaptiveHeight
       description={copy.calendar.description}
-      image={{
-        src: "/images/calendar/kendo-calendar-1600.webp",
-        sources: [
-          {
-            srcSet:
-              "/images/calendar/kendo-calendar-480.webp 480w, /images/calendar/kendo-calendar-960.webp 960w, /images/calendar/kendo-calendar-1600.webp 1600w",
-            sizes: "100vw",
-            type: "image/webp",
-          },
-        ],
-        width: 1600,
-        height: 1069,
-        className: "object-[center_20%]",
-      }}
+      image={calendarBannerImage}
     />
   );
 }

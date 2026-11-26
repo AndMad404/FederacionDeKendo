@@ -358,6 +358,7 @@ export async function synchronizeEventGalleries({
 }: GalleryOptions = {}): Promise<GalleryResult> {
   const warnings = [];
   const alarms = [];
+  const photoChanges: GalleryResult["photoChanges"] = [];
   const previousState = await readJson(statePath, {
     version: 2,
     galleries: {},
@@ -581,6 +582,20 @@ export async function synchronizeEventGalleries({
           });
           continue;
         }
+        const publishedPhotos =
+          manifestFrozen?.images.filter(
+            (image) => image !== retainedFlyer && image.kind !== "flyer",
+          ) ?? [];
+        if (drive?.past && photos.length === 0 && publishedPhotos.length > 0) {
+          alarms.push({
+            slug: event.slug,
+            status: "galeria_conservada",
+            reason:
+              "La carpeta quedó sin fotos del evento. Se conservó la galería publicada.",
+            folderName: drive.folderName,
+          });
+          continue;
+        }
         const selected = drive
           ? [...orderedPhotos, ...valid.filter((item) => item.flyer)]
           : valid;
@@ -673,6 +688,37 @@ export async function synchronizeEventGalleries({
             order: images.length + 1,
           });
         }
+        let removed = 0;
+        let added = 0;
+        if (drive?.past && publishedPhotos.length) {
+          const remaining = new Map<string, number>();
+          for (const image of publishedPhotos) {
+            const asset = EVENT_ASSET_URL.exec(image.src);
+            if (!asset)
+              throw new Error(
+                "La galería publicada tiene una ruta de imagen inválida.",
+              );
+            const hash = digest(
+              await readFile(path.join(stage, asset[1], asset[2])),
+            );
+            remaining.set(hash, (remaining.get(hash) ?? 0) + 1);
+          }
+          for (const image of images) {
+            if (image.kind === "flyer") continue;
+            const hash = digest(
+              await readFile(
+                path.join(renderDirectory, path.basename(image.src)),
+              ),
+            );
+            const count = remaining.get(hash) ?? 0;
+            if (count > 0) remaining.set(hash, count - 1);
+            else added += 1;
+          }
+          removed = [...remaining.values()].reduce(
+            (sum, count) => sum + count,
+            0,
+          );
+        }
         if (drive) {
           await mkdir(eventDirectory, { recursive: true });
           await cp(eventDirectory, renderDirectory, {
@@ -702,6 +748,14 @@ export async function synchronizeEventGalleries({
           fingerprint,
           ...(drive ? { flyerKey, hadDriveImages: true } : {}),
         };
+        if (drive && removed > 0) {
+          photoChanges.push({
+            slug: event.slug,
+            folderName: drive.folderName,
+            removed,
+            added,
+          });
+        }
         hasGalleryChange = true;
         hasStateChange = true;
         importedCount += 1;
@@ -738,6 +792,7 @@ export async function synchronizeEventGalleries({
         state: nextState,
         warnings,
         alarms,
+        photoChanges,
         importedCount,
       };
     }
@@ -764,6 +819,7 @@ export async function synchronizeEventGalleries({
       state: nextState,
       warnings,
       alarms,
+      photoChanges,
       publication,
       importedCount,
     };

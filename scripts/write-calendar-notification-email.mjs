@@ -192,6 +192,11 @@ async function main() {
   if (report.version !== 1 || !Array.isArray(report.notifications)) {
     throw new Error("Calendar notification report has an invalid schema.");
   }
+  if (process.env.CALENDAR_GIT_SAVED !== "true") {
+    report.notifications = report.notifications.filter(
+      (notification) => notification.kind !== "galeria_drive_actualizada",
+    );
+  }
   const folderLinks = new Map();
   const driveConfig = process.env.CALENDAR_DRIVE_CONFIG;
   const folderNotices = report.notifications.filter(

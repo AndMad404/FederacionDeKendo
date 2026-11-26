@@ -10,6 +10,7 @@ import {
 import { getEventThumbnail } from "../../src/app/utils/eventThumbnail.ts";
 import coverApproval from "../../src/app/config/eventCoverApproval.json";
 import seoData from "../../src/app/config/seo-data.json";
+import { eventCoverPresentation } from "../../src/app/config/eventCoverPresentation.ts";
 
 const manifest = JSON.parse(
   await readFile("src/app/data/eventCovers.json", "utf8"),
@@ -194,44 +195,68 @@ test("generated thumbnails describe organization and event in their alternative 
   }
 });
 
-test("pending illustration preserves the Shogun Drive cover and official flyer", () => {
+test("published galleries contain images and configured official flyers exist", async () => {
+  for (const [id, gallery] of Object.entries(EVENT_GALLERIES)) {
+    assert.ok(gallery.images.length, `${id}: published gallery is empty`);
+  }
+
+  for (const [
+    id,
+    { officialFlyer, generatedCalendarDesktop },
+  ] of Object.entries(eventCoverPresentation)) {
+    if (officialFlyer) {
+      const gallery = EVENT_GALLERIES[id];
+      assert.ok(gallery?.posterSource, `${id}: missing official poster source`);
+      const flyer = gallery.images.find(({ kind }) => kind === "flyer");
+      assert.ok(flyer, `${id}: missing official flyer`);
+      assert.ok((await readFile(`public${flyer.src}`)).length > 0);
+    }
+    for (const variant of [
+      officialFlyer?.portraitTablet,
+      generatedCalendarDesktop,
+    ]) {
+      if (variant)
+        assert.ok((await readFile(`public${variant.src}`)).length > 0);
+    }
+  }
+});
+
+test("pending illustration preserves published event covers and official flyers", async () => {
   assert.throws(
     () => assertCoverGenerationReady({ status: "awaiting-user-illustration" }),
     /No images were generated/,
   );
   assert.doesNotThrow(() => assertCoverGenerationReady({ status: "approved" }));
-  const shogunId = "panama-5ta-copa-shogun-torneo-por-equipos-y-seminario";
-  const gallery = EVENT_GALLERIES[shogunId];
-  const firstImage = gallery.images[0];
   const pendingApproval = { status: "awaiting-user-illustration" };
-  for (const format of ["calendar", "archive"]) {
-    const shogun = getEventThumbnail(shogunId, format, pendingApproval);
-    if (gallery.driveOrdered && gallery.images.length > 1) {
-      assert.equal(shogun.source, "gallery");
-      assert.equal(shogun.image, firstImage);
-      assert.notEqual(firstImage.kind, "flyer");
-      assert.equal(gallery.images.at(-1).kind, "flyer");
-      assert.match(
-        gallery.images.at(-1).src,
-        /copa-shogun-2026-panama-kendo-flyer/,
-      );
-    } else {
-      assert.equal(shogun.source, "poster");
-      assert.match(
-        shogun.image.src,
-        /copa-shogun-2026-panama-kendo-(?:thumbnail|flyer)/,
+  for (const { id } of CALENDAR_EVENTS) {
+    const gallery = EVENT_GALLERIES[id];
+    const firstImage = gallery?.images[0];
+    const image = gallery?.thumbnail ?? firstImage;
+
+    for (const format of ["calendar", "archive"]) {
+      const selection = getEventThumbnail(id, format, pendingApproval);
+      if (!image) {
+        assert.equal(selection, undefined);
+        continue;
+      }
+      assert.equal(selection?.image, image);
+      assert.equal(
+        selection.source,
+        firstImage?.kind === "flyer" ||
+          (gallery.posterSource && !gallery.driveOrdered)
+          ? "poster"
+          : "gallery",
       );
     }
-  }
-  for (const event of CALENDAR_EVENTS) {
-    if (!(
-      EVENT_GALLERIES[event.id]?.thumbnail ??
-      EVENT_GALLERIES[event.id]?.images[0]
-    ))
-      assert.equal(
-        getEventThumbnail(event.id, "archive", pendingApproval),
-        undefined,
-      );
+
+    if (gallery?.posterSource) {
+      const flyer =
+        gallery.images.find(({ kind }) => kind === "flyer") ??
+        (!gallery.driveOrdered ? firstImage : undefined);
+      assert.ok(flyer, `${id}: missing official flyer`);
+      if (gallery.driveOrdered) assert.equal(gallery.images.at(-1), flyer);
+      assert.ok((await readFile(`public${flyer.src}`)).length > 0);
+    }
   }
 });
 

@@ -146,14 +146,15 @@ const shogunEvent: CalendarEvent = {
   external: true,
   eventType: "torneo",
 };
-const shogunFlyerSrc = `/images/events/${SHOGUN_ID}/copa-shogun-2026-panama-kendo-flyer-1440.webp`;
+export const SHOGUN_FLYER_SRC = `/images/events/${SHOGUN_ID}/copa-shogun-2026-panama-kendo-flyer-1440.webp`;
 const shogunFlyer = {
   order: 1,
-  alt: "Flyer oficial de la Copa Shogun 2026 — Panamá",
+  kind: "flyer" as const,
+  alt: "Flyer oficial de la Copa Shogun",
   width: 1440,
   height: 1728,
-  src: shogunFlyerSrc,
-  srcSet: { webp: `${shogunFlyerSrc} 1440w` },
+  src: SHOGUN_FLYER_SRC,
+  srcSet: { webp: `${SHOGUN_FLYER_SRC} 1440w` },
   sizes: "100vw",
 };
 // Keep the three-card composition independent of later calendar and Drive syncs.
@@ -215,10 +216,7 @@ export const EVENT_GALLERIES = shogunFixture
         ...(shogunWithDrive
           ? {
               driveOrdered: true,
-              images: [
-                SHOGUN_DRIVE_PHOTO,
-                { ...shogunFlyer, order: 2, kind: "flyer" },
-              ],
+              images: [SHOGUN_DRIVE_PHOTO, { ...shogunFlyer, order: 2 }],
             }
           : { images: [shogunFlyer] }),
       },

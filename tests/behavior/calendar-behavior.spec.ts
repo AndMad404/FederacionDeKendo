@@ -16,6 +16,27 @@ function calendarNavigation(page: Page) {
   return page.getByRole("navigation", { name: "Navegación del calendario" });
 }
 
+test("calendar banner reuses its preloaded image", async ({ page }) => {
+  await page.setViewportSize({ width: 1366, height: 768 });
+  const requests: string[] = [];
+  page.on("request", (request) => {
+    const { pathname } = new URL(request.url());
+    if (pathname.startsWith("/images/calendar/kendo-calendar-")) {
+      requests.push(request.url());
+    }
+  });
+
+  await openCalendar(page);
+  const banner = page.locator("header").filter({
+    has: page.locator("#calendar-title"),
+  });
+  const selectedUrl = await banner
+    .locator("picture img")
+    .evaluate((image: HTMLImageElement) => image.currentSrc);
+  expect(selectedUrl).toBeTruthy();
+  expect(requests).toEqual([selectedUrl]);
+});
+
 test("mobile calendar navigation advances and returns one month", async ({
   page,
 }) => {

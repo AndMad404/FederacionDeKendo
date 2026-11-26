@@ -26,12 +26,11 @@ import {
 } from "../utils/calendarEventPresentation";
 import { findEventByPathname, getEventPath } from "../utils/eventRoutes";
 import { MediaPageBanner } from "./ui/MediaPageBanner";
+import { calendarBannerImage } from "../config/calendarBanner";
 import { HistoricalEventGallery } from "./HistoricalEventGallery";
 import { useHydratedNow } from "../hooks/useHydratedNow";
 import { EventSummary } from "./EventSummary";
 import { EVENT_GALLERIES } from "../data/eventGalleries";
-
-const SOCIAL_PREVIEW_VERSION = "20260825";
 
 const eventNavigationLinkClass = `control-navigation inline-flex min-h-11 items-center justify-center rounded-full border px-5 py-2 font-bold hover:border-site-action hover:bg-site-action hover:text-site-on-dark hover:[&_svg]:text-site-on-dark aria-[current=page]:hover:bg-site-surface aria-[current=page]:hover:text-site-action aria-[current=page]:hover:[&_svg]:text-site-action ${textButtonInteractionClass}`;
 
@@ -130,7 +129,6 @@ export function EventPage() {
 
   async function handleShare() {
     const shareUrl = new URL(canonicalPath, window.location.origin);
-    shareUrl.searchParams.set("share", SOCIAL_PREVIEW_VERSION);
     const result = await shareEvent(eventTitle, shareUrl.toString());
     if (result === "copied") {
       setCopied(true);
@@ -152,20 +150,7 @@ export function EventPage() {
         adaptiveHeight
         centerTitle
         description={null}
-        image={{
-          src: "/images/calendar/kendo-calendar-1600.webp",
-          sources: [
-            {
-              srcSet:
-                "/images/calendar/kendo-calendar-480.webp 480w, /images/calendar/kendo-calendar-960.webp 960w, /images/calendar/kendo-calendar-1600.webp 1600w",
-              sizes: "100vw",
-              type: "image/webp",
-            },
-          ],
-          width: 1600,
-          height: 1069,
-          className: "object-[center_20%]",
-        }}
+        image={calendarBannerImage}
       />
 
       <div

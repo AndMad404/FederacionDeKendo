@@ -106,12 +106,33 @@ test("keeps the flyer through archival and reflects only complete Drive inventor
   );
   const galleryDirectory = path.join(options.imagesRoot, slug);
   files.splice(2, 1);
-  assert.equal((await sync()).galleries[slug].images.length, 2);
+  const removal = await sync();
+  assert.equal(removal.galleries[slug].images.length, 2);
+  assert.deepEqual(removal.photoChanges, [
+    { slug, folderName, removed: 1, added: 0 },
+  ]);
   const publishedAssets = await readdir(galleryDirectory);
   assert.ok(publishedAssets.includes(path.basename(flyer.src)));
   assert.ok(!publishedAssets.includes(path.basename(album.images[0].src)));
 
-  const published = (await sync()).galleries[slug];
+  const removedPhoto = files.pop();
+  const flyerOnly = await sync();
+  assert.deepEqual(flyerOnly.galleries[slug], removal.galleries[slug]);
+  assert.equal(flyerOnly.alarms[0].status, "galeria_conservada");
+  assert.deepEqual(flyerOnly.photoChanges, []);
+
+  files.push({
+    ...removedPhoto,
+    name: "Nueva.jpg",
+    buffer: await image("green"),
+  });
+  const replacement = await sync();
+  assert.deepEqual(replacement.photoChanges, [
+    { slug, folderName, removed: 1, added: 1 },
+  ]);
+  assert.deepEqual((await sync()).photoChanges, []);
+
+  const published = replacement.galleries[slug];
   files[1].buffer = undefined;
   assert.deepEqual((await sync()).galleries[slug], published);
   files.length = 0;

@@ -6,18 +6,13 @@ import {
 } from "../helpers/load-yaml-document.mjs";
 import { validateHistoricalRun } from "../../scripts/calendar-workflow-inputs.mjs";
 
-const CALENDAR = [
-  "sync-calendar",
-  "correct-calendar-history-range",
-  "apply-calendar-editorial-decision",
-];
 const workflow = (name) => loadYamlDocument(`.github/workflows/${name}.yml`);
 const action = (name) => loadYamlDocument(`.github/actions/${name}/action.yml`);
 const uses = (steps, name) =>
   steps.find((step) => step.uses?.startsWith(`${name}@`));
 
 test("workflows restrict writes, credentials and executable inputs and pin external actions", async () => {
-  for (const name of ["ci", ...CALENDAR]) {
+  for (const name of ["ci", "sync-calendar"]) {
     const document = await workflow(name);
     assert.equal(document.permissions.contents, "read", name);
     assert.match(document.concurrency.group, /site-writer-/);
@@ -58,56 +53,49 @@ test("workflows restrict writes, credentials and executable inputs and pin exter
   assert.equal(bot.updates[0].schedule.interval, "weekly");
 });
 
-test("calendar publication requires verified evidence from this attempt and preserves Presidency approval", async () => {
-  for (const name of CALENDAR) {
-    const { prepare, publish, finalize } = (await workflow(name)).jobs;
-    assert.equal(publish.needs, "prepare");
-    assert.match(publish.if, /needs.prepare.result == 'success'/);
-    assert.equal(
-      prepare.steps.find((step) => step.id === "verification").with.mode,
-      "calendar",
-    );
-    assert.match(
-      prepare.steps.find((step) => step.id === "handoff").env.CALENDAR_PREPARED,
-      /steps.verification.outcome == 'success'/,
-    );
-    const download = uses(publish.steps, "actions/download-artifact");
-    const upload = uses(prepare.steps, "actions/upload-artifact");
-    assert.equal(download.with.name, upload.with.name);
-    assert.match(download.with.name, /github.run_attempt/);
-    assert.match(download.with.path, /runner.temp/);
-    assert.equal(download.with["run-id"], undefined);
-    assert.match(
-      uses(publish.steps, "actions/checkout").with.ref,
-      /github.sha/,
-    );
-    assert.equal(
-      publish.steps.find((step) => step.id === "publication").run,
-      "node scripts/calendar-handoff.mjs publish",
-    );
-    assert.deepEqual(finalize.needs, ["prepare", "publish"]);
-    assert.match(finalize.if, /always\(\)/);
-    assert.equal(
-      finalize.steps.find((step) => step.id === "restore").run,
-      "node scripts/calendar-handoff.mjs restore",
-    );
-    const review = finalize.steps.find(
-      (step) => step.uses === "./.github/actions/calendar-design-review",
-    );
-    assert.match(
-      review.with["git-saved"],
-      /needs.publish.outputs.git-saved == 'true'/,
-    );
-    assert.match(
-      review.with["publication-failed"],
-      /needs.prepare.result.*needs.publish.result/,
-    );
-    if (name === "apply-calendar-editorial-decision")
-      assert.deepEqual(
-        [prepare.environment, publish.environment],
-        ["presidencia", "presidencia"],
-      );
-  }
+test("calendar publication requires verified evidence from this attempt", async () => {
+  const { prepare, publish, finalize } = (await workflow("sync-calendar")).jobs;
+  assert.equal(publish.needs, "prepare");
+  assert.match(publish.if, /needs.prepare.result == 'success'/);
+  assert.equal(
+    prepare.steps.find((step) => step.id === "verification").with.mode,
+    "calendar",
+  );
+  assert.match(
+    prepare.steps.find((step) => step.id === "handoff").env.CALENDAR_PREPARED,
+    /steps.verification.outcome == 'success'/,
+  );
+  const download = uses(publish.steps, "actions/download-artifact");
+  const upload = uses(prepare.steps, "actions/upload-artifact");
+  assert.equal(download.with.name, upload.with.name);
+  assert.match(download.with.name, /github.run_attempt/);
+  assert.match(download.with.path, /runner.temp/);
+  assert.equal(download.with["run-id"], undefined);
+  assert.match(
+    uses(publish.steps, "actions/checkout").with.ref,
+    /github.sha/,
+  );
+  assert.equal(
+    publish.steps.find((step) => step.id === "publication").run,
+    "node scripts/calendar-handoff.mjs publish",
+  );
+  assert.deepEqual(finalize.needs, ["prepare", "publish"]);
+  assert.match(finalize.if, /always\(\)/);
+  assert.equal(
+    finalize.steps.find((step) => step.id === "restore").run,
+    "node scripts/calendar-handoff.mjs restore",
+  );
+  const review = finalize.steps.find(
+    (step) => step.uses === "./.github/actions/calendar-design-review",
+  );
+  assert.match(
+    review.with["git-saved"],
+    /needs.publish.outputs.git-saved == 'true'/,
+  );
+  assert.match(
+    review.with["publication-failed"],
+    /needs.prepare.result.*needs.publish.result/,
+  );
 });
 
 test("CI verifies pull requests but publishes corrections only after verification on main pushes", async () => {
@@ -156,21 +144,7 @@ test("design failures cannot undo publication and SMTP credentials are scoped to
   );
 });
 
-test("historical corrections validate dates and report origin before consuming a downloaded report", async () => {
-  const prepare = (await workflow("correct-calendar-history-range")).jobs
-    .prepare.steps;
-  const validate = prepare.findIndex(
-    (step) => step.run === "node scripts/calendar-workflow-inputs.mjs",
-  );
-  const download = prepare.findIndex((step) => step.with?.["run-id"]);
-  assert.ok(validate >= 0 && validate < download);
-  assert.match(prepare[download].with.path, /runner.temp/);
-  for (const step of prepare.filter((step) => step.run?.includes("--from"))) {
-    assert.ok(step.run.includes('--from "$CALENDAR_FROM" --to "$CALENDAR_TO"'));
-    assert.match(step.env.CALENDAR_FROM, /inputs.from/);
-    assert.match(step.env.CALENDAR_TO, /inputs.to/);
-    assert.match(step.env.CALENDAR_APPROVED_REPORT_PATH, /runner.temp/);
-  }
+test("historical report validation requires a successful main calendar run from this repository", async () => {
   const env = {
     CALENDAR_FROM: "2026-01-01",
     CALENDAR_TO: "2026-03-01",

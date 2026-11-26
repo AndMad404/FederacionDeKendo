@@ -60,6 +60,7 @@ runs:
       env:
         CALENDAR_NOTIFICATIONS_REPORT_PATH: ${{ runner.temp }}/calendar-notifications.json
         CALENDAR_NOTIFICATION_EMAIL_PATH: ${{ runner.temp }}/calendar-notification-email.txt
+        CALENDAR_GIT_SAVED: ${{ inputs.git-saved }}
         CALENDAR_DRIVE_CONFIG: ${{ inputs.drive-config }}
         CALENDAR_ALERT_SMTP_USERNAME: ${{ inputs.smtp-username }}
         CALENDAR_ALERT_RECIPIENT: ${{ inputs.recipient }}

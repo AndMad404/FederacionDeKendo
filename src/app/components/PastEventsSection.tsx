@@ -25,6 +25,7 @@ import {
   type ArchiveEventType,
 } from "../utils/eventArchive.ts";
 import { MediaPageBanner } from "./ui/MediaPageBanner";
+import { calendarBannerImage } from "../config/calendarBanner";
 import { useLanguage } from "../config/i18n";
 import { getLocalizedEvents } from "../utils/localizedEvents";
 import { useHydratedNow, useIsHydrated } from "../hooks/useHydratedNow";
@@ -115,20 +116,7 @@ export function PastEventsSection() {
         titleId="past-events-title"
         title={copy.archive.title}
         description={copy.archive.description}
-        image={{
-          src: "/images/calendar/kendo-calendar-1600.webp",
-          sources: [
-            {
-              srcSet:
-                "/images/calendar/kendo-calendar-480.webp 480w, /images/calendar/kendo-calendar-960.webp 960w, /images/calendar/kendo-calendar-1600.webp 1600w",
-              sizes: "100vw",
-              type: "image/webp",
-            },
-          ],
-          width: 1600,
-          height: 1069,
-          className: "object-[center_20%]",
-        }}
+        image={calendarBannerImage}
       />
 
       <div className="relative z-20 -mt-11 flex min-h-0 flex-1 items-start justify-center px-3 pb-0 pt-3 sm:-mt-13 sm:px-4 sm:pb-0 sm:pt-4 tall-md:items-stretch tall-md:px-4 tall-md:pt-4 page-fit:absolute page-fit:inset-0 page-fit:mt-0 page-fit:items-start page-fit:px-4 page-fit:pb-0 page-fit:pt-20 land-sm:px-2 land-sm:pb-0 land-sm:pt-2 land-compact:-mt-8">

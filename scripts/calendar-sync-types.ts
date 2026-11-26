@@ -153,6 +153,12 @@ export interface GalleryResult {
   state: GalleryState;
   warnings: string[];
   alarms: GalleryAlarm[];
+  photoChanges: {
+    slug: string;
+    folderName: string;
+    removed: number;
+    added: number;
+  }[];
   publication?: Publication[];
   importedCount: number;
 }

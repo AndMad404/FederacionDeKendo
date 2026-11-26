@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { EVENT_GALLERIES } from "../../data/eventGalleries";
+import { eventCoverPresentation } from "../../config/eventCoverPresentation";
 import {
   getEventThumbnail,
   type EventCoverFormat,
@@ -74,19 +75,20 @@ export function EventThumbnail({
       tablet.removeEventListener("change", measure);
     };
   }, [canAdapt, eventId, portraitOnTablet]);
-  // Keep the Shogun crest visible by framing the top of the official flyer.
-  const showShogunCrest =
-    eventId === "panama-5ta-copa-shogun-torneo-por-equipos-y-seminario" &&
-    selection?.source === "poster";
-  const showShogunTabletCover = showShogunCrest && calendarArtwork;
-  const showSeminarDesktopCover =
-    adaptive &&
-    format === "calendar" &&
-    selection?.source === "generated" &&
-    eventId === "seminario-noviembre-2026";
-  const thumbnail = showShogunCrest
-    ? EVENT_GALLERIES[eventId]?.images[0]
-    : selection?.image;
+  const presentation = eventCoverPresentation[eventId];
+  const officialFlyer =
+    selection?.source === "poster" && presentation?.officialFlyer
+      ? EVENT_GALLERIES[eventId]?.images.find(({ kind }) => kind === "flyer")
+      : undefined;
+  const tabletCover =
+    officialFlyer && calendarArtwork
+      ? presentation?.officialFlyer?.portraitTablet
+      : undefined;
+  const desktopCover =
+    adaptive && format === "calendar" && selection?.source === "generated"
+      ? presentation?.generatedCalendarDesktop
+      : undefined;
+  const thumbnail = officialFlyer ?? selection?.image;
   if (!thumbnail) return null;
   // Enlarged archive cards use the largest existing variant, avoiding browser
   // selection of a small thumbnail left over from the compact layout.
@@ -102,7 +104,7 @@ export function EventThumbnail({
       })[0]
       .trim();
   };
-  const objectFit = showShogunCrest
+  const objectFit = officialFlyer
     ? "cover"
     : selection?.source === "generated"
       ? "contain"
@@ -126,20 +128,20 @@ export function EventThumbnail({
       data-cover-format={format}
       className={`flex ${aspectClass} h-auto w-full max-w-full items-center justify-center overflow-hidden rounded-lg bg-site-surface ${className}`}
     >
-      {showShogunTabletCover ? (
+      {tabletCover ? (
         <source
           media="(min-width: 768px) and (max-width: 1279px) and (orientation: portrait)"
-          srcSet="/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/copa-shogun-2026-panama-kendo-tablet-960.webp"
-          width={960}
-          height={720}
+          srcSet={tabletCover.src}
+          width={tabletCover.width}
+          height={tabletCover.height}
         />
       ) : null}
-      {showSeminarDesktopCover ? (
+      {desktopCover ? (
         <source
           media="(min-width: 1280px) and (min-height: 768px)"
-          srcSet="/images/calendar/seminario-noviembre-2026-desktop.webp"
-          width={1280}
-          height={800}
+          srcSet={desktopCover.src}
+          width={desktopCover.width}
+          height={desktopCover.height}
         />
       ) : null}
       <img
@@ -149,10 +151,9 @@ export function EventThumbnail({
         alt={thumbnail.alt ?? ""}
         width={thumbnail.width}
         height={thumbnail.height}
-
         loading="lazy"
         decoding="async"
-        className={`block h-full max-h-full w-full max-w-full rounded-lg ${showShogunCrest ? "object-top" : "object-center"} ${objectFitClass} ${showShogunCrest ? "aspect-[8/5]" : ""} ${showSeminarDesktopCover ? "page-fit:w-auto page-fit:aspect-[8/5]" : ""} ${showShogunTabletCover ? "md:max-xl:portrait:aspect-auto md:max-xl:portrait:object-contain md:max-xl:portrait:object-center" : ""}`}
+        className={`block h-full max-h-full w-full max-w-full rounded-lg ${officialFlyer ? "object-top" : "object-center"} ${objectFitClass} ${officialFlyer ? "aspect-[8/5]" : ""} ${desktopCover ? "page-fit:w-auto page-fit:aspect-[8/5]" : ""} ${tabletCover ? "md:max-xl:portrait:aspect-auto md:max-xl:portrait:object-contain md:max-xl:portrait:object-center" : ""}`}
       />
     </picture>
   );

@@ -1450,6 +1450,7 @@ const notificationTitles: Record<string, string> = {
   carpeta_drive_fallida: "Fallo al preparar carpeta de Drive",
   carpeta_drive_vinculada: "Carpeta de Drive vinculada",
   galeria_drive_conservada: "Galería de Drive conservada",
+  galeria_drive_actualizada: "Se retiraron fotos de una galería de Drive",
   verificacion_fallida: "Fallo una verificacion de la publicacion",
 };
 
@@ -2026,6 +2027,15 @@ export async function synchronizeCalendar({
       const eventsBySlug = new Map(
         registry.events.map((event) => [event.slug, event]),
       );
+      for (const change of galleryResult.photoChanges) {
+        notifyDrive(
+          eventsBySlug.get(change.slug)!,
+          "galeria_drive_actualizada",
+          change.folderName,
+          `Fotos retiradas: ${change.removed}. Fotos agregadas: ${change.added}.`,
+          "Revisar la galería si la modificación fue inesperada.",
+        );
+      }
       for (const alarm of galleryResult.alarms) {
         if (!alarm.folderName) continue;
         const event = eventsBySlug.get(alarm.slug)!;
