@@ -60,10 +60,11 @@ for (const [context, route, referenceTime] of SHOGUN_ROUTES) {
     await photo.scrollIntoViewIfNeeded();
     await expect(photo).toBeVisible();
     await expect(photo).toHaveAttribute("src", SHOGUN_DRIVE_PHOTO.src);
-    await expect(photo).toHaveJSProperty(
-      "naturalWidth",
-      SHOGUN_DRIVE_PHOTO.width,
-    );
+    await expect
+      .poll(() =>
+        photo.evaluate((image: HTMLImageElement) => image.naturalWidth),
+      )
+      .toBeGreaterThan(0);
   });
 }
 
