@@ -1,5 +1,5 @@
 import type { CalendarEvent } from "../types";
-import { addCalendarDays } from "./calendarDate.ts";
+import { addCalendarDays, createEventDate } from "./calendarDate.ts";
 import { calculatePublicPastAt } from "./eventArchive.ts";
 
 export interface UpcomingEventGroup {
@@ -7,7 +7,6 @@ export interface UpcomingEventGroup {
   events: CalendarEvent[];
 }
 
-const DEFAULT_EVENT_TIME_ZONE = "America/Costa_Rica";
 const EXTERNAL_EVENT_MARKER = /(?:^|\s)#EventoExterno\b/iu;
 
 export function isExternalEvent(event: {
@@ -17,62 +16,6 @@ export function isExternalEvent(event: {
   return (
     event.external === true || EXTERNAL_EVENT_MARKER.test(event.summary ?? "")
   );
-}
-
-function parseDateParts(date: string) {
-  const [year, month, day] = date.split("-").map(Number);
-
-  return { year, month, day };
-}
-
-function parseTimeParts(time: string) {
-  const [hours, minutes] = time.split(":").map(Number);
-
-  return { hours, minutes };
-}
-
-function getTimeZoneOffsetMilliseconds(date: Date, timeZone: string) {
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hourCycle: "h23",
-  }).formatToParts(date);
-  const values = Object.fromEntries(
-    parts.map(({ type, value }) => [type, value]),
-  );
-  const representedAsUtc = Date.UTC(
-    Number(values.year),
-    Number(values.month) - 1,
-    Number(values.day),
-    Number(values.hour),
-    Number(values.minute),
-    Number(values.second),
-  );
-
-  return representedAsUtc - date.getTime();
-}
-
-function createEventDate(
-  date: string,
-  time = "00:00",
-  timeZone = DEFAULT_EVENT_TIME_ZONE,
-) {
-  const { year, month, day } = parseDateParts(date);
-  const { hours, minutes } = parseTimeParts(time);
-  const approximate = new Date(Date.UTC(year, month - 1, day, hours, minutes));
-  const firstOffset = getTimeZoneOffsetMilliseconds(approximate, timeZone);
-  let instant = new Date(approximate.getTime() - firstOffset);
-  const finalOffset = getTimeZoneOffsetMilliseconds(instant, timeZone);
-  if (finalOffset !== firstOffset) {
-    instant = new Date(approximate.getTime() - finalOffset);
-  }
-
-  return instant;
 }
 
 function addHours(date: Date, hours: number) {

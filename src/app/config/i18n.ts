@@ -1,5 +1,10 @@
 import { createContext, useContext } from "react";
-import { findEventByPathname, getEventPath } from "../utils/eventRoutes";
+import {
+  EVENT_PATHS,
+  findEventByPathname,
+  getEventPath,
+  getEventSlugFromPath,
+} from "../utils/eventRoutes";
 import { hasDistinctEventTranslation } from "../utils/localizedEvents";
 
 export type Language = "es" | "en";
@@ -26,14 +31,19 @@ function normalizePathname(pathname: string) {
 
 export function getLocalizedPath(pathname: string, language: Language) {
   const normalized = normalizePathname(pathname);
-  if (normalized === "/eventos/" || normalized === "/en/events/")
-    return "/eventos/";
   if (
-    /^\/(?:eventos\/pasados|en\/events\/past)\/(?:$|(?:pagina|page)\/\d+\/$)/.test(
-      normalized,
+    normalized === EVENT_PATHS.es.current ||
+    normalized === EVENT_PATHS.en.current
+  )
+    return EVENT_PATHS.es.current;
+  if (
+    [EVENT_PATHS.es.archived, EVENT_PATHS.en.archived].some(
+      (prefix) =>
+        normalized.startsWith(prefix) &&
+        /^(?:$|(?:pagina|page)\/\d+\/$)/.test(normalized.slice(prefix.length)),
     )
   )
-    return "/eventos/pasados/";
+    return EVENT_PATHS.es.archived;
 
   for (const [spanishPath, englishPath] of STATIC_ROUTE_PAIRS) {
     if (normalized === spanishPath || normalized === englishPath) {
@@ -41,19 +51,21 @@ export function getLocalizedPath(pathname: string, language: Language) {
     }
   }
 
-  const spanishArchivedEvent = normalized.match(
-    /^\/eventos\/pasados\/([^/]+)\/$/,
+  const spanishArchivedEvent = getEventSlugFromPath(
+    normalized,
+    EVENT_PATHS.es.archived,
   );
   if (spanishArchivedEvent) {
     if (language === "es") return normalized;
     const event = findEventByPathname(normalized);
     return event && hasDistinctEventTranslation(event)
       ? getEventPath(event, "en")
-      : "/eventos/pasados/";
+      : EVENT_PATHS.es.archived;
   }
 
-  const englishArchivedEvent = normalized.match(
-    /^\/en\/events\/past\/([^/]+)\/$/,
+  const englishArchivedEvent = getEventSlugFromPath(
+    normalized,
+    EVENT_PATHS.en.archived,
   );
   if (englishArchivedEvent) {
     if (language === "en") return normalized;
@@ -61,18 +73,20 @@ export function getLocalizedPath(pathname: string, language: Language) {
     return event ? getEventPath(event, "es") : "/";
   }
 
-  const spanishEvent = normalized.match(/^\/eventos\/([^/]+)\/$/);
+  const spanishEvent = getEventSlugFromPath(normalized, EVENT_PATHS.es.current);
   if (spanishEvent) {
     if (language === "es") return normalized;
     const event = findEventByPathname(normalized);
     return event && hasDistinctEventTranslation(event)
       ? getEventPath(event, "en")
-      : "/eventos/";
+      : EVENT_PATHS.es.current;
   }
 
-  const englishEvent = normalized.match(/^\/en\/events\/([^/]+)\/$/);
-  if (englishEvent && englishEvent[1] !== "past") {
-    return language === "es" ? `/eventos/${englishEvent[1]}/` : normalized;
+  const englishEvent = getEventSlugFromPath(normalized, EVENT_PATHS.en.current);
+  if (englishEvent && englishEvent !== "past") {
+    return language === "es"
+      ? `${EVENT_PATHS.es.current}${englishEvent}/`
+      : normalized;
   }
 
   return language === "en" ? "/en/" : "/";
@@ -105,7 +119,7 @@ export const COPY = {
       pastEvents: "Eventos Pasados",
       links: [
         { id: "home", path: "/", label: "Inicio" },
-        { id: "calendar", path: "/eventos/", label: "Calendario" },
+        { id: "calendar", path: EVENT_PATHS.es.current, label: "Calendario" },
         { id: "gallery", path: "/galeria/", label: "Galería" },
         { id: "affiliates", path: "/afiliados/", label: "Afiliados" },
       ],
@@ -265,7 +279,7 @@ export const COPY = {
       pastEvents: "View More Past Events",
       links: [
         { id: "home", path: "/en/", label: "Home" },
-        { id: "calendar", path: "/eventos/", label: "Calendar" },
+        { id: "calendar", path: EVENT_PATHS.es.current, label: "Calendar" },
         { id: "gallery", path: "/en/gallery/", label: "Gallery" },
         { id: "affiliates", path: "/en/affiliates/", label: "Affiliates" },
       ],

@@ -58,7 +58,7 @@ export function formatEventTime(
   if (!startTime) {
     return language === "en" ? "Time to be confirmed" : "Horario por confirmar";
   }
-  // Calendar times are published in Costa Rica's local time (UTC−6).
+  // Calendar times are published in the event's local time.
   const formatTime = (time: string) => {
     const [hours, minutes] = time.split(":");
     const hour = Number(hours);

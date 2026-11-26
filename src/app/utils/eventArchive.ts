@@ -5,10 +5,13 @@ export interface ArchiveFilters {
   year?: string;
   type?: ArchiveEventType;
 }
+import {
+  DEFAULT_EVENT_TIME_ZONE as ARCHIVE_TIME_ZONE,
+  resolveCalendarInstant,
+} from "./calendarDate.ts";
 import { getArchivePagePath } from "./eventArchiveRoutes.ts";
 export { getArchivePageNumber } from "./eventArchiveRoutes.ts";
 
-const ARCHIVE_TIME_ZONE = "America/Costa_Rica";
 const ARCHIVE_EVENT_TYPES = new Set([
   "torneo",
   "examen",
@@ -33,41 +36,10 @@ function addCalendarDays(date: string, days: number) {
   ];
 }
 
-function getTimeZoneOffsetMilliseconds(date: Date, timeZone: string) {
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hourCycle: "h23",
-  }).formatToParts(date);
-  const values = Object.fromEntries(
-    parts.map(({ type, value }) => [type, value]),
-  );
-  const representedAsUtc = Date.UTC(
-    Number(values.year),
-    Number(values.month) - 1,
-    Number(values.day),
-    Number(values.hour),
-    Number(values.minute),
-    Number(values.second),
-  );
-  return representedAsUtc - date.getTime();
-}
-
 function localMidnightToInstant(parts: number[], timeZone: string) {
   const [year, month, day] = parts;
   const approximate = new Date(Date.UTC(year, month - 1, day));
-  const firstOffset = getTimeZoneOffsetMilliseconds(approximate, timeZone);
-  let instant = new Date(approximate.getTime() - firstOffset);
-  const finalOffset = getTimeZoneOffsetMilliseconds(instant, timeZone);
-  if (finalOffset !== firstOffset) {
-    instant = new Date(approximate.getTime() - finalOffset);
-  }
-  return instant;
+  return resolveCalendarInstant(approximate, timeZone);
 }
 
 export function calculateArchiveEligibleAt(

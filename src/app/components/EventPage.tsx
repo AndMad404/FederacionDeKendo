@@ -16,6 +16,7 @@ import {
   panelSurfaceClass,
   primaryButtonClass,
 } from "../styles/shared";
+import { formatCalendarUtcOffsetLabel } from "../utils/calendarDate.ts";
 import { isExternalEvent, isPastEvent } from "../utils/calendarEvents";
 import {
   formatEventTime,
@@ -24,7 +25,11 @@ import {
   getEventLocationName,
   getLocationMapUrl,
 } from "../utils/calendarEventPresentation";
-import { findEventByPathname, getEventPath } from "../utils/eventRoutes";
+import {
+  EVENT_PATHS,
+  findEventByPathname,
+  getEventPath,
+} from "../utils/eventRoutes";
 import { MediaPageBanner } from "./ui/MediaPageBanner";
 import { calendarBannerImage } from "../config/calendarBanner";
 import { HistoricalEventGallery } from "./HistoricalEventGallery";
@@ -193,7 +198,13 @@ export function EventPage() {
                       {formatEventTime(event, language)}
                       {event.startTime ? (
                         <span className="whitespace-nowrap text-site-muted">
-                          {" (UTC−6)"}
+                          {" ("}
+                          {formatCalendarUtcOffsetLabel(
+                            event.date,
+                            event.startTime,
+                            event.timeZone,
+                          )}
+                          {")"}
                         </span>
                       ) : null}
                     </dd>
@@ -280,13 +291,13 @@ export function EventPage() {
                   {isPast ? (
                     <>
                       <Link
-                        to="/eventos/pasados/"
+                        to={EVENT_PATHS.es.archived}
                         className={`${eventNavigationLinkClass} border-site-action bg-site-surface text-site-action ${focusRingClass}`}
                       >
                         {copy.event.viewArchive}
                       </Link>
                       <Link
-                        to="/eventos/"
+                        to={EVENT_PATHS.es.current}
                         className={`${eventNavigationLinkClass} border-site-action bg-site-surface text-site-action ${focusRingClass}`}
                       >
                         {copy.archive.upcomingEvents}
@@ -309,7 +320,7 @@ export function EventPage() {
                   ) : null}
                   {!isPast ? (
                     <Link
-                      to="/eventos/"
+                      to={EVENT_PATHS.es.current}
                       className={`${eventNavigationLinkClass} border-site-action bg-site-surface text-site-action ${focusRingClass}`}
                     >
                       {copy.event.backToCalendar}

@@ -16,6 +16,7 @@ import {
   getRouteSeoPayload,
   type RouteComponent,
 } from "./config/seo";
+import { EVENT_PATHS } from "./utils/eventRoutes";
 import { getRoutePresentation } from "./config/routePresentation";
 import {
   getLanguageFromPathname,
@@ -135,22 +136,31 @@ function AppShell({
       >
         <Routes>
           <Route
-            path="/en/events/"
-            element={<Navigate to={`/eventos/${search}`} replace />}
+            path={EVENT_PATHS.en.current}
+            element={
+              <Navigate to={`${EVENT_PATHS.es.current}${search}`} replace />
+            }
           />
           <Route
-            path="/en/events/past/"
-            element={<Navigate to={`/eventos/pasados/${search}`} replace />}
+            path={EVENT_PATHS.en.archived}
+            element={
+              <Navigate to={`${EVENT_PATHS.es.archived}${search}`} replace />
+            }
           />
           {["pagina", "page"].flatMap((segment) =>
             [
-              ["/eventos/pasados/", "es"],
-              ["/en/events/past/", "en"],
+              [EVENT_PATHS.es.archived, "es"],
+              [EVENT_PATHS.en.archived, "en"],
             ].map(([archivePath, language]) => (
               <Route
                 key={`${language}:${segment}`}
                 path={`${archivePath}${segment}/*`}
-                element={<Navigate to={`/eventos/pasados/${search}`} replace />}
+                element={
+                  <Navigate
+                    to={`${EVENT_PATHS.es.archived}${search}`}
+                    replace
+                  />
+                }
               />
             )),
           )}

@@ -18,6 +18,7 @@ export {
   getRouteSeoPayload,
   getRouteSitemapImageUrls,
 } from "./app/config/seo";
+export { isArchivedEventPath } from "./app/utils/eventRoutes";
 export { CALENDAR_EVENTS } from "./app/data/calendarEvents";
 export {
   hasDistinctEventTranslation,

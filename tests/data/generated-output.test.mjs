@@ -6,7 +6,10 @@ import {
   getRouteManifest,
   getRouteSeoPayload,
 } from "../../dist-ssr/entry-server.js";
-import { readDist } from "../helpers/generated-output-fixtures.mjs";
+import {
+  getExpectedEventZoneName,
+  readDist,
+} from "../helpers/generated-output-fixtures.mjs";
 import { MOBILE_PAST_EVENTS_PAGE_SIZE } from "../../src/app/config/events.ts";
 import {
   getEventPath,
@@ -57,17 +60,30 @@ test("generates localized, unique, indexable SEO output for every event route", 
         assert.ok(event, `${route.path}: calendar event is missing`);
         assert.ok(event.timeZone, `${route.path}: event time zone is missing`);
         const visibleHtml = html.replace(/<!--[\s\S]*?-->/g, "");
+        const timeWithOffset =
+          /<dd>([^<]*)<span[^>]*>\s*\((UTC[^)]*)\)<\/span><\/dd>/.exec(
+            visibleHtml,
+          );
+        const expectedZone = event.startTime
+          ? getExpectedEventZoneName(
+              event.date,
+              event.startTime,
+              event.timeZone,
+              "shortOffset",
+            )
+              .replace("GMT", "UTC")
+              .replace("-", "−")
+          : undefined;
         assert.equal(
-          /<dd>[^<]*<span[^>]*>\s*\(UTC−6\)<\/span><\/dd>/.test(visibleHtml),
-          Boolean(event.startTime),
-          `${route.path}: show the abbreviated time zone beside the time only when a start time is published`,
+          timeWithOffset?.[2],
+          expectedZone,
+          `${route.path}: show the actual event offset only when a start time is published`,
         );
         if (event.startTime) {
-          assert.ok(
-            /<dd>\d{1,2}:\d{2}(?:[ap]\.m\.| [AP]M)[^<]*<span[^>]*>\s*\(UTC−6\)<\/span><\/dd>/.test(
-              visibleHtml,
-            ),
-            `${route.path}: publish a 12-hour Costa Rica time with its UTC−6 offset`,
+          assert.match(
+            timeWithOffset[1],
+            /^\d{1,2}:\d{2}(?:[ap]\.m\.| [AP]M)/,
+            `${route.path}: publish a 12-hour local event time`,
           );
         }
         assert.ok(

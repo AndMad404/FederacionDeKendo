@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import "../helpers/generated-output-fixtures.mjs";
+import { getExpectedEventZoneName } from "../helpers/generated-output-fixtures.mjs";
 
 import {
   CALENDAR_EVENTS,
@@ -9,6 +9,12 @@ import {
   getRouteSeoPayload,
 } from "../../dist-ssr/entry-server.js";
 
+function getExpectedTimedDate(event, date, time) {
+  const zone = getExpectedEventZoneName(date, time, event.timeZone);
+  const offset = zone.slice(3) || "+00:00";
+  return `${date}T${time}:00${offset}`;
+}
+
 function getExpectedStructuredEndDate(event) {
   if (event.endDate && !event.startTime && !event.endTime) {
     const endDate = new Date(`${event.endDate}T00:00:00.000Z`);
@@ -16,15 +22,14 @@ function getExpectedStructuredEndDate(event) {
     return endDate.toISOString().slice(0, 10);
   }
   if (event.endDate && event.endTime) {
-    return `${event.endDate}T${event.endTime}:00-06:00`;
+    return getExpectedTimedDate(event, event.endDate, event.endTime);
   }
   if (event.endDate) return event.endDate;
-  if (event.endTime) return `${event.date}T${event.endTime}:00-06:00`;
+  if (event.endTime) return getExpectedTimedDate(event, event.date, event.endTime);
   return event.startTime ? undefined : event.date;
 }
 
 test("publishes Event JSON-LD only for federation events with a known physical location", () => {
-  const organizationId = "https://fak-kendo.org/#organization";
   const eventRoutes = getRouteManifest().filter(
     (route) => route.component === "event",
   );
@@ -64,6 +69,13 @@ test("publishes Event JSON-LD only for federation events with a known physical l
       getEventAddressCountry(event),
     );
     assert.equal(
+      structuredEvent.startDate,
+      event.startTime
+        ? getExpectedTimedDate(event, event.date, event.startTime)
+        : event.date,
+      `${route.path}: startDate must match the local event start`,
+    );
+    assert.equal(
       structuredEvent.endDate,
       getExpectedStructuredEndDate(event),
       `${route.path}: endDate must match the visible inclusive event end`,
@@ -75,49 +87,13 @@ test("publishes Event JSON-LD only for federation events with a known physical l
       ],
       `${route.path}: Event image must match the visible calendar banner`,
     );
-    assert.deepEqual(
-      structuredEvent.organizer,
-      [
-        { "@id": organizationId },
-        {
-          "@type": "Person",
-          name: "Pablo Quesada",
-          url: "https://www.facebook.com/pablo.quesadachavarria",
-          sameAs: ["https://www.instagram.com/kendocostarica/"],
-        },
-      ],
-      `${route.path}: unexpected organizer`,
-    );
-    assert.deepEqual(
-      structuredEvent.performer,
-      [
-        {
-          "@type": "Person",
-          name: "Genki Kubo",
-          description: "Sensei de kendo 7° Dan",
-        },
-        {
-          "@type": "Person",
-          name: "Haruyo Kubo",
-          description: "Sensei de kendo 7° Dan",
-        },
-      ],
-      `${route.path}: unexpected performers`,
-    );
-    const scheduled =
-      structuredEvent.eventStatus === "https://schema.org/EventScheduled";
-    assert.deepEqual(
-      structuredEvent.offers,
-      scheduled
-        ? {
-            "@type": "Offer",
-            url: `https://fak-kendo.org${route.path}`,
-            price: 0,
-            priceCurrency: "CRC",
-          }
-        : undefined,
-      `${route.path}: unexpected offer`,
-    );
+    for (const field of ["organizer", "performer", "offers"]) {
+      assert.equal(
+        Object.hasOwn(structuredEvent, field),
+        false,
+        `${route.path}: ${field} requires confirmed per-event data`,
+      );
+    }
   }
 });
 

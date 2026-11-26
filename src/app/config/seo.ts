@@ -1,6 +1,7 @@
 import seoData from "./seo-data.json";
 import { GALLERY_IMAGES, getGalleryImages } from "../data/gallery";
 import { CALENDAR_EVENTS } from "../data/calendarEvents";
+import { formatCalendarDateTimeWithOffset } from "../utils/calendarDate.ts";
 import {
   getEventEndDate,
   getEventInclusiveEndDate,
@@ -8,7 +9,9 @@ import {
 } from "../utils/calendarEvents";
 import { EVENT_INDEXING_ENABLED } from "./events";
 import {
+  EVENT_PATHS,
   findEventByPathname,
+  isArchivedEventPath,
   getEventPath,
   getEventLegacySlugs,
   getEventPublicSlug,
@@ -185,9 +188,9 @@ const DEFAULT_SOCIAL_IMAGE_HEIGHT = DATA.defaultImageHeight;
 const AUTHOR = DATA.author;
 const ROUTE_META = DATA.routes;
 const CALENDAR_META: Record<Language, RouteMeta> = {
-  es: ROUTE_META["/eventos/"],
+  es: ROUTE_META[EVENT_PATHS.es.current],
   en: {
-    ...ROUTE_META["/eventos/"],
+    ...ROUTE_META[EVENT_PATHS.es.current],
     imageAlt: "Kendo practitioners seated in the dojo after an activity",
   },
 };
@@ -245,60 +248,6 @@ export function getEventAddressCountry(event: {
       pattern.test(countryEvidence),
     )?.code ?? "CR"
   );
-}
-
-export function getEventOrganizerReference(
-  event: { summary?: string },
-  organizationId: string,
-) {
-  if (isExternalEvent(event)) return undefined;
-
-  return [
-    { "@id": organizationId },
-    {
-      "@type": "Person",
-      name: "Pablo Quesada",
-      url: "https://www.facebook.com/pablo.quesadachavarria",
-      sameAs: ["https://www.instagram.com/kendocostarica/"],
-    },
-  ];
-}
-
-export function getEventPerformers(event: { summary?: string }) {
-  if (isExternalEvent(event)) return undefined;
-
-  return [
-    {
-      "@type": "Person",
-      name: "Genki Kubo",
-      description: "Sensei de kendo 7° Dan",
-    },
-    {
-      "@type": "Person",
-      name: "Haruyo Kubo",
-      description: "Sensei de kendo 7° Dan",
-    },
-  ];
-}
-
-export function getEventOffer(
-  event: Parameters<typeof getEventEndDate>[0],
-  canonicalUrl: string,
-  now = new Date(),
-) {
-  if (
-    isExternalEvent(event) ||
-    getEventEndDate(event).getTime() <= now.getTime()
-  ) {
-    return undefined;
-  }
-
-  return {
-    "@type": "Offer",
-    url: canonicalUrl,
-    price: 0,
-    priceCurrency: "CRC",
-  };
 }
 
 interface EventSeoTitleInput {
@@ -555,37 +504,37 @@ export function getRouteManifest() {
 
 export function getEventRedirects() {
   const redirects = [
-    { from: "/calendario/", to: "/eventos/" },
-    { from: "/en/calendar/", to: "/eventos/" },
-    { from: "/en/events/", to: "/eventos/" },
-    { from: "/en/events/past/", to: "/eventos/pasados/" },
-    { from: "/eventos/pasados/pagina/*", to: "/eventos/pasados/" },
-    { from: "/eventos/pasados/page/*", to: "/eventos/pasados/" },
-    { from: "/en/events/past/page/*", to: "/eventos/pasados/" },
-    { from: "/en/events/past/pagina/*", to: "/eventos/pasados/" },
+    { from: "/calendario/", to: EVENT_PATHS.es.current },
+    { from: "/en/calendar/", to: EVENT_PATHS.es.current },
+    { from: EVENT_PATHS.en.current, to: EVENT_PATHS.es.current },
+    { from: EVENT_PATHS.en.archived, to: EVENT_PATHS.es.archived },
+    { from: `${EVENT_PATHS.es.archived}pagina/*`, to: EVENT_PATHS.es.archived },
+    { from: `${EVENT_PATHS.es.archived}page/*`, to: EVENT_PATHS.es.archived },
+    { from: `${EVENT_PATHS.en.archived}page/*`, to: EVENT_PATHS.es.archived },
+    { from: `${EVENT_PATHS.en.archived}pagina/*`, to: EVENT_PATHS.es.archived },
     ...CALENDAR_EVENTS.flatMap((event) => {
       const spanishPath = getEventPath(event, "es");
       const englishPath = getEventPath(event, "en");
-      const archived = spanishPath.startsWith("/eventos/pasados/");
+      const archived = isArchivedEventPath(spanishPath);
       const aliases = getEventLegacySlugs(event);
 
       const spanishSources = new Set([
-        `/eventos/${getEventPublicSlug(event, "es")}/`,
-        `/eventos/${event.id}/`,
-        ...(archived ? [`/eventos/pasados/${event.id}/`] : []),
+        `${EVENT_PATHS.es.current}${getEventPublicSlug(event, "es")}/`,
+        `${EVENT_PATHS.es.current}${event.id}/`,
+        ...(archived ? [`${EVENT_PATHS.es.archived}${event.id}/`] : []),
         ...aliases.flatMap((alias) => [
-          `/eventos/${alias}/`,
-          ...(archived ? [`/eventos/pasados/${alias}/`] : []),
+          `${EVENT_PATHS.es.current}${alias}/`,
+          ...(archived ? [`${EVENT_PATHS.es.archived}${alias}/`] : []),
         ]),
       ]);
 
       const englishSources = new Set([
-        `/en/events/${getEventPublicSlug(event, "en")}/`,
-        `/en/events/${event.id}/`,
-        ...(archived ? [`/en/events/past/${event.id}/`] : []),
+        `${EVENT_PATHS.en.current}${getEventPublicSlug(event, "en")}/`,
+        `${EVENT_PATHS.en.current}${event.id}/`,
+        ...(archived ? [`${EVENT_PATHS.en.archived}${event.id}/`] : []),
         ...aliases.flatMap((alias) => [
-          `/en/events/${alias}/`,
-          ...(archived ? [`/en/events/past/${alias}/`] : []),
+          `${EVENT_PATHS.en.current}${alias}/`,
+          ...(archived ? [`${EVENT_PATHS.en.archived}${alias}/`] : []),
         ]),
       ]);
 
@@ -734,30 +683,36 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
     const event = CALENDAR_EVENTS.find(
       (candidate) => candidate.id === meta.eventId,
     );
-    // Google requires a real physical location and recommends ticket,
-    // organizer, and performer data for Event rich results. External calendar
-    // notices do not supply a defensible public offer or participant contract,
-    // so keep their general WebPage data without publishing an incomplete Event
-    // entity or inventing commercial details.
+    // Publish Event data only for non-external events with a known location.
+    // Organizer, performer and offer require explicit per-event evidence.
     if (event?.location?.trim() && !isExternalEvent(event)) {
       const localizedEvent = getLocalizedEvent(event, meta.language);
       if (!localizedEvent) return null;
       const startDate = event.startTime
-        ? `${event.date}T${event.startTime}:00-06:00`
+        ? formatCalendarDateTimeWithOffset(
+            event.date,
+            event.startTime,
+            event.timeZone,
+          )
         : event.date;
       const inclusiveEndDate = getEventInclusiveEndDate(event);
       const endDate = inclusiveEndDate
         ? event.endTime
-          ? `${inclusiveEndDate}T${event.endTime}:00-06:00`
+          ? formatCalendarDateTimeWithOffset(
+              inclusiveEndDate,
+              event.endTime,
+              event.timeZone,
+            )
           : inclusiveEndDate
         : event.endTime
-          ? `${event.date}T${event.endTime}:00-06:00`
+          ? formatCalendarDateTimeWithOffset(
+              event.date,
+              event.endTime,
+              event.timeZone,
+            )
           : event.startTime
             ? undefined
             : event.date;
-      const organizer = getEventOrganizerReference(event, organizationId);
-      const performers = getEventPerformers(event);
-      const offer = getEventOffer(event, canonicalUrl);
       const location = event.location.trim();
       routeEntities.push({
         "@type": "Event",
@@ -780,9 +735,6 @@ function getRouteStructuredData(meta: RouteMeta): StructuredData | null {
             addressCountry: getEventAddressCountry(event),
           },
         },
-        ...(organizer ? { organizer } : {}),
-        ...(performers ? { performer: performers } : {}),
-        ...(offer ? { offers: offer } : {}),
         image: [getRouteImageUrl(meta)],
         url: canonicalUrl,
       });

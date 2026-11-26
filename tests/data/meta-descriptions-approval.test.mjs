@@ -11,8 +11,9 @@ import {
 
 test.after(async () => closeSourceModuleLoader());
 
-const { buildEventMetaDescription, getEventOrganizerReference } =
-  await loadSourceModule("/src/app/config/seo.ts");
+const { buildEventMetaDescription } = await loadSourceModule(
+  "/src/app/config/seo.ts",
+);
 
 const TERMINAL_PUNCTUATION = /[.!?…]$/u;
 const IRREGULAR_WHITESPACE = /\s{2,}|^\s|\s$/u;
@@ -82,33 +83,6 @@ function buildDescription({
     overrides,
   });
 }
-
-test("assigns the Federation and Pablo Quesada as organizers except for #EventoExterno events", () => {
-  const organizationId = "https://fak-kendo.org/#organization";
-
-  assert.deepEqual(
-    getEventOrganizerReference(
-      { summary: "Seminario organizado por la Federación." },
-      organizationId,
-    ),
-    [
-      { "@id": organizationId },
-      {
-        "@type": "Person",
-        name: "Pablo Quesada",
-        url: "https://www.facebook.com/pablo.quesadachavarria",
-        sameAs: ["https://www.instagram.com/kendocostarica/"],
-      },
-    ],
-  );
-  assert.equal(
-    getEventOrganizerReference(
-      { summary: "#EventoExterno Seminario organizado por CLAK." },
-      organizationId,
-    ),
-    undefined,
-  );
-});
 
 test("validates static ES/EN description quality and consistency across config, SEO payload, and HTML", async () => {
   const config = await readSeoConfig();

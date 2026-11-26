@@ -8,6 +8,7 @@ import {
   getRouteMeta,
   getRouteSeoPayload,
   getRouteSitemapImageUrls,
+  isArchivedEventPath,
   render,
 } from "../dist-ssr/entry-server.js";
 import { validateLlmsTxt } from "./check-llms-txt.mjs";
@@ -52,9 +53,7 @@ function getRouteLastModified(route) {
   );
   if (!event) return undefined;
 
-  const isPast =
-    route.path.includes("/eventos/pasados/") ||
-    route.path.includes("/en/events/past/");
+  const isPast = isArchivedEventPath(route.path);
 
   return latestIsoTimestamp(
     isPast

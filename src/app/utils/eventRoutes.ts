@@ -4,6 +4,24 @@ import type { Language } from "../config/i18n";
 import { isPastEvent } from "./calendarEvents";
 import { hasDistinctEventTranslation } from "./localizedEvents";
 
+export const EVENT_PATHS = {
+  es: { current: "/eventos/", archived: "/eventos/pasados/" },
+  en: { current: "/en/events/", archived: "/en/events/past/" },
+} as const;
+
+export function isArchivedEventPath(pathname: string) {
+  return (
+    pathname.startsWith(EVENT_PATHS.es.archived) ||
+    pathname.startsWith(EVENT_PATHS.en.archived)
+  );
+}
+
+export function getEventSlugFromPath(pathname: string, prefix: string) {
+  if (!pathname.startsWith(prefix)) return undefined;
+  const slug = pathname.slice(prefix.length).replace(/\/$/, "");
+  return slug && !slug.includes("/") ? slug : undefined;
+}
+
 const EVENT_VANITY_SLUGS: Readonly<Record<string, string>> = {
   "2026-05-29-clak-seminario-instructores-chile": "2026-05-30-seminario",
 };
@@ -49,13 +67,10 @@ export function getEventPath(
   const archived = isPastEvent(event, now);
   const publishEnglishRoute =
     language === "en" && hasDistinctEventTranslation(event);
-  const slug = getEventPublicSlug(event, publishEnglishRoute ? "en" : "es");
-
-  if (publishEnglishRoute) {
-    return archived ? `/en/events/past/${slug}/` : `/en/events/${slug}/`;
-  }
-
-  return archived ? `/eventos/pasados/${slug}/` : `/eventos/${slug}/`;
+  const routeLanguage = publishEnglishRoute ? "en" : "es";
+  const slug = getEventPublicSlug(event, routeLanguage);
+  const paths = EVENT_PATHS[routeLanguage];
+  return `${archived ? paths.archived : paths.current}${slug}/`;
 }
 
 function findEventBySlug(slug: string) {
@@ -69,18 +84,20 @@ function findEventBySlug(slug: string) {
 }
 
 export function findEventByPathname(pathname: string) {
-  const archivedMatch = pathname.match(
-    /^\/(?:eventos\/pasados|en\/events\/past)\/([^/]+)\/?$/,
-  );
-  if (archivedMatch) {
-    const event = findEventBySlug(decodeURIComponent(archivedMatch[1]));
+  const archivedSlug =
+    getEventSlugFromPath(pathname, EVENT_PATHS.es.archived) ??
+    getEventSlugFromPath(pathname, EVENT_PATHS.en.archived);
+  if (archivedSlug) {
+    const event = findEventBySlug(decodeURIComponent(archivedSlug));
     return event && isPastEvent(event) ? event : undefined;
   }
 
-  const currentMatch = pathname.match(/^\/(?:eventos|en\/events)\/([^/]+)\/?$/);
-  if (!currentMatch) return undefined;
-
-  return findEventBySlug(decodeURIComponent(currentMatch[1]));
+  const currentSlug =
+    getEventSlugFromPath(pathname, EVENT_PATHS.es.current) ??
+    getEventSlugFromPath(pathname, EVENT_PATHS.en.current);
+  return currentSlug
+    ? findEventBySlug(decodeURIComponent(currentSlug))
+    : undefined;
 }
 
 export function getPastEvents(now = new Date()) {
