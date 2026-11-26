@@ -230,6 +230,7 @@ export function createCalendarDrive(
             ? " (" + error.reason + ")"
             : "") +
           ".",
+        { cause: error },
       );
     }
     if (units) charge(units);
