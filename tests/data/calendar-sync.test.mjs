@@ -627,3 +627,55 @@ test("cleans deferred gallery stages and a successful registry stage when calend
     "photo.jpg",
   ]);
 });
+
+test("a failed Drive authorization reports only a safe OAuth reason", async () => {
+  const config = {
+    rootId: "root",
+    clientId: "client",
+    clientSecret: "secret",
+    refreshToken: "token",
+    quota: driveQuotaFixture,
+  };
+  const respondWith = (body, status = 400) =>
+    createCalendarDrive(config, async () => Response.json(body, { status }));
+
+  await assert.rejects(
+    respondWith({
+      error: "invalid_grant",
+      error_description: "Bad Request client secret token",
+    }).findFolder("event"),
+    (error) => {
+      assert.equal(
+        error.message,
+        "No se pudo autorizar el acceso a Drive (HTTP 400 invalid_grant).",
+      );
+      return true;
+    },
+  );
+  await assert.rejects(
+    respondWith({ error: "unexpected <value> with secret" }).findFolder(
+      "event",
+    ),
+    (error) => {
+      assert.equal(
+        error.message,
+        "No se pudo autorizar el acceso a Drive (HTTP 400 error_desconocido).",
+      );
+      return true;
+    },
+  );
+
+  let network = 0;
+  const incomplete = createCalendarDrive(
+    { ...config, refreshToken: "" },
+    async () => {
+      network++;
+      return Response.json({ access_token: "test" });
+    },
+  );
+  await assert.rejects(
+    incomplete.findFolder("event"),
+    /\(falta refreshToken en CALENDAR_DRIVE_CONFIG\)/,
+  );
+  assert.equal(network, 0);
+});

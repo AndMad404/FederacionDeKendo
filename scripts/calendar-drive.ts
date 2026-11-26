@@ -10,6 +10,30 @@ const folderMime = "application/vnd.google-apps.folder";
 const budgetKey = "calendarDownloadBudget";
 export const MAX_DRIVE_IMAGE_BYTES = 20 * 1024 * 1024;
 
+// OAuth error codes from RFC 6749 section 5.2 plus Google-specific ones. Only
+// these values may reach logs and notifications; error_description never does.
+const oauthErrorCodes = new Set([
+  "invalid_request",
+  "invalid_client",
+  "invalid_grant",
+  "unauthorized_client",
+  "unsupported_grant_type",
+  "invalid_scope",
+  "access_denied",
+  "disabled_client",
+  "admin_policy_enforced",
+]);
+
+class DriveAuthorizationError extends Error {
+  readonly reason: string;
+
+  constructor(reason: string) {
+    super("No se pudo autorizar Drive: " + reason + ".");
+    this.name = "DriveAuthorizationError";
+    this.reason = reason;
+  }
+}
+
 export class DriveQuotaError extends Error implements CalendarError {
   readonly calendarNotification: NonNullable<
     CalendarError["calendarNotification"]
@@ -159,27 +183,39 @@ export function createCalendarDrive(
   }
   let authorization: Promise<string> | undefined;
   async function authorize() {
-    if (
-      !config.rootId ||
-      !config.clientId ||
-      !config.clientSecret ||
-      !config.refreshToken
-    )
-      throw new Error("Configuración de Drive incompleta.");
-    const response = await fetchImpl("https://oauth2.googleapis.com/token", {
-      method: "POST",
-      body: new URLSearchParams({
-        client_id: config.clientId,
-        client_secret: config.clientSecret,
-        refresh_token: config.refreshToken,
-        grant_type: "refresh_token",
-      }),
-      signal: AbortSignal.timeout(20_000),
-    });
-    if (!response.ok) throw new Error("No se pudo autorizar Drive.");
-    const { access_token: token } = await response.json();
+    const missing = (
+      ["rootId", "clientId", "clientSecret", "refreshToken"] as const
+    ).filter((field) => !config[field]);
+    if (missing.length)
+      throw new DriveAuthorizationError(
+        "falta " + missing.join(", ") + " en CALENDAR_DRIVE_CONFIG",
+      );
+    let response: Response;
+    try {
+      response = await fetchImpl("https://oauth2.googleapis.com/token", {
+        method: "POST",
+        body: new URLSearchParams({
+          client_id: config.clientId,
+          client_secret: config.clientSecret,
+          refresh_token: config.refreshToken,
+          grant_type: "refresh_token",
+        }),
+        signal: AbortSignal.timeout(20_000),
+      });
+    } catch {
+      throw new DriveAuthorizationError("el servicio OAuth no respondió");
+    }
+    const payload = await response.json().catch(() => undefined);
+    if (!response.ok) {
+      const code =
+        typeof payload?.error === "string" && oauthErrorCodes.has(payload.error)
+          ? payload.error
+          : "error_desconocido";
+      throw new DriveAuthorizationError("HTTP " + response.status + " " + code);
+    }
+    const token = payload?.access_token;
     if (typeof token !== "string" || !token)
-      throw new Error("Respuesta OAuth inválida.");
+      throw new DriveAuthorizationError("respuesta OAuth inválida");
     return token;
   }
 
@@ -187,8 +223,14 @@ export function createCalendarDrive(
     let token: string;
     try {
       token = await (authorization ??= authorize());
-    } catch {
-      throw new Error("No se pudo autorizar el acceso a Drive.");
+    } catch (error) {
+      throw new Error(
+        "No se pudo autorizar el acceso a Drive" +
+          (error instanceof DriveAuthorizationError
+            ? " (" + error.reason + ")"
+            : "") +
+          ".",
+      );
     }
     if (units) charge(units);
     const headers = new Headers(init?.headers);
