@@ -71,10 +71,7 @@ test("calendar publication requires verified evidence from this attempt", async 
   assert.match(download.with.name, /github.run_attempt/);
   assert.match(download.with.path, /runner.temp/);
   assert.equal(download.with["run-id"], undefined);
-  assert.match(
-    uses(publish.steps, "actions/checkout").with.ref,
-    /github.sha/,
-  );
+  assert.match(uses(publish.steps, "actions/checkout").with.ref, /github.sha/);
   assert.equal(
     publish.steps.find((step) => step.id === "publication").run,
     "node scripts/calendar-handoff.mjs publish",

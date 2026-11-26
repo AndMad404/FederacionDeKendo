@@ -5,7 +5,7 @@ Plataforma web institucional que sincroniza eventos desde Google Calendar, gener
 Arquitectura
 text
 Google Calendar → sincronización y validación → datos versionados
-                → React Router → SSR y prerender → Cloudflare Pages
+→ React Router → SSR y prerender → Cloudflare Pages
 React comparte el árbol de componentes entre navegador y servidor.
 Vite genera los bundles cliente y SSR; scripts/generate-route-html.mjs materializa las rutas públicas.
 Las rutas estáticas y sus metadatos se definen en src/app/config/seo-data.json; las rutas de eventos se derivan de los datos sincronizados.
@@ -48,13 +48,13 @@ corepack pnpm run quality:fix
 Los reportes de verificación se escriben en .cache/verification/. El funcionamiento de la integración continua, las alertas y la sincronización programada está documentado en docs/verificacion.md.
 
 Estructura
-Ruta	Responsabilidad
-src/app/	UI, rutas, configuración y datos versionados
-public/	Archivos estáticos y respaldos para desarrollo
-scripts/	Sincronización, prerender y verificación
-tests/	Contratos de arquitectura, datos, comportamiento y diseño
-docs/	Contratos y documentación operativa
-.github/workflows/	Integración continua y sincronización programada
+Ruta Responsabilidad
+src/app/ UI, rutas, configuración y datos versionados
+public/ Archivos estáticos y respaldos para desarrollo
+scripts/ Sincronización, prerender y verificación
+tests/ Contratos de arquitectura, datos, comportamiento y diseño
+docs/ Contratos y documentación operativa
+.github/workflows/ Integración continua y sincronización programada
 Licencia
 
 El código usa licencia MIT. Fotografías, logos y contenido institucional se rigen por ASSETS-LICENSE.md; las dependencias y recursos de terceros se detallan en ATTRIBUTIONS.md.
