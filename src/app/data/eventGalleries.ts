@@ -22,9 +22,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - 2do Examen 2026 2026-08-08",
         "width": 1280,
         "height": 720,
-        "src": "/images/events/2do-examen-2026/drive-3b1589eaf22e-1-1280.webp",
+        "src": "/images/events/2do-examen-2026/kendo-costa-rica-2do-examen-2026-foto-01-3b1589eaf22e-1280.webp",
         "srcSet": {
-          "webp": "/images/events/2do-examen-2026/drive-3b1589eaf22e-1-480.webp 480w, /images/events/2do-examen-2026/drive-3b1589eaf22e-1-960.webp 960w, /images/events/2do-examen-2026/drive-3b1589eaf22e-1-1280.webp 1280w"
+          "webp": "/images/events/2do-examen-2026/kendo-costa-rica-2do-examen-2026-foto-01-3b1589eaf22e-480.webp 480w, /images/events/2do-examen-2026/kendo-costa-rica-2do-examen-2026-foto-01-3b1589eaf22e-960.webp 960w, /images/events/2do-examen-2026/kendo-costa-rica-2do-examen-2026-foto-01-3b1589eaf22e-1280.webp 1280w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -33,9 +33,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - 2do Examen 2026 2026-08-08",
         "width": 1600,
         "height": 1200,
-        "src": "/images/events/2do-examen-2026/drive-3b1589eaf22e-2-1600.webp",
+        "src": "/images/events/2do-examen-2026/kendo-costa-rica-2do-examen-2026-foto-02-3b1589eaf22e-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2do-examen-2026/drive-3b1589eaf22e-2-480.webp 480w, /images/events/2do-examen-2026/drive-3b1589eaf22e-2-960.webp 960w, /images/events/2do-examen-2026/drive-3b1589eaf22e-2-1600.webp 1600w"
+          "webp": "/images/events/2do-examen-2026/kendo-costa-rica-2do-examen-2026-foto-02-3b1589eaf22e-480.webp 480w, /images/events/2do-examen-2026/kendo-costa-rica-2do-examen-2026-foto-02-3b1589eaf22e-960.webp 960w, /images/events/2do-examen-2026/kendo-costa-rica-2do-examen-2026-foto-02-3b1589eaf22e-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -44,9 +44,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - 2do Examen 2026 2026-08-08",
         "width": 1600,
         "height": 901,
-        "src": "/images/events/2do-examen-2026/drive-3b1589eaf22e-3-1600.webp",
+        "src": "/images/events/2do-examen-2026/kendo-costa-rica-2do-examen-2026-foto-03-3b1589eaf22e-1600.webp",
         "srcSet": {
-          "webp": "/images/events/2do-examen-2026/drive-3b1589eaf22e-3-480.webp 480w, /images/events/2do-examen-2026/drive-3b1589eaf22e-3-960.webp 960w, /images/events/2do-examen-2026/drive-3b1589eaf22e-3-1600.webp 1600w"
+          "webp": "/images/events/2do-examen-2026/kendo-costa-rica-2do-examen-2026-foto-03-3b1589eaf22e-480.webp 480w, /images/events/2do-examen-2026/kendo-costa-rica-2do-examen-2026-foto-03-3b1589eaf22e-960.webp 960w, /images/events/2do-examen-2026/kendo-costa-rica-2do-examen-2026-foto-03-3b1589eaf22e-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       }
@@ -54,16 +54,16 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
     "driveOrdered": true
   },
   "3er-torneo": {
-    "fingerprint": "1e7e6414f7fb6437620cb42dc66df4cb1778dc29440a167bac08920868525212",
+    "fingerprint": "90e33161936b36b433d19cd009451016285205fd8e9ea1f2f257b76c3ade1921",
     "images": [
       {
         "order": 1,
         "alt": "Federaciones de Asociaciones de Kendo - 3er Torneo 2026 2026-08-22",
         "width": 720,
         "height": 1560,
-        "src": "/images/events/3er-torneo/drive-1e7e6414f7fb-1-720.webp",
+        "src": "/images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-01-90e33161936b-720.webp",
         "srcSet": {
-          "webp": "/images/events/3er-torneo/drive-1e7e6414f7fb-1-480.webp 480w, /images/events/3er-torneo/drive-1e7e6414f7fb-1-720.webp 720w"
+          "webp": "/images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-01-90e33161936b-480.webp 480w, /images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-01-90e33161936b-720.webp 720w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -72,9 +72,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - 3er Torneo 2026 2026-08-22",
         "width": 1445,
         "height": 1600,
-        "src": "/images/events/3er-torneo/drive-1e7e6414f7fb-2-1445.webp",
+        "src": "/images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-02-90e33161936b-1445.webp",
         "srcSet": {
-          "webp": "/images/events/3er-torneo/drive-1e7e6414f7fb-2-480.webp 480w, /images/events/3er-torneo/drive-1e7e6414f7fb-2-960.webp 960w, /images/events/3er-torneo/drive-1e7e6414f7fb-2-1445.webp 1445w"
+          "webp": "/images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-02-90e33161936b-480.webp 480w, /images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-02-90e33161936b-960.webp 960w, /images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-02-90e33161936b-1445.webp 1445w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -82,10 +82,10 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "order": 3,
         "alt": "Federaciones de Asociaciones de Kendo - 3er Torneo 2026 2026-08-22",
         "width": 1600,
-        "height": 1493,
-        "src": "/images/events/3er-torneo/drive-1e7e6414f7fb-3-1600.webp",
+        "height": 1200,
+        "src": "/images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-03-90e33161936b-1600.webp",
         "srcSet": {
-          "webp": "/images/events/3er-torneo/drive-1e7e6414f7fb-3-480.webp 480w, /images/events/3er-torneo/drive-1e7e6414f7fb-3-960.webp 960w, /images/events/3er-torneo/drive-1e7e6414f7fb-3-1600.webp 1600w"
+          "webp": "/images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-03-90e33161936b-480.webp 480w, /images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-03-90e33161936b-960.webp 960w, /images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-03-90e33161936b-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -93,10 +93,10 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "order": 4,
         "alt": "Federaciones de Asociaciones de Kendo - 3er Torneo 2026 2026-08-22",
         "width": 1600,
-        "height": 901,
-        "src": "/images/events/3er-torneo/drive-1e7e6414f7fb-4-1600.webp",
+        "height": 1493,
+        "src": "/images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-04-90e33161936b-1600.webp",
         "srcSet": {
-          "webp": "/images/events/3er-torneo/drive-1e7e6414f7fb-4-480.webp 480w, /images/events/3er-torneo/drive-1e7e6414f7fb-4-960.webp 960w, /images/events/3er-torneo/drive-1e7e6414f7fb-4-1600.webp 1600w"
+          "webp": "/images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-04-90e33161936b-480.webp 480w, /images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-04-90e33161936b-960.webp 960w, /images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-04-90e33161936b-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -104,21 +104,43 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "order": 5,
         "alt": "Federaciones de Asociaciones de Kendo - 3er Torneo 2026 2026-08-22",
         "width": 1600,
-        "height": 900,
-        "src": "/images/events/3er-torneo/drive-1e7e6414f7fb-5-1600.webp",
+        "height": 1200,
+        "src": "/images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-05-90e33161936b-1600.webp",
         "srcSet": {
-          "webp": "/images/events/3er-torneo/drive-1e7e6414f7fb-5-480.webp 480w, /images/events/3er-torneo/drive-1e7e6414f7fb-5-960.webp 960w, /images/events/3er-torneo/drive-1e7e6414f7fb-5-1600.webp 1600w"
+          "webp": "/images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-05-90e33161936b-480.webp 480w, /images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-05-90e33161936b-960.webp 960w, /images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-05-90e33161936b-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
       {
         "order": 6,
         "alt": "Federaciones de Asociaciones de Kendo - 3er Torneo 2026 2026-08-22",
+        "width": 1600,
+        "height": 901,
+        "src": "/images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-06-90e33161936b-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-06-90e33161936b-480.webp 480w, /images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-06-90e33161936b-960.webp 960w, /images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-06-90e33161936b-1600.webp 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 7,
+        "alt": "Federaciones de Asociaciones de Kendo - 3er Torneo 2026 2026-08-22",
+        "width": 1600,
+        "height": 900,
+        "src": "/images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-07-90e33161936b-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-07-90e33161936b-480.webp 480w, /images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-07-90e33161936b-960.webp 960w, /images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-07-90e33161936b-1600.webp 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 8,
+        "alt": "Federaciones de Asociaciones de Kendo - 3er Torneo 2026 2026-08-22",
         "width": 900,
         "height": 1600,
-        "src": "/images/events/3er-torneo/drive-1e7e6414f7fb-6-900.webp",
+        "src": "/images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-08-90e33161936b-900.webp",
         "srcSet": {
-          "webp": "/images/events/3er-torneo/drive-1e7e6414f7fb-6-480.webp 480w, /images/events/3er-torneo/drive-1e7e6414f7fb-6-900.webp 900w"
+          "webp": "/images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-08-90e33161936b-480.webp 480w, /images/events/3er-torneo/kendo-costa-rica-3er-torneo-2026-foto-08-90e33161936b-900.webp 900w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       }
@@ -133,9 +155,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/gasshuku-monteverde/drive-af30ed46a352-1-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-01-af30ed46a352-1600.webp",
         "srcSet": {
-          "webp": "/images/events/gasshuku-monteverde/drive-af30ed46a352-1-480.webp 480w, /images/events/gasshuku-monteverde/drive-af30ed46a352-1-960.webp 960w, /images/events/gasshuku-monteverde/drive-af30ed46a352-1-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-01-af30ed46a352-480.webp 480w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-01-af30ed46a352-960.webp 960w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-01-af30ed46a352-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -144,9 +166,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/gasshuku-monteverde/drive-af30ed46a352-2-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-02-af30ed46a352-1600.webp",
         "srcSet": {
-          "webp": "/images/events/gasshuku-monteverde/drive-af30ed46a352-2-480.webp 480w, /images/events/gasshuku-monteverde/drive-af30ed46a352-2-960.webp 960w, /images/events/gasshuku-monteverde/drive-af30ed46a352-2-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-02-af30ed46a352-480.webp 480w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-02-af30ed46a352-960.webp 960w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-02-af30ed46a352-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -155,9 +177,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/gasshuku-monteverde/drive-af30ed46a352-3-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-03-af30ed46a352-1600.webp",
         "srcSet": {
-          "webp": "/images/events/gasshuku-monteverde/drive-af30ed46a352-3-480.webp 480w, /images/events/gasshuku-monteverde/drive-af30ed46a352-3-960.webp 960w, /images/events/gasshuku-monteverde/drive-af30ed46a352-3-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-03-af30ed46a352-480.webp 480w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-03-af30ed46a352-960.webp 960w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-03-af30ed46a352-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -166,9 +188,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/gasshuku-monteverde/drive-af30ed46a352-4-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-04-af30ed46a352-1600.webp",
         "srcSet": {
-          "webp": "/images/events/gasshuku-monteverde/drive-af30ed46a352-4-480.webp 480w, /images/events/gasshuku-monteverde/drive-af30ed46a352-4-960.webp 960w, /images/events/gasshuku-monteverde/drive-af30ed46a352-4-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-04-af30ed46a352-480.webp 480w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-04-af30ed46a352-960.webp 960w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-04-af30ed46a352-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -177,9 +199,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/gasshuku-monteverde/drive-af30ed46a352-5-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-05-af30ed46a352-1600.webp",
         "srcSet": {
-          "webp": "/images/events/gasshuku-monteverde/drive-af30ed46a352-5-480.webp 480w, /images/events/gasshuku-monteverde/drive-af30ed46a352-5-960.webp 960w, /images/events/gasshuku-monteverde/drive-af30ed46a352-5-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-05-af30ed46a352-480.webp 480w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-05-af30ed46a352-960.webp 960w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-05-af30ed46a352-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -188,9 +210,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/gasshuku-monteverde/drive-af30ed46a352-6-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-06-af30ed46a352-1600.webp",
         "srcSet": {
-          "webp": "/images/events/gasshuku-monteverde/drive-af30ed46a352-6-480.webp 480w, /images/events/gasshuku-monteverde/drive-af30ed46a352-6-960.webp 960w, /images/events/gasshuku-monteverde/drive-af30ed46a352-6-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-06-af30ed46a352-480.webp 480w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-06-af30ed46a352-960.webp 960w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-06-af30ed46a352-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -199,9 +221,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/gasshuku-monteverde/drive-af30ed46a352-7-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-07-af30ed46a352-1600.webp",
         "srcSet": {
-          "webp": "/images/events/gasshuku-monteverde/drive-af30ed46a352-7-480.webp 480w, /images/events/gasshuku-monteverde/drive-af30ed46a352-7-960.webp 960w, /images/events/gasshuku-monteverde/drive-af30ed46a352-7-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-07-af30ed46a352-480.webp 480w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-07-af30ed46a352-960.webp 960w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-07-af30ed46a352-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -210,9 +232,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/gasshuku-monteverde/drive-af30ed46a352-8-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-08-af30ed46a352-1600.webp",
         "srcSet": {
-          "webp": "/images/events/gasshuku-monteverde/drive-af30ed46a352-8-480.webp 480w, /images/events/gasshuku-monteverde/drive-af30ed46a352-8-960.webp 960w, /images/events/gasshuku-monteverde/drive-af30ed46a352-8-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-08-af30ed46a352-480.webp 480w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-08-af30ed46a352-960.webp 960w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-08-af30ed46a352-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -221,9 +243,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 863,
-        "src": "/images/events/gasshuku-monteverde/drive-af30ed46a352-9-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-09-af30ed46a352-1600.webp",
         "srcSet": {
-          "webp": "/images/events/gasshuku-monteverde/drive-af30ed46a352-9-480.webp 480w, /images/events/gasshuku-monteverde/drive-af30ed46a352-9-960.webp 960w, /images/events/gasshuku-monteverde/drive-af30ed46a352-9-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-09-af30ed46a352-480.webp 480w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-09-af30ed46a352-960.webp 960w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-09-af30ed46a352-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -232,9 +254,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/gasshuku-monteverde/drive-af30ed46a352-10-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-10-af30ed46a352-1600.webp",
         "srcSet": {
-          "webp": "/images/events/gasshuku-monteverde/drive-af30ed46a352-10-480.webp 480w, /images/events/gasshuku-monteverde/drive-af30ed46a352-10-960.webp 960w, /images/events/gasshuku-monteverde/drive-af30ed46a352-10-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-10-af30ed46a352-480.webp 480w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-10-af30ed46a352-960.webp 960w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-10-af30ed46a352-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -243,9 +265,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/gasshuku-monteverde/drive-af30ed46a352-11-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-11-af30ed46a352-1600.webp",
         "srcSet": {
-          "webp": "/images/events/gasshuku-monteverde/drive-af30ed46a352-11-480.webp 480w, /images/events/gasshuku-monteverde/drive-af30ed46a352-11-960.webp 960w, /images/events/gasshuku-monteverde/drive-af30ed46a352-11-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-11-af30ed46a352-480.webp 480w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-11-af30ed46a352-960.webp 960w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-11-af30ed46a352-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -254,9 +276,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/gasshuku-monteverde/drive-af30ed46a352-12-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-12-af30ed46a352-1600.webp",
         "srcSet": {
-          "webp": "/images/events/gasshuku-monteverde/drive-af30ed46a352-12-480.webp 480w, /images/events/gasshuku-monteverde/drive-af30ed46a352-12-960.webp 960w, /images/events/gasshuku-monteverde/drive-af30ed46a352-12-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-12-af30ed46a352-480.webp 480w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-12-af30ed46a352-960.webp 960w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-12-af30ed46a352-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -265,9 +287,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/gasshuku-monteverde/drive-af30ed46a352-13-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-13-af30ed46a352-1600.webp",
         "srcSet": {
-          "webp": "/images/events/gasshuku-monteverde/drive-af30ed46a352-13-480.webp 480w, /images/events/gasshuku-monteverde/drive-af30ed46a352-13-960.webp 960w, /images/events/gasshuku-monteverde/drive-af30ed46a352-13-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-13-af30ed46a352-480.webp 480w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-13-af30ed46a352-960.webp 960w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-13-af30ed46a352-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -276,9 +298,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/gasshuku-monteverde/drive-af30ed46a352-14-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-14-af30ed46a352-1600.webp",
         "srcSet": {
-          "webp": "/images/events/gasshuku-monteverde/drive-af30ed46a352-14-480.webp 480w, /images/events/gasshuku-monteverde/drive-af30ed46a352-14-960.webp 960w, /images/events/gasshuku-monteverde/drive-af30ed46a352-14-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-14-af30ed46a352-480.webp 480w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-14-af30ed46a352-960.webp 960w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-14-af30ed46a352-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -287,9 +309,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/gasshuku-monteverde/drive-af30ed46a352-15-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-15-af30ed46a352-1600.webp",
         "srcSet": {
-          "webp": "/images/events/gasshuku-monteverde/drive-af30ed46a352-15-480.webp 480w, /images/events/gasshuku-monteverde/drive-af30ed46a352-15-960.webp 960w, /images/events/gasshuku-monteverde/drive-af30ed46a352-15-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-15-af30ed46a352-480.webp 480w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-15-af30ed46a352-960.webp 960w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-15-af30ed46a352-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -298,9 +320,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/gasshuku-monteverde/drive-af30ed46a352-16-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-16-af30ed46a352-1600.webp",
         "srcSet": {
-          "webp": "/images/events/gasshuku-monteverde/drive-af30ed46a352-16-480.webp 480w, /images/events/gasshuku-monteverde/drive-af30ed46a352-16-960.webp 960w, /images/events/gasshuku-monteverde/drive-af30ed46a352-16-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-16-af30ed46a352-480.webp 480w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-16-af30ed46a352-960.webp 960w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-16-af30ed46a352-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -309,9 +331,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/gasshuku-monteverde/drive-af30ed46a352-17-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-17-af30ed46a352-1600.webp",
         "srcSet": {
-          "webp": "/images/events/gasshuku-monteverde/drive-af30ed46a352-17-480.webp 480w, /images/events/gasshuku-monteverde/drive-af30ed46a352-17-960.webp 960w, /images/events/gasshuku-monteverde/drive-af30ed46a352-17-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-17-af30ed46a352-480.webp 480w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-17-af30ed46a352-960.webp 960w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-17-af30ed46a352-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -320,9 +342,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/gasshuku-monteverde/drive-af30ed46a352-18-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-18-af30ed46a352-1600.webp",
         "srcSet": {
-          "webp": "/images/events/gasshuku-monteverde/drive-af30ed46a352-18-480.webp 480w, /images/events/gasshuku-monteverde/drive-af30ed46a352-18-960.webp 960w, /images/events/gasshuku-monteverde/drive-af30ed46a352-18-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-18-af30ed46a352-480.webp 480w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-18-af30ed46a352-960.webp 960w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-18-af30ed46a352-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -331,9 +353,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/gasshuku-monteverde/drive-af30ed46a352-19-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-19-af30ed46a352-1600.webp",
         "srcSet": {
-          "webp": "/images/events/gasshuku-monteverde/drive-af30ed46a352-19-480.webp 480w, /images/events/gasshuku-monteverde/drive-af30ed46a352-19-960.webp 960w, /images/events/gasshuku-monteverde/drive-af30ed46a352-19-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-19-af30ed46a352-480.webp 480w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-19-af30ed46a352-960.webp 960w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-19-af30ed46a352-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -342,9 +364,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Gasshuku Monteverde 2026-09-12",
         "width": 1600,
         "height": 1066,
-        "src": "/images/events/gasshuku-monteverde/drive-af30ed46a352-20-1600.webp",
+        "src": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-20-af30ed46a352-1600.webp",
         "srcSet": {
-          "webp": "/images/events/gasshuku-monteverde/drive-af30ed46a352-20-480.webp 480w, /images/events/gasshuku-monteverde/drive-af30ed46a352-20-960.webp 960w, /images/events/gasshuku-monteverde/drive-af30ed46a352-20-1600.webp 1600w"
+          "webp": "/images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-20-af30ed46a352-480.webp 480w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-20-af30ed46a352-960.webp 960w, /images/events/gasshuku-monteverde/kendo-costa-rica-gasshuku-monteverde-2026-foto-20-af30ed46a352-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       }
@@ -359,9 +381,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
         "width": 1200,
         "height": 1600,
-        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-1-1200.webp",
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-01-b4b61e2b4dcd-1200.webp",
         "srcSet": {
-          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-1-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-1-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-1-1200.webp 1200w"
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-01-b4b61e2b4dcd-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-01-b4b61e2b4dcd-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-01-b4b61e2b4dcd-1200.webp 1200w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -370,9 +392,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
         "width": 1280,
         "height": 960,
-        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-2-1280.webp",
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-02-b4b61e2b4dcd-1280.webp",
         "srcSet": {
-          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-2-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-2-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-2-1280.webp 1280w"
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-02-b4b61e2b4dcd-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-02-b4b61e2b4dcd-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-02-b4b61e2b4dcd-1280.webp 1280w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -381,9 +403,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
         "width": 1200,
         "height": 1600,
-        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-3-1200.webp",
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-03-b4b61e2b4dcd-1200.webp",
         "srcSet": {
-          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-3-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-3-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-3-1200.webp 1200w"
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-03-b4b61e2b4dcd-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-03-b4b61e2b4dcd-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-03-b4b61e2b4dcd-1200.webp 1200w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -392,9 +414,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
         "width": 1200,
         "height": 1600,
-        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-4-1200.webp",
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-04-b4b61e2b4dcd-1200.webp",
         "srcSet": {
-          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-4-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-4-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-4-1200.webp 1200w"
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-04-b4b61e2b4dcd-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-04-b4b61e2b4dcd-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-04-b4b61e2b4dcd-1200.webp 1200w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -403,9 +425,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
         "width": 1200,
         "height": 1600,
-        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-5-1200.webp",
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-05-b4b61e2b4dcd-1200.webp",
         "srcSet": {
-          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-5-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-5-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-5-1200.webp 1200w"
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-05-b4b61e2b4dcd-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-05-b4b61e2b4dcd-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-05-b4b61e2b4dcd-1200.webp 1200w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -414,9 +436,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
         "width": 1200,
         "height": 1600,
-        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-6-1200.webp",
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-06-b4b61e2b4dcd-1200.webp",
         "srcSet": {
-          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-6-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-6-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-6-1200.webp 1200w"
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-06-b4b61e2b4dcd-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-06-b4b61e2b4dcd-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-06-b4b61e2b4dcd-1200.webp 1200w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -425,9 +447,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
         "width": 1188,
         "height": 967,
-        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-7-1188.webp",
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-07-b4b61e2b4dcd-1188.webp",
         "srcSet": {
-          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-7-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-7-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-7-1188.webp 1188w"
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-07-b4b61e2b4dcd-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-07-b4b61e2b4dcd-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-07-b4b61e2b4dcd-1188.webp 1188w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -436,9 +458,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
         "width": 1280,
         "height": 960,
-        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-8-1280.webp",
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-08-b4b61e2b4dcd-1280.webp",
         "srcSet": {
-          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-8-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-8-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-8-1280.webp 1280w"
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-08-b4b61e2b4dcd-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-08-b4b61e2b4dcd-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-08-b4b61e2b4dcd-1280.webp 1280w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -447,9 +469,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
         "width": 1600,
         "height": 1200,
-        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-9-1600.webp",
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-09-b4b61e2b4dcd-1600.webp",
         "srcSet": {
-          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-9-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-9-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-9-1600.webp 1600w"
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-09-b4b61e2b4dcd-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-09-b4b61e2b4dcd-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-09-b4b61e2b4dcd-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -458,9 +480,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
         "width": 1600,
         "height": 1200,
-        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-10-1600.webp",
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-10-b4b61e2b4dcd-1600.webp",
         "srcSet": {
-          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-10-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-10-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-10-1600.webp 1600w"
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-10-b4b61e2b4dcd-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-10-b4b61e2b4dcd-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-10-b4b61e2b4dcd-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -469,9 +491,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
         "width": 1600,
         "height": 1200,
-        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-11-1600.webp",
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-11-b4b61e2b4dcd-1600.webp",
         "srcSet": {
-          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-11-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-11-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/drive-b4b61e2b4dcd-11-1600.webp 1600w"
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-11-b4b61e2b4dcd-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-11-b4b61e2b4dcd-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-11-b4b61e2b4dcd-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -480,9 +502,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Flyer oficial de la Copa Shogun 2026 — Panamá",
         "width": 1440,
         "height": 1728,
-        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/copa-shogun-2026-panama-kendo-flyer-1440.webp",
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-afiche-b4b61e2b4dcd-1440.webp",
         "srcSet": {
-          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/copa-shogun-2026-panama-kendo-flyer-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/copa-shogun-2026-panama-kendo-flyer-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/copa-shogun-2026-panama-kendo-flyer-1440.webp 1440w"
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-afiche-b4b61e2b4dcd-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-afiche-b4b61e2b4dcd-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-afiche-b4b61e2b4dcd-1440.webp 1440w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px",
         "kind": "flyer"
@@ -495,38 +517,38 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
     }
   },
   "3er-examen-2026": {
-    "fingerprint": "6718b77145459c7a2eb7bff66357e8965609f26bdeea8e5d80fdec0151167212",
+    "fingerprint": "8384a372470957b3b714c6e6923d8b10fd9a9d94af2d0aa545898351e70fab74",
     "images": [
       {
         "order": 1,
         "alt": "Federaciones de Asociaciones de Kendo - 3er Examen 2026 2026-10-31",
-        "width": 464,
-        "height": 832,
-        "src": "/images/events/3er-examen-2026/drive-6718b7714545-1-464.webp",
+        "width": 1600,
+        "height": 901,
+        "src": "/images/events/3er-examen-2026/kendo-costa-rica-3er-examen-2026-foto-01-8384a3724709-1600.webp",
         "srcSet": {
-          "webp": "/images/events/3er-examen-2026/drive-6718b7714545-1-464.webp 464w"
+          "webp": "/images/events/3er-examen-2026/kendo-costa-rica-3er-examen-2026-foto-01-8384a3724709-480.webp 480w, /images/events/3er-examen-2026/kendo-costa-rica-3er-examen-2026-foto-01-8384a3724709-960.webp 960w, /images/events/3er-examen-2026/kendo-costa-rica-3er-examen-2026-foto-01-8384a3724709-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
       {
         "order": 2,
         "alt": "Federaciones de Asociaciones de Kendo - 3er Examen 2026 2026-10-31",
-        "width": 1200,
-        "height": 1600,
-        "src": "/images/events/3er-examen-2026/drive-6718b7714545-2-1200.webp",
+        "width": 464,
+        "height": 832,
+        "src": "/images/events/3er-examen-2026/kendo-costa-rica-3er-examen-2026-foto-02-8384a3724709-464.webp",
         "srcSet": {
-          "webp": "/images/events/3er-examen-2026/drive-6718b7714545-2-480.webp 480w, /images/events/3er-examen-2026/drive-6718b7714545-2-960.webp 960w, /images/events/3er-examen-2026/drive-6718b7714545-2-1200.webp 1200w"
+          "webp": "/images/events/3er-examen-2026/kendo-costa-rica-3er-examen-2026-foto-02-8384a3724709-464.webp 464w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
       {
         "order": 3,
         "alt": "Federaciones de Asociaciones de Kendo - 3er Examen 2026 2026-10-31",
-        "width": 1600,
-        "height": 900,
-        "src": "/images/events/3er-examen-2026/drive-6718b7714545-3-1600.webp",
+        "width": 1200,
+        "height": 1600,
+        "src": "/images/events/3er-examen-2026/kendo-costa-rica-3er-examen-2026-foto-03-8384a3724709-1200.webp",
         "srcSet": {
-          "webp": "/images/events/3er-examen-2026/drive-6718b7714545-3-480.webp 480w, /images/events/3er-examen-2026/drive-6718b7714545-3-960.webp 960w, /images/events/3er-examen-2026/drive-6718b7714545-3-1600.webp 1600w"
+          "webp": "/images/events/3er-examen-2026/kendo-costa-rica-3er-examen-2026-foto-03-8384a3724709-480.webp 480w, /images/events/3er-examen-2026/kendo-costa-rica-3er-examen-2026-foto-03-8384a3724709-960.webp 960w, /images/events/3er-examen-2026/kendo-costa-rica-3er-examen-2026-foto-03-8384a3724709-1200.webp 1200w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -534,21 +556,32 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "order": 4,
         "alt": "Federaciones de Asociaciones de Kendo - 3er Examen 2026 2026-10-31",
         "width": 1600,
-        "height": 904,
-        "src": "/images/events/3er-examen-2026/drive-6718b7714545-4-1600.webp",
+        "height": 900,
+        "src": "/images/events/3er-examen-2026/kendo-costa-rica-3er-examen-2026-foto-04-8384a3724709-1600.webp",
         "srcSet": {
-          "webp": "/images/events/3er-examen-2026/drive-6718b7714545-4-480.webp 480w, /images/events/3er-examen-2026/drive-6718b7714545-4-960.webp 960w, /images/events/3er-examen-2026/drive-6718b7714545-4-1600.webp 1600w"
+          "webp": "/images/events/3er-examen-2026/kendo-costa-rica-3er-examen-2026-foto-04-8384a3724709-480.webp 480w, /images/events/3er-examen-2026/kendo-costa-rica-3er-examen-2026-foto-04-8384a3724709-960.webp 960w, /images/events/3er-examen-2026/kendo-costa-rica-3er-examen-2026-foto-04-8384a3724709-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
       {
         "order": 5,
         "alt": "Federaciones de Asociaciones de Kendo - 3er Examen 2026 2026-10-31",
+        "width": 1600,
+        "height": 904,
+        "src": "/images/events/3er-examen-2026/kendo-costa-rica-3er-examen-2026-foto-05-8384a3724709-1600.webp",
+        "srcSet": {
+          "webp": "/images/events/3er-examen-2026/kendo-costa-rica-3er-examen-2026-foto-05-8384a3724709-480.webp 480w, /images/events/3er-examen-2026/kendo-costa-rica-3er-examen-2026-foto-05-8384a3724709-960.webp 960w, /images/events/3er-examen-2026/kendo-costa-rica-3er-examen-2026-foto-05-8384a3724709-1600.webp 1600w"
+        },
+        "sizes": "(max-width: 640px) 100vw, 960px"
+      },
+      {
+        "order": 6,
+        "alt": "Federaciones de Asociaciones de Kendo - 3er Examen 2026 2026-10-31",
         "width": 1122,
         "height": 1402,
-        "src": "/images/events/3er-examen-2026/drive-6718b7714545-5-1122.webp",
+        "src": "/images/events/3er-examen-2026/kendo-costa-rica-3er-examen-2026-foto-06-8384a3724709-1122.webp",
         "srcSet": {
-          "webp": "/images/events/3er-examen-2026/drive-6718b7714545-5-480.webp 480w, /images/events/3er-examen-2026/drive-6718b7714545-5-960.webp 960w, /images/events/3er-examen-2026/drive-6718b7714545-5-1122.webp 1122w"
+          "webp": "/images/events/3er-examen-2026/kendo-costa-rica-3er-examen-2026-foto-06-8384a3724709-480.webp 480w, /images/events/3er-examen-2026/kendo-costa-rica-3er-examen-2026-foto-06-8384a3724709-960.webp 960w, /images/events/3er-examen-2026/kendo-costa-rica-3er-examen-2026-foto-06-8384a3724709-1122.webp 1122w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       }
