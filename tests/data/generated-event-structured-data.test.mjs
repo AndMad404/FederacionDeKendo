@@ -25,7 +25,8 @@ function getExpectedStructuredEndDate(event) {
     return getExpectedTimedDate(event, event.endDate, event.endTime);
   }
   if (event.endDate) return event.endDate;
-  if (event.endTime) return getExpectedTimedDate(event, event.date, event.endTime);
+  if (event.endTime)
+    return getExpectedTimedDate(event, event.date, event.endTime);
   return event.startTime ? undefined : event.date;
 }
 

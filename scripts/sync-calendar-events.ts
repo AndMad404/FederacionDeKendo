@@ -38,6 +38,7 @@ import {
 } from "../src/app/utils/eventArchive.ts";
 import {
   addCalendarDays,
+  DEFAULT_EVENT_TIME_ZONE,
   getCalendarDateTimeSortKey,
 } from "../src/app/utils/calendarDate.ts";
 import {
@@ -70,7 +71,8 @@ const defaultRegistryPath = path.join(
   "data",
   "calendarEventRegistry.json",
 );
-const defaultTimeZone = process.env.CALENDAR_TIME_ZONE ?? "America/Costa_Rica";
+const defaultTimeZone =
+  process.env.CALENDAR_TIME_ZONE ?? DEFAULT_EVENT_TIME_ZONE;
 const draftPrefix = "[BORRADOR]";
 const inferredEventTypes: [string, RegExp][] = [
   ["torneo", /(?:^|\s)torneos?(?:$|\s)/],
