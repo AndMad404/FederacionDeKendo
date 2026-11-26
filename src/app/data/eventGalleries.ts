@@ -374,16 +374,16 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
     "driveOrdered": true
   },
   "panama-5ta-copa-shogun-torneo-por-equipos-y-seminario": {
-    "fingerprint": "b4b61e2b4dcdcb2f296b79caf0e23bccbe7d3e312a4f21b95e47bb92eaf8a748",
+    "fingerprint": "87f295a31004fd7cffc57cfc143fa6cf529389027bb9a6b1c128d04eb0fc1e80",
     "images": [
       {
         "order": 1,
         "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
         "width": 1200,
         "height": 1600,
-        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-01-b4b61e2b4dcd-1200.webp",
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-01-87f295a31004-1200.webp",
         "srcSet": {
-          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-01-b4b61e2b4dcd-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-01-b4b61e2b4dcd-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-01-b4b61e2b4dcd-1200.webp 1200w"
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-01-87f295a31004-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-01-87f295a31004-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-01-87f295a31004-1200.webp 1200w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -392,9 +392,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
         "width": 1280,
         "height": 960,
-        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-02-b4b61e2b4dcd-1280.webp",
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-02-87f295a31004-1280.webp",
         "srcSet": {
-          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-02-b4b61e2b4dcd-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-02-b4b61e2b4dcd-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-02-b4b61e2b4dcd-1280.webp 1280w"
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-02-87f295a31004-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-02-87f295a31004-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-02-87f295a31004-1280.webp 1280w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -403,9 +403,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
         "width": 1200,
         "height": 1600,
-        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-03-b4b61e2b4dcd-1200.webp",
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-03-87f295a31004-1200.webp",
         "srcSet": {
-          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-03-b4b61e2b4dcd-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-03-b4b61e2b4dcd-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-03-b4b61e2b4dcd-1200.webp 1200w"
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-03-87f295a31004-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-03-87f295a31004-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-03-87f295a31004-1200.webp 1200w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -414,9 +414,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
         "width": 1200,
         "height": 1600,
-        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-04-b4b61e2b4dcd-1200.webp",
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-04-87f295a31004-1200.webp",
         "srcSet": {
-          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-04-b4b61e2b4dcd-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-04-b4b61e2b4dcd-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-04-b4b61e2b4dcd-1200.webp 1200w"
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-04-87f295a31004-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-04-87f295a31004-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-04-87f295a31004-1200.webp 1200w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -425,9 +425,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
         "width": 1200,
         "height": 1600,
-        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-05-b4b61e2b4dcd-1200.webp",
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-05-87f295a31004-1200.webp",
         "srcSet": {
-          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-05-b4b61e2b4dcd-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-05-b4b61e2b4dcd-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-05-b4b61e2b4dcd-1200.webp 1200w"
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-05-87f295a31004-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-05-87f295a31004-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-05-87f295a31004-1200.webp 1200w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -436,9 +436,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
         "width": 1200,
         "height": 1600,
-        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-06-b4b61e2b4dcd-1200.webp",
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-06-87f295a31004-1200.webp",
         "srcSet": {
-          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-06-b4b61e2b4dcd-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-06-b4b61e2b4dcd-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-06-b4b61e2b4dcd-1200.webp 1200w"
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-06-87f295a31004-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-06-87f295a31004-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-06-87f295a31004-1200.webp 1200w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -447,9 +447,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
         "width": 1188,
         "height": 967,
-        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-07-b4b61e2b4dcd-1188.webp",
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-07-87f295a31004-1188.webp",
         "srcSet": {
-          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-07-b4b61e2b4dcd-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-07-b4b61e2b4dcd-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-07-b4b61e2b4dcd-1188.webp 1188w"
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-07-87f295a31004-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-07-87f295a31004-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-07-87f295a31004-1188.webp 1188w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -458,9 +458,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
         "width": 1280,
         "height": 960,
-        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-08-b4b61e2b4dcd-1280.webp",
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-08-87f295a31004-1280.webp",
         "srcSet": {
-          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-08-b4b61e2b4dcd-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-08-b4b61e2b4dcd-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-08-b4b61e2b4dcd-1280.webp 1280w"
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-08-87f295a31004-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-08-87f295a31004-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-08-87f295a31004-1280.webp 1280w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -469,9 +469,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
         "width": 1600,
         "height": 1200,
-        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-09-b4b61e2b4dcd-1600.webp",
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-09-87f295a31004-1600.webp",
         "srcSet": {
-          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-09-b4b61e2b4dcd-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-09-b4b61e2b4dcd-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-09-b4b61e2b4dcd-1600.webp 1600w"
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-09-87f295a31004-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-09-87f295a31004-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-09-87f295a31004-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -480,9 +480,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
         "width": 1600,
         "height": 1200,
-        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-10-b4b61e2b4dcd-1600.webp",
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-10-87f295a31004-1600.webp",
         "srcSet": {
-          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-10-b4b61e2b4dcd-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-10-b4b61e2b4dcd-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-10-b4b61e2b4dcd-1600.webp 1600w"
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-10-87f295a31004-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-10-87f295a31004-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-10-87f295a31004-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
@@ -491,9 +491,9 @@ export const EVENT_GALLERIES: Record<string, EventGallery> = {
         "alt": "Federaciones de Asociaciones de Kendo - Copa Shogun 2026 — Panamá 2026-11-20",
         "width": 1600,
         "height": 1200,
-        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-11-b4b61e2b4dcd-1600.webp",
+        "src": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-11-87f295a31004-1600.webp",
         "srcSet": {
-          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-11-b4b61e2b4dcd-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-11-b4b61e2b4dcd-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-11-b4b61e2b4dcd-1600.webp 1600w"
+          "webp": "/images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-11-87f295a31004-480.webp 480w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-11-87f295a31004-960.webp 960w, /images/events/panama-5ta-copa-shogun-torneo-por-equipos-y-seminario/kendo-costa-rica-panama-5ta-copa-shogun-torneo-por-equipos-y-seminario-2026-foto-11-87f295a31004-1600.webp 1600w"
         },
         "sizes": "(max-width: 640px) 100vw, 960px"
       },
