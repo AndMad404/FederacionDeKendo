@@ -146,16 +146,12 @@ const shogunEvent: CalendarEvent = {
   external: true,
   eventType: "torneo",
 };
-export const SHOGUN_FLYER_SRC = `/images/events/${SHOGUN_ID}/copa-shogun-2026-panama-kendo-flyer-1440.webp`;
+const [shogunPosterImage] = neutralImages(1, [[1440, 1728]]);
+export const SHOGUN_FLYER_SRC = shogunPosterImage.src;
 const shogunFlyer = {
-  order: 1,
+  ...shogunPosterImage,
   kind: "flyer" as const,
   alt: "Flyer oficial de la Copa Shogun",
-  width: 1440,
-  height: 1728,
-  src: SHOGUN_FLYER_SRC,
-  srcSet: { webp: `${SHOGUN_FLYER_SRC} 1440w` },
-  sizes: "100vw",
 };
 // Keep the three-card composition independent of later calendar and Drive syncs.
 const geometryEvents: CalendarEvent[] = [

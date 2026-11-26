@@ -106,7 +106,7 @@ export function HistoricalEventGallery({
       className={`-mx-3 grid min-w-0 w-[calc(100%_+_1.5rem)] content-start gap-2.5 sm:mx-0 sm:w-full xl:[&_[role=group]]:h-[var(--event-thumbnail-height)] ${!flyerOnly && images.length === 1 ? "xl:self-stretch xl:content-stretch" : ""} ${images.length > 6 ? "sm:[&_[role=group]]:justify-start" : ""}`}
     >
       <figure
-        className={`group relative cursor-pointer overflow-hidden rounded-xl bg-site-media ${flyerOnly ? "h-[min(75svh,48rem)] xl:h-[var(--event-poster-height)]" : images.length === 1 ? "aspect-video xl:aspect-auto xl:h-full" : "aspect-video xl:aspect-auto xl:h-[var(--event-featured-height)]"}`}
+        className={`group relative cursor-pointer overflow-hidden rounded-xl bg-white ${flyerOnly ? "h-[min(75svh,48rem)] xl:h-[var(--event-poster-height)]" : images.length === 1 ? "aspect-video xl:aspect-auto xl:h-full" : "aspect-video xl:aspect-auto xl:h-[var(--event-featured-height)]"}`}
       >
         <picture>
           <img
@@ -118,7 +118,7 @@ export function HistoricalEventGallery({
             height={featured.height}
             loading="lazy"
             decoding="async"
-            className={`h-full w-full ${images.length === 1 ? "pt-(--event-page-bottom-padding)" : ""} ${featuredFlyer ? "object-contain bg-white" : "object-contain transition-transform duration-700 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:transform-none"}`}
+            className={`h-full w-full object-contain ${images.length === 1 ? "pt-(--event-page-bottom-padding)" : ""} ${featuredFlyer ? "" : "transition-transform duration-700 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:transform-none"}`}
           />
         </picture>
         <button

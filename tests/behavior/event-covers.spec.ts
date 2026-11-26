@@ -110,7 +110,7 @@ for (const viewport of [
   { width: 1366, height: 768 },
 ]) {
   for (const [context, route, referenceTime] of SHOGUN_ROUTES) {
-    test(`Shogun ${context} thumbnail preserves the crest with a top crop at ${viewport.width}px`, async ({
+    test(`Shogun ${context} thumbnail follows the pre-import flyer layout at ${viewport.width}px`, async ({
       page,
     }) => {
       await page.setViewportSize(viewport);
@@ -119,7 +119,7 @@ for (const viewport of [
         shogunFixtureUrl(route, "poster"),
         new Date(referenceTime),
       );
-      const poster = page.locator(SHOGUN_POSTER_SELECTOR);
+      const poster = page.locator('main [data-thumbnail-source="poster"] img');
       await expect(poster).toHaveCount(1);
       await poster.scrollIntoViewIfNeeded();
       await expect(poster).toBeVisible();

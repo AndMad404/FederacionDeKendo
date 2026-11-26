@@ -19,7 +19,9 @@ for (const index of [1, 5, 4, 7]) {
     const [width, height] = scenario.dimensions[selected];
     // naturalWidth is density-corrected when srcset has width descriptors;
     // currentSrc identifies the selected source independently of that scaling.
-    const image = page.locator("main figure img");
+    const figure = page.locator("main figure");
+    const image = figure.locator("img");
+    await expect(figure).toHaveCSS("background-color", "rgb(255, 255, 255)");
     await expect(image).toHaveAttribute(
       "alt",
       new RegExp(`Fotografía ${selected + 1} `),
