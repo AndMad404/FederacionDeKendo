@@ -6,7 +6,7 @@ import {
 } from "../helpers/temporary-directory.mjs";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { readdir, readFile, stat, writeFile } from "node:fs/promises";
+import { readdir, readFile, rename, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import sharp from "sharp";
@@ -82,6 +82,10 @@ test("keeps the flyer through archival and reflects only complete Drive inventor
   const flyer = (await sync()).galleries[slug].images[0];
   assert.equal(flyer.kind, "flyer");
   assert.equal(flyer.originalName, "Afiche externo.jpg");
+  assert.match(
+    flyer.src,
+    /kendo-costa-rica-evento-drive-2026-afiche-[a-f0-9]{12}-640\.webp$/,
+  );
   assert.equal((await sync()).publication, undefined);
 
   event.drive.past = true;
@@ -96,8 +100,16 @@ test("keeps the flyer through archival and reflects only complete Drive inventor
   );
   assert.ok(album.images[0].width > album.images[0].height);
   assert.equal(album.images[2].src, flyer.src);
+  assert.match(
+    album.images[0].src,
+    /kendo-costa-rica-evento-drive-2026-foto-01-[a-f0-9]{12}-640\.webp$/,
+  );
+  const galleryDirectory = path.join(options.imagesRoot, slug);
   files.splice(2, 1);
   assert.equal((await sync()).galleries[slug].images.length, 2);
+  const publishedAssets = await readdir(galleryDirectory);
+  assert.ok(publishedAssets.includes(path.basename(flyer.src)));
+  assert.ok(!publishedAssets.includes(path.basename(album.images[0].src)));
 
   const published = (await sync()).galleries[slug];
   files[1].buffer = undefined;
@@ -340,7 +352,10 @@ test("valid public album freezes all naturally ordered sanitized responsive imag
     false,
   );
   const manifest = await readFile(context.options.manifestPath, "utf8");
-  assert.match(manifest, /photo-1-480\.webp 480w/);
+  assert.match(
+    manifest,
+    /kendo-costa-rica-2026-01-01-evento-foto-01-[a-f0-9]{12}-480\.webp 480w/,
+  );
   assert.match(
     manifest,
     /Federaciones de Asociaciones de Kendo - Evento 2026-01-01/,
@@ -349,7 +364,7 @@ test("valid public album freezes all naturally ordered sanitized responsive imag
   const firstPath = path.join(
     context.options.imagesRoot,
     "2026-01-01-evento",
-    "photo-1-480.webp",
+    `kendo-costa-rica-2026-01-01-evento-foto-01-${result.galleries["2026-01-01-evento"].fingerprint.slice(0, 12)}-480.webp`,
   );
   const firstBuffer = await readFile(firstPath);
   const stats = await sharp(firstBuffer).stats();
@@ -362,13 +377,13 @@ test("published galleries retain their manifest, state, and image without Drive 
   const context = await fixture(t, files);
   const slug = "2026-01-01-evento";
   const event = { slug, title: "Evento" };
+  const first = await run(context.options);
+  const fingerprint = first.galleries[slug].fingerprint;
   const imagePath = path.join(
     context.options.imagesRoot,
     slug,
-    "photo-1-480.webp",
+    `kendo-costa-rica-${slug}-foto-01-${fingerprint.slice(0, 12)}-480.webp`,
   );
-  const first = await run(context.options);
-  const fingerprint = first.galleries[slug].fingerprint;
   const before = await snapshotFiles([
     context.options.manifestPath,
     context.options.statePath,
@@ -413,6 +428,54 @@ test("published galleries retain their manifest, state, and image without Drive 
       await expectFilesUnchanged(before);
     });
   }
+});
+
+test("renames existing variants to the public format without fetching or reimporting", async (t) => {
+  const slug = "2026-01-01-evento";
+  const { options } = await fixture(t, [
+    { name: "evento.jpg", id: "one", buffer: await image("red") },
+  ]);
+  const first = await run(options);
+  const gallery = first.galleries[slug];
+  const variants = gallery.images[0].srcSet.webp.split(", ");
+  const directory = path.join(options.imagesRoot, slug);
+  const existingNames = [];
+  for (const variant of variants) {
+    const [url, width] = variant.split(" ");
+    const original = path.basename(url);
+    const otherName = `evento-${width.slice(0, -1)}.webp`;
+    existingNames.push(otherName);
+    await rename(
+      path.join(directory, original),
+      path.join(directory, otherName),
+    );
+    gallery.images[0].srcSet.webp = gallery.images[0].srcSet.webp.replace(
+      original,
+      otherName,
+    );
+    gallery.images[0].src = gallery.images[0].src.replace(original, otherName);
+  }
+  await writeFile(options.manifestPath, serializeManifest(first.galleries));
+  const unexpectedRead = () => assert.fail("A rename should not fetch Drive");
+  const sync = () =>
+    run({
+      ...options,
+      listFolder: unexpectedRead,
+      downloadFile: unexpectedRead,
+    });
+  const migrated = await sync();
+  assert.deepEqual(migrated.warnings, []);
+  assert.equal(migrated.importedCount, 0);
+  assert.equal(migrated.galleries[slug].fingerprint, gallery.fingerprint);
+  assert.match(
+    migrated.galleries[slug].images[0].src,
+    /kendo-costa-rica-2026-01-01-evento-foto-01-[a-f0-9]{12}-640\.webp$/,
+  );
+  const published = await readdir(directory);
+  for (const name of existingNames) assert.ok(!published.includes(name));
+  for (const variant of variants)
+    assert.ok(published.includes(path.basename(variant.split(" ")[0])));
+  assert.equal((await sync()).publication, undefined);
 });
 
 test("deduplicates identical images during first publication", async (t) => {

@@ -10,12 +10,13 @@ import type {
 import { DriveQuotaError, MAX_DRIVE_IMAGE_BYTES } from "./calendar-drive.ts";
 import type { EventGallery } from "../src/app/data/eventGalleries";
 import { createHash } from "node:crypto";
+import { constants } from "node:fs";
 import {
+  copyFile,
   cp,
   mkdir,
   mkdtemp,
   readFile,
-  readdir,
   rename,
   rm,
   writeFile,
@@ -33,6 +34,11 @@ const MAX_SIZE_MIB = MAX_BYTES / (1024 * 1024);
 const MAX_FULL_SIZE_FINGERPRINT_PIXELS = 3840 * 2160;
 const WIDTHS = [480, 960, 1600];
 const SIZES = "(max-width: 640px) 100vw, 960px";
+const EVENT_ASSET_URL =
+  /^\/images\/events\/([a-z0-9-]+)\/([a-zA-Z0-9._-]+\.webp)$/;
+const EVENT_ASSET_NAME =
+  /^(?:\d{4}-)?(?:foto-\d+|afiche|miniatura)-[a-f0-9]{12}-\d+\.webp$/;
+const SRCSET_VARIANT = /(\S+) (\d+)w/g;
 const collator = new Intl.Collator("en", {
   numeric: true,
   sensitivity: "base",
@@ -43,6 +49,102 @@ export const EVENT_GALLERY_LIMITS = Object.freeze({
   inputFormats: [...INPUT_FORMATS],
   outputFormats: ["webp"],
 });
+
+function galleryAssetPrefix(slug: string) {
+  return `kendo-costa-rica-${slug}-`;
+}
+
+function galleryAssetStem(
+  slug: string,
+  label: string,
+  fingerprint: string,
+  date?: string,
+) {
+  const year = date?.match(/^\d{4}/)?.[0];
+  const yearSuffix = year && !slug.split("-").includes(year) ? `${year}-` : "";
+  return `${galleryAssetPrefix(slug)}${yearSuffix}${label}-${fingerprint.slice(0, 12)}`;
+}
+
+function galleryImages(gallery: EventGallery) {
+  return gallery.thumbnail
+    ? [...gallery.images, gallery.thumbnail]
+    : gallery.images;
+}
+
+function* imageVariants(image: EventGallery["images"][number]) {
+  yield { url: image.src, width: image.width };
+  for (const [, url, width] of image.srcSet.webp.matchAll(SRCSET_VARIANT))
+    yield { url, width: Number(width) };
+}
+
+async function normalizeGalleryAssetNames(
+  stage: string,
+  previous: Record<string, EventGallery>,
+  galleries: Record<string, EventGallery>,
+  events: NonNullable<GalleryOptions["events"]>,
+) {
+  const dates = new Map(events.map((event) => [event.slug, event.date]));
+  const renamed = new Map<string, string>();
+  for (const [slug, gallery] of Object.entries(galleries)) {
+    const prefix = galleryAssetPrefix(slug);
+    for (const image of galleryImages(gallery)) {
+      const position = String(image.order).padStart(2, "0");
+      const label =
+        image.kind === "flyer"
+          ? "afiche"
+          : image === gallery.thumbnail
+            ? "miniatura"
+            : `foto-${position}`;
+      const stem = galleryAssetStem(
+        slug,
+        label,
+        gallery.fingerprint,
+        dates.get(slug),
+      );
+      for (const { url, width } of imageVariants(image)) {
+        const match = EVENT_ASSET_URL.exec(url);
+        if (!match || match[1] !== slug || renamed.has(url)) continue;
+        const name = match[2];
+        if (
+          name.startsWith(prefix) &&
+          EVENT_ASSET_NAME.test(name.slice(prefix.length))
+        )
+          continue;
+        const fileName = `${stem}-${width}.webp`;
+        await copyFile(
+          path.join(stage, slug, name),
+          path.join(stage, slug, fileName),
+          constants.COPYFILE_EXCL,
+        );
+        renamed.set(url, `/images/events/${slug}/${fileName}`);
+      }
+    }
+  }
+
+  const currentUrls = new Set<string>();
+  for (const gallery of Object.values(galleries)) {
+    for (const image of galleryImages(gallery)) {
+      image.src = renamed.get(image.src) ?? image.src;
+      image.srcSet.webp = image.srcSet.webp.replace(
+        SRCSET_VARIANT,
+        (_match, url: string, width: string) =>
+          `${renamed.get(url) ?? url} ${width}w`,
+      );
+      for (const { url } of imageVariants(image)) currentUrls.add(url);
+    }
+  }
+  const oldUrls = new Set(renamed.keys());
+  for (const gallery of Object.values(previous))
+    for (const image of galleryImages(gallery))
+      for (const { url } of imageVariants(image)) oldUrls.add(url);
+
+  for (const url of oldUrls) {
+    const match = EVENT_ASSET_URL.exec(url);
+    if (match && !currentUrls.has(url))
+      await rm(path.join(stage, match[1], match[2]), { force: true });
+  }
+  return renamed.size > 0;
+}
 
 export function getDriveFolderId(albumUrl: string | undefined) {
   return DRIVE_FOLDER.exec(albumUrl ?? "")?.[1];
@@ -513,9 +615,14 @@ export async function synchronizeEventGalleries({
         const images = [];
         for (const [index, item] of selected.entries()) {
           const buffer = await readFile(item.inputPath);
-          const baseName = drive
-            ? `drive-${fingerprint.slice(0, 12)}-${index + 1}`
-            : `photo-${index + 1}`;
+          const position = String(index + 1).padStart(2, "0");
+          const label = item.flyer ? "afiche" : `foto-${position}`;
+          const baseName = galleryAssetStem(
+            event.slug,
+            label,
+            fingerprint,
+            event.date,
+          );
           const widths = WIDTHS.filter((width) => width <= item.width);
           if (!widths.includes(item.width) && item.width < WIDTHS.at(-1)!)
             widths.push(item.width);
@@ -572,19 +679,6 @@ export async function synchronizeEventGalleries({
             recursive: true,
             force: false,
           });
-          const previousAssets = await readdir(renderDirectory);
-          await Promise.all(
-            previousAssets
-              .filter(
-                (name) =>
-                  /^drive-[a-f0-9]{12}-\d+-\d+\.webp$/.test(name) &&
-                  !name.startsWith(`drive-${fingerprint.slice(0, 12)}-`) &&
-                  !retainedFlyer?.srcSet.webp.includes(
-                    `/images/events/${event.slug}/${name} `,
-                  ),
-              )
-              .map((name) => rm(path.join(renderDirectory, name))),
-          );
         }
         await replaceTransaction([
           { target: eventDirectory, staged: renderDirectory },
@@ -628,6 +722,14 @@ export async function synchronizeEventGalleries({
         });
       }
     }
+
+    const renamedAssets = await normalizeGalleryAssetNames(
+      stage,
+      previousGalleries,
+      nextGalleries,
+      events ?? [],
+    );
+    if (renamedAssets) hasGalleryChange = true;
 
     if (!hasGalleryChange && !hasStateChange) {
       await rm(stage, { recursive: true, force: true });
